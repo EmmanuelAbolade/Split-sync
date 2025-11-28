@@ -1,5 +1,5 @@
 // src/components/AddExpenseModal.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
@@ -36,37 +36,117 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Initialize selected members when modal opens
-  useState(() => {
-    if (isOpen && group?.members) {
-      const initial = {};
-      group.members.forEach(member => {
-        initial[member.userId] = true;
-      });
-      setSelectedMembers(initial);
+      // Initialize members when modal opens
+    useEffect(() => {
+      if (isOpen && group?.members) {
+        const initial = {};
+        group.members.forEach(member => {
+          initial[member.userId] = true;
+        });
+        setSelectedMembers(initial);
+        
+        // Initialize splits based on split method
+        const initialSplits = {};
+        if (splitMethod === 'percentage') {
+          // First member gets 100%, rest get 0%
+          group.members.forEach((member, index) => {
+            initialSplits[member.userId] = index === 0 ? '100.0' : '0.0';
+          });
+        } else if (splitMethod === 'shares') {
+          group.members.forEach(member => {
+            initialSplits[member.userId] = '1';
+          });
+        } else {
+          group.members.forEach(member => {
+            initialSplits[member.userId] = '';
+          });
+        }
+        setSplits(initialSplits);
+      }
+    }, [isOpen, splitMethod, group?.members]);
       
-      // Initialize splits
-      const initialSplits = {};
-      group.members.forEach(member => {
-        initialSplits[member.userId] = splitMethod === 'shares' ? '1' : '';
-      });
-      setSplits(initialSplits);
+    // Reinitialize splits when split method changes
+useEffect(() => {
+  if (!group?.members) return;
+  
+  const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
+  const newSplits = {};
+  
+  if (splitMethod === 'percentage') {
+    // First selected member gets 100%, rest get 0%
+    selected.forEach((userId, index) => {
+      newSplits[userId] = index === 0 ? '100.0' : '0.0';
+    });
+  } else if (splitMethod === 'shares') {
+    selected.forEach(userId => {
+      newSplits[userId] = '1';
+    });
+  } else {
+    selected.forEach(userId => {
+      newSplits[userId] = '';
+    });
+  }
+  
+  // ... reinitialize splits based on new method
+  setSplits(newSplits);
+}, [splitMethod]);
+
+    // toggleMember function
+    const toggleMember = (userId) => {
+        setSelectedMembers(prev => ({
+          ...prev,
+          [userId]: !prev[userId]
+        }));
+      };
+      
+      // updateSplit function (the one we just fixed)
+      const updateSplit = (userId, value) => {
+  if (splitMethod === 'percentage') {
+    // Allow free typing - don't format yet!
+    const numValue = value === '' ? 0 : parseFloat(value);
+    
+    // Don't restrict typing - let them type any number
+    // We'll validate on blur or submit
+    const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
+    
+    // Update this user's value (keep as string, no formatting!)
+    const newSplits = { ...splits };
+    newSplits[userId] = value; // Keep exact typed value
+    
+    // Calculate remaining for last member (only if value is valid)
+    if (!isNaN(numValue)) {
+      const lastMember = selected[selected.length - 1];
+      const otherMembers = selected.filter(id => id !== userId && id !== lastMember);
+      
+      const othersTotal = otherMembers.reduce((sum, id) => {
+        return sum + (parseFloat(newSplits[id]) || 0);
+      }, 0);
+      
+      // Calculate remaining
+      let remaining = 100 - numValue - othersTotal;
+      remaining = Math.max(0, Math.min(100, remaining));
+      
+      // Update last member (unless this IS the last member)
+      if (userId !== lastMember && selected.length > 1) {
+        newSplits[lastMember] = remaining.toFixed(1);
+      } else if (userId === lastMember && selected.length > 1) {
+        // If editing last member, adjust first member
+        const firstMember = selected[0];
+        if (userId !== firstMember) {
+          newSplits[firstMember] = remaining.toFixed(1);
+        }
+      }
     }
-  }, [isOpen]);
-
-  const toggleMember = (userId) => {
-    setSelectedMembers(prev => ({
-      ...prev,
-      [userId]: !prev[userId]
-    }));
-  };
-
-  const updateSplit = (userId, value) => {
+    
+    setSplits(newSplits);
+  } else {
+    // Other split methods
     setSplits(prev => ({
       ...prev,
       [userId]: value
     }));
-  };
+  }
+};
 
   const calculateSplits = () => {
     const amountNum = parseFloat(amount) || 0;
@@ -377,11 +457,14 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
                       step={splitMethod === 'percentage' ? '0.01' : splitMethod === 'shares' ? '1' : '0.01'}
                       value={splits[member.userId] || ''}
                       onChange={(e) => updateSplit(member.userId, e.target.value)}
+                    
                       placeholder={
                         splitMethod === 'percentage' ? '%' :
                         splitMethod === 'shares' ? 'shares' : 
                         group?.currency
                       }
+                      min={splitMethod === 'percentage' ? '0' : undefined}
+                      max={splitMethod === 'percentage' ? '100' : undefined}
                       className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -396,6 +479,26 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
               ))}
             </div>
           </div>
+
+          {/* Percentage Total Indicator */}
+        {splitMethod === 'percentage' && selected.length > 0 && (
+          <div className={`mt-2 p-2 rounded text-sm text-center font-medium ${
+            (() => {
+              const total = selected.reduce((sum, id) => sum + (parseFloat(splits[id]) || 0), 0);
+              const isValid = Math.abs(total - 100) < 0.01;
+              return isValid ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700';
+            })()
+          }`}>
+            {(() => {
+              const total = selected.reduce((sum, id) => sum + (parseFloat(splits[id]) || 0), 0);
+              const isValid = Math.abs(total - 100) < 0.01;
+              return isValid 
+                ? `✓ Total: ${total.toFixed(1)}% (Perfect!)` 
+                : `Total: ${total.toFixed(1)}% (Must equal 100%)`;
+            })()}
+          </div>
+        )}
+     
 
           {/* Summary */}
           {amount && selected.length > 0 && (

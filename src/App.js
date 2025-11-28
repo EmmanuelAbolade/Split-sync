@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebase';
 import { useAuthStore } from './stores/authStore';
-
+import JoinGroup from './pages/JoinGroup';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -56,6 +56,11 @@ function App() {
         <Route 
           path="/group/:groupId" 
           element={isAuthenticated ? <GroupDetails /> : <Navigate to="/login" />} 
+        />
+
+        <Route 
+          path="/invite/:groupId" 
+          element={isAuthenticated ? <JoinGroup /> : <Navigate to="/login" />} 
         />
 
         {/* Default Route */}
