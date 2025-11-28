@@ -1,0 +1,439 @@
+// src/components/AddExpenseModal.jsx
+import { useState } from 'react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { useAuthStore } from '../stores/authStore';
+
+const CATEGORIES = [
+  { id: 'food', name: 'Food & Dining' },
+  { id: 'transport', name: 'Transport' },
+  { id: 'accommodation', name: 'Accommodation' },
+  { id: 'entertainment', name: 'Entertainment' },
+  { id: 'shopping', name: 'Shopping' },
+  { id: 'utilities', name: 'Utilities' },
+  { id: 'other', name: 'Other' },
+];
+
+const SPLIT_METHODS = [
+  { id: 'equal', name: 'Equal Split', description: 'Split equally among members' },
+  { id: 'percentage', name: 'By Percentage', description: 'Custom percentage per person' },
+  { id: 'exact', name: 'Exact Amounts', description: 'Specific amount per person' },
+  { id: 'shares', name: 'By Shares', description: 'Proportional shares (e.g., 2x, 1x)' },
+];
+
+export default function AddExpenseModal({ isOpen, onClose, group }) {
+  const { user } = useAuthStore();
+  
+  const [title, setTitle] = useState('');
+  const [amount, setAmount] = useState('');
+  const [paidBy, setPaidBy] = useState(user?.uid || '');
+  const [category, setCategory] = useState('food');
+  const [description, setDescription] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [splitMethod, setSplitMethod] = useState('equal');
+  const [selectedMembers, setSelectedMembers] = useState({});
+  const [splits, setSplits] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Initialize selected members when modal opens
+  useState(() => {
+    if (isOpen && group?.members) {
+      const initial = {};
+      group.members.forEach(member => {
+        initial[member.userId] = true;
+      });
+      setSelectedMembers(initial);
+      
+      // Initialize splits
+      const initialSplits = {};
+      group.members.forEach(member => {
+        initialSplits[member.userId] = splitMethod === 'shares' ? '1' : '';
+      });
+      setSplits(initialSplits);
+    }
+  }, [isOpen]);
+
+  const toggleMember = (userId) => {
+    setSelectedMembers(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+  };
+
+  const updateSplit = (userId, value) => {
+    setSplits(prev => ({
+      ...prev,
+      [userId]: value
+    }));
+  };
+
+  const calculateSplits = () => {
+    const amountNum = parseFloat(amount) || 0;
+    const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
+    
+    if (selected.length === 0) return {};
+
+    const result = {};
+
+    switch (splitMethod) {
+      case 'equal':
+        const equalAmount = amountNum / selected.length;
+        selected.forEach(id => {
+          result[id] = equalAmount;
+        });
+        break;
+
+      case 'percentage':
+        selected.forEach(id => {
+          const percent = parseFloat(splits[id]) || 0;
+          result[id] = (amountNum * percent) / 100;
+        });
+        break;
+
+      case 'exact':
+        selected.forEach(id => {
+          result[id] = parseFloat(splits[id]) || 0;
+        });
+        break;
+
+      case 'shares':
+        const totalShares = selected.reduce((sum, id) => {
+          return sum + (parseFloat(splits[id]) || 1);
+        }, 0);
+        const perShare = amountNum / totalShares;
+        selected.forEach(id => {
+          const shares = parseFloat(splits[id]) || 1;
+          result[id] = perShare * shares;
+        });
+        break;
+    }
+
+    return result;
+  };
+
+  const validateSplits = () => {
+    const amountNum = parseFloat(amount) || 0;
+    const calculated = calculateSplits();
+    const total = Object.values(calculated).reduce((sum, val) => sum + val, 0);
+
+    if (splitMethod === 'percentage') {
+      const totalPercent = Object.keys(selectedMembers)
+        .filter(id => selectedMembers[id])
+        .reduce((sum, id) => sum + (parseFloat(splits[id]) || 0), 0);
+      
+      if (Math.abs(totalPercent - 100) > 0.01) {
+        return `Percentages must add up to 100% (currently ${totalPercent.toFixed(1)}%)`;
+      }
+    }
+
+    if (splitMethod === 'exact') {
+      if (Math.abs(total - amountNum) > 0.01) {
+        return `Split amounts must equal total (currently ${total.toFixed(2)} vs ${amountNum.toFixed(2)})`;
+      }
+    }
+
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation
+    if (!title.trim()) {
+      setError('Expense title is required');
+      return;
+    }
+
+    const amountNum = parseFloat(amount);
+    if (!amountNum || amountNum <= 0) {
+      setError('Valid amount is required');
+      return;
+    }
+
+    const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
+    if (selected.length === 0) {
+      setError('Select at least one member');
+      return;
+    }
+
+    const validationError = validateSplits();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const calculated = calculateSplits();
+      
+      const expenseData = {
+        groupId: group.id,
+        title: title.trim(),
+        amount: amountNum,
+        currency: group.currency,
+        paidBy,
+        category,
+        description: description.trim(),
+        date: new Date(date),
+        splitMethod,
+        splits: calculated,
+        participants: selected,
+        createdAt: serverTimestamp(),
+        createdBy: user.uid,
+      };
+
+      await addDoc(collection(db, 'expenses'), expenseData);
+      
+      // Reset form
+      setTitle('');
+      setAmount('');
+      setDescription('');
+      setDate(new Date().toISOString().split('T')[0]);
+      setSplitMethod('equal');
+      
+      onClose();
+    } catch (err) {
+      console.error('Error adding expense:', err);
+      setError('Failed to add expense. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  const calculated = calculateSplits();
+  const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
+
+  return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-4">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Add Expense</h2>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+          {/* Scrollable Content */}
+      <div className="overflow-y-auto p-6 pt-4"></div>
+        {/* Error */}
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Title & Amount */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Expense Title *
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g., Dinner at Restaurant"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Amount ({group?.currency}) *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0.00"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Paid By & Category */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Paid By *
+              </label>
+              <select
+                value={paidBy}
+                onChange={(e) => setPaidBy(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                required
+              >
+                {group?.members?.map((member) => (
+                  <option key={member.userId} value={member.userId}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Description & Date */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional notes..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Split Method */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Split Method
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {SPLIT_METHODS.map((method) => (
+                <button
+                  key={method.id}
+                  type="button"
+                  onClick={() => setSplitMethod(method.id)}
+                  className={`p-3 rounded-lg border-2 text-left transition ${
+                    splitMethod === method.id
+                      ? 'border-primary bg-primary-light'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-semibold text-sm">{method.name}</div>
+                  <div className="text-xs text-gray-600">{method.description}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Member Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Split Between
+            </label>
+            <div className="space-y-2 max-h-40 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+              {group?.members?.map((member) => (
+                <label
+                  key={member.userId}
+                  className="flex items-center gap-3 p-2 hover:bg-white rounded cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedMembers[member.userId] || false}
+                    onChange={() => toggleMember(member.userId)}
+                    className="w-4 h-4 text-primary"
+                  />
+                  <span className="flex-1">{member.name}</span>
+                  
+                  {selectedMembers[member.userId] && splitMethod !== 'equal' && (
+                    <input
+                      type="number"
+                      step={splitMethod === 'percentage' ? '0.01' : splitMethod === 'shares' ? '1' : '0.01'}
+                      value={splits[member.userId] || ''}
+                      onChange={(e) => updateSplit(member.userId, e.target.value)}
+                      placeholder={
+                        splitMethod === 'percentage' ? '%' :
+                        splitMethod === 'shares' ? 'shares' : 
+                        group?.currency
+                      }
+                      className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )}
+                  
+                  {selectedMembers[member.userId] && calculated[member.userId] !== undefined && (
+                    <span className="text-sm font-semibold text-gray-700">
+                      {group?.currency} {calculated[member.userId].toFixed(2)}
+                    </span>
+                  )}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary */}
+          {amount && selected.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-700">Total Amount:</span>
+                <span className="font-bold text-gray-900">
+                  {group?.currency} {parseFloat(amount).toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm mt-1">
+                <span className="text-gray-700">Split among:</span>
+                <span className="font-semibold text-gray-900">
+                  {selected.length} member{selected.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition disabled:opacity-50"
+            >
+              {loading ? 'Adding...' : 'Add Expense'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

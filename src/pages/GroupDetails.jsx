@@ -1,15 +1,18 @@
 // src/pages/GroupDetails.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { 
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag
 } from 'lucide-react';
+import AddExpenseModal from '../components/AddExpenseModal';
+import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
+import SettleUpModal from '../components/SettleUpModal';
 
 const ICON_MAP = {
   home: Home, plane: Plane, pizza: Pizza, party: PartyPopper,
@@ -23,6 +26,22 @@ function getIconComponent(iconName) {
   return ICON_MAP[iconName] || Home;
 }
 
+// Category icon mapping
+const CATEGORY_ICONS = {
+  food: UtensilsCrossed,
+  transport: Car,
+  accommodation: Home,
+  entertainment: PartyPopper,
+  shopping: ShoppingCart,
+  utilities: Lightbulb,
+  other: Tag,
+};
+
+function getCategoryIcon(category) {
+  return CATEGORY_ICONS[category] || Tag;
+}
+
+
 export default function GroupDetails() {
   const { groupId } = useParams();
   const navigate = useNavigate();
@@ -31,6 +50,11 @@ export default function GroupDetails() {
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showInviteLink, setShowInviteLink] = useState(false);
+  const [showAddExpense, setShowAddExpense] = useState(false);
+  const [selectedSettlement, setSelectedSettlement] = useState(null);
+  const [expenses, setExpenses] = useState([]);  
+  const [loadingExpenses, setLoadingExpenses] = useState(true);
+  
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -53,6 +77,38 @@ export default function GroupDetails() {
     fetchGroup();
   }, [groupId, navigate]);
 
+  // Fetch expenses in real-time
+useEffect(() => {
+  if (!groupId) return;
+
+  const expensesQuery = query(
+    collection(db, 'expenses'),
+    where('groupId', '==', groupId),
+  );
+
+  const unsubscribe = onSnapshot(expensesQuery, (snapshot) => {
+    const expensesData = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+     // Sort by date manually
+  expensesData.sort((a, b) => {
+    const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+    const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+    return dateB - dateA; // Newest first
+  });
+    
+    setExpenses(expensesData);
+    setLoadingExpenses(false);
+  }, (error) => {
+    console.error('Error fetching expenses:', error);
+    setLoadingExpenses(false);
+  });
+
+  return () => unsubscribe();
+}, [groupId]);
+
   const copyInviteLink = () => {
     const inviteLink = `${window.location.origin}/invite/${groupId}`;
     navigator.clipboard.writeText(inviteLink);
@@ -60,6 +116,8 @@ export default function GroupDetails() {
     setTimeout(() => setShowInviteLink(false), 3000);
   };
 
+  
+  // LOADING CHECK FIRST
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -71,10 +129,16 @@ export default function GroupDetails() {
     );
   }
 
+  // NULL CHECK SECOND
   if (!group) return null;
 
+  // Calculate balances (only if group exists)
+  const balances = calculateBalances(expenses, group.members || []);
+  const settlements = calculateSettlements(balances);
+  const userBalance = getUserBalanceSummary(balances, user.uid, group.members);
   const IconComponent = getIconComponent(group.icon);
 
+  // THEN RETURN JSX
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
@@ -86,7 +150,7 @@ export default function GroupDetails() {
           >
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">💰 SplitSync</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> SplitSync</h1>
         </div>
       </div>
 
@@ -122,14 +186,50 @@ export default function GroupDetails() {
             </button>
             <button
               className="flex-1 bg-primary text-white px-4 py-3 rounded-lg hover:bg-primary-hover transition flex items-center justify-center gap-2"
-              onClick={() => alert('Add Expense - Coming in Day 4!')}
+              onClick={() => setShowAddExpense(true)}
             >
               <Plus size={18} />
               Add Expense
             </button>
           </div>
+
+          {/* Balance Summary */}
+          {expenses.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className={`p-4 rounded-lg ${
+                userBalance.status === 'settled' ? 'bg-green-50' :
+                userBalance.status === 'owed' ? 'bg-blue-50' :
+                'bg-orange-50'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">{userBalance.message}</p>
+                    {userBalance.status !== 'settled' && (
+                      <p className="text-2xl font-bold mt-1">
+                        {group.currency} {userBalance.amount.toFixed(2)}
+                      </p>
+                    )}
+                    {userBalance.status === 'settled' && (
+                      <p className="text-lg font-semibold text-green-600 mt-1">
+                        ✓ All settled up!
+                      </p>
+                    )}
+                  </div>
+                  <div className={`text-4xl ${
+                    userBalance.status === 'settled' ? '✓' :
+                    userBalance.status === 'owed' ? '💰' :
+                    '⚠️'
+                  }`}>
+                    {userBalance.status === 'settled' ? '✅' :
+                     userBalance.status === 'owed' ? '💰' : '⚠️'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
+        
         {/* Members Section */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -169,25 +269,244 @@ export default function GroupDetails() {
             ))}
           </div>
         </div>
-
-        {/* Expenses Section - Placeholder */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Expenses</h3>
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4">📊</div>
-            <p className="text-gray-600 mb-2">No expenses yet</p>
-            <p className="text-sm text-gray-500 mb-4">
-              Add your first expense to start tracking
-            </p>
-            <button
-              onClick={() => alert('Add Expense - Coming in Day 4!')}
-              className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-hover transition"
-            >
-              Add First Expense
-            </button>
+        
+        {/* Settlements Section */}
+        {expenses.length > 0 && settlements.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Settlement Summary
+            </h3>
+            <div className="space-y-3">
+              {settlements.map((settlement, index) => {
+                const fromMember = group.members?.find(m => m.userId === settlement.from);
+                const toMember = group.members?.find(m => m.userId === settlement.to);
+                
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                        <span className="text-orange-600 font-semibold">
+                          {fromMember?.name?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">
+                          {fromMember?.name || 'Unknown'}
+                        </p>
+                        <p className="text-sm text-gray-500">owes</p>
+                      </div>
+                      <div className="mx-4">
+                        <p className="text-xl font-bold text-primary">
+                          {group.currency} {settlement.amount.toFixed(2)}
+                        </p>
+                      </div>
+                      <button
+                      onClick={() => setSelectedSettlement(settlement)}
+                      className="px-3 py-1 bg-success text-white text-sm rounded hover:opacity-90 transition"
+                      >
+                        Record
+                      </button>
+                      <div className="flex items-center gap-3 flex-1">
+                        <p className="text-sm text-gray-500 text-right">to</p>
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <span className="text-green-600 font-semibold">
+                            {toMember?.name?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {toMember?.name || 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {settlements.length === 0 && (
+              <div className="text-center py-6">
+                <p className="text-green-600 font-semibold">✓ Everyone is settled up!</p>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* Balances Breakdown */}
+        {expenses.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Individual Balances
+            </h3>
+            <div className="space-y-2">
+              {group.members?.map((member) => {
+                const balance = balances[member.userId] || 0;
+                const isSettled = Math.abs(balance) < 0.01;
+                
+                return (
+                  <div
+                    key={member.userId}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        isSettled ? 'bg-gray-200' :
+                        balance > 0 ? 'bg-green-100' : 'bg-orange-100'
+                      }`}>
+                        <span className={`font-semibold ${
+                          isSettled ? 'text-gray-600' :
+                          balance > 0 ? 'text-green-600' : 'text-orange-600'
+                        }`}>
+                          {member.name?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{member.name}</p>
+                        {member.userId === user.uid && (
+                          <span className="text-xs text-gray-500">(You)</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {isSettled ? (
+                        <span className="text-sm text-gray-500">Settled</span>
+                      ) : balance > 0 ? (
+                        <div>
+                          <p className="text-sm text-gray-600">gets back</p>
+                          <p className="font-bold text-green-600">
+                            {group.currency} {balance.toFixed(2)}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-gray-600">owes</p>
+                          <p className="font-bold text-orange-600">
+                            {group.currency} {Math.abs(balance).toFixed(2)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}   
+        
+        {/* Expenses Section */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+  <div>
+    <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
+    {expenses.length > 0 && (
+      <p className="text-sm text-gray-600 mt-1">
+        {expenses.length} expense{expenses.length !== 1 ? 's' : ''} • Total: {group.currency} {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
+      </p>
+    )}
+  </div>
+  <button
+    onClick={() => setShowAddExpense(true)}
+    className="text-primary text-sm font-medium flex items-center gap-1 hover:underline"
+  >
+    <Plus size={16} />
+    Add Expense
+  </button>
+</div>
+
+  {loadingExpenses ? (
+    <div className="text-center py-12">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+      <p className="mt-4 text-gray-600 text-sm">Loading expenses...</p>
+    </div>
+  ) : expenses.length === 0 ? (
+    <div className="text-center py-12">
+      <div className="text-4xl mb-4">📊</div>
+      <p className="text-gray-600 mb-2">No expenses yet</p>
+      <p className="text-sm text-gray-500 mb-4">
+        Add your first expense to start tracking
+      </p>
+      <button
+        onClick={() => setShowAddExpense(true)}
+        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-hover transition"
+      >
+        Add First Expense
+      </button>
+    </div>
+  ) : (
+    <div className="space-y-3">
+      {expenses.map((expense) => {
+        const payer = group.members?.find(m => m.userId === expense.paidBy);
+        const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
+
+        return (
+          <div
+            key={expense.id}
+            className="p-4 border border-gray-200 rounded-lg hover:border-primary transition cursor-pointer"
+          >
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-semibold text-gray-900">{expense.title}</h4>
+    
+                  {/* Category Icon Badge */}
+                  <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded">
+                    {(() => {
+                      const CategoryIcon = getCategoryIcon(expense.category);
+                      return <CategoryIcon size={14} className="text-gray-600" />;
+                    })()}
+                    <span className="text-xs text-gray-600 capitalize">{expense.category}</span>
+                  </div>
+                </div>
+  
+                <p className="text-sm text-gray-600">
+                  Paid by {payer?.name || 'Unknown'}
+                </p>
+                {expense.description && (
+                  <p className="text-sm text-gray-500 mt-1">{expense.description}</p>
+                  )}
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-gray-900">
+                  {expense.currency} {expense.amount.toFixed(2)}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {expenseDate.toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+              <Users size={14} className="text-gray-400" />
+              <span className="text-sm text-gray-600">
+                Split {expense.splitMethod} among {expense.participants?.length || 0} member
+                {expense.participants?.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</div>
+
       </div>
+      {/* Add Expense Modal */}
+      <AddExpenseModal
+        isOpen={showAddExpense}
+        onClose={() => setShowAddExpense(false)}
+        group={group}
+      />
+      {/* Settle Up Modal */}
+      <SettleUpModal
+        isOpen={!!selectedSettlement}
+        onClose={() => setSelectedSettlement(null)}
+        settlement={selectedSettlement}
+        group={group}
+      />
     </div>
   );
 }

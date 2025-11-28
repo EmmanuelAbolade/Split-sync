@@ -31,7 +31,7 @@ export default function IconSelector({ selected, onSelect }) {
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Choose Icon
       </label>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
         {ICONS.map(({ name, Icon, label }) => {
           const isSelected = selected === name;
           return (

@@ -5,7 +5,7 @@ import { getFirestore } from 'firebase/firestore';
 
 // YOUR Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDnfSNZQ8AB8hE1KWBKBIfPNWxw2FMdJ80",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "splitsync-dev.firebaseapp.com",
   projectId: "splitsync-dev",
   storageBucket: "splitsync-dev.firebasestorage.app",

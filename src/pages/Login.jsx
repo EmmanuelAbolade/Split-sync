@@ -63,7 +63,7 @@ export default function Login() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">💰 SplitSync</h1>
+          <h1 className="text-3xl font-bold text-gray-900"> SplitSync</h1>
           <p className="text-gray-600 mt-2">Share expenses simply</p>
         </div>
 
