@@ -1,4 +1,6 @@
 // src/components/AddExpenseModal.jsx
+import ReceiptScanner from './ReceiptScanner';
+import { Camera } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -35,7 +37,8 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
   const [splits, setSplits] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showReceiptScanner, setShowReceiptScanner] = useState(false);
       // Initialize members when modal opens
     useEffect(() => {
       if (isOpen && group?.members) {
@@ -203,7 +206,7 @@ useEffect(() => {
         .reduce((sum, id) => sum + (parseFloat(splits[id]) || 0), 0);
       
       if (Math.abs(totalPercent - 100) > 0.01) {
-        return `Percentages must add up to 100% (currently ${totalPercent.toFixed(1)}%)`;
+        return `Percentages must add up to exactly100% (currently ${totalPercent.toFixed(1)}%)`;
       }
     }
 
@@ -228,7 +231,12 @@ useEffect(() => {
 
     const amountNum = parseFloat(amount);
     if (!amountNum || amountNum <= 0) {
-      setError('Valid amount is required');
+      setError('Please enter a valid amount greater than 0');
+      return;
+    }
+
+    if (amountNum > 1000000) {
+      setError('Amount cannot exceed €1,000,000');
       return;
     }
 
@@ -244,6 +252,12 @@ useEffect(() => {
       return;
     }
 
+    // Show confirmation instead of submitting immediately
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setShowConfirmation(false);
     setLoading(true);
 
     try {
@@ -252,7 +266,7 @@ useEffect(() => {
       const expenseData = {
         groupId: group.id,
         title: title.trim(),
-        amount: amountNum,
+        amount: parseFloat(amount),
         currency: group.currency,
         paidBy,
         category,
@@ -260,7 +274,7 @@ useEffect(() => {
         date: new Date(date),
         splitMethod,
         splits: calculated,
-        participants: selected,
+        participants: Object.keys(selectedMembers).filter(id => selectedMembers[id]),
         createdAt: serverTimestamp(),
         createdBy: user.uid,
       };
@@ -283,16 +297,118 @@ useEffect(() => {
     }
   };
 
+
+  const handleReceiptData = (data) => {
+    // Pre-fill form with extracted data
+    if (data.title) setTitle(data.title);
+    if (data.amount) setAmount(data.amount);
+    if (data.date) setDate(data.date);
+    
+    // Close scanner
+    setShowReceiptScanner(false);
+  };
+
+
   if (!isOpen) return null;
 
   const calculated = calculateSplits();
   const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
 
+  // Confirmation view
+  if (showConfirmation) {
+    const payer = group?.members?.find(m => m.userId === paidBy);
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg max-w-md w-full p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Confirm Expense</h2>
+          
+          <div className="space-y-3 mb-6">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">{title}</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Amount:</span>
+                  <span className="font-semibold text-gray-900">{group?.currency} {parseFloat(amount).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Paid by:</span>
+                  <span className="font-semibold text-gray-900">{payer?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Category:</span>
+                  <span className="font-semibold text-gray-900 capitalize">{category}</span>
+                </div>
+                {description && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Description:</span>
+                    <span className="font-semibold text-gray-900">{description}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Split method:</span>
+                  <span className="font-semibold text-gray-900 capitalize">{splitMethod}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-2">Split Details:</h4>
+              <div className="space-y-1">
+                {selected.map(userId => {
+                  const member = group?.members?.find(m => m.userId === userId);
+                  const amount = calculated[userId];
+                  return (
+                    <div key={userId} className="flex justify-between text-sm">
+                      <span className="text-gray-700">{member?.name}</span>
+                      <span className="font-semibold text-gray-900">
+                        {group?.currency} {amount?.toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            Are you sure you want to add this expense?
+          </p>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowConfirmation(false)}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={handleConfirmSubmit}
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition disabled:opacity-50"
+            >
+              {loading ? 'Adding...' : 'Confirm & Add'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  
   return (
+    <>
+    {/* Receipt Scanner - NOW PROPERLY INSIDE RETURN */}
+    <ReceiptScanner
+      isOpen={showReceiptScanner}
+      onClose={() => setShowReceiptScanner(false)}
+      onDataExtracted={handleReceiptData}
+    />
+
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-4">
             {/* Header */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-900">Add Expense</h2>
               <button
                 onClick={onClose}
@@ -301,6 +417,20 @@ useEffect(() => {
                 ✕
               </button>
             </div>
+           {/* Scan Receipt Button */}
+            <button
+              type="button"
+              onClick={() => {
+                console.log('🔵 Button clicked!');
+                console.log('🔵 Current showReceiptScanner:', showReceiptScanner);
+                setShowReceiptScanner(true);
+                console.log('🔵 Set showReceiptScanner to true');
+              }}
+              className="w-full mb-4 px-4 py-3 bg-blue-50 border-2 border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition flex items-center justify-center gap-2 font-medium"
+            >
+              <Camera size={20} />
+              Scan Receipt (Auto-fill)
+            </button>
 
           {/* Scrollable Content */}
       <div className="overflow-y-auto p-6 pt-4"></div>
@@ -323,7 +453,9 @@ useEffect(() => {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                onBlur={(e) => setTitle(e.target.value.trim())}
                 placeholder="e.g., Dinner at Restaurant"
+                maxLength="100"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                 required
               />
@@ -335,8 +467,22 @@ useEffect(() => {
               <input
                 type="number"
                 step="0.01"
+                min="0.01"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow empty or valid numbers with max 2 decimals
+                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                    setAmount(value);
+                  }
+                }}
+                onBlur={(e) => {
+                  // Format to 2 decimals when user leaves field
+                  if (e.target.value && !isNaN(e.target.value)) {
+                    const formatted = parseFloat(e.target.value).toFixed(2);
+                    setAmount(formatted);
+                  }
+                }}
                 placeholder="0.00"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                 required
@@ -456,16 +602,67 @@ useEffect(() => {
                       type="number"
                       step={splitMethod === 'percentage' ? '0.01' : splitMethod === 'shares' ? '1' : '0.01'}
                       value={splits[member.userId] || ''}
-                      onChange={(e) => updateSplit(member.userId, e.target.value)}
-                    
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        
+                        // Validation based on split method
+                        if (splitMethod === 'shares') {
+                          // Shares: only positive integers
+                          if (value === '' || /^\d+$/.test(value)) {
+                            const num = parseInt(value);
+                            if (value === '' || (num > 0 && num <= 100)) {
+                              updateSplit(member.userId, value);
+                            }
+                          }
+                        } else if (splitMethod === 'exact') {
+                          // Exact amounts: max 2 decimals, positive only
+                          if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                            updateSplit(member.userId, value);
+                          }
+                        } else {
+                          // Percentage: handled by updateSplit function
+                          updateSplit(member.userId, value);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const value = e.target.value;
+                        
+                        // Format on blur
+                        if (splitMethod === 'percentage' && value) {
+                          const num = parseFloat(value);
+                          if (!isNaN(num)) {
+                            const formatted = Math.max(0, Math.min(100, num)).toFixed(1);
+                            updateSplit(member.userId, formatted);
+                          }
+                        } else if (splitMethod === 'exact' && value) {
+                          const num = parseFloat(value);
+                          if (!isNaN(num) && num > 0) {
+                            const formatted = num.toFixed(2);
+                            updateSplit(member.userId, formatted);
+                          }
+                        } else if (splitMethod === 'shares' && value) {
+                          const num = parseInt(value);
+                          if (!isNaN(num) && num > 0) {
+                            updateSplit(member.userId, num.toString());
+                          }
+                        }
+                      }}
                       placeholder={
                         splitMethod === 'percentage' ? '%' :
                         splitMethod === 'shares' ? 'shares' : 
                         group?.currency
                       }
-                      min={splitMethod === 'percentage' ? '0' : undefined}
-                      max={splitMethod === 'percentage' ? '100' : undefined}
-                      className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                      min={
+                        splitMethod === 'percentage' ? '0' :
+                        splitMethod === 'shares' ? '1' :
+                        '0.01'
+                      }
+                      max={
+                        splitMethod === 'percentage' ? '100' :
+                        splitMethod === 'shares' ? '100' :
+                        undefined
+                      }
+                      className="w-24 px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary"
                       onClick={(e) => e.stopPropagation()}
                     />
                   )}
@@ -538,5 +735,6 @@ useEffect(() => {
         </form>
       </div>
     </div>
+    </>
   );
 }

@@ -6,11 +6,12 @@ import { getFirestore } from 'firebase/firestore';
 // YOUR Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: "splitsync-dev.firebaseapp.com",
-  projectId: "splitsync-dev",
-  storageBucket: "splitsync-dev.firebasestorage.app",
-  messagingSenderId: "581596264864",
-  appId: "1:581596264864:web:a6d937458258abec604cc5",
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
