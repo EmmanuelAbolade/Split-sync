@@ -142,7 +142,7 @@ useEffect(() => {
 
   // THEN RETURN JSX
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Top Bar */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">

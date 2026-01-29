@@ -1,5 +1,5 @@
-// src/App.js
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+// src/App.js - WITH BOTTOM NAVIGATION
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebase';
@@ -9,6 +9,26 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import GroupDetails from './pages/GroupDetails';
+import Activity from './pages/Activity';
+import Profile from './pages/Profile';
+import QuickAdd from './pages/QuickAdd';
+import BottomNav from './components/BottomNav';
+
+// Layout wrapper for protected routes with bottom nav
+function ProtectedLayout({ children }) {
+  const location = useLocation();
+  
+  // Hide bottom nav on group details and invite pages
+  const hideBottomNav = location.pathname.startsWith('/group/') || 
+                       location.pathname.startsWith('/invite/');
+  
+  return (
+    <>
+      {children}
+      {!hideBottomNav && <BottomNav />}
+    </>
+  );
+}
 
 function App() {
   const { setUser, setLoading, isAuthenticated, loading } = useAuthStore();
@@ -48,19 +68,84 @@ function App() {
           element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
         />
 
-        {/* Protected Routes */}
+        {/* Protected Routes with Bottom Nav */}
         <Route 
           path="/dashboard" 
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <Dashboard />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
         />
+        
+        <Route 
+          path="/activity" 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <Activity />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        
+        <Route 
+          path="/add" 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <QuickAdd />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        
+        <Route 
+          path="/profile" 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <Profile />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+
+        {/* Group details - no bottom nav */}
         <Route 
           path="/group/:groupId" 
-          element={isAuthenticated ? <GroupDetails /> : <Navigate to="/login" />} 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <GroupDetails />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
         />
 
         <Route 
           path="/invite/:groupId" 
-          element={isAuthenticated ? <JoinGroup /> : <Navigate to="/login" />} 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <JoinGroup />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
         />
 
         {/* Default Route */}
