@@ -13,6 +13,7 @@ import {
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
 import SettleUpModal from '../components/SettleUpModal';
+import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 
 const ICON_MAP = {
   home: Home, plane: Plane, pizza: Pizza, party: PartyPopper,
@@ -50,6 +51,7 @@ export default function GroupDetails() {
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showInviteLink, setShowInviteLink] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [selectedSettlement, setSelectedSettlement] = useState(null);
   const [expenses, setExpenses] = useState([]);  
@@ -269,7 +271,7 @@ useEffect(() => {
             ))}
           </div>
         </div>
-        
+
         {/* Settlements Section */}
         {expenses.length > 0 && settlements.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -280,6 +282,11 @@ useEffect(() => {
               {settlements.map((settlement, index) => {
                 const fromMember = group.members?.find(m => m.userId === settlement.from);
                 const toMember = group.members?.find(m => m.userId === settlement.to);
+                
+                // Determine if current user is involved
+                const userIsPaying = user.uid === settlement.from;
+                const userIsReceiving = user.uid === settlement.to;
+                const userIsInvolved = userIsPaying || userIsReceiving;
                 
                 return (
                   <div
@@ -303,12 +310,27 @@ useEffect(() => {
                           {group.currency} {settlement.amount.toFixed(2)}
                         </p>
                       </div>
-                      <button
-                      onClick={() => setSelectedSettlement(settlement)}
-                      className="px-3 py-1 bg-success text-white text-sm rounded hover:opacity-90 transition"
-                      >
-                        Record
-                      </button>
+                      
+                      {/* IMPROVED BUTTON LOGIC */}
+                      {userIsInvolved && (
+                        <button
+                          onClick={() => setSelectedSettlement(settlement)}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
+                            userIsPaying
+                              ? 'bg-primary text-white hover:bg-primary-hover'
+                              : 'bg-success text-white hover:opacity-90'
+                          }`}
+                        >
+                          {userIsPaying ? `Pay ${group.currency}${settlement.amount.toFixed(2)}` : 'Mark as Received'}
+                        </button>
+                      )}
+                      
+                      {!userIsInvolved && (
+                        <span className="px-4 py-2 text-sm text-gray-400 italic">
+                          Not involved
+                        </span>
+                      )}
+                      
                       <div className="flex items-center gap-3 flex-1">
                         <p className="text-sm text-gray-500 text-right">to</p>
                         <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -335,6 +357,7 @@ useEffect(() => {
             )}
           </div>
         )}
+
 
         {/* Balances Breakdown */}
         {expenses.length > 0 && (
@@ -445,6 +468,7 @@ useEffect(() => {
         return (
           <div
             key={expense.id}
+            onClick={() => setSelectedExpense(expense)}
             className="p-4 border border-gray-200 rounded-lg hover:border-primary transition cursor-pointer"
           >
             <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
@@ -505,6 +529,15 @@ useEffect(() => {
         isOpen={!!selectedSettlement}
         onClose={() => setSelectedSettlement(null)}
         settlement={selectedSettlement}
+        group={group}
+        currentUserId={user.uid}
+      />
+
+      {/* Expense Details Modal */}
+      <ExpenseDetailsModal
+        isOpen={!!selectedExpense}
+        onClose={() => setSelectedExpense(null)}
+        expense={selectedExpense}
         group={group}
       />
     </div>
