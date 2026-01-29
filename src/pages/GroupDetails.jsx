@@ -198,16 +198,16 @@ useEffect(() => {
           {/* Balance Summary */}
           {expenses.length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className={`p-4 rounded-lg ${
-                userBalance.status === 'settled' ? 'bg-green-50' :
-                userBalance.status === 'owed' ? 'bg-blue-50' :
-                'bg-orange-50'
+              <div className={`p-6 rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 ${
+                userBalance.status === 'settled' ? 'bg-gradient-to-br from-green-50 to-emerald-100' :
+                userBalance.status === 'owed' ? 'bg-gradient-to-br from-blue-50 to-indigo-100' :
+                'bg-gradient-to-br from-orange-50 to-amber-100'
               }`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">{userBalance.message}</p>
                     {userBalance.status !== 'settled' && (
-                      <p className="text-2xl font-bold mt-1">
+                      <p className="text-2xl font-bold mt-1 transition-all duration-300 hover:scale-110">
                         {group.currency} {userBalance.amount.toFixed(2)}
                       </p>
                     )}
@@ -233,7 +233,7 @@ useEffect(() => {
 
         
         {/* Members Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Members</h3>
             <button
@@ -249,7 +249,7 @@ useEffect(() => {
             {group.members?.map((member, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-white rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:scale-[1.02]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center">
@@ -274,7 +274,7 @@ useEffect(() => {
 
         {/* Settlements Section */}
         {expenses.length > 0 && settlements.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Settlement Summary
             </h3>
@@ -291,7 +291,7 @@ useEffect(() => {
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 border border-gray-100"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -317,7 +317,7 @@ useEffect(() => {
                           onClick={() => setSelectedSettlement(settlement)}
                           className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
                             userIsPaying
-                              ? 'bg-primary text-white hover:bg-primary-hover'
+                              ? 'bg-gradient-to-r from-primary to-primary-dark text-white hover:shadow-card-hover transition-all duration-300 transform hover:scale-105'
                               : 'bg-success text-white hover:opacity-90'
                           }`}
                         >
@@ -361,7 +361,7 @@ useEffect(() => {
 
         {/* Balances Breakdown */}
         {expenses.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Individual Balances
             </h3>
@@ -433,7 +433,7 @@ useEffect(() => {
   </div>
   <button
     onClick={() => setShowAddExpense(true)}
-    className="text-primary text-sm font-medium flex items-center gap-1 hover:underline"
+    className="text-primary text-sm font-medium flex items-center gap-1 hover:underline transition-all duration-300 transform hover:scale-105"
   >
     <Plus size={16} />
     Add Expense
@@ -469,7 +469,7 @@ useEffect(() => {
           <div
             key={expense.id}
             onClick={() => setSelectedExpense(expense)}
-            className="p-4 border border-gray-200 rounded-lg hover:border-primary transition cursor-pointer"
+            className="p-4 border border-gray-200 rounded-lg hover:border-primary transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover cursor-pointer bg-white shadow-card"
           >
             <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
               <div className="flex-1">

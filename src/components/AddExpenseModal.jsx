@@ -319,8 +319,8 @@ useEffect(() => {
     const payer = group?.members?.find(m => m.userId === paidBy);
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-md w-full p-6">
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
+        <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Confirm Expense</h2>
           
           <div className="space-y-3 mb-6">

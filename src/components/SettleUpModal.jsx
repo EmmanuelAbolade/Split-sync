@@ -141,8 +141,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   if (paymentSuccess) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-md w-full p-6 text-center">
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
+        <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in text-center">
           <div className="flex justify-end mb-2">
             <button
               onClick={onClose}
@@ -174,8 +174,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   // Confirmation screen for receivers
   if (showConfirmation && userIsReceiving) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-md w-full p-6">
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
+        <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Confirm Payment</h2>
             <button
@@ -227,8 +227,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
+      <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
             {userIsPaying ? 'Pay Settlement' : 'Mark as Received'}

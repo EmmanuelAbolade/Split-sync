@@ -118,7 +118,7 @@ export default function Dashboard() {
             <h3 className="text-xl font-semibold text-gray-900">Your Groups</h3>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-hover transition flex items-center gap-2"
+              className="bg-gradient-to-r from-primary to-primary-dark text-white px-4 py-2 rounded-lg hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
             >
               <span className="text-xl">+</span>
               Create Group
@@ -145,7 +145,7 @@ export default function Dashboard() {
               </p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-hover transition"
+                className="bg-gradient-to-r from-primary to-primary-dark text-white px-4 py-2 rounded-lg hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 Create Your First Group
               </button>
@@ -155,16 +155,17 @@ export default function Dashboard() {
           {/* Groups Grid */}
             {!loading && groups.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {groups.map((group) => {
+                {groups.map((group, index) => {
                     const IconComponent = getIconComponent(group.icon);
                 return (
                     <div
-                    key={group.id}
-                    onClick={() => navigate(`/group/${group.id}`)}
-                    className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6 cursor-pointer border border-gray-100 hover:border-primary"
+                      key={group.id}
+                      onClick={() => navigate(`/group/${group.id}`)}
+                      className="group bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-2 active:translate-y-0 p-6 cursor-pointer border border-gray-100 hover:border-primary animate-slide-up"
+                      style={{ animationDelay: `${index * 50}ms` }}
                     >
                     <div className="flex items-start gap-4 mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-hover rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center flex-shrink-0 shadow-card transform transition-transform group-hover:scale-110 group-hover:rotate-6">
                         <IconComponent className="text-white" size={28} />
                         </div>
                         <div className="flex-1 min-w-0">
