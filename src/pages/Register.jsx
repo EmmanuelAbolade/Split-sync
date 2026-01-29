@@ -1,4 +1,4 @@
-// src/pages/Register.jsx
+// src/pages/Register.jsx - UPDATED WITH FIRST LOGIN FLAG
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
@@ -47,7 +47,10 @@ export default function Register() {
       await setDoc(doc(db, 'users', result.user.uid), {
         fullName,
         email,
+        photoURL: null,
+        isFirstLogin: true, // ← NEW: Track first login
         createdAt: new Date(),
+        updatedAt: new Date(),
       });
 
       setUser(result.user);

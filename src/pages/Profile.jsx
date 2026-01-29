@@ -10,11 +10,13 @@ import {
   TrendingUp, TrendingDown, Users, Wallet 
 } from 'lucide-react';
 import { calculateBalances } from '../utils/balanceCalculator';
+import { doc, getDoc } from 'firebase/firestore';
+import CloudinaryUpload from '../components/CloudinaryUpload';
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  
+  const [userData, setUserData] = useState(null);
   const [groups, setGroups] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +62,28 @@ export default function Profile() {
 
     return () => unsubscribe();
   }, [user, groups]);
+
+  // fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user) return;
+      
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        }
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+    
+    fetchUserData();
+  }, [user]);
+
+  const handlePhotoUpdated = (photoURL) => {
+    setUserData(prev => ({ ...prev, photoURL }));
+  };
 
   // Calculate overall balance across all groups
   const calculateOverallBalance = () => {
@@ -111,11 +135,11 @@ export default function Profile() {
       <div className="bg-gradient-to-br from-primary to-primary-dark text-white shadow-card-3d">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 bg-white bg-opacity-20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 shadow-card-hover">
-              <span className="text-5xl font-bold text-white">
-                {user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <CloudinaryUpload
+              user={user}
+              currentPhotoURL={userData?.photoURL}
+              onPhotoUpdated={handlePhotoUpdated}
+            />
             <h1 className="text-2xl font-bold mb-1">
               {user?.displayName || 'User'}
             </h1>

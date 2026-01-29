@@ -68,6 +68,9 @@ export default function BottomNav() {
               );
             }
 
+
+            
+
             return (
               <button
                 key={tab.id}

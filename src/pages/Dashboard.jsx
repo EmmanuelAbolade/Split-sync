@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import CreateGroupModal from '../components/CreateGroupModal';
 import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift } from 'lucide-react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -33,12 +34,41 @@ function getIconComponent(iconName) {
 }
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Fetch user data
+useEffect(() => {
+  const fetchUserData = async () => {
+    if (!user) return;
+    
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setUserData(data);
+        
+        // Mark first login as complete
+        if (data.isFirstLogin) {
+          await updateDoc(doc(db, 'users', user.uid), {
+            isFirstLogin: false,
+            lastLoginAt: new Date(),
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+    }
+  };
+  
+  fetchUserData();
+}, [user]);
+  
+  
   // Fetch user's groups in real-time
   useEffect(() => {
     if (!user) return;
@@ -81,7 +111,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Top Bar */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -104,12 +134,36 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Welcome */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.displayName || 'there'}! 
-          </h2>
-          <p className="text-gray-600">
-            Manage your shared expenses and settle up with friends
-          </p>
+          <div className="flex items-center gap-4 mb-4">
+            {/* Profile Photo */}
+            <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover">
+              {userData?.photoURL ? (
+                <img
+                  src={userData.photoURL}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
+                    {user?.displayName?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900">
+                {userData?.isFirstLogin === false 
+                  ? `Welcome back, ${user?.displayName || 'there'}!`
+                  : `Welcome, ${user?.displayName || 'there'}!`
+                }
+              </h2>
+              <p className="text-gray-600">
+                Manage your shared expenses and settle up with friends
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Your Groups Section */}
