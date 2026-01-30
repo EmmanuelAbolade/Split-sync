@@ -13,6 +13,7 @@ import Activity from './pages/Activity';
 import Profile from './pages/Profile';
 import QuickAdd from './pages/QuickAdd';
 import BottomNav from './components/BottomNav';
+import ForgotPassword from './pages/ForgotPassword';
 
 // Layout wrapper for protected routes with bottom nav
 function ProtectedLayout({ children }) {
@@ -80,6 +81,11 @@ function App() {
               <Navigate to="/login" />
             )
           } 
+        />
+
+        <Route 
+          path="/forgot-password" 
+          element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} 
         />
         
         <Route 

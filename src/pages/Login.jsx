@@ -103,6 +103,7 @@ export default function Login() {
               placeholder="••••••••"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               required
+              minLength={8}
             />
           </div>
 
@@ -112,8 +113,12 @@ export default function Login() {
               <input type="checkbox" className="mr-2" />
               <span className="text-gray-600">Remember me</span>
             </label>
-            <button type="button" className="text-primary hover:underline">
-              Forgot password?
+            <button
+              type="button"
+              onClick={() => navigate('/forgot-password')}
+              className="text-sm text-primary hover:underline"
+            >
+              Forgot Password?
             </button>
           </div>
 

@@ -4,6 +4,8 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import IconSelector from './IconSelector';
+import { useRef } from 'react';
+import { useKeyboardAware } from '../hooks/useKeyboardAware';
 
 export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   const [groupName, setGroupName] = useState('');
@@ -68,6 +70,19 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
       setLoading(false);
     }
   };
+
+  function MyForm() {
+    const amountInputRef = useRef(null);
+    useKeyboardAware(amountInputRef);
+
+    return (
+      <input
+        ref={amountInputRef}
+        type="number"
+        // ... other props
+      />
+    );
+  }
 
   if (!isOpen) return null;
 

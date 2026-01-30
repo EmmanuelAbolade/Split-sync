@@ -4,6 +4,8 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle } from 'lucide-react';
+import { useRef } from 'react';
+import { useKeyboardAware } from '../hooks/useKeyboardAware';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
   const [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || '');
@@ -37,7 +39,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         date: new Date(),
         splitMethod: 'exact',
         splits: {
-          [settlement.from]: -amountNum,
+          
           [settlement.to]: amountNum,
         },
         participants: [settlement.from, settlement.to],
@@ -55,6 +57,19 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       throw err;
     }
   };
+
+  function MyForm() {
+    const amountInputRef = useRef(null);
+    useKeyboardAware(amountInputRef);
+
+    return (
+      <input
+        ref={amountInputRef}
+        type="number"
+        // ... other props
+      />
+    );
+  }
 
   const handleManualSettle = async (e) => {
     e.preventDefault();

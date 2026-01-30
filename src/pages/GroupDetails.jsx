@@ -111,11 +111,28 @@ useEffect(() => {
   return () => unsubscribe();
 }, [groupId]);
 
-  const copyInviteLink = () => {
+  const copyInviteLink = async () => {
     const inviteLink = `${window.location.origin}/invite/${groupId}`;
-    navigator.clipboard.writeText(inviteLink);
-    setShowInviteLink(true);
-    setTimeout(() => setShowInviteLink(false), 3000);
+    
+    // Try clipboard API first (works on localhost and HTTPS)
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(inviteLink);
+        setShowInviteLink(true);
+        setTimeout(() => setShowInviteLink(false), 3000);
+      } catch (err) {
+        console.error('Clipboard write failed:', err);
+        // Show link for manual copy
+        alert(`Copy this link:\n\n${inviteLink}`);
+      }
+    } else {
+      // Fallback for mobile/HTTP - show link to manually copy
+      const copied = prompt('Copy this invite link:', inviteLink);
+      if (copied !== null) {
+        setShowInviteLink(true);
+        setTimeout(() => setShowInviteLink(false), 3000);
+      }
+    }
   };
 
   
@@ -274,7 +291,7 @@ useEffect(() => {
 
         {/* Settlements Section */}
         {expenses.length > 0 && settlements.length > 0 && (
-          <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6">
+          <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6 overflow-hidden">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Settlement Summary
             </h3>
@@ -291,7 +308,7 @@ useEffect(() => {
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 border border-gray-100"
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 border border-gray-100 flex-wrap gap-2"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -300,7 +317,7 @@ useEffect(() => {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-900 truncate max-w-[120px]">
                           {fromMember?.name || 'Unknown'}
                         </p>
                         <p className="text-sm text-gray-500">owes</p>
@@ -339,7 +356,7 @@ useEffect(() => {
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-gray-900 truncate max-w-[120px]">
                             {toMember?.name || 'Unknown'}
                           </p>
                         </div>

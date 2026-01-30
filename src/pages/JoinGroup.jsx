@@ -16,6 +16,7 @@ export default function JoinGroup() {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
   const [alreadyMember, setAlreadyMember] = useState(false);
+  const [inviterName, setInviterName] = useState(''); // ✅ ADDED
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -35,6 +36,14 @@ export default function JoinGroup() {
 
         const groupData = { id: groupDoc.id, ...groupDoc.data() };
         setGroup(groupData);
+
+        // ✅ ADDED: Get inviter name
+        const creatorMember = groupData.members?.find(
+          m => m.userId === groupData.createdBy
+        );
+        if (creatorMember) {
+          setInviterName(creatorMember.name);
+        }
 
         // Check if user is already a member
         const isMember = groupData.memberIds?.includes(user.uid);
@@ -149,8 +158,17 @@ export default function JoinGroup() {
           <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-4">
             <Users className="text-primary" size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Group</h1>
-          <p className="text-gray-600">You've been invited to join</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {/* ✅ CHANGED: Show inviter name */}
+            {inviterName ? 'You\'re Invited!' : 'Join Group'}
+          </h1>
+          <p className="text-gray-600">
+            {/* ✅ CHANGED: Personalized message */}
+            {inviterName 
+              ? `${inviterName} invited you to join` 
+              : 'You\'ve been invited to join'
+            }
+          </p>
         </div>
 
         {error && (
@@ -171,6 +189,12 @@ export default function JoinGroup() {
             <span className="mx-2">•</span>
             <span className="text-sm">{group?.currency}</span>
           </div>
+          {/* ✅ ADDED: Show inviter wants to share with you */}
+          {inviterName && (
+            <p className="text-center text-sm text-gray-500 mt-2">
+              {inviterName} wants to share expenses with you
+            </p>
+          )}
         </div>
 
         <div className="space-y-3 mb-6">

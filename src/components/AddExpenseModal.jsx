@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
+import { useRef } from 'react';
+import { useKeyboardAware } from '../hooks/useKeyboardAware';
 
 const CATEGORIES = [
   { id: 'food', name: 'Food & Dining' },
@@ -67,32 +69,46 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
         setSplits(initialSplits);
       }
     }, [isOpen, splitMethod, group?.members]);
+
+
+    function MyForm() {
+      const amountInputRef = useRef(null);
+      useKeyboardAware(amountInputRef);
+
+      return (
+        <input
+          ref={amountInputRef}
+          type="number"
+          // ... other props
+        />
+      );
+    }
       
     // Reinitialize splits when split method changes
-useEffect(() => {
-  if (!group?.members) return;
-  
-  const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
-  const newSplits = {};
-  
-  if (splitMethod === 'percentage') {
-    // First selected member gets 100%, rest get 0%
-    selected.forEach((userId, index) => {
-      newSplits[userId] = index === 0 ? '100.0' : '0.0';
-    });
-  } else if (splitMethod === 'shares') {
-    selected.forEach(userId => {
-      newSplits[userId] = '1';
-    });
-  } else {
-    selected.forEach(userId => {
-      newSplits[userId] = '';
-    });
-  }
-  
-  // ... reinitialize splits based on new method
-  setSplits(newSplits);
-}, [splitMethod]);
+    useEffect(() => {
+      if (!group?.members) return;
+      
+      const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
+      const newSplits = {};
+      
+      if (splitMethod === 'percentage') {
+        // First selected member gets 100%, rest get 0%
+        selected.forEach((userId, index) => {
+          newSplits[userId] = index === 0 ? '100.0' : '0.0';
+        });
+      } else if (splitMethod === 'shares') {
+        selected.forEach(userId => {
+          newSplits[userId] = '1';
+        });
+      } else {
+        selected.forEach(userId => {
+          newSplits[userId] = '';
+        });
+      }
+      
+      // ... reinitialize splits based on new method
+      setSplits(newSplits);
+    }, [splitMethod]);
 
     // toggleMember function
     const toggleMember = (userId) => {
