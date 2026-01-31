@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
+import PasswordStrength from '../components/PasswordStrength';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
@@ -132,6 +133,10 @@ export default function Register() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               required
               minLength={8}
+            />
+            <PasswordStrength 
+              password={password}
+              onPasswordGenerate={setPassword}
             />
           </div>
 

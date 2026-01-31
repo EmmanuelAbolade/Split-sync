@@ -14,6 +14,7 @@ import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
 import SettleUpModal from '../components/SettleUpModal';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
+import ShareInviteModal from '../components/ShareInviteModal';
 
 const ICON_MAP = {
   home: Home, plane: Plane, pizza: Pizza, party: PartyPopper,
@@ -56,7 +57,7 @@ export default function GroupDetails() {
   const [selectedSettlement, setSelectedSettlement] = useState(null);
   const [expenses, setExpenses] = useState([]);  
   const [loadingExpenses, setLoadingExpenses] = useState(true);
-  
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -110,30 +111,6 @@ useEffect(() => {
 
   return () => unsubscribe();
 }, [groupId]);
-
-  const copyInviteLink = async () => {
-    const inviteLink = `${window.location.origin}/invite/${groupId}`;
-    
-    // Try clipboard API first (works on localhost and HTTPS)
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      try {
-        await navigator.clipboard.writeText(inviteLink);
-        setShowInviteLink(true);
-        setTimeout(() => setShowInviteLink(false), 3000);
-      } catch (err) {
-        console.error('Clipboard write failed:', err);
-        // Show link for manual copy
-        alert(`Copy this link:\n\n${inviteLink}`);
-      }
-    } else {
-      // Fallback for mobile/HTTP - show link to manually copy
-      const copied = prompt('Copy this invite link:', inviteLink);
-      if (copied !== null) {
-        setShowInviteLink(true);
-        setTimeout(() => setShowInviteLink(false), 3000);
-      }
-    }
-  };
 
   
   // LOADING CHECK FIRST
@@ -197,7 +174,7 @@ useEffect(() => {
           {/* Action Buttons */}
           <div className="flex gap-3">
             <button
-              onClick={copyInviteLink}
+              onClick={() => setShowShareModal(true)}
               className="flex-1 bg-white border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2"
             >
               <LinkIcon size={18} />
@@ -254,7 +231,7 @@ useEffect(() => {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Members</h3>
             <button
-              onClick={copyInviteLink}
+              onClick={() => setShowShareModal(true)}
               className="text-primary text-sm font-medium flex items-center gap-1 hover:underline"
             >
               <UserPlus size={16} />
@@ -556,6 +533,14 @@ useEffect(() => {
         onClose={() => setSelectedExpense(null)}
         expense={selectedExpense}
         group={group}
+      />
+
+      {/* Share Invite Modal */}
+      <ShareInviteModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        inviteLink={`${window.location.origin}/invite/${groupId}`}
+        groupName={group?.name}
       />
     </div>
   );
