@@ -7,6 +7,7 @@ import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { useRef } from 'react';
 import { useKeyboardAware } from '../hooks/useKeyboardAware';
+import Tooltip from './Tooltip';
 
 const CATEGORIES = [
   { id: 'food', name: 'Food & Dining' },
@@ -477,8 +478,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount ({group?.currency}) *
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                Amount ({group.currency})
+                <Tooltip text="Enter the total amount that was paid for this expense. This will be divided among the selected members based on the split method." />
               </label>
               <input
                 type="number"
@@ -572,8 +574,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
 
           {/* Split Method */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
               Split Method
+              <Tooltip text="Choose how to divide: Equally (split evenly among all), Percentage (by %), Exact amounts (specific amounts per person), or Shares (by ratio like 1:2:3)." />
             </label>
             <div className="grid grid-cols-2 gap-2">
               {SPLIT_METHODS.map((method) => (
@@ -596,8 +599,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
 
           {/* Member Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
               Split Between
+              <Tooltip text="Select which group members should pay their share. You can choose everyone or just specific people who participated in this expense." />
             </label>
             <div className="space-y-2 max-h-40 overflow-y-auto bg-gray-50 p-3 rounded-lg">
               {group?.members?.map((member) => (
