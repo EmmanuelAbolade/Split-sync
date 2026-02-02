@@ -6,7 +6,7 @@ import { auth, db } from '../services/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 import { 
-  User, Mail, Calendar, LogOut, Settings, 
+  User, Mail, Calendar, LogOut,
   TrendingUp, TrendingDown, Users, Wallet 
 } from 'lucide-react';
 import { calculateBalances } from '../utils/balanceCalculator';
@@ -19,7 +19,7 @@ export default function Profile() {
   const [userData, setUserData] = useState(null);
   const [groups, setGroups] = useState([]);
   const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   // Fetch user's groups and expenses
   useEffect(() => {

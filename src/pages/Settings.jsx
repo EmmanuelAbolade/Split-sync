@@ -7,8 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { 
-  updateProfile, 
-  updateEmail, 
+  updateProfile,
   EmailAuthProvider, 
   reauthenticateWithCredential,
   deleteUser

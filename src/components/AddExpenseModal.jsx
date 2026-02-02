@@ -5,8 +5,6 @@ import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { useRef } from 'react';
-import { useKeyboardAware } from '../hooks/useKeyboardAware';
 import Tooltip from './Tooltip';
 
 const CATEGORIES = [
@@ -70,20 +68,6 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
         setSplits(initialSplits);
       }
     }, [isOpen, splitMethod, group?.members]);
-
-
-    function MyForm() {
-      const amountInputRef = useRef(null);
-      useKeyboardAware(amountInputRef);
-
-      return (
-        <input
-          ref={amountInputRef}
-          type="number"
-          // ... other props
-        />
-      );
-    }
       
     // Reinitialize splits when split method changes
     useEffect(() => {

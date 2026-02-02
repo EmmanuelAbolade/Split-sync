@@ -1,10 +1,10 @@
 // src/pages/Activity.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { ArrowLeft, Calendar, DollarSign, Users, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, TrendingUp, TrendingDown } from 'lucide-react';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 
 export default function Activity() {
