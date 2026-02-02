@@ -48,10 +48,9 @@ export default function GroupDetails() {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showInviteLink, setShowInviteLink] = useState(false);
+  const [showInviteLink] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [selectedSettlement, setSelectedSettlement] = useState(null);

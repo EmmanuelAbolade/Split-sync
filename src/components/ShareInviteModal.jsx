@@ -120,6 +120,33 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
           <div className="space-y-3 mb-6">
             <p className="text-sm font-medium text-gray-700">Share via:</p>
 
+            {/* QR Code */}
+            <button
+              onClick={() => setShowQR(!showQR)}
+              className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-300 transform hover:scale-105"
+            >
+              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                <QrCode size={20} className="text-white" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="font-semibold text-gray-900">QR Code</p>
+                <p className="text-xs text-gray-600">Show scannable QR code</p>
+              </div>
+            </button>
+
+            {/* QR Code Display */}
+            {showQR && (
+              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center animate-scale-in">
+                <p className="text-sm font-medium text-gray-700 mb-4">
+                  Scan to join group
+                </p>
+                <QRCodeCanvas value={inviteLink} size={200} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Scan this QR code with your phone camera
+                </p>
+              </div>
+            )}
+            
             {/* WhatsApp */}
             <button
               onClick={handleWhatsApp}
@@ -162,19 +189,7 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
               </div>
             </button>
 
-            {/* QR Code */}
-            <button
-              onClick={() => setShowQR(!showQR)}
-              className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-300 transform hover:scale-105"
-            >
-              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-                <QrCode size={20} className="text-white" />
-              </div>
-              <div className="flex-1 text-left">
-                <p className="font-semibold text-gray-900">QR Code</p>
-                <p className="text-xs text-gray-600">Show scannable QR code</p>
-              </div>
-            </button>
+            
 
             {/* More Options (Native Share) */}
             {navigator.share && (
@@ -193,18 +208,7 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
             )}
           </div>
 
-          {/* QR Code Display */}
-          {showQR && (
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center animate-scale-in">
-              <p className="text-sm font-medium text-gray-700 mb-4">
-                Scan to join group
-              </p>
-              <QRCodeCanvas value={inviteLink} size={200} />
-              <p className="text-xs text-gray-500 mt-4">
-                Scan this QR code with your phone camera
-              </p>
-            </div>
-          )}
+          
         </div>
 
         {/* Footer */}

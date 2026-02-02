@@ -8,6 +8,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import CreateGroupModal from '../components/CreateGroupModal';
 import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift } from 'lucide-react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { Settings } from 'lucide-react';
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -120,6 +121,12 @@ useEffect(() => {
             <span className="text-sm text-gray-600">
               {user?.displayName || user?.email}
             </span>
+            <button
+              onClick={() => navigate('/settings')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              <Settings size={24} />
+            </button>
             <button
               onClick={handleLogout}
               className="text-sm text-gray-600 hover:text-gray-900 font-medium"

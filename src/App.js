@@ -14,6 +14,9 @@ import Profile from './pages/Profile';
 import QuickAdd from './pages/QuickAdd';
 import BottomNav from './components/BottomNav';
 import ForgotPassword from './pages/ForgotPassword';
+import Settings from './pages/Settings';
+
+
 
 // Layout wrapper for protected routes with bottom nav
 function ProtectedLayout({ children }) {
@@ -100,6 +103,8 @@ function App() {
             )
           } 
         />
+
+        <Route path="/settings" element={<Settings />} />
         
         <Route 
           path="/add" 
