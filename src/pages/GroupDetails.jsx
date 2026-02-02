@@ -57,6 +57,7 @@ export default function GroupDetails() {
   const [expenses, setExpenses] = useState([]);  
   const [loadingExpenses, setLoadingExpenses] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [memberPhotos, setMemberPhotos] = useState({});
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -78,6 +79,31 @@ export default function GroupDetails() {
 
     fetchGroup();
   }, [groupId, navigate]);
+  // Fetch member photos
+  useEffect(() => {
+    if (!group?.members) return;
+
+    const fetchMemberPhotos = async () => {
+      const photos = {};
+      
+      for (const member of group.members) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', member.userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            photos[member.userId] = userData.photoURL || null;
+          }
+        } catch (err) {
+          console.error(`Error fetching photo for ${member.userId}:`, err);
+        }
+      }
+      
+      setMemberPhotos(photos);
+    };
+
+    fetchMemberPhotos();
+  }, [group?.members]);
+
 
   // Fetch expenses in real-time
 useEffect(() => {
@@ -245,10 +271,18 @@ useEffect(() => {
                 className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-white rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:scale-[1.02]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold">
-                      {member.name?.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center overflow-hidden">
+                    {memberPhotos[member.userId] ? (
+                      <img
+                        src={memberPhotos[member.userId]}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-primary font-semibold">
+                        {member.name?.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{member.name}</p>
@@ -276,7 +310,6 @@ useEffect(() => {
                 const fromMember = group.members?.find(m => m.userId === settlement.from);
                 const toMember = group.members?.find(m => m.userId === settlement.to);
                 
-                // Determine if current user is involved
                 const userIsPaying = user.uid === settlement.from;
                 const userIsReceiving = user.uid === settlement.to;
                 const userIsInvolved = userIsPaying || userIsReceiving;
@@ -284,59 +317,134 @@ useEffect(() => {
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 border border-gray-100 flex-wrap gap-2"
+                    className="p-4 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300 border border-gray-100"
                   >
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                        <span className="text-orange-600 font-semibold">
-                          {fromMember?.name?.charAt(0).toUpperCase()}
-                        </span>
+                    {/* Mobile: Stacked Layout */}
+                    <div className="md:hidden space-y-3">
+                      {/* From Member */}
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {memberPhotos[settlement.from] ? (
+                            <img
+                              src={memberPhotos[settlement.from]}
+                              alt={fromMember?.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-orange-600 font-semibold">
+                              {fromMember?.name?.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{fromMember?.name || 'Unknown'}</p>
+                          <p className="text-sm text-gray-500">owes</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900 truncate max-w-[120px]">
-                          {fromMember?.name || 'Unknown'}
-                        </p>
-                        <p className="text-sm text-gray-500">owes</p>
-                      </div>
-                      <div className="mx-4">
-                        <p className="text-xl font-bold text-primary">
+
+                      {/* Amount */}
+                      <div className="text-center py-2">
+                        <p className="text-2xl font-bold text-primary">
                           {group.currency} {settlement.amount.toFixed(2)}
                         </p>
                       </div>
-                      
-                      {/* IMPROVED BUTTON LOGIC */}
-                      {userIsInvolved && (
+
+                      {/* To Member */}
+                      <div className="flex items-center gap-3">
+                        <p className="text-sm text-gray-500">to</p>
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {memberPhotos[settlement.to] ? (
+                            <img
+                              src={memberPhotos[settlement.to]}
+                              alt={toMember?.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-green-600 font-semibold">
+                              {toMember?.name?.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{toMember?.name || 'Unknown'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop: Horizontal Layout */}
+                    <div className="hidden md:flex items-center justify-between gap-3 mb-3">
+                      {/* From Member */}
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {memberPhotos[settlement.from] ? (
+                            <img
+                              src={memberPhotos[settlement.from]}
+                              alt={fromMember?.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-orange-600 font-semibold">
+                              {fromMember?.name?.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">
+                            {fromMember?.name || 'Unknown'}
+                          </p>
+                          <p className="text-sm text-gray-500">owes</p>
+                        </div>
+                      </div>
+
+                      {/* Amount */}
+                      <div className="flex-shrink-0">
+                        <p className="text-lg font-bold text-primary whitespace-nowrap">
+                          {group.currency} {settlement.amount.toFixed(2)}
+                        </p>
+                      </div>
+
+                      {/* To Member */}
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <p className="text-sm text-gray-500 flex-shrink-0">to</p>
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {memberPhotos[settlement.to] ? (
+                            <img
+                              src={memberPhotos[settlement.to]}
+                              alt={toMember?.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-green-600 font-semibold">
+                              {toMember?.name?.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">
+                            {toMember?.name || 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Button - Both Layouts */}
+                    <div className="md:mt-3">
+                      {userIsInvolved ? (
                         <button
                           onClick={() => setSelectedSettlement(settlement)}
-                          className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
+                          className={`w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${
                             userIsPaying
-                              ? 'bg-gradient-to-r from-primary to-primary-dark text-white hover:shadow-card-hover transition-all duration-300 transform hover:scale-105'
+                              ? 'bg-gradient-to-r from-primary to-primary-dark text-white hover:shadow-lg transform hover:scale-[1.02]'
                               : 'bg-success text-white hover:opacity-90'
                           }`}
                         >
                           {userIsPaying ? `Pay ${group.currency}${settlement.amount.toFixed(2)}` : 'Mark as Received'}
                         </button>
-                      )}
-                      
-                      {!userIsInvolved && (
-                        <span className="px-4 py-2 text-sm text-gray-400 italic">
+                      ) : (
+                        <div className="w-full text-center py-2 text-sm text-gray-400 italic">
                           Not involved
-                        </span>
+                        </div>
                       )}
-                      
-                      <div className="flex items-center gap-3 flex-1">
-                        <p className="text-sm text-gray-500 text-right">to</p>
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                          <span className="text-green-600 font-semibold">
-                            {toMember?.name?.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 truncate max-w-[120px]">
-                            {toMember?.name || 'Unknown'}
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );
@@ -369,24 +477,35 @@ useEffect(() => {
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${
                         isSettled ? 'bg-gray-200' :
                         balance > 0 ? 'bg-green-100' : 'bg-orange-100'
                       }`}>
-                        <span className={`font-semibold ${
-                          isSettled ? 'text-gray-600' :
-                          balance > 0 ? 'text-green-600' : 'text-orange-600'
-                        }`}>
-                          {member.name?.charAt(0).toUpperCase()}
-                        </span>
+                        {memberPhotos[member.userId] ? (
+                          <img
+                            src={memberPhotos[member.userId]}
+                            alt={member.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className={`font-semibold ${
+                            isSettled ? 'text-gray-600' :
+                            balance > 0 ? 'text-green-600' : 'text-orange-600'
+                          }`}>
+                            {member.name?.charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{member.name}</p>
+
+                      {/* USER NAME HERE! */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 text-sm">{member.name}</p>
                         {member.userId === user.uid && (
                           <span className="text-xs text-gray-500">(You)</span>
                         )}
                       </div>
-                    </div>
+                    </div> 
+                    
                     <div className="text-right">
                       {isSettled ? (
                         <span className="text-sm text-gray-500">Settled</span>
