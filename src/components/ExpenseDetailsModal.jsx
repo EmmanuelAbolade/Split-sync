@@ -1,5 +1,5 @@
 // src/components/ExpenseDetailsModal.jsx
-import { X, User, Calendar, Tag, Users, DollarSign, FileText } from 'lucide-react';
+import { X, User, Calendar, Tag, Users, DollarSign, FileText, Receipt, Download, ExternalLink } from 'lucide-react';
 
 export default function ExpenseDetailsModal({ isOpen, onClose, expense, group }) {
   if (!isOpen || !expense) return null;
@@ -49,6 +49,46 @@ export default function ExpenseDetailsModal({ isOpen, onClose, expense, group })
             <X size={24} />
           </button>
         </div>
+
+        {/* Receipt Image Section - NEW! */}
+        {expense.receiptURL && (
+          <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Receipt size={20} className="text-blue-600" />
+              <h3 className="font-semibold text-gray-900">Scanned Receipt</h3>
+            </div>
+            
+            {/* Receipt Image Preview */}
+            <div className="bg-white rounded-lg p-2 mb-3">
+              <img 
+                src={expense.receiptURL} 
+                alt="Receipt" 
+                className="w-full h-64 object-contain rounded"
+              />
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <a
+                href={expense.receiptURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 px-3 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition text-sm font-medium flex items-center justify-center gap-2"
+              >
+                <ExternalLink size={16} />
+                View Full Size
+              </a>
+              <a
+                href={expense.receiptURL}
+                download
+                className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium flex items-center justify-center gap-2"
+              >
+                <Download size={16} />
+                Download
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Amount Card */}
         <div className="bg-primary-light border border-primary rounded-lg p-6 mb-6 text-center">

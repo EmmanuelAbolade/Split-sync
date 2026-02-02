@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import app from '../services/firebase';
-import { Camera, X, Loader, Image as ImageIcon, Lightbulb, Sun, Droplets, FileCheck, Edit3, CheckCircle2, Sparkles } from 'lucide-react';
+import { Camera, X, Loader, Image as ImageIcon, Lightbulb, Sun, Droplets, FileCheck, Edit3, CheckCircle2, Sparkles, Upload } from 'lucide-react';
 
 export default function ReceiptScanner({ onDataExtracted, isOpen, onClose }) {
   const [image, setImage] = useState(null);
@@ -31,6 +31,34 @@ export default function ReceiptScanner({ onDataExtracted, isOpen, onClose }) {
     setProcessing(true);
 
     try {
+      // Upload image to Cloudinary FIRST
+      let receiptURL = null;
+      try {
+        const formData = new FormData();
+        formData.append('file', image);
+        formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
+        formData.append('folder', 'splitsync/receipts'); // Separate folder for receipts
+        
+        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`;
+        
+        const uploadResponse = await fetch(cloudinaryUrl, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          receiptURL = uploadData.secure_url;
+          console.log('Receipt uploaded to Cloudinary:', receiptURL);
+        } else {
+          console.error('Cloudinary upload failed');
+        }
+      } catch (uploadError) {
+        console.error('Error uploading to Cloudinary:', uploadError);
+        // Continue with OCR even if upload fails
+      }
+
+      // Process with Google Vision
       const reader = new FileReader();
       
       reader.onload = async () => {
@@ -50,7 +78,11 @@ export default function ReceiptScanner({ onDataExtracted, isOpen, onClose }) {
           const result = await scanReceipt({ imageData: base64Data });
           
           if (result.data.success) {
-            setExtractedData(result.data.data);
+            // Add receiptURL to extracted data
+            setExtractedData({
+              ...result.data.data,
+              receiptURL: receiptURL // Add the Cloudinary URL
+            });
             setShowReview(true);
           } else {
             alert(result.data.error || 'Failed to scan receipt. Please try again.');

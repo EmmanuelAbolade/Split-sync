@@ -40,6 +40,8 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
   const [error, setError] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showReceiptScanner, setShowReceiptScanner] = useState(false);
+  const [scannedData, setScannedData] = useState(null);
+
       // Initialize members when modal opens
     useEffect(() => {
       if (isOpen && group?.members) {
@@ -278,6 +280,7 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
         participants: Object.keys(selectedMembers).filter(id => selectedMembers[id]),
         createdAt: serverTimestamp(),
         createdBy: user.uid,
+        ...(scannedData?.receiptURL && { receiptURL: scannedData.receiptURL })
       };
 
       await addDoc(collection(db, 'expenses'), expenseData);
@@ -300,6 +303,8 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
 
 
   const handleReceiptData = (data) => {
+    // Store ALL scanned data including receiptURL
+    setScannedData(data);
     // Pre-fill form with extracted data
     if (data.title) setTitle(data.title);
     if (data.amount) setAmount(data.amount);
