@@ -8,7 +8,7 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -59,6 +59,7 @@ export default function GroupDetails() {
   const [loadingExpenses, setLoadingExpenses] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [memberPhotos, setMemberPhotos] = useState({});
+  const [memberPaymentMethods, setMemberPaymentMethods] = useState({});
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -105,38 +106,61 @@ export default function GroupDetails() {
     fetchMemberPhotos();
   }, [group?.members]);
 
+  // Fetch member payment methods
+  useEffect(() => {
+    if (!group?.members) return;
+
+    const fetchPaymentMethods = async () => {
+      const methods = {};
+      for (const member of group.members) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', member.userId));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            methods[member.userId] = data.paymentMethods || null;
+          }
+        } catch (error) {
+          console.error(`Error fetching payment methods for ${member.userId}:`, error);
+        }
+      }
+      setMemberPaymentMethods(methods);
+    };
+
+    fetchPaymentMethods();
+  }, [group?.members]);
+
 
   // Fetch expenses in real-time
-useEffect(() => {
-  if (!groupId) return;
+  useEffect(() => {
+    if (!groupId) return;
 
-  const expensesQuery = query(
-    collection(db, 'expenses'),
-    where('groupId', '==', groupId),
-  );
+    const expensesQuery = query(
+      collection(db, 'expenses'),
+      where('groupId', '==', groupId),
+    );
 
-  const unsubscribe = onSnapshot(expensesQuery, (snapshot) => {
-    const expensesData = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const unsubscribe = onSnapshot(expensesQuery, (snapshot) => {
+      const expensesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-     // Sort by date manually
-  expensesData.sort((a, b) => {
-    const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-    const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-    return dateB - dateA; // Newest first
-  });
-    
-    setExpenses(expensesData);
-    setLoadingExpenses(false);
-  }, (error) => {
-    console.error('Error fetching expenses:', error);
-    setLoadingExpenses(false);
-  });
+      // Sort by date manually
+    expensesData.sort((a, b) => {
+      const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+      const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+      return dateB - dateA; // Newest first
+    });
+      
+      setExpenses(expensesData);
+      setLoadingExpenses(false);
+    }, (error) => {
+      console.error('Error fetching expenses:', error);
+      setLoadingExpenses(false);
+    });
 
-  return () => unsubscribe();
-}, [groupId]);
+    return () => unsubscribe();
+  }, [groupId]);
 
   
   // LOADING CHECK FIRST

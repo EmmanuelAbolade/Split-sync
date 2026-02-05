@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info } from 'lucide-react';
+import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
 import { useEffect } from 'react';
 import PaymentInfoModal from './PaymentInfoModal';
+import SepaPaymentModal from './SepaPaymentModal';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
   const [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || '');
@@ -20,8 +21,10 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
   const [selectedPaymentLink, setSelectedPaymentLink] = useState(null);
   const [copiedIban, setCopiedIban] = useState(false);
-const [showPaymentInfo, setShowPaymentInfo] = useState(false);  // ← ADD THIS!
-const [paymentInfo, setPaymentInfo] = useState(null);
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false);  // ← ADD THIS!
+  const [showSepaModal, setShowSepaModal] = useState(false);
+  const [sepaPaymentData, setSepaPaymentData] = useState(null);
+  const [paymentInfo, setPaymentInfo] = useState(null);
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
 
@@ -121,6 +124,71 @@ const [paymentInfo, setPaymentInfo] = useState(null);
       setLoading(false);
     }
   };
+
+
+  const handleSepaPayment = () => {
+    // Prepare payment data for SEPA modal
+    const paymentData = {
+      amount: parseFloat(amount),
+      fromUser: {
+        id: settlement.from,
+        name: fromMember?.name || 'Unknown'
+      },
+      toUser: {
+        id: settlement.to,
+        name: toMember?.name || 'Unknown'
+      },
+      fromUserPaymentMethods: null, // Will be fetched in modal
+      toUserPaymentMethods: recipientPaymentMethods,
+      groupName: group.name,
+      groupId: group.id
+    };
+    
+    setSepaPaymentData(paymentData);
+    setShowSepaModal(true);
+  };
+
+  const handleSepaPaymentSuccess = async (paymentResult) => {
+    try {
+      // Record the settlement in Firestore
+      const settlementData = {
+        groupId: group.id,
+        title: `SEPA Settlement: ${fromMember?.name} → ${toMember?.name}`,
+        amount: paymentResult.amount,
+        currency: group.currency,
+        paidBy: settlement.from,
+        category: 'settlement',
+        description: `SEPA Payment (Ref: ${paymentResult.reference})`,
+        date: new Date(),
+        splitMethod: 'exact',
+        splits: {
+          [settlement.to]: paymentResult.amount,
+        },
+        participants: [settlement.from, settlement.to],
+        createdAt: serverTimestamp(),
+        isSettlement: true,
+        paymentMethod: 'sepa',
+        sepaReference: paymentResult.reference,
+        sepaPaymentId: paymentResult.paymentId,
+        recordedBy: currentUserId,
+      };
+
+      await addDoc(collection(db, 'expenses'), settlementData);
+      
+      setPaymentSuccess(true);
+      setShowSepaModal(false);
+      
+      // Close main modal after short delay
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Error recording SEPA settlement:', err);
+      setError('Payment processed but failed to record. Please contact support.');
+    }
+  };
+
 
   const handlePaymentLinkClick = (method) => {
     const amountNum = parseFloat(amount);
@@ -354,7 +422,7 @@ const [paymentInfo, setPaymentInfo] = useState(null);
         {userIsPaying ? (
           /* User is paying - show payment options */
           <div className="mb-6">
-            {/* Quick Payment Links Section - NEW! */}
+            {/* Quick Payment Links Section */}
             {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
               <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
@@ -395,7 +463,34 @@ const [paymentInfo, setPaymentInfo] = useState(null);
               </div>
             )}
 
-            {/* Bank Transfer Details - NEW! */}
+            {/* SEPA Bank Transfer Button */}
+            {!loadingPaymentMethods && recipientPaymentMethods?.encryptedIBAN && !selectedPaymentLink && (
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Or pay directly with SEPA</h3>
+                <button
+                  onClick={handleSepaPayment}
+                  disabled={!amount || parseFloat(amount) <= 0}
+                  className="w-full flex items-center gap-3 p-4 border-2 border-indigo-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center group-hover:bg-indigo-200 transition">
+                    <Landmark size={24} className="text-indigo-600" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-gray-900">SEPA Bank Transfer</div>
+                    <div className="text-sm text-gray-600">
+                      Secure bank-to-bank payment
+                    </div>
+                    <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <CheckCircle2 size={12} />
+                      IBAN available · Biometric secured
+                    </div>
+                  </div>
+                  <ArrowRight size={20} className="text-gray-400 group-hover:text-indigo-600 transition" />
+                </button>
+              </div>
+            )}
+
+            {/* Bank Transfer Details */}
             {selectedPaymentLink && selectedPaymentLink.id === 'bank' && (
               <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -461,7 +556,7 @@ const [paymentInfo, setPaymentInfo] = useState(null);
               </div>
             )}
 
-            {/* Divider - NEW! */}
+            {/* Divider */}
             {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
@@ -573,6 +668,16 @@ const [paymentInfo, setPaymentInfo] = useState(null);
         onClose={() => setShowPaymentInfo(false)}
         paymentInfo={paymentInfo}
       />
+      {/* SEPA Payment Modal */}
+      {showSepaModal && sepaPaymentData && (
+        <SepaPaymentModal
+          isOpen={showSepaModal}
+          onClose={() => setShowSepaModal(false)}
+          payment={sepaPaymentData}
+          currentUser={{ uid: currentUserId }}
+          onPaymentSuccess={handleSepaPaymentSuccess}
+        />
+      )}
     </div>
   );
 }
