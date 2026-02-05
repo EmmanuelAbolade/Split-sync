@@ -680,7 +680,7 @@ useEffect(() => {
       <ShareInviteModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
-        inviteLink={`${window.location.origin}/invite/${groupId}`}
+        inviteLink={`${process.env.REACT_APP_BASE_URL || window.location.origin}/invite/${groupId}`}
         groupName={group?.name}
       />
     </div>
