@@ -169,8 +169,8 @@ export default function SepaPaymentModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full my-4 flex flex-col max-h-[90vh] ">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -193,7 +193,7 @@ export default function SepaPaymentModal({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           {/* Loading State */}
           {loadingPaymentData ? (
             <div className="py-12 text-center">

@@ -201,7 +201,7 @@ export const getPaymentStatusColor = (status) => {
  */
 export const validatePaymentAmount = (amount) => {
   if (!amount || amount <= 0) {
-    return { valid: false, error: 'Amount must be greater than 0' };
+    return { valid: false, error: 'Please enter an amount greater than €0' };
   }
   
   if (amount > 999999) {
@@ -209,8 +209,10 @@ export const validatePaymentAmount = (amount) => {
   }
   
   // Check for more than 2 decimal places
-  if (amount.toFixed(2) !== amount.toString()) {
-    return { valid: false, error: 'Amount can have maximum 2 decimal places' };
+  // Round to 2 decimals and compare with original
+  const rounded = Math.round(amount * 100) / 100;
+  if (rounded !== Number(amount)) {
+    return { valid: false, error: 'Please use maximum 2 decimal places (e.g., 5.99)' };
   }
   
   return { valid: true, error: null };
