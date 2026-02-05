@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle } from 'lucide-react';
+import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info } from 'lucide-react';
+import { doc, getDoc } from 'firebase/firestore';
+import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
+import { useEffect } from 'react';
+import PaymentInfoModal from './PaymentInfoModal';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
   const [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || '');
@@ -12,13 +16,43 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [paymentMethod, setPaymentMethod] = useState('paypal');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-
+  const [recipientPaymentMethods, setRecipientPaymentMethods] = useState(null);
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
+  const [selectedPaymentLink, setSelectedPaymentLink] = useState(null);
+  const [copiedIban, setCopiedIban] = useState(false);
+const [showPaymentInfo, setShowPaymentInfo] = useState(false);  // ← ADD THIS!
+const [paymentInfo, setPaymentInfo] = useState(null);
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
 
   // Determine if current user is the one paying or receiving
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
+
+  // Fetch recipient's payment methods
+  useEffect(() => {
+    const fetchRecipientPaymentMethods = async () => {
+      if (!settlement || !settlement.to) return;
+      
+      setLoadingPaymentMethods(true);
+      try {
+        const recipientDoc = await getDoc(doc(db, 'users', settlement.to));
+        if (recipientDoc.exists()) {
+          const data = recipientDoc.data();
+          setRecipientPaymentMethods(data.paymentMethods || null);
+        }
+      } catch (error) {
+        console.error('Error fetching payment methods:', error);
+      } finally {
+        setLoadingPaymentMethods(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchRecipientPaymentMethods();
+    }
+  }, [settlement, isOpen]);
+
 
   const recordSettlement = async (paypalOrderId = null) => {
     const amountNum = parseFloat(amount);
@@ -88,6 +122,44 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     }
   };
 
+  const handlePaymentLinkClick = (method) => {
+    const amountNum = parseFloat(amount);
+    
+    if (method.id === 'paypal' || method.id === 'paypal-link') {
+      // Show beautiful modal instead of alert
+      setPaymentInfo({
+        method: 'paypal',
+        amount: amountNum,
+        currency: group.currency,
+        username: method.username,
+        onProceed: () => {
+          const link = generatePayPalLink(method.username, amountNum, group.currency);
+          window.open(link, '_blank');
+        }
+      });
+      setShowPaymentInfo(true);
+      
+    } else if (method.id === 'revolut') {
+      // Show beautiful modal instead of alert
+      setPaymentInfo({
+        method: 'revolut',
+        amount: amountNum,
+        currency: group.currency,
+        username: method.username,
+        onProceed: () => {
+          const link = generateRevolutLink(method.username, amountNum, group.currency);
+          window.open(link, '_blank');
+        }
+      });
+      setShowPaymentInfo(true);
+      
+    } else if (method.id === 'bank') {
+      setSelectedPaymentLink(method);
+    }
+  };
+
+
+
   const createPayPalOrder = (data, actions) => {
     const amountNum = parseFloat(amount);
     if (!amountNum || amountNum <= 0) {
@@ -120,7 +192,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
     try {
       const details = await actions.order.capture();
-      console.log('PayPal payment successful:', details);
       
       await recordSettlement(details.id);
       setPaymentSuccess(true);
@@ -228,7 +299,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-      <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6 shadow-card-3d animate-scale-in">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
             {userIsPaying ? 'Pay Settlement' : 'Mark as Received'}
@@ -283,6 +354,125 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         {userIsPaying ? (
           /* User is paying - show payment options */
           <div className="mb-6">
+            {/* Quick Payment Links Section - NEW! */}
+            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
+              <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="relative group">
+                    <Info size={18} className="text-blue-600" />
+                    <div className="absolute left-0 top-6 w-64 bg-gray-900 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      These payment methods are set up by the recipient in their Profile settings
+                    </div>
+                  </div>
+                  <h3 className="font-semibold text-gray-900">Quick Payment Options</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  {toMember?.name} accepts payments via:
+                </p>
+                <div className="space-y-2">
+                  {getAvailablePaymentMethods(recipientPaymentMethods).map((method) => (
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => handlePaymentLinkClick(method)}
+                      disabled={!amount || parseFloat(amount) <= 0}
+                      className="w-full flex items-center gap-3 p-3 bg-white border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                    >
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                        {method.icon}
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-gray-900">{method.name}</p>
+                        <p className="text-xs text-gray-600">{method.description}</p>
+                      </div>
+                      <ExternalLink size={16} className="text-gray-400 group-hover:text-blue-600" />
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-3 text-center">
+                  Click to open payment app, then return here to mark as paid
+                </p>
+              </div>
+            )}
+
+            {/* Bank Transfer Details - NEW! */}
+            {selectedPaymentLink && selectedPaymentLink.id === 'bank' && (
+              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-blue-900 flex items-center gap-2">
+                    <CreditCard size={18} />
+                    Bank Transfer Details
+                  </h3>
+                  <button
+                    onClick={() => setSelectedPaymentLink(null)}
+                    className="text-blue-600 text-sm hover:underline"
+                  >
+                    Back to options
+                  </button>
+                </div>
+                
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-blue-600 font-medium">Recipient</p>
+                    <p className="text-blue-900">{toMember?.name}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-blue-600 font-medium">IBAN</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-blue-900 font-mono text-xs flex-1 break-all bg-white p-2 rounded">
+                        {selectedPaymentLink.iban}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(selectedPaymentLink.iban);
+                          setCopiedIban(true);
+                          setTimeout(() => setCopiedIban(false), 2000);
+                        }}
+                        className="p-2 hover:bg-blue-100 rounded flex-shrink-0"
+                      >
+                        {copiedIban ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {selectedPaymentLink.bic && (
+                    <div>
+                      <p className="text-blue-600 font-medium">BIC</p>
+                      <p className="text-blue-900 font-mono text-sm bg-white p-2 rounded">{selectedPaymentLink.bic}</p>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <p className="text-blue-600 font-medium">Amount</p>
+                    <p className="text-blue-900 font-semibold bg-white p-2 rounded">{group.currency} {amount}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-blue-600 font-medium">Reference</p>
+                    <p className="text-blue-900 bg-white p-2 rounded">SplitSync Settlement</p>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-blue-700 mt-3 text-center">
+                  After making the transfer, mark the payment as completed below
+                </p>
+              </div>
+            )}
+
+            {/* Divider - NEW! */}
+            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-3 bg-white text-gray-500">or use</span>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 mb-4">
               <button
                 type="button"
@@ -377,6 +567,12 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           Cancel
         </button>
       </div>
+      {/* Payment Info Modal */}
+      <PaymentInfoModal
+        isOpen={showPaymentInfo}
+        onClose={() => setShowPaymentInfo(false)}
+        paymentInfo={paymentInfo}
+      />
     </div>
   );
 }

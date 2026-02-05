@@ -108,7 +108,7 @@ useEffect(() => {
 
   const handleGroupCreated = (groupId) => {
     // Groups will update automatically via real-time listener
-    console.log('Group created:', groupId);
+    
   };
 
   return (
@@ -167,7 +167,7 @@ useEffect(() => {
                 }
               </h2>
               <p className="text-gray-600">
-                Manage your shared expenses and settle up with friends
+                Do you have any shared expenses to manage? Settle up with friends and family.
               </p>
             </div>
           </div>

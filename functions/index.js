@@ -10,8 +10,7 @@ const googleVisionApiKey = defineSecret('GOOGLE_VISION_API_KEY');
 exports.scanReceipt = functions.https.onCall(
   { secrets: [googleVisionApiKey] },
   async (request) => {
-    console.log('🚀 Function called!');
-    
+     
     const data = request.data;
     
     if (!data || !data.imageData) {
@@ -20,8 +19,7 @@ exports.scanReceipt = functions.https.onCall(
     }
 
     try {
-      console.log('✅ Image data received, length:', data.imageData.length);
-      
+          
       // Initialize Vision API client
       const client = new vision.ImageAnnotatorClient({
         apiKey: googleVisionApiKey.value(),
@@ -35,8 +33,7 @@ exports.scanReceipt = functions.https.onCall(
       const detections = result.textAnnotations;
       const fullText = detections[0]?.description || '';
       
-      console.log('📄 Extracted text:', fullText);
-
+      
       // Parse the text
       const lines = fullText.split('\n').filter(l => l.trim());
       

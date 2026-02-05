@@ -274,7 +274,7 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
         paidBy,
         category,
         description: description.trim(),
-        date: new Date(date),
+        date: new Date(`${date}T${new Date().toTimeString().slice(0, 8)}`),
         splitMethod,
         splits: calculated,
         participants: Object.keys(selectedMembers).filter(id => selectedMembers[id]),
@@ -427,10 +427,7 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
             <button
               type="button"
               onClick={() => {
-                console.log('🔵 Button clicked!');
-                console.log('🔵 Current showReceiptScanner:', showReceiptScanner);
                 setShowReceiptScanner(true);
-                console.log('🔵 Set showReceiptScanner to true');
               }}
               className="w-full mb-4 px-4 py-3 bg-blue-50 border-2 border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition flex items-center justify-center gap-2 font-medium"
             >

@@ -49,7 +49,7 @@ export default function ReceiptScanner({ onDataExtracted, isOpen, onClose }) {
         if (uploadResponse.ok) {
           const uploadData = await uploadResponse.json();
           receiptURL = uploadData.secure_url;
-          console.log('Receipt uploaded to Cloudinary:', receiptURL);
+          
         } else {
           console.error('Cloudinary upload failed');
         }

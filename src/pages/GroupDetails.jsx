@@ -8,7 +8,7 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -55,6 +55,7 @@ export default function GroupDetails() {
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [selectedSettlement, setSelectedSettlement] = useState(null);
   const [expenses, setExpenses] = useState([]);  
+  const [showRecentExpenses, setShowRecentExpenses] = useState(true);
   const [loadingExpenses, setLoadingExpenses] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [memberPhotos, setMemberPhotos] = useState({});
@@ -534,101 +535,123 @@ useEffect(() => {
         
         {/* Expenses Section */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-  <div>
-    <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
-    {expenses.length > 0 && (
-      <p className="text-sm text-gray-600 mt-1">
-        {expenses.length} expense{expenses.length !== 1 ? 's' : ''} • Total: {group.currency} {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
-      </p>
-    )}
-  </div>
-  <button
-    onClick={() => setShowAddExpense(true)}
-    className="text-primary text-sm font-medium flex items-center gap-1 hover:underline transition-all duration-300 transform hover:scale-105"
-  >
-    <Plus size={16} />
-    Add Expense
-  </button>
-</div>
-
-  {loadingExpenses ? (
-    <div className="text-center py-12">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-      <p className="mt-4 text-gray-600 text-sm">Loading expenses...</p>
-    </div>
-  ) : expenses.length === 0 ? (
-    <div className="text-center py-12">
-      <div className="text-4xl mb-4">📊</div>
-      <p className="text-gray-600 mb-2">No expenses yet</p>
-      <p className="text-sm text-gray-500 mb-4">
-        Add your first expense to start tracking
-      </p>
-      <button
-        onClick={() => setShowAddExpense(true)}
-        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-hover transition"
-      >
-        Add First Expense
-      </button>
-    </div>
-  ) : (
-    <div className="space-y-3">
-      {expenses.map((expense) => {
-        const payer = group.members?.find(m => m.userId === expense.paidBy);
-        const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
-
-        return (
-          <div
-            key={expense.id}
-            onClick={() => setSelectedExpense(expense)}
-            className="p-4 border border-gray-200 rounded-lg hover:border-primary transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover cursor-pointer bg-white shadow-card"
-          >
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
+          {/* Modified Header - Collapsible */}
+          <div className="flex items-center justify-between mb-4">
+            <div 
+              className="flex items-center gap-3 cursor-pointer flex-1"
+              onClick={() => setShowRecentExpenses(!showRecentExpenses)}
+            >
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-gray-900">{expense.title}</h4>
-    
-                  {/* Category Icon Badge */}
-                  <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded">
-                    {(() => {
-                      const CategoryIcon = getCategoryIcon(expense.category);
-                      return <CategoryIcon size={14} className="text-gray-600" />;
-                    })()}
-                    <span className="text-xs text-gray-600 capitalize">{expense.category}</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
+                  <ChevronDown 
+                    size={20} 
+                    className={`text-gray-400 transition-transform duration-300 ${
+                      showRecentExpenses ? 'rotate-180' : ''
+                    }`}
+                  />
                 </div>
-  
-                <p className="text-sm text-gray-600">
-                  Paid by {payer?.name || 'Unknown'}
-                </p>
-                {expense.description && (
-                  <p className="text-sm text-gray-500 mt-1">{expense.description}</p>
-                  )}
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-bold text-gray-900">
-                  {expense.currency} {expense.amount.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {expenseDate.toLocaleDateString()}
-                </p>
+                {expenses.length > 0 && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {expenses.length} expense{expenses.length !== 1 ? 's' : ''} • Total: {group.currency} {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
+                  </p>
+                )}
               </div>
             </div>
-
-            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-              <Users size={14} className="text-gray-400" />
-              <span className="text-sm text-gray-600">
-                Split {expense.splitMethod} among {expense.participants?.length || 0} member
-                {expense.participants?.length !== 1 ? 's' : ''}
-              </span>
-            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent collapse when clicking Add
+                setShowAddExpense(true);
+              }}
+              className="text-primary text-sm font-medium flex items-center gap-1 hover:underline transition-all duration-300 transform hover:scale-105"
+            >
+              <Plus size={16} />
+              Add Expense
+            </button>
           </div>
-        );
-      })}
-    </div>
-  )}
-</div>
 
+          {/* Collapsible Content - ALL YOUR EXISTING CODE */}
+          {showRecentExpenses && (
+            <>
+              {loadingExpenses ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  <p className="mt-4 text-gray-600 text-sm">Loading expenses...</p>
+                </div>
+              ) : expenses.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-4xl mb-4">📊</div>
+                  <p className="text-gray-600 mb-2">No expenses yet</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Add your first expense to start tracking
+                  </p>
+                  <button
+                    onClick={() => setShowAddExpense(true)}
+                    className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-hover transition"
+                  >
+                    Add First Expense
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {expenses.map((expense) => {
+                    const payer = group.members?.find(m => m.userId === expense.paidBy);
+                    const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
+
+                    return (
+                      <div
+                        key={expense.id}
+                        onClick={() => setSelectedExpense(expense)}
+                        className="p-4 border border-gray-200 rounded-lg hover:border-primary transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover cursor-pointer bg-white shadow-card"
+                      >
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold text-gray-900">{expense.title}</h4>
+                
+                              {/* Category Icon Badge */}
+                              <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded">
+                                {(() => {
+                                  const CategoryIcon = getCategoryIcon(expense.category);
+                                  return <CategoryIcon size={14} className="text-gray-600" />;
+                                })()}
+                                <span className="text-xs text-gray-600 capitalize">{expense.category}</span>
+                              </div>
+                            </div>
+              
+                            <p className="text-sm text-gray-600">
+                              Paid by {payer?.name || 'Unknown'}
+                            </p>
+                            {expense.description && (
+                              <p className="text-sm text-gray-500 mt-1">{expense.description}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-gray-900">
+                              {expense.currency} {expense.amount.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {expenseDate.toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                          <Users size={14} className="text-gray-400" />
+                          <span className="text-sm text-gray-600">
+                            Split {expense.splitMethod} among {expense.participants?.length || 0} member
+                            {expense.participants?.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      
       </div>
       {/* Add Expense Modal */}
       <AddExpenseModal
