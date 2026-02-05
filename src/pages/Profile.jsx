@@ -7,11 +7,25 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 import { 
   User, Mail, Calendar, LogOut,
-  TrendingUp, TrendingDown, Users, Wallet, CreditCard, Save, Info, ChevronDown 
+  TrendingUp, TrendingDown, Users, Wallet, CreditCard, Save, Info, ChevronDown, Shield, Fingerprint, Lock 
 } from 'lucide-react';
 import { calculateBalances } from '../utils/balanceCalculator';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import CloudinaryUpload from '../components/CloudinaryUpload';
+import { 
+  encryptData, 
+  decryptData, 
+  validateIBAN, 
+  formatIBANDisplay,
+  maskIBAN 
+} from '../utils/encryption';
+import { 
+  authenticateWithBiometric,
+  isBiometricAvailable,
+  getBiometricPreference,
+  enableBiometric,
+  disableBiometric
+} from '../utils/biometric';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -34,6 +48,12 @@ export default function Profile() {
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+
+  // Biometric state
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   // Fetch user's groups and expenses
   useEffect(() => {
     if (!user) return;
@@ -52,6 +72,14 @@ export default function Profile() {
     });
 
     return () => unsubscribe();
+  }, [user]);
+
+  // Check biometric availability on mount
+  useEffect(() => {
+    if (user) {
+      setBiometricAvailable(isBiometricAvailable());
+      setBiometricEnabled(getBiometricPreference(user.uid));
+    }
   }, [user]);
 
   useEffect(() => {
@@ -89,7 +117,31 @@ export default function Profile() {
           
           // Load payment methods if they exist
           if (data.paymentMethods) {
-            setPaymentMethods(data.paymentMethods);
+            const methods = data.paymentMethods;
+            
+            // Decrypt IBAN if it exists and is encrypted
+            if (methods.encryptedIBAN) {
+              try {
+                const decryptedIBAN = decryptData(methods.encryptedIBAN);
+                setPaymentMethods({
+                  paypalUsername: methods.paypalUsername || '',
+                  revolutUsername: methods.revolutUsername || '',
+                  iban: decryptedIBAN,
+                  bic: methods.bic || ''
+                });
+              } catch (error) {
+                console.error('Error decrypting IBAN:', error);
+                setPaymentMethods({
+                  paypalUsername: methods.paypalUsername || '',
+                  revolutUsername: methods.revolutUsername || '',
+                  iban: '',
+                  bic: methods.bic || ''
+                });
+              }
+            } else {
+              // Legacy: IBAN stored unencrypted
+              setPaymentMethods(methods);
+            }
           }
         }
       } catch (err) {
@@ -130,16 +182,14 @@ export default function Profile() {
     setSavingPayment(true);
 
     try {
-      // Validate IBAN if provided
       if (paymentMethods.iban && paymentMethods.iban.trim()) {
-        const ibanRegex = /^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/;
-        if (!ibanRegex.test(paymentMethods.iban.replace(/\s/g, ''))) {
+        if (!validateIBAN(paymentMethods.iban)) {
           setPaymentError('Invalid IBAN format. Example: IE29 AIBK 9311 5212 3456 78');
           setSavingPayment(false);
           return;
         }
       }
-
+    
       // Validate PayPal username (alphanumeric and underscore only)
       if (paymentMethods.paypalUsername && paymentMethods.paypalUsername.trim()) {
         const paypalRegex = /^[a-zA-Z0-9_]+$/;
@@ -150,14 +200,26 @@ export default function Profile() {
         }
       }
 
-      // Clean up data (remove empty strings)
+      // Prepare data to save (to encrypt IBAN and avoid saving raw sensitive data)
       const cleanedPaymentMethods = {};
-      Object.keys(paymentMethods).forEach(key => {
-        const value = paymentMethods[key]?.trim();
-        if (value) {
-          cleanedPaymentMethods[key] = value;
-        }
-      });
+
+      // Add non-sensitive data
+      if (paymentMethods.paypalUsername?.trim()) {
+        cleanedPaymentMethods.paypalUsername = paymentMethods.paypalUsername.trim();
+      }
+      if (paymentMethods.revolutUsername?.trim()) {
+        cleanedPaymentMethods.revolutUsername = paymentMethods.revolutUsername.trim();
+      }
+      if (paymentMethods.bic?.trim()) {
+        cleanedPaymentMethods.bic = paymentMethods.bic.trim().toUpperCase();
+      }
+
+      // Encrypt IBAN before saving
+      if (paymentMethods.iban?.trim()) {
+        const cleanIBAN = paymentMethods.iban.replace(/\s/g, '').toUpperCase();
+        const encryptedIBAN = encryptData(cleanIBAN);
+        cleanedPaymentMethods.encryptedIBAN = encryptedIBAN;
+      }
 
       // Save to Firestore
       await updateDoc(doc(db, 'users', user.uid), {
@@ -201,6 +263,82 @@ export default function Profile() {
         year: 'numeric'
       })
     : 'Unknown';
+
+
+
+  // Handle biometric toggle
+  const handleBiometricToggle = async () => {
+    if (!user) return;
+
+    if (biometricEnabled) {
+      // Disable biometric
+      disableBiometric(user.uid);
+      setBiometricEnabled(false);
+      setIsAuthenticated(false);
+      alert('Biometric authentication disabled');
+    } else {
+      // Enable biometric
+      const success = await enableBiometric(user.uid);
+      if (success) {
+        setBiometricEnabled(true);
+        alert('Biometric authentication enabled successfully!');
+      } else {
+        alert('Failed to enable biometric authentication. Please try again.');
+      }
+    }
+  };
+
+  // Handle showing payment settings with biometric check
+  const handleShowPaymentSettings = async () => {
+    if (!user) return;
+
+    // If already open, just toggle closed
+    if (showPaymentSettings) {
+      setShowPaymentSettings(false);
+      setIsAuthenticated(false);
+      return;
+    }
+
+    // Check if biometric is enabled
+    if (biometricEnabled) {
+      const authenticated = await authenticateWithBiometric(
+        user.uid, 
+        'Authenticate to view payment settings'
+      );
+      
+      if (!authenticated) {
+        alert('Authentication failed. Cannot access payment settings.');
+        return;
+      }
+      
+      setIsAuthenticated(true);
+    }
+
+    setShowPaymentSettings(true);
+  };
+
+  // Handle editing payment with biometric check
+  const handleEditPayment = async () => {
+    if (!user) return;
+
+    // Check if biometric is enabled
+    if (biometricEnabled && !isAuthenticated) {
+      const authenticated = await authenticateWithBiometric(
+        user.uid, 
+        'Authenticate to edit payment settings'
+      );
+      
+      if (!authenticated) {
+        alert('Authentication failed. Cannot edit payment settings.');
+        return;
+      }
+      
+      setIsAuthenticated(true);
+    }
+
+    setEditingPayment(true);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -326,21 +464,71 @@ export default function Profile() {
           </div>
         </div>
 
+
+        {/* Security Settings */}
+        {biometricAvailable && (
+          <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                <Shield size={20} className="text-indigo-600" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+                <p className="text-sm text-gray-500">Biometric authentication</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Fingerprint size={24} className="text-indigo-600" />
+                <div>
+                  <p className="font-medium text-gray-900">Fingerprint/Face ID</p>
+                  <p className="text-xs text-gray-600">
+                    {biometricEnabled 
+                      ? 'Required for payment settings' 
+                      : 'Enable for extra security'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleBiometricToggle}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  biometricEnabled ? 'bg-indigo-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    biometricEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        )}
+
+
+
         {/* Payment Settings */}
         <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 mb-6">
           {/* Collapsible Header */}
           <div 
             className="flex items-center justify-between cursor-pointer select-none"
-            onClick={() => setShowPaymentSettings(!showPaymentSettings)}
+            onClick={handleShowPaymentSettings}
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center">
                 <CreditCard size={20} className="text-primary" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Payment Settings</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-semibold text-gray-900">Payment Settings</h2>
+                  {biometricEnabled && (
+                    <Lock size={16} className="text-indigo-600" />
+                  )}
+                </div>
                 <p className="text-xs text-gray-500">
                   {showPaymentSettings ? 'Click to hide' : 'Click to show'}
+                  {biometricEnabled && !showPaymentSettings && ' (requires authentication)'}
                 </p>
               </div>
             </div>
@@ -361,7 +549,7 @@ export default function Profile() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setEditingPayment(true);
+                      handleEditPayment();
                     }}
                     className="px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary-light transition"
                   >
@@ -376,15 +564,16 @@ export default function Profile() {
                   <Info size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="text-xs text-blue-800">
                     <p className="font-medium mb-1">Set up your payment methods to receive money easily</p>
-                    <p>Your payment info is only visible to you and members of your groups.</p>
+                    <p>Your IBAN is encrypted and secure. Payment info is only visible to you and members of your groups.</p>
                   </div>
                 </div>
               </div>
 
               {/* Success/Error Messages */}
               {paymentSuccess && (
-                <div className="bg-green-50 text-green-600 p-3 rounded-lg mb-4 text-sm">
-                  Payment settings saved successfully!
+                <div className="bg-green-50 text-green-600 p-3 rounded-lg mb-4 text-sm flex items-center gap-2">
+                  <Shield size={16} />
+                  Payment settings saved successfully! IBAN encrypted.
                 </div>
               )}
 
@@ -446,8 +635,9 @@ export default function Profile() {
 
                 {/* IBAN */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                     IBAN (Bank Transfer)
+                    <Shield size={14} className="text-indigo-600" title="Encrypted" />
                   </label>
                   <input
                     type="text"
