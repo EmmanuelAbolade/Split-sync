@@ -93,10 +93,10 @@ export default function JoinGroup() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading invitation...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary dark:border-indigo-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading invitation...</p>
         </div>
       </div>
     );
@@ -104,14 +104,14 @@ export default function JoinGroup() {
 
   if (error && !group) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Invalid Invite</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Invalid Invite</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-hover transition"
+            className="bg-primary dark:bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition"
           >
             Go to Dashboard
           </button>
@@ -122,16 +122,16 @@ export default function JoinGroup() {
 
   if (alreadyMember) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
-          <CheckCircle className="text-green-500 mx-auto mb-4" size={64} />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Already a Member</h2>
-          <p className="text-gray-600 mb-2">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-8 max-w-md w-full text-center">
+          <CheckCircle className="text-green-500 dark:text-green-400 mx-auto mb-4" size={64} />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Already a Member</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-2">
             You're already part of <span className="font-semibold">{group?.name}</span>!
           </p>
           <button
             onClick={() => navigate(`/group/${groupId}`)}
-            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-hover transition mt-6"
+            className="bg-primary dark:bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition mt-6"
           >
             View Group
           </button>
@@ -142,27 +142,27 @@ export default function JoinGroup() {
 
   if (joining) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Joining group...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary dark:border-indigo-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Joining group...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-8 max-w-md w-full">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="text-primary" size={32} />
+          <div className="w-16 h-16 bg-primary-light dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="text-primary dark:text-indigo-400" size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {/* ✅ CHANGED: Show inviter name */}
             {inviterName ? 'You\'re Invited!' : 'Join Group'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {/* ✅ CHANGED: Personalized message */}
             {inviterName 
               ? `${inviterName} invited you to join` 
@@ -172,16 +172,16 @@ export default function JoinGroup() {
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">
             {error}
           </div>
         )}
 
-        <div className="bg-gray-50 rounded-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
             {group?.name}
           </h2>
-          <div className="flex items-center justify-center gap-2 text-gray-600">
+          <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
             <Users size={16} />
             <span className="text-sm">
               {group?.members?.length || 0} member{group?.members?.length !== 1 ? 's' : ''}
@@ -191,7 +191,7 @@ export default function JoinGroup() {
           </div>
           {/* ✅ ADDED: Show inviter wants to share with you */}
           {inviterName && (
-            <p className="text-center text-sm text-gray-500 mt-2">
+            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
               {inviterName} wants to share expenses with you
             </p>
           )}
@@ -201,36 +201,36 @@ export default function JoinGroup() {
           <div className="flex items-start gap-3">
             <div className="text-2xl">💰</div>
             <div>
-              <h3 className="font-semibold text-gray-900">Track Expenses</h3>
-              <p className="text-sm text-gray-600">Record shared expenses easily</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Track Expenses</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Record shared expenses easily</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="text-2xl">📊</div>
             <div>
-              <h3 className="font-semibold text-gray-900">See Balances</h3>
-              <p className="text-sm text-gray-600">Know who owes what instantly</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white">See Balances</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Know who owes what instantly</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="text-2xl">✅</div>
             <div>
-              <h3 className="font-semibold text-gray-900">Settle Up</h3>
-              <p className="text-sm text-gray-600">Record payments when settled</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Settle Up</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Record payments when settled</p>
             </div>
           </div>
         </div>
 
         <button
           onClick={handleJoinGroup}
-          className="w-full bg-primary text-white px-6 py-4 rounded-lg hover:bg-primary-hover transition text-lg font-semibold"
+          className="w-full bg-primary dark:bg-indigo-600 text-white px-6 py-4 rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition text-lg font-semibold"
         >
           Join {group?.name}
         </button>
 
         <button
           onClick={() => navigate('/dashboard')}
-          className="w-full mt-3 text-gray-600 hover:text-gray-900 text-sm"
+          className="w-full mt-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm"
         >
           Cancel
         </button>

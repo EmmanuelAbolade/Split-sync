@@ -5,19 +5,22 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { DarkModeProvider } from './contexts/DarkModeContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <PayPalScriptProvider
-      options={{
-        clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,
-        currency: "EUR",
-        intent: "capture",
-      }}
-    >
-      <App />
-    </PayPalScriptProvider>
+    <DarkModeProvider>
+      <PayPalScriptProvider
+        options={{
+          clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,
+          currency: "EUR",
+          intent: "capture",
+        }}
+      >
+        <App />
+      </PayPalScriptProvider>
+    </DarkModeProvider>
   </React.StrictMode>
 );
 
