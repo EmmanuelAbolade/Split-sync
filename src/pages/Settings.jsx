@@ -1,5 +1,5 @@
 // src/pages/Settings.jsx
-import { useState } from 'react';
+import { useState, useEffectEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, User, Mail, Moon, Sun, Bell, Trash2, 
@@ -14,6 +14,9 @@ import {
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
 import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { QrCode, HelpCircle, Star } from 'lucide-react';
+import QRCodeModal from '../components/QRCodeModal';
+import InfoHubModal from '../components/InfoHubModal';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -24,6 +27,8 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [showInfoHub, setShowInfoHub] = useState(false);
   
   // Profile edit state
   const [editingName, setEditingName] = useState(false);
@@ -301,6 +306,56 @@ export default function Settings() {
           </h2>
 
           <div className="space-y-3">
+          
+
+          {/* App Information Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <HelpCircle size={20} className="text-primary" />
+              App Information
+            </h3>
+            
+            <div className="space-y-3">
+              {/* Share App Button */}
+              <button
+                onClick={() => setShowQRCode(true)}
+                className="w-full flex items-center justify-between p-4 bg-white rounded-lg shadow-card hover:shadow-card-hover transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <QrCode size={20} className="text-indigo-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Share Split-Sync</p>
+                    <p className="text-sm text-gray-500">QR code & download link</p>
+                  </div>
+                </div>
+                <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center">
+                  <span className="text-gray-600">→</span>
+                </div>
+              </button>
+
+              {/* Help & Information Button */}
+              <button
+                onClick={() => setShowInfoHub(true)}
+                className="w-full flex items-center justify-between p-4 bg-white rounded-lg shadow-card hover:shadow-card-hover transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <HelpCircle size={20} className="text-blue-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Help & Information</p>
+                    <p className="text-sm text-gray-500">Guides, tutorials & support</p>
+                  </div>
+                </div>
+                <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center">
+                  <span className="text-gray-600">→</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
             {/* Logout */}
             <button
               onClick={handleLogout}
@@ -414,6 +469,19 @@ export default function Settings() {
           </div>
         </div>
       )}
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        isOpen={showQRCode}
+        onClose={() => setShowQRCode(false)}
+      />
+
+      {/* Info Hub Modal */}
+      <InfoHubModal
+        isOpen={showInfoHub}
+        onClose={() => setShowInfoHub(false)}
+      />
+
     </div>
   );
 }
