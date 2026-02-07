@@ -66,13 +66,13 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-card-3d animate-scale-in">
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
         {/* Header */}
-        <div className="sticky top-0 bg-white z-10 flex justify-between items-center p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">Share Invite Link</h2>
+        <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Share Invite Link</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition"
           >
             <X size={24} />
           </button>
@@ -82,7 +82,7 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
         <div className="p-6">
           {/* Invite Link Display */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Invite Link
             </label>
             <div className="flex gap-2">
@@ -90,15 +90,15 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
                 type="text"
                 value={inviteLink}
                 readOnly
-                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-mono"
+                className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 font-mono"
                 onClick={(e) => e.target.select()}
               />
               <button
                 onClick={handleCopy}
                 className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 ${
                   copied
-                    ? 'bg-green-500 text-white'
-                    : 'bg-primary text-white hover:bg-primary-dark'
+                    ? 'bg-green-500 dark:bg-green-600 text-white'
+                    : 'bg-primary dark:bg-indigo-600 text-white hover:bg-primary-dark dark:hover:bg-indigo-700'
                 }`}
               >
                 {copied ? (
@@ -118,30 +118,30 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
 
           {/* Share Options */}
           <div className="space-y-3 mb-6">
-            <p className="text-sm font-medium text-gray-700">Share via:</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Share via:</p>
 
             {/* QR Code */}
             <button
               onClick={() => setShowQR(!showQR)}
-              className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-300 transform hover:scale-105"
+              className="w-full flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-300 transform hover:scale-105"
             >
-              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gray-700 dark:bg-gray-600 rounded-full flex items-center justify-center">
                 <QrCode size={20} className="text-white" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-semibold text-gray-900">QR Code</p>
-                <p className="text-xs text-gray-600">Show scannable QR code</p>
+                <p className="font-semibold text-gray-900 dark:text-white">QR Code</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Show scannable QR code</p>
               </div>
             </button>
 
             {/* QR Code Display */}
             {showQR && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center animate-scale-in">
-                <p className="text-sm font-medium text-gray-700 mb-4">
+              <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6 text-center animate-scale-in">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
                   Scan to join group
                 </p>
                 <QRCodeCanvas value={inviteLink} size={200} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
                   Scan this QR code with your phone camera
                 </p>
               </div>
@@ -150,42 +150,42 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
             {/* WhatsApp */}
             <button
               onClick={handleWhatsApp}
-              className="w-full flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-300 transform hover:scale-105"
+              className="w-full flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-800 rounded-lg transition-all duration-300 transform hover:scale-105"
             >
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center">
                 <MessageCircle size={20} className="text-white" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-semibold text-gray-900">WhatsApp</p>
-                <p className="text-xs text-gray-600">Share via WhatsApp</p>
+                <p className="font-semibold text-gray-900 dark:text-white">WhatsApp</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Share via WhatsApp</p>
               </div>
             </button>
 
             {/* SMS */}
             <button
               onClick={handleSMS}
-              className="w-full flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all duration-300 transform hover:scale-105"
+              className="w-full flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-lg transition-all duration-300 transform hover:scale-105"
             >
-              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center">
                 <MessageCircle size={20} className="text-white" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-semibold text-gray-900">Text Message</p>
-                <p className="text-xs text-gray-600">Share via SMS/iMessage</p>
+                <p className="font-semibold text-gray-900 dark:text-white">Text Message</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Share via SMS/iMessage</p>
               </div>
             </button>
 
             {/* Email */}
             <button
               onClick={handleEmail}
-              className="w-full flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all duration-300 transform hover:scale-105"
+              className="w-full flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-800 rounded-lg transition-all duration-300 transform hover:scale-105"
             >
-              <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-purple-500 dark:bg-purple-600 rounded-full flex items-center justify-center">
                 <Mail size={20} className="text-white" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-semibold text-gray-900">Email</p>
-                <p className="text-xs text-gray-600">Share via email</p>
+                <p className="font-semibold text-gray-900 dark:text-white">Email</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Share via email</p>
               </div>
             </button>
 
@@ -195,14 +195,14 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
             {navigator.share && (
               <button
                 onClick={handleNativeShare}
-                className="w-full flex items-center gap-3 p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-all duration-300 transform hover:scale-105"
+                className="w-full flex items-center gap-3 p-4 bg-orange-50 dark:bg-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 border border-orange-200 dark:border-orange-800 rounded-lg transition-all duration-300 transform hover:scale-105"
               >
-                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-orange-500 dark:bg-orange-600 rounded-full flex items-center justify-center">
                   <Share2 size={20} className="text-white" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-semibold text-gray-900">More Options</p>
-                  <p className="text-xs text-gray-600">Share via other apps</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">More Options</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Share via other apps</p>
                 </div>
               </button>
             )}
@@ -212,10 +212,10 @@ export default function ShareInviteModal({ isOpen, onClose, inviteLink, groupNam
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white p-6 border-t border-gray-100">
+        <div className="sticky bottom-0 bg-white dark:bg-gray-800 p-6 border-t border-gray-100 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
+            className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition"
           >
             Close
           </button>

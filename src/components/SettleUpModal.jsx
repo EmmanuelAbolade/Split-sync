@@ -1,4 +1,4 @@
-// src/components/SettleUpModal.jsx - FINAL VERSION WITH ALL FIXES
+// src/components/SettleUpModal.jsx - FINAL VERSION WITH ALL FIXES + DARK MODE
 import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -21,7 +21,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
   const [selectedPaymentLink, setSelectedPaymentLink] = useState(null);
   const [copiedIban, setCopiedIban] = useState(false);
-  const [showPaymentInfo, setShowPaymentInfo] = useState(false);  // ← ADD THIS!
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
   const [showSepaModal, setShowSepaModal] = useState(false);
   const [sepaPaymentData, setSepaPaymentData] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState(null);
@@ -281,27 +281,27 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   if (paymentSuccess) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-        <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in text-center">
           <div className="flex justify-end mb-2">
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             >
               <X size={24} />
             </button>
           </div>
           <div className="mb-4">
-            <CheckCircle2 className="mx-auto text-green-500" size={64} />
+            <CheckCircle2 className="mx-auto text-green-500 dark:text-green-400" size={64} />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {userIsPaying ? 'Payment Sent!' : 'Payment Received!'}
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             {group?.currency} {amount} has been settled
           </p>
           <button
             onClick={onClose}
-            className="w-full px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition"
+            className="w-full px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition"
           >
             Close
           </button>
@@ -314,25 +314,25 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   if (showConfirmation && userIsReceiving) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-        <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in">
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Confirm Payment</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Confirm Payment</h2>
             <button
               onClick={() => setShowConfirmation(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             >
               <X size={24} />
             </button>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-3">
-              <AlertCircle className="text-yellow-600 flex-shrink-0" size={24} />
+              <AlertCircle className="text-yellow-600 dark:text-yellow-400 flex-shrink-0" size={24} />
               <div>
-                <p className="text-sm font-medium text-yellow-900 mb-2">
+                <p className="text-sm font-medium text-yellow-900 dark:text-yellow-200 mb-2">
                   Please confirm the payment details:
                 </p>
-                <div className="space-y-2 text-sm text-yellow-800">
+                <div className="space-y-2 text-sm text-yellow-800 dark:text-yellow-300">
                   <p><strong>From:</strong> {fromMember?.name}</p>
                   <p><strong>To:</strong> {toMember?.name} (You)</p>
                   <p><strong>Amount:</strong> {group?.currency} {amount}</p>
@@ -341,21 +341,21 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             </div>
           </div>
 
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             By confirming, you acknowledge that you have received this payment from {fromMember?.name}.
           </p>
 
           <div className="flex gap-3">
             <button
               onClick={() => setShowConfirmation(false)}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
             >
               Go Back
             </button>
             <button
               onClick={handleManualSettle}
               disabled={loading}
-              className="flex-1 px-4 py-3 bg-success text-white rounded-lg hover:opacity-90 transition disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50"
             >
               {loading ? 'Confirming...' : 'Confirm Receipt'}
             </button>
@@ -367,40 +367,40 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6 shadow-card-3d animate-scale-in">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {userIsPaying ? 'Pay Settlement' : 'Mark as Received'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
           >
             <X size={24} />
           </button>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm flex items-start gap-2">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm flex items-start gap-2 border border-red-200 dark:border-red-800">
             <span className="font-semibold">Error:</span>
             <span>{error}</span>
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-gray-700 mb-2">Settlement Details:</p>
+        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Settlement Details:</p>
           <div className="flex items-center justify-center gap-2">
-            <span className="text-lg font-semibold text-primary">{fromMember?.name}</span>
-            <ArrowRight size={20} className="text-gray-400" />
-            <span className="text-lg font-semibold text-primary">{toMember?.name}</span>
+            <span className="text-lg font-semibold text-primary dark:text-indigo-400">{fromMember?.name}</span>
+            <ArrowRight size={20} className="text-gray-400 dark:text-gray-500" />
+            <span className="text-lg font-semibold text-primary dark:text-indigo-400">{toMember?.name}</span>
           </div>
-          <p className="text-center text-2xl font-bold text-gray-900 mt-2">
+          <p className="text-center text-2xl font-bold text-gray-900 dark:text-white mt-2">
             {group?.currency} {settlement?.amount?.toFixed(2)}
           </p>
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Amount ({group?.currency})
           </label>
           <input
@@ -410,11 +410,11 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-lg font-semibold"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none text-lg font-semibold"
             required
             autoFocus
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Suggested: {group?.currency} {settlement?.amount?.toFixed(2)}
           </p>
         </div>
@@ -424,17 +424,17 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           <div className="mb-6">
             {/* Quick Payment Links Section */}
             {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
-              <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+              <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="relative group">
-                    <Info size={18} className="text-blue-600" />
-                    <div className="absolute left-0 top-6 w-64 bg-gray-900 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                    <Info size={18} className="text-blue-600 dark:text-blue-400" />
+                    <div className="absolute left-0 top-6 w-64 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                       These payment methods are set up by the recipient in their Profile settings
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-900">Quick Payment Options</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Quick Payment Options</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                   {toMember?.name} accepts payments via:
                 </p>
                 <div className="space-y-2">
@@ -444,20 +444,20 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                       type="button"
                       onClick={() => handlePaymentLinkClick(method)}
                       disabled={!amount || parseFloat(amount) <= 0}
-                      className="w-full flex items-center gap-3 p-3 bg-white border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                      className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-700 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                         {method.icon}
                       </div>
                       <div className="flex-1 text-left">
-                        <p className="font-semibold text-gray-900">{method.name}</p>
-                        <p className="text-xs text-gray-600">{method.description}</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{method.name}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{method.description}</p>
                       </div>
-                      <ExternalLink size={16} className="text-gray-400 group-hover:text-blue-600" />
+                      <ExternalLink size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-3 text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
                   Click to open payment app, then return here to mark as paid
                 </p>
               </div>
@@ -466,41 +466,41 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             {/* SEPA Bank Transfer Button */}
             {!loadingPaymentMethods && recipientPaymentMethods?.encryptedIBAN && !selectedPaymentLink && (
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Or pay directly with SEPA</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Or pay directly with SEPA</h3>
                 <button
                   onClick={handleSepaPayment}
                   disabled={!amount || parseFloat(amount) <= 0}
-                  className="w-full flex items-center gap-3 p-4 border-2 border-indigo-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center gap-3 p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center group-hover:bg-indigo-200 transition">
-                    <Landmark size={24} className="text-indigo-600" />
+                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900/50 transition">
+                    <Landmark size={24} className="text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div className="text-left flex-1">
-                    <div className="font-semibold text-gray-900">SEPA Bank Transfer</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-semibold text-gray-900 dark:text-white">SEPA Bank Transfer</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
                       Secure bank-to-bank payment
                     </div>
-                    <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                    <div className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
                       <CheckCircle2 size={12} />
                       IBAN available · Biometric secured
                     </div>
                   </div>
-                  <ArrowRight size={20} className="text-gray-400 group-hover:text-indigo-600 transition" />
+                  <ArrowRight size={20} className="text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition" />
                 </button>
               </div>
             )}
 
             {/* Bank Transfer Details */}
             {selectedPaymentLink && selectedPaymentLink.id === 'bank' && (
-              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="mb-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-blue-900 flex items-center gap-2">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 flex items-center gap-2">
                     <CreditCard size={18} />
                     Bank Transfer Details
                   </h3>
                   <button
                     onClick={() => setSelectedPaymentLink(null)}
-                    className="text-blue-600 text-sm hover:underline"
+                    className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
                   >
                     Back to options
                   </button>
@@ -508,14 +508,14 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                 
                 <div className="space-y-3 text-sm">
                   <div>
-                    <p className="text-blue-600 font-medium">Recipient</p>
-                    <p className="text-blue-900">{toMember?.name}</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium">Recipient</p>
+                    <p className="text-blue-900 dark:text-blue-200">{toMember?.name}</p>
                   </div>
                   
                   <div>
-                    <p className="text-blue-600 font-medium">IBAN</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium">IBAN</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-blue-900 font-mono text-xs flex-1 break-all bg-white p-2 rounded">
+                      <p className="text-blue-900 dark:text-blue-200 font-mono text-xs flex-1 break-all bg-white dark:bg-gray-700 p-2 rounded">
                         {selectedPaymentLink.iban}
                       </p>
                       <button
@@ -525,32 +525,32 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                           setCopiedIban(true);
                           setTimeout(() => setCopiedIban(false), 2000);
                         }}
-                        className="p-2 hover:bg-blue-100 rounded flex-shrink-0"
+                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded flex-shrink-0"
                       >
-                        {copiedIban ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                        {copiedIban ? <Check size={16} className="text-green-600 dark:text-green-400" /> : <Copy size={16} className="dark:text-blue-400" />}
                       </button>
                     </div>
                   </div>
                   
                   {selectedPaymentLink.bic && (
                     <div>
-                      <p className="text-blue-600 font-medium">BIC</p>
-                      <p className="text-blue-900 font-mono text-sm bg-white p-2 rounded">{selectedPaymentLink.bic}</p>
+                      <p className="text-blue-600 dark:text-blue-400 font-medium">BIC</p>
+                      <p className="text-blue-900 dark:text-blue-200 font-mono text-sm bg-white dark:bg-gray-700 p-2 rounded">{selectedPaymentLink.bic}</p>
                     </div>
                   )}
                   
                   <div>
-                    <p className="text-blue-600 font-medium">Amount</p>
-                    <p className="text-blue-900 font-semibold bg-white p-2 rounded">{group.currency} {amount}</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium">Amount</p>
+                    <p className="text-blue-900 dark:text-blue-200 font-semibold bg-white dark:bg-gray-700 p-2 rounded">{group.currency} {amount}</p>
                   </div>
                   
                   <div>
-                    <p className="text-blue-600 font-medium">Reference</p>
-                    <p className="text-blue-900 bg-white p-2 rounded">SplitSync Settlement</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium">Reference</p>
+                    <p className="text-blue-900 dark:text-blue-200 bg-white dark:bg-gray-700 p-2 rounded">SplitSync Settlement</p>
                   </div>
                 </div>
                 
-                <p className="text-xs text-blue-700 mt-3 text-center">
+                <p className="text-xs text-blue-700 dark:text-blue-400 mt-3 text-center">
                   After making the transfer, mark the payment as completed below
                 </p>
               </div>
@@ -560,10 +560,10 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
+                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-3 bg-white text-gray-500">or use</span>
+                  <span className="px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or use</span>
                 </div>
               </div>
             )}
@@ -574,8 +574,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                 onClick={() => setPaymentMethod('paypal')}
                 className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition ${
                   paymentMethod === 'paypal'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 <CreditCard size={18} />
@@ -586,8 +586,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                 onClick={() => setPaymentMethod('manual')}
                 className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition ${
                   paymentMethod === 'manual'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 <DollarSign size={18} />
@@ -597,8 +597,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
             {paymentMethod === 'paypal' ? (
               <div>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                  <p className="text-xs text-yellow-800">
+                <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-4">
+                  <p className="text-xs text-yellow-800 dark:text-yellow-300">
                     <strong>Demo Mode:</strong> Using PayPal Sandbox for demonstration.
                   </p>
                 </div>
@@ -611,22 +611,22 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                     disabled={loading}
                   />
                 ) : (
-                  <div className="text-center py-4 text-gray-500">
+                  <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                     Enter an amount to continue
                   </div>
                 )}
               </div>
             ) : (
               <form onSubmit={handleManualSettle}>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-gray-700">
+                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     Mark this payment as completed if you paid {toMember?.name} via cash, bank transfer, or another method.
                   </p>
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-4 py-3 bg-success text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium"
+                  className="w-full px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium"
                 >
                   {loading ? 'Recording...' : 'Confirm Payment Sent'}
                 </button>
@@ -636,18 +636,18 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         ) : (
           /* User is receiving - manual confirmation only */
           <form onSubmit={handleManualSettle}>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-              <p className="text-sm font-medium text-green-900 mb-2">
+            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+              <p className="text-sm font-medium text-green-900 dark:text-green-300 mb-2">
                 Did you receive this payment?
               </p>
-              <p className="text-sm text-green-700">
+              <p className="text-sm text-green-700 dark:text-green-400">
                 You will be asked to confirm before recording this payment.
               </p>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-4 py-3 bg-success text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium"
+              className="w-full px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium"
             >
               {loading ? 'Recording...' : 'Confirm Payment Received'}
             </button>
@@ -657,7 +657,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         <button
           type="button"
           onClick={onClose}
-          className="w-full mt-3 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+          className="w-full mt-3 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
         >
           Cancel
         </button>

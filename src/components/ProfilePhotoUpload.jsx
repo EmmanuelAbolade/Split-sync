@@ -70,7 +70,7 @@ export default function ProfilePhotoUpload({ user, currentPhotoURL, onPhotoUpdat
 
       <div className="relative inline-block">
         {/* Profile Photo Display */}
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover">
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-indigo-800 shadow-card-hover dark:shadow-gray-900/50">
           {currentPhotoURL ? (
             <img
               src={currentPhotoURL}
@@ -90,7 +90,7 @@ export default function ProfilePhotoUpload({ user, currentPhotoURL, onPhotoUpdat
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:scale-110 disabled:opacity-50"
+          className="absolute bottom-0 right-0 w-8 h-8 bg-primary dark:bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 transform hover:scale-110 disabled:opacity-50"
         >
           {uploading ? (
             <Loader size={16} className="animate-spin" />
@@ -101,7 +101,7 @@ export default function ProfilePhotoUpload({ user, currentPhotoURL, onPhotoUpdat
       </div>
 
       {error && (
-        <p className="text-red-600 text-xs mt-2">{error}</p>
+        <p className="text-red-600 dark:text-red-400 text-xs mt-2">{error}</p>
       )}
     </div>
   );

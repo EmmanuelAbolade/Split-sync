@@ -28,7 +28,7 @@ const ICONS = [
 export default function IconSelector({ selected, onSelect }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         Choose Icon
       </label>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -42,8 +42,8 @@ export default function IconSelector({ selected, onSelect }) {
               title={label}
               className={`p-3 rounded-lg transition flex items-center justify-center ${
                 isSelected
-                  ? 'bg-primary text-white ring-2 ring-primary'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-primary dark:bg-indigo-600 text-white ring-2 ring-primary dark:ring-indigo-500'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               <Icon size={24} />

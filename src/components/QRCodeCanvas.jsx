@@ -26,7 +26,7 @@ export default function QRCodeCanvas({ value, size = 200 }) {
   }, [value, size]);
 
   return (
-    <div className="inline-block bg-white p-4 rounded-lg shadow-sm">
+    <div className="inline-block bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm dark:shadow-gray-900/50">
       <canvas ref={canvasRef} />
     </div>
   );

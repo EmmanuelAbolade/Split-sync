@@ -66,9 +66,9 @@ export default function PasswordStrength({ password, onPasswordGenerate }) {
   };
 
   const strengthTextColors = {
-    red: 'text-red-600',
-    yellow: 'text-yellow-600',
-    green: 'text-green-600',
+    red: 'text-red-600 dark:text-red-400',
+    yellow: 'text-yellow-600 dark:text-yellow-400',
+    green: 'text-green-600 dark:text-green-400',
   };
 
   return (
@@ -77,12 +77,12 @@ export default function PasswordStrength({ password, onPasswordGenerate }) {
       {password && (
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-gray-600">Password Strength:</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400">Password Strength:</span>
             <span className={`text-xs font-semibold ${strengthTextColors[strength.color]}`}>
               {strength.label}
             </span>
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
               className={`h-full ${strengthColors[strength.color]} transition-all duration-300`}
               style={{ width: `${(strength.score / 6) * 100}%` }}
@@ -95,7 +95,7 @@ export default function PasswordStrength({ password, onPasswordGenerate }) {
       <button
         type="button"
         onClick={generatePassword}
-        className="flex items-center gap-2 text-sm text-primary hover:text-primary-dark transition mb-3"
+        className="flex items-center gap-2 text-sm text-primary dark:text-indigo-400 hover:text-primary-dark dark:hover:text-indigo-300 transition mb-3"
       >
         <RefreshCw size={14} />
         <span>Generate Strong Password</span>
@@ -107,11 +107,11 @@ export default function PasswordStrength({ password, onPasswordGenerate }) {
           {requirements.map((req, index) => (
             <div key={index} className="flex items-center gap-2 text-xs">
               {req.met ? (
-                <Check size={14} className="text-green-600" />
+                <Check size={14} className="text-green-600 dark:text-green-400" />
               ) : (
-                <X size={14} className="text-gray-400" />
+                <X size={14} className="text-gray-400 dark:text-gray-600" />
               )}
-              <span className={req.met ? 'text-green-600' : 'text-gray-500'}>
+              <span className={req.met ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-500'}>
                 {req.label}
               </span>
             </div>

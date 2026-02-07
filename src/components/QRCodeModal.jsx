@@ -39,21 +39,21 @@ export default function QRCodeModal({ isOpen, onClose, appUrl }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-gray-900/50 max-w-md w-full p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-              <Share2 size={20} className="text-indigo-600" />
+            <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+              <Share2 size={20} className="text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Share Split-Sync</h2>
-              <p className="text-xs text-gray-500">Scan to download the app</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Share Split-Sync</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Scan to download the app</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition"
           >
             <X size={24} />
           </button>
@@ -62,7 +62,7 @@ export default function QRCodeModal({ isOpen, onClose, appUrl }) {
         {/* QR Code Display */}
         <div className="flex flex-col items-center space-y-4">
           {/* QR Code */}
-          <div className="p-6 bg-white border-4 border-indigo-100 rounded-2xl shadow-lg">
+          <div className="p-6 bg-white dark:bg-gray-700 border-4 border-indigo-100 dark:border-indigo-900/50 rounded-2xl shadow-lg dark:shadow-gray-900/50">
             <QRCodeSVG
               id="qr-code-svg"
               value={appUrl}
@@ -75,18 +75,18 @@ export default function QRCodeModal({ isOpen, onClose, appUrl }) {
           {/* App Info */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Smartphone size={16} className="text-indigo-600" />
-              <p className="text-sm font-medium text-gray-900">Split-Sync App</p>
+              <Smartphone size={16} className="text-indigo-600 dark:text-indigo-400" />
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Split-Sync App</p>
             </div>
-            <p className="text-xs text-gray-600 font-mono bg-gray-50 px-3 py-1 rounded">
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-700 px-3 py-1 rounded">
               {appUrl}
             </p>
           </div>
 
           {/* Instructions */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full">
-            <p className="text-sm text-blue-900 font-medium mb-2">📱 How to use:</p>
-            <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
+          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 w-full">
+            <p className="text-sm text-blue-900 dark:text-blue-300 font-medium mb-2">📱 How to use:</p>
+            <ol className="text-xs text-blue-800 dark:text-blue-300 space-y-1 list-decimal list-inside">
               <li>Open your phone's camera app</li>
               <li>Point at the QR code above</li>
               <li>Tap the notification to open Split-Sync</li>
@@ -98,14 +98,14 @@ export default function QRCodeModal({ isOpen, onClose, appUrl }) {
           <div className="flex gap-3 w-full">
             <button
               onClick={handleDownloadQR}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-700 transition font-medium"
             >
               <Download size={18} />
               Download QR
             </button>
             <button
               onClick={handleCopyUrl}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-indigo-300 text-indigo-600 rounded-lg hover:bg-indigo-50 transition font-medium"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition font-medium"
             >
               {copied ? (
                 <>
@@ -122,12 +122,12 @@ export default function QRCodeModal({ isOpen, onClose, appUrl }) {
           </div>
 
           {/* Share Options */}
-          <div className="w-full pt-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center mb-3">Or share via:</p>
+          <div className="w-full pt-4 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">Or share via:</p>
             <div className="flex justify-center gap-3">
               <button
                 onClick={() => window.open(`https://wa.me/?text=Check out Split-Sync: ${appUrl}`, '_blank')}
-                className="p-3 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition"
+                className="p-3 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/40 transition"
                 title="Share on WhatsApp"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -136,7 +136,7 @@ export default function QRCodeModal({ isOpen, onClose, appUrl }) {
               </button>
               <button
                 onClick={() => window.open(`mailto:?subject=Check out Split-Sync&body=I found this great expense-sharing app: ${appUrl}`, '_blank')}
-                className="p-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition"
+                className="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition"
                 title="Share via Email"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
