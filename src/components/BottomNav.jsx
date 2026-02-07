@@ -12,21 +12,21 @@ export default function BottomNav() {
       label: 'Home', 
       icon: Home, 
       path: '/dashboard',
-      activeColor: 'text-primary'
+      activeColor: 'text-primary dark:text-indigo-400'
     },
     { 
       id: 'activity', 
       label: 'Activity', 
       icon: Activity, 
       path: '/activity',
-      activeColor: 'text-blue-600'
+      activeColor: 'text-blue-600 dark:text-blue-400'
     },
     { 
       id: 'add', 
       label: 'Add', 
       icon: Plus, 
       path: '/add',
-      activeColor: 'text-green-600',
+      activeColor: 'text-green-600 dark:text-green-400',
       isSpecial: true
     },
     { 
@@ -34,7 +34,7 @@ export default function BottomNav() {
       label: 'You', 
       icon: User, 
       path: '/profile',
-      activeColor: 'text-purple-600'
+      activeColor: 'text-purple-600 dark:text-purple-400'
     },
   ];
 
@@ -46,7 +46,7 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-card-3d z-40 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-card-3d dark:shadow-gray-900/50 z-40 safe-area-bottom">
       <div className="max-w-7xl mx-auto px-2 py-2">
         <div className="flex items-center justify-around">
           {tabs.map((tab) => {
@@ -61,7 +61,7 @@ export default function BottomNav() {
                   onClick={() => navigate(tab.path)}
                   className="relative -mt-6"
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center shadow-card-hover hover:shadow-card-3d transition-all duration-300 transform hover:scale-110 active:scale-95">
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-full flex items-center justify-center shadow-card-hover hover:shadow-card-3d dark:shadow-gray-900/50 transition-all duration-300 transform hover:scale-110 active:scale-95">
                     <Icon size={24} className="text-white" strokeWidth={2.5} />
                   </div>
                 </button>
@@ -78,18 +78,18 @@ export default function BottomNav() {
                 className={`flex flex-col items-center gap-1 py-2 px-4 rounded-lg transition-all duration-300 ${
                   active 
                     ? 'transform scale-105' 
-                    : 'hover:bg-gray-50'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 <Icon 
                   size={24} 
                   className={`transition-colors duration-300 ${
-                    active ? tab.activeColor : 'text-gray-400'
+                    active ? tab.activeColor : 'text-gray-400 dark:text-gray-500'
                   }`}
                   strokeWidth={active ? 2.5 : 2}
                 />
                 <span className={`text-xs font-medium transition-colors duration-300 ${
-                  active ? tab.activeColor : 'text-gray-500'
+                  active ? tab.activeColor : 'text-gray-500 dark:text-gray-400'
                 }`}>
                   {tab.label}
                 </span>
