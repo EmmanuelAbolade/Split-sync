@@ -67,8 +67,8 @@ export default function InfoHubModal({ isOpen, onClose }) {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Welcome to Split-Sync! 👋</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Split-Sync makes it easy to share expenses with friends, family, and roommates. 
-                  No more awkward money conversations or complicated spreadsheets!
+                  Split-Sync makes it easy to share expenses with friends, family, roommates, and small groups like event planning teams, travel groups, and more. 
+                  No more awkward money conversations and calculations, complicated spreadsheets and calendar notifications, or confusion about who owes what. Just simple, seamless expense sharing at your fingertips!
                 </p>
               </div>
 
@@ -78,8 +78,15 @@ export default function InfoHubModal({ isOpen, onClose }) {
                   <li className="flex gap-3">
                     <span className="flex-shrink-0 w-6 h-6 bg-indigo-600 dark:bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">Create or Join a Group</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Click "Create Group" or join using an invite link</p>
+                      <p className="font-medium text-gray-900 dark:text-white">Create a Group</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Click "Create Group" to set up a new group</p>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 bg-indigo-600 dark:bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">Send invite or Join a Group</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Click "Invite" to share an invite using QR code, Whatsapp etc. or join using an invite link (ensure members are added to the group before adding expenses)</p>
                     </div>
                   </li>
                   <li className="flex gap-3">
@@ -280,7 +287,7 @@ export default function InfoHubModal({ isOpen, onClose }) {
 
               <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <p className="text-sm text-blue-900 dark:text-blue-300">
-                  <strong>Note:</strong> These are placeholder tutorial links. Replace them with your actual tutorial videos when ready!
+                  <strong>Note:</strong> These tutorial videos are always available here when you need them!
                 </p>
               </div>
             </div>
@@ -312,7 +319,7 @@ export default function InfoHubModal({ isOpen, onClose }) {
                 </a>
 
                 <a
-                  href="https://wa.me/1234567890"
+                  href="https://wa.me/+3530899891720"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-green-400 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition"

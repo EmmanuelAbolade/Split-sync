@@ -634,7 +634,7 @@ export default function GroupDetails() {
                       <div
                         key={expense.id}
                         onClick={() => setSelectedExpense(expense)}
-                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-indigo-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover dark:hover:shadow-gray-900/50 cursor-pointer bg-white dark:bg-gray-750 shadow-card dark:shadow-gray-900/50"
+                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-indigo-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover dark:hover:shadow-gray-900/50 cursor-pointer bg-white dark:bg-gray-700 shadow-card dark:shadow-gray-900/50"
                       >
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
                           <div className="flex-1">
