@@ -15,14 +15,12 @@ import CloudinaryUpload from '../components/CloudinaryUpload';
 import { 
   encryptData, 
   decryptData, 
-  validateIBAN, 
-  formatIBANDisplay,
-  maskIBAN 
+  validateIBAN
 } from '../utils/encryption';
 import { 
   authenticateWithBiometric,
   isBiometricAvailable,
-  getBiometricPreference,
+  isBiometricEnabledOnDevice,
   enableBiometric,
   disableBiometric
 } from '../utils/biometric';
@@ -78,7 +76,7 @@ export default function Profile() {
   useEffect(() => {
     if (user) {
       setBiometricAvailable(isBiometricAvailable());
-      setBiometricEnabled(getBiometricPreference(user.uid));
+      setBiometricEnabled(isBiometricEnabledOnDevice(user.uid));  
     }
   }, [user]);
 

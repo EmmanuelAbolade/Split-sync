@@ -13,12 +13,13 @@ import {
   deleteUser
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
-import { doc, deleteDoc, collection, query, where, getDocs, updateDoc, getDoc } from 'firebase/firestore';
-import { QrCode, HelpCircle, Star } from 'lucide-react';
+import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { QrCode, HelpCircle } from 'lucide-react';
 import QRCodeModal from '../components/QRCodeModal';
 import InfoHubModal from '../components/InfoHubModal';
 import DarkModeToggle from '../components/DarkModeToggle';
-import { authenticateWithBiometric } from '../utils/biometric';
+import { registerBiometric, authenticateWithBiometric, disableBiometric, isBiometricEnabledOnDevice, getDeviceInfo } from '../utils/biometric';
+
 
 export default function Settings() {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -138,52 +139,73 @@ export default function Settings() {
   };
 
   const handleBiometricToggle = async (newValue) => {
+    // TURNING ON - Register biometric on THIS device
+    if (newValue && !biometricEnabled) {
+      try {
+        setLoading(true);
+        
+        // Register biometric - prompts for ACTUAL fingerprint/Face ID
+        const success = await registerBiometric(user.uid, user.email, user.displayName);
+        
+        if (success) {
+          setBiometricEnabled(true);
+          const deviceInfo = getDeviceInfo();
+          setSuccess(`✅ Biometric authentication enabled on ${deviceInfo}!`);
+          setTimeout(() => setSuccess(''), 4000);
+        } else {
+          setError('Failed to enable biometric authentication. Please try again.');
+          setTimeout(() => setError(''), 3000);
+        }
+      } catch (err) {
+        console.error('Biometric enable error:', err);
+        setError('Failed to enable biometric authentication');
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    
+    // TURNING OFF - Require authentication first
     if (!newValue && biometricEnabled) {
       try {
+        setLoading(true);
+        
+        // Require biometric auth to disable
         const authenticated = await authenticateWithBiometric(
           user.uid,
           'Authenticate to disable biometric security'
         );
-        if (!authenticated) 
-          // Don't change toggle
-          return;
+        
+        if (!authenticated) {
+          setLoading(false);
+          return; // Don't change toggle
+        }
+
+        // Disable biometric on THIS device
+        disableBiometric(user.uid);
+        
+        setBiometricEnabled(false);
+        const deviceInfo = getDeviceInfo();
+        setSuccess(`Biometric authentication disabled on ${deviceInfo}`);
+        setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
-        // Don't change toggle
-        return;
+        console.error('Biometric disable error:', err);
+        setError('Failed to disable biometric authentication');
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setLoading(false);
       }
-    }
-    // Update state
-    setBiometricEnabled(newValue);
-    
-    // Save to Firestore
-    try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        biometricEnabled: newValue,
-        updatedAt: new Date()
-      });
-    } catch (err) {
-      console.error('Errorupdating biometric setting:', err);
-      setError('Failed to update setting');
-      // Revert state
-      setBiometricEnabled(!newValue);
     }
   };
 
+
+  // Load biometric setting from user document
   useEffect(() => {
-    // Load biometric setting from user document
-    const loadBiometricSetting = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          setBiometricEnabled(userDoc.data().biometricEnabled || false);
-        }
-      } catch (err) {
-        console.error('Error loading biometric setting:', err);
-      }
-    };
-    
+    // Load biometric setting from localStorage (device-specific)
     if (user) {
-      loadBiometricSetting();
+      const enabled = isBiometricEnabledOnDevice(user.uid);
+      setBiometricEnabled(enabled);
     }
   }, [user]);
 
@@ -367,7 +389,7 @@ export default function Settings() {
               </button>
             </div>
           </div>
-          
+
           {/* Biometric Authentication Toggle */}
            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition">
               <div className="flex items-center gap-3">
@@ -376,7 +398,7 @@ export default function Settings() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">Biometric Authentication</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Use fingerprint/Face ID</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Use fingerprint/Face ID on {getDeviceInfo()}</p>
                 </div>
               </div>
               

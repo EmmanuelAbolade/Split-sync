@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { auth} from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { Eye, EyeOff } from 'lucide-react';
+import { isBiometricEnabledOnDevice, authenticateWithBiometric } from '../utils/biometric';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -22,7 +23,29 @@ export default function Login() {
     setLoading(true);
 
     try {
+      // Step 1: Authenticate with Firebase (email + password)
       const result = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Step 2: Check if user has biometric enabled
+      const biometricEnabled = isBiometricEnabledOnDevice(result.user.uid);
+      
+      // Step 3: If biometric is enabled, require authentication
+      if (biometricEnabled) {
+        const authenticated = await authenticateWithBiometric(
+          result.user.uid,
+          'Verify your identity to login'
+        );
+        
+        if (!authenticated) {
+          // Biometric failed - sign out and show error
+          await auth.signOut();
+          setError('Biometric authentication required to login on this device');
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Step 4: All good - proceed to dashboard
       setUser(result.user);
       navigate('/dashboard');
     } catch (err) {
@@ -47,8 +70,30 @@ export default function Login() {
     setLoading(true);
 
     try {
+      // Step 1: Sign in with Google
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      
+      // Step 2: Check if user has biometric enabled
+      const biometricEnabled = isBiometricEnabledOnDevice(result.user.uid);
+      
+      // Step 3: If biometric is enabled, require authentication
+      if (biometricEnabled) {
+        const authenticated = await authenticateWithBiometric(
+          result.user.uid,
+          'Verify your identity to login'
+        );
+        
+        if (!authenticated) {
+          // Biometric failed or cancelled- sign out and show error
+          await auth.signOut();
+          setError('Biometric authentication required to login on this device');
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Step 4: All good - proceed to dashboard
       setUser(result.user);
       navigate('/dashboard');
     } catch (err) {
