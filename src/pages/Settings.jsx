@@ -1,5 +1,5 @@
 // src/pages/Settings.jsx
-import { useState, useEffectEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, User, Mail, Bell, Trash2, 
@@ -13,13 +13,15 @@ import {
   deleteUser
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
-import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, deleteDoc, collection, query, where, getDocs, updateDoc, getDoc } from 'firebase/firestore';
 import { QrCode, HelpCircle, Star } from 'lucide-react';
 import QRCodeModal from '../components/QRCodeModal';
 import InfoHubModal from '../components/InfoHubModal';
 import DarkModeToggle from '../components/DarkModeToggle';
+import { authenticateWithBiometric } from '../utils/biometric';
 
 export default function Settings() {
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [notifications, setNotifications] = useState(true);
@@ -134,6 +136,56 @@ export default function Settings() {
       setDeleteLoading(false);
     }
   };
+
+  const handleBiometricToggle = async (newValue) => {
+    if (!newValue && biometricEnabled) {
+      try {
+        const authenticated = await authenticateWithBiometric(
+          user.uid,
+          'Authenticate to disable biometric security'
+        );
+        if (!authenticated) 
+          // Don't change toggle
+          return;
+      } catch (err) {
+        // Don't change toggle
+        return;
+      }
+    }
+    // Update state
+    setBiometricEnabled(newValue);
+    
+    // Save to Firestore
+    try {
+      await updateDoc(doc(db, 'users', user.uid), {
+        biometricEnabled: newValue,
+        updatedAt: new Date()
+      });
+    } catch (err) {
+      console.error('Errorupdating biometric setting:', err);
+      setError('Failed to update setting');
+      // Revert state
+      setBiometricEnabled(!newValue);
+    }
+  };
+
+  useEffect(() => {
+    // Load biometric setting from user document
+    const loadBiometricSetting = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setBiometricEnabled(userDoc.data().biometricEnabled || false);
+        }
+      } catch (err) {
+        console.error('Error loading biometric setting:', err);
+      }
+    };
+    
+    if (user) {
+      loadBiometricSetting();
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
@@ -315,6 +367,32 @@ export default function Settings() {
               </button>
             </div>
           </div>
+          
+          {/* Biometric Authentication Toggle */}
+           <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                  <Shield size={20} className="text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">Biometric Authentication</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Use fingerprint/Face ID</p>
+                </div>
+              </div>
+              
+              {/* Toggle Switch */}
+              <button
+                onClick={() => handleBiometricToggle(!biometricEnabled)}
+                className={`relative w-12 h-6 rounded-full transition ${
+                  biometricEnabled ? 'bg-primary dark:bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+                aria-label="Toggle biometric authentication"
+              >
+                <span className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-all ${
+                  biometricEnabled ? 'right-0.5' : 'left-0.5'
+                }`} />
+              </button>
+            </div>
 
             {/* Logout */}
             <button
@@ -329,6 +407,7 @@ export default function Settings() {
                 </div>
               </div>
             </button>
+
 
             {/* Delete Account */}
             <button
@@ -434,6 +513,7 @@ export default function Settings() {
       <QRCodeModal
         isOpen={showQRCode}
         onClose={() => setShowQRCode(false)}
+        appUrl={process.env.REACT_APP_BASE_URL || window.location.origin}
       />
 
       {/* Info Hub Modal */}

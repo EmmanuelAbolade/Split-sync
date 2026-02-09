@@ -9,6 +9,7 @@ import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } f
 import { useEffect } from 'react';
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
+import { authenticateWithBiometric } from '../utils/biometric';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
   const [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || '');
@@ -109,6 +110,25 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       return;
     }
 
+    // If user is receiving and confirmed, require biometric
+    if (userIsReceiving && showConfirmation) {
+      try {
+        const authenticated = await authenticateWithBiometric(
+          currentUserId,
+          'Authenticate to confirm receipt'
+        );
+        
+        if (!authenticated) {
+          setError('Authentication required to confirm receipt');
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        setError('Authentication failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+    }
     setLoading(true);
 
     try {
