@@ -263,29 +263,6 @@ export default function Profile() {
     : 'Unknown';
 
 
-
-  // Handle biometric toggle
-  const handleBiometricToggle = async () => {
-    if (!user) return;
-
-    if (biometricEnabled) {
-      // Disable biometric
-      disableBiometric(user.uid);
-      setBiometricEnabled(false);
-      setIsAuthenticated(false);
-      alert('Biometric authentication disabled');
-    } else {
-      // Enable biometric
-      const success = await enableBiometric(user.uid);
-      if (success) {
-        setBiometricEnabled(true);
-        alert('Biometric authentication enabled successfully!');
-      } else {
-        alert('Failed to enable biometric authentication. Please try again.');
-      }
-    }
-  };
-
   // Handle showing payment settings with biometric check
   const handleShowPaymentSettings = async () => {
     if (!user) return;
@@ -461,49 +438,6 @@ export default function Profile() {
             </div>
           </div>
         </div>
-
-
-        {/* Security Settings */}
-        {biometricAvailable && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
-                <Shield size={20} className="text-indigo-600 dark:text-indigo-400" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Security</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Biometric authentication</p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg border border-indigo-200 dark:border-indigo-800">
-              <div className="flex items-center gap-3">
-                <Fingerprint size={24} className="text-indigo-600 dark:text-indigo-400" />
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Fingerprint/Face ID</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {biometricEnabled 
-                      ? 'Required for payment settings' 
-                      : 'Enable for extra security'}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleBiometricToggle}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  biometricEnabled ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-gray-300 dark:bg-gray-600'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    biometricEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-        )}
-
 
 
         {/* Payment Settings */}
