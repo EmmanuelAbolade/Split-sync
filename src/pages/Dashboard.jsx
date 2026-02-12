@@ -8,7 +8,10 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import CreateGroupModal from '../components/CreateGroupModal';
 import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift } from 'lucide-react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { Settings } from 'lucide-react';
+import { Settings, Bell } from 'lucide-react';
+import InvitationNotification from '../components/InvitationNotification';
+import OnboardingWizard from "../components/OnboardingWizard";
+
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -30,6 +33,7 @@ const ICON_MAP = {
   gift: Gift,
 };
 
+
 function getIconComponent(iconName) {
   return ICON_MAP[iconName] || Home;
 }
@@ -38,10 +42,12 @@ export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
-  
+  const [hasPayment, setHasPayment] = useState(true);
+
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Fetch user data
   useEffect(() => {
@@ -53,6 +59,20 @@ export default function Dashboard() {
         if (userDoc.exists()) {
           const data = userDoc.data();
           setUserData(data);
+
+          // Check if user has at least one payment method
+          const pm = data?.paymentMethods;
+          const hasPayment =
+            !!pm?.paypalUsername || !!pm?.revolutUsername || !!pm?.encryptedIBAN;
+
+          setHasPayment(hasPayment);
+
+
+          // If first login, show onboarding wizard
+          if (data.isFirstLogin) {
+            setShowOnboarding(true);
+          }
+
           
           // Mark first login as complete
           if (data.isFirstLogin) {
@@ -111,8 +131,112 @@ export default function Dashboard() {
     // Groups will update automatically via real-time listener
   };
 
+  const [invitationCount, setInvitationCount] = useState(0);
+  const [showInvitations, setShowInvitations] = useState(true);
+
+  // Play sound or show toast when new invitations arrive
+  useEffect(() => {
+    if (invitationCount > 0) {
+      // Play sound
+      const audio = new Audio('/notification.mp3');
+      audio.play().catch(err => console.log('Audio play failed:', err));
+      
+      // Or show toast
+      alert(`🔔 You have ${invitationCount} new invitation(s)!`);
+    }
+  }, [invitationCount]);
+
+  // Listen for real-time invitation changes/notifications
+  useEffect(() => {
+    if (!user) return;
+    
+    // Listen for real-time invitation changes
+    const invitationsQuery = query(
+      collection(db, 'invitations'),
+      where('toUserId', '==', user.uid),
+      where('status', '==', 'pending')
+    );
+    
+    const unsubscribe = onSnapshot(invitationsQuery, (snapshot) => {
+      const count = snapshot.docs.length;
+      setInvitationCount(count);
+    });
+    
+    return () => unsubscribe();
+  }, [user]);
+
+
+  // Handle invitation count updates
+  const handleInvitationUpdate = (count) => {
+    setInvitationCount(count);
+    
+    // Auto-hide if no invitations
+    if (count === 0) {
+      setShowInvitations(false);
+    } else {
+      setShowInvitations(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+      {/* Invitation Notifications */}
+      {user && showInvitations && invitationCount > 0 && (
+        <div className="mb-6 animate-scale-in">
+          <InvitationNotification
+            user={user}
+            onInvitationUpdate={handleInvitationUpdate}
+          />
+        </div>
+      )}
+
+      {/* payment notification banner UI */}
+      {!hasPayment && (
+        <div className="mb-4 p-4 rounded-xl border border-yellow-300
+                        bg-yellow-50 text-yellow-800
+                        dark:bg-yellow-900/20 dark:text-yellow-300
+                        dark:border-yellow-700">
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-sm">
+                Payment method not set
+              </p>
+              <p className="text-xs mt-1">
+                Add at least one payment method to receive settlements faster.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/profile")}
+              className="ml-4 px-3 py-2 rounded-lg text-sm
+                        bg-primary text-white hover:bg-primary-hover
+                        dark:bg-indigo-600 dark:hover:bg-indigo-700"
+            >
+              Set Up
+            </button>
+          </div>
+        </div>
+      )}
+
+
+
+      <OnboardingWizard
+        open={showOnboarding}
+        navigate={navigate}
+        onClose={() => setShowOnboarding(false)}
+        onFinish={async () => {
+          setShowOnboarding(false);
+
+          // Optional: store a “tour completed” flag too (separate from isFirstLogin)
+          await updateDoc(doc(db, "users", user.uid), {
+            onboardingCompletedAt: new Date(),
+          });
+        }}
+      />
+
+
       {/* Top Bar */}
       <div className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -121,6 +245,14 @@ export default function Dashboard() {
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {user?.displayName || user?.email}
             </span>
+            <div className="relative">
+              <Bell size={24} className="text-gray-600 dark:text-gray-300" />
+              {invitationCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {invitationCount}
+                </span>
+              )}
+            </div>
             <button
               onClick={() => navigate('/settings')}
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"

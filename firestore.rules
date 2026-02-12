@@ -43,5 +43,58 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
+
+    // NEW: Connections - users can read/write their own connections
+    match /connections/{userId}/connectedUsers/{connectedUserId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // NEW: Invitations
+    match /invitations/{invitationId} {
+      // Users can read invitations they sent or received
+      allow read: if request.auth != null && 
+        (resource.data.toUserId == request.auth.uid || 
+         resource.data.fromUserId == request.auth.uid);
+      
+      // Users can create invitations
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.fromUserId;
+      
+      // Users can update invitations they received (accept/decline)
+      allow update: if request.auth != null && 
+        resource.data.toUserId == request.auth.uid;
+      
+      // Users can delete invitations they sent
+      allow delete: if request.auth != null && 
+        resource.data.fromUserId == request.auth.uid;
+    }
+    
+    // NEW: Phone Numbers (for contact matching)
+    match /phoneNumbers/{hashedPhone} {
+      // Anyone authenticated can read (for matching)
+      allow read: if request.auth != null;
+      
+      // Users can create their own phone hash
+      allow create: if request.auth != null;
+      
+      // Users can update their own phone hash
+      allow update: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      
+      // Users can delete their own phone hash
+      allow delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // UPDATED: Users collection (add allowContactSync field)
+    match /users/{userId} {
+      // ... existing rules ...
+      
+      // Allow users to update their contact sync preference
+      allow update: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+
   }
 }

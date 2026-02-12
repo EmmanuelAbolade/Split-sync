@@ -1,3 +1,4 @@
+// functions/index.js
 const functions = require('firebase-functions/v2');
 const admin = require('firebase-admin');
 const vision = require('@google-cloud/vision');
