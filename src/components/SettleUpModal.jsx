@@ -1,12 +1,11 @@
-// src/components/SettleUpModal.jsx - FINAL VERSION WITH ALL FIXES + DARK MODE
-import { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+// src/components/SettleUpModal.jsx - WITH PAYMENT CONFIRMATION FLOW
+import { useState, useEffect } from 'react';
+import { collection, addDoc, serverTimestamp, runTransaction, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
+import { getDoc } from 'firebase/firestore';
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
-import { useEffect } from 'react';
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { authenticateWithBiometric } from '../utils/biometric';
@@ -26,13 +25,49 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [showSepaModal, setShowSepaModal] = useState(false);
   const [sepaPaymentData, setSepaPaymentData] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState(null);
+  
+  // Pending payment confirmation state
+  const [pendingPayment, setPendingPayment] = useState(null);
+  const [showPendingConfirmation, setShowPendingConfirmation] = useState(false);
+  
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
 
-  // Determine if current user is the one paying or receiving
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
 
+  // Check for pending payment on mount
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const checkPendingPayment = () => {
+      try {
+        const pending = sessionStorage.getItem('pendingPayment');
+        if (pending) {
+          const paymentData = JSON.parse(pending);
+          
+          // Verify this pending payment matches current settlement
+          if (
+            paymentData.groupId === group?.id &&
+            paymentData.fromUserId === settlement?.from &&
+            paymentData.toUserId === settlement?.to
+          ) {
+            console.log('📋 Found pending payment:', paymentData);
+            setPendingPayment(paymentData);
+            setShowPendingConfirmation(true);
+          } else {
+            // Different settlement, clear old pending payment
+            sessionStorage.removeItem('pendingPayment');
+          }
+        }
+      } catch (err) {
+        console.error('Error checking pending payment:', err);
+        sessionStorage.removeItem('pendingPayment');
+      }
+    };
+
+    checkPendingPayment();
+  }, [isOpen, group?.id, settlement?.from, settlement?.to]);
 
   // Fetch recipient's payment methods
   useEffect(() => {
@@ -58,13 +93,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     }
   }, [settlement, isOpen]);
 
-  const hasRecipientPayment =
-  !!recipientPaymentMethods?.paypalUsername ||
-  !!recipientPaymentMethods?.revolutUsername ||
-  !!recipientPaymentMethods?.encryptedIBAN;
-
-
-
   const recordSettlement = async (paypalOrderId = null) => {
     const amountNum = parseFloat(amount);
 
@@ -82,7 +110,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         date: new Date(),
         splitMethod: 'exact',
         splits: {
-          
           [settlement.to]: amountNum,
         },
         participants: [settlement.from, settlement.to],
@@ -101,6 +128,66 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     }
   };
 
+  // Handle "Mark as Paid" for pending payment
+  const handleMarkAsPaid = async () => {
+    if (!pendingPayment) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Record settlement in Firestore
+      const settlementData = {
+        groupId: group.id,
+        title: `Settlement: ${fromMember?.name} → ${toMember?.name}`,
+        amount: pendingPayment.amount,
+        currency: pendingPayment.currency,
+        paidBy: settlement.from,
+        category: 'settlement',
+        description: `${pendingPayment.method.toUpperCase()} Payment - Confirmed by payer`,
+        date: new Date(),
+        splitMethod: 'exact',
+        splits: {
+          [settlement.to]: pendingPayment.amount,
+        },
+        participants: [settlement.from, settlement.to],
+        createdAt: serverTimestamp(),
+        isSettlement: true,
+        paymentMethod: pendingPayment.method,
+        paymentTimestamp: pendingPayment.timestamp,
+        recordedBy: currentUserId,
+        confirmedAt: serverTimestamp(),
+      };
+
+      await addDoc(collection(db, 'expenses'), settlementData);
+
+      // Clear sessionStorage
+      sessionStorage.removeItem('pendingPayment');
+      
+      // Show success
+      setPendingPayment(null);
+      setShowPendingConfirmation(false);
+      setPaymentSuccess(true);
+      
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+
+    } catch (err) {
+      console.error('❌ Error marking as paid:', err);
+      setError('Failed to record payment. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle "Not Yet" for pending payment
+  const handleNotYet = () => {
+    // Keep pending payment in sessionStorage for later
+    setShowPendingConfirmation(false);
+    setPendingPayment(null);
+  };
+
   const handleManualSettle = async (e) => {
     e.preventDefault();
     setError('');
@@ -111,13 +198,11 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       return;
     }
 
-    // For receivers, show confirmation first
     if (userIsReceiving && !showConfirmation) {
       setShowConfirmation(true);
       return;
     }
 
-    // If user is receiving and confirmed, require biometric
     if (userIsReceiving && showConfirmation) {
       try {
         const authenticated = await authenticateWithBiometric(
@@ -136,6 +221,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         return;
       }
     }
+    
     setLoading(true);
 
     try {
@@ -152,9 +238,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     }
   };
 
-
   const handleSepaPayment = () => {
-    // Prepare payment data for SEPA modal
     const paymentData = {
       amount: parseFloat(amount),
       fromUser: {
@@ -165,7 +249,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         id: settlement.to,
         name: toMember?.name || 'Unknown'
       },
-      fromUserPaymentMethods: null, // Will be fetched in modal
+      fromUserPaymentMethods: null,
       toUserPaymentMethods: recipientPaymentMethods,
       groupName: group.name,
       groupId: group.id
@@ -177,7 +261,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   const handleSepaPaymentSuccess = async (paymentResult) => {
     try {
-      // Record the settlement in Firestore
       const settlementData = {
         groupId: group.id,
         title: `SEPA Settlement: ${fromMember?.name} → ${toMember?.name}`,
@@ -205,7 +288,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       setPaymentSuccess(true);
       setShowSepaModal(false);
       
-      // Close main modal after short delay
       setTimeout(() => {
         onClose();
       }, 2000);
@@ -216,12 +298,29 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     }
   };
 
-
+  // Save to sessionStorage before opening payment link
   const handlePaymentLinkClick = (method) => {
     const amountNum = parseFloat(amount);
     
+    // Save pending payment data
+    const pendingPaymentData = {
+      groupId: group.id,
+      fromUserId: settlement.from,
+      toUserId: settlement.to,
+      fromName: fromMember?.name,
+      toName: toMember?.name,
+      amount: amountNum,
+      currency: group.currency,
+      method: method.id === 'paypal' || method.id === 'paypal-link' ? 'paypal' :
+              method.id === 'revolut' ? 'revolut' :
+              method.id === 'bank' ? 'bank' : 'manual',
+      timestamp: Date.now(),
+    };
+
+    console.log('💾 Saving pending payment:', pendingPaymentData);
+    sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
+    
     if (method.id === 'paypal' || method.id === 'paypal-link') {
-      // Show beautiful modal instead of alert
       setPaymentInfo({
         method: 'paypal',
         amount: amountNum,
@@ -230,12 +329,12 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         onProceed: () => {
           const link = generatePayPalLink(method.username, amountNum, group.currency);
           window.open(link, '_blank');
+          setShowPaymentInfo(false);
         }
       });
       setShowPaymentInfo(true);
       
     } else if (method.id === 'revolut') {
-      // Show beautiful modal instead of alert
       setPaymentInfo({
         method: 'revolut',
         amount: amountNum,
@@ -244,16 +343,16 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         onProceed: () => {
           const link = generateRevolutLink(method.username, amountNum, group.currency);
           window.open(link, '_blank');
+          setShowPaymentInfo(false);
         }
       });
       setShowPaymentInfo(true);
       
     } else if (method.id === 'bank') {
+      // Shows inline bank details - user copies IBAN and makes transfer
       setSelectedPaymentLink(method);
     }
   };
-
-
 
   const createPayPalOrder = (data, actions) => {
     const amountNum = parseFloat(amount);
@@ -305,6 +404,86 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   if (!isOpen) return null;
 
+  // ⭐ NEW: Pending payment confirmation dialog
+  if (showPendingConfirmation && pendingPayment) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Did you complete the payment?
+            </h2>
+            <button
+              onClick={() => {
+                setShowPendingConfirmation(false);
+                setPendingPayment(null);
+              }}
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <Info size={20} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-900 dark:text-blue-200">
+                <p className="font-medium mb-2">Payment Summary</p>
+                <div className="space-y-1">
+                  <p><strong>Amount:</strong> {pendingPayment.currency} {pendingPayment.amount.toFixed(2)}</p>
+                  <p><strong>To:</strong> {pendingPayment.toName}</p>
+                  <p><strong>Method:</strong> {pendingPayment.method.toUpperCase()}</p>
+                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+                    {new Date(pendingPayment.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-6">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                <strong>Important:</strong> Only mark as paid if you actually transferred the money. This will update your group balances.
+              </p>
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleNotYet}
+              disabled={loading}
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+            >
+              Not Yet
+            </button>
+            <button
+              onClick={handleMarkAsPaid}
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                'Processing...'
+              ) : (
+                <>
+                  <CheckCircle2 size={18} />
+                  Mark as Paid
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (paymentSuccess) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
@@ -337,7 +516,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     );
   }
 
-  // Confirmation screen for receivers
   if (showConfirmation && userIsReceiving) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
@@ -689,12 +867,14 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           Cancel
         </button>
       </div>
+
       {/* Payment Info Modal */}
       <PaymentInfoModal
         isOpen={showPaymentInfo}
         onClose={() => setShowPaymentInfo(false)}
         paymentInfo={paymentInfo}
       />
+
       {/* SEPA Payment Modal */}
       {showSepaModal && sepaPaymentData && (
         <SepaPaymentModal

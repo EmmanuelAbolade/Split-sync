@@ -60,6 +60,7 @@ export default function GroupDetails() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [memberPhotos, setMemberPhotos] = useState({});
   const [memberPaymentMethods, setMemberPaymentMethods] = useState({});
+  const [pendingPaymentBanner, setPendingPaymentBanner] = useState(null);
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -105,6 +106,51 @@ export default function GroupDetails() {
 
     fetchMemberPhotos();
   }, [group?.members]);
+
+
+  // Detect pending payment when page gains focus (user returns from PayPal/Revolut)
+  useEffect(() => {
+    const checkPendingOnFocus = () => {
+      try {
+        const pending = sessionStorage.getItem('pendingPayment');
+        if (pending) {
+          const paymentData = JSON.parse(pending);
+          
+          // Check if this pending payment belongs to THIS group
+          if (paymentData.groupId === groupId) {
+            console.log('🔔 Pending payment detected on focus:', paymentData);
+            setPendingPaymentBanner(paymentData);
+            
+            // Auto-open SettleUpModal with the matching settlement
+            const matchingSettlement = settlements.find(
+              s => s.from === paymentData.fromUserId && s.to === paymentData.toUserId
+            );
+            
+            if (matchingSettlement) {
+              setSelectedSettlement(matchingSettlement);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error checking pending payment:', err);
+      }
+    };
+
+    // Check on page load
+    checkPendingOnFocus();
+    
+    // Check when user returns to this tab/window from external payment app
+    window.addEventListener('focus', checkPendingOnFocus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        checkPendingOnFocus();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('focus', checkPendingOnFocus);
+    };
+  }, [groupId, settlements]);
 
   // Fetch member payment methods
   useEffect(() => {
@@ -274,6 +320,53 @@ export default function GroupDetails() {
             </div>
           )}
         </div>
+
+        {/* Pending Payment Banner */}
+        {pendingPaymentBanner && (
+          <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-6 animate-scale-in">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 size={20} className="text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                  Payment Confirmation Needed
+                </p>
+                <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
+                  Did you complete your {pendingPaymentBanner.method?.toUpperCase()} payment of{' '}
+                  <strong>{pendingPaymentBanner.currency} {pendingPaymentBanner.amount?.toFixed(2)}</strong>{' '}
+                  to <strong>{pendingPaymentBanner.toName}</strong>?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      // Find and open the matching settlement modal
+                      const matchingSettlement = settlements.find(
+                        s => s.from === pendingPaymentBanner.fromUserId && 
+                            s.to === pendingPaymentBanner.toUserId
+                      );
+                      if (matchingSettlement) {
+                        setSelectedSettlement(matchingSettlement);
+                      }
+                    }}
+                    className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition text-sm font-medium"
+                  >
+                    Yes, Mark as Paid
+                  </button>
+                  <button
+                    onClick={() => {
+                      sessionStorage.removeItem('pendingPayment');
+                      setPendingPaymentBanner(null);
+                    }}
+                    className="px-4 py-2 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition text-sm"
+                  >
+                    Not Yet
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         
         {/* Members Section */}
@@ -694,7 +787,14 @@ export default function GroupDetails() {
       {/* Settle Up Modal */}
       <SettleUpModal
         isOpen={!!selectedSettlement}
-        onClose={() => setSelectedSettlement(null)}
+        onClose={() => {
+          setSelectedSettlement(null);
+          // ⭐ Clear banner if payment was confirmed
+          const pending = sessionStorage.getItem('pendingPayment');
+          if (!pending) {
+            setPendingPaymentBanner(null);
+          }
+        }}
         settlement={selectedSettlement}
         group={group}
         currentUserId={user.uid}
