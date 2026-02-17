@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth} from '../services/firebase';
+import { auth, db } from '../services/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 import { Eye, EyeOff } from 'lucide-react';
 import { isBiometricEnabledOnDevice, authenticateWithBiometric } from '../utils/biometric';
@@ -70,35 +71,115 @@ export default function Login() {
     setLoading(true);
 
     try {
+      console.log('🔵 Starting Google sign-in...');
+      
       // Step 1: Sign in with Google
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const user = result.user;
       
-      // Step 2: Check if user has biometric enabled
-      const biometricEnabled = isBiometricEnabledOnDevice(result.user.uid);
+      console.log('✓ Google auth successful');
+      console.log('User:', user.uid, user.email);
       
-      // Step 3: If biometric is enabled, require authentication
+      // Step 2: Check if user document exists in Firestore
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (!userDoc.exists()) {
+        console.log('⚠️ User document does NOT exist. Creating new user profile...');
+        
+        // NEW USER - Create user document with Google profile data
+        await setDoc(userRef, {
+          userId: user.uid,
+          email: user.email,
+          displayName: user.displayName || user.email.split('@')[0],
+          photoURL: user.photoURL || null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          
+          // Default settings
+          defaultCurrency: 'EUR',
+          allowContactSync: false,
+          biometricEnabled: false,
+          
+          // Notification preferences
+          notificationPreferences: {
+            email: true,
+            push: true,
+            invitations: true,
+            payments: true,
+            expenses: true
+          },
+          
+          // Payment methods (empty initially)
+          paymentMethods: {},
+          
+          // Onboarding
+          onboardingCompleted: false,
+          
+          // Status
+          isActive: true,
+          
+          // Auth provider tracking
+          authProvider: 'google'
+        });
+        
+        console.log('✅ User document created successfully!');
+        
+      } else {
+        console.log('✓ User document exists');
+        
+        // EXISTING USER - Update photo if Google has one and user hasn't uploaded custom
+        const existingData = userDoc.data();
+        
+        if (user.photoURL && !existingData.customPhotoURL) {
+          console.log('📸 Updating profile picture from Google...');
+          await setDoc(userRef, {
+            photoURL: user.photoURL,
+            displayName: user.displayName || existingData.displayName,
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        }
+      }
+      
+      // Step 3: Check if user has biometric enabled
+      const biometricEnabled = isBiometricEnabledOnDevice(user.uid);
+      
+      // Step 4: If biometric is enabled, require authentication
       if (biometricEnabled) {
+        console.log('🔐 Biometric enabled, requesting authentication...');
+        
         const authenticated = await authenticateWithBiometric(
-          result.user.uid,
+          user.uid,
           'Verify your identity to login'
         );
         
         if (!authenticated) {
-          // Biometric failed or cancelled- sign out and show error
+          console.log('❌ Biometric authentication failed');
           await auth.signOut();
           setError('Biometric authentication required to login on this device');
           setLoading(false);
           return;
         }
+        
+        console.log('✓ Biometric authentication successful');
       }
       
-      // Step 4: All good - proceed to dashboard
-      setUser(result.user);
+      // Step 5: All good - proceed to dashboard
+      console.log('✅ Login complete, navigating to dashboard');
+      setUser(user);
       navigate('/dashboard');
+      
     } catch (err) {
-      console.error('Google sign-in error:', err);
-      setError('Failed to sign in with Google');
+      console.error('❌ Google sign-in error:', err);
+      
+      if (err.code === 'auth/popup-closed-by-user') {
+        setError('Sign-in cancelled');
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Pop-up blocked. Please allow pop-ups for this site.');
+      } else {
+        setError('Failed to sign in with Google. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -109,7 +190,7 @@ export default function Login() {
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-8">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white"> SplitSync</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">SplitSync</h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">Share expenses simply</p>
         </div>
 

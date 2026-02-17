@@ -10,7 +10,7 @@ import {
   TrendingUp, TrendingDown, Users, Wallet, CreditCard, Save, Info, ChevronDown, Shield, Fingerprint, Lock 
 } from 'lucide-react';
 import { calculateBalances } from '../utils/balanceCalculator';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import CloudinaryUpload from '../components/CloudinaryUpload';
 import { 
   encryptData, 
@@ -29,6 +29,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [userData, setUserData] = useState(null);
+  const updateUserPhoto = useAuthStore((state) => state.updateUserPhoto);
   const [groups, setGroups] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [, setLoading] = useState(true);
@@ -45,6 +46,7 @@ export default function Profile() {
   const [showPaymentSettings, setShowPaymentSettings] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  
 
 
   // Biometric state
@@ -150,9 +152,33 @@ export default function Profile() {
     fetchUserData();
   }, [user]);
 
-  const handlePhotoUpdated = (photoURL) => {
-    setUserData(prev => ({ ...prev, photoURL }));
-  };
+  // Update local state when photo is updated
+  const handlePhotoUpdated = async (photoURL) => {
+    console.log('📸 Photo updated callback received:', photoURL);
+  
+  // Update local userData state
+  setUserData(prev => ({ 
+    ...prev, 
+    photoURL: photoURL 
+  }));
+  
+  // ALSO update authStore so it persists
+  updateUserPhoto(photoURL);
+  
+  // Force re-fetch from Firestore to ensure sync
+  setTimeout(async () => {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const freshData = userDoc.data();
+        console.log('🔄 Refreshed user data from Firestore:', freshData.photoURL);
+        setUserData(freshData);
+      }
+    } catch (err) {
+      console.error('Error refreshing user data:', err);
+    }
+  }, 500); // Small delay to ensure Firestore has propagated
+};
 
   // Calculate overall balance across all groups
   const calculateOverallBalance = () => {
@@ -180,6 +206,10 @@ export default function Profile() {
     setSavingPayment(true);
 
     try {
+      console.log('=== PAYMENT SAVE DEBUG START ===');
+      console.log('1. User UID:', user.uid);
+
+      // Validate IBAN
       if (paymentMethods.iban && paymentMethods.iban.trim()) {
         if (!validateIBAN(paymentMethods.iban)) {
           setPaymentError('Invalid IBAN format. Example: IE29 AIBK 9311 5212 3456 78');
@@ -188,7 +218,7 @@ export default function Profile() {
         }
       }
     
-      // Validate PayPal username (alphanumeric and underscore only)
+      // Validate PayPal username
       if (paymentMethods.paypalUsername && paymentMethods.paypalUsername.trim()) {
         const paypalRegex = /^[a-zA-Z0-9_]+$/;
         if (!paypalRegex.test(paymentMethods.paypalUsername)) {
@@ -198,10 +228,9 @@ export default function Profile() {
         }
       }
 
-      // Prepare data to save (to encrypt IBAN and avoid saving raw sensitive data)
+      // Prepare data
       const cleanedPaymentMethods = {};
 
-      // Add non-sensitive data
       if (paymentMethods.paypalUsername?.trim()) {
         cleanedPaymentMethods.paypalUsername = paymentMethods.paypalUsername.trim();
       }
@@ -212,27 +241,90 @@ export default function Profile() {
         cleanedPaymentMethods.bic = paymentMethods.bic.trim().toUpperCase();
       }
 
-      // Encrypt IBAN before saving
+      // Encrypt IBAN
       if (paymentMethods.iban?.trim()) {
         const cleanIBAN = paymentMethods.iban.replace(/\s/g, '').toUpperCase();
         const encryptedIBAN = encryptData(cleanIBAN);
         cleanedPaymentMethods.encryptedIBAN = encryptedIBAN;
       }
 
-      // Save to Firestore
-      await updateDoc(doc(db, 'users', user.uid), {
-        paymentMethods: cleanedPaymentMethods,
-        updatedAt: new Date(),
-      });
+      console.log('2. Data prepared, checking if user document exists...');
+
+      // ⭐ KEY FIX: Check if document exists before updating
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        console.log('3. ⚠️ User document does NOT exist. Creating it now...');
+        
+        // Create the document with setDoc
+        await setDoc(userDocRef, {
+          userId: user.uid,
+          email: user.email,
+          displayName: user.displayName || user.email.split('@')[0],
+          photoURL: user.photoURL || null,
+          createdAt: new Date(),
+          paymentMethods: cleanedPaymentMethods,
+          updatedAt: new Date(),
+          defaultCurrency: 'EUR',
+          allowContactSync: false,
+          biometricEnabled: false,
+          notificationPreferences: {
+            email: true,
+            push: true,
+            invitations: true,
+            payments: true,
+            expenses: true
+          },
+          onboardingCompleted: false,
+          isActive: true
+        });
+        
+        console.log('4. ✅ User document CREATED with payment methods!');
+        
+      } else {
+        console.log('3. ✓ User document exists. Updating...');
+        
+        // Document exists, update it
+        await updateDoc(userDocRef, {
+          paymentMethods: cleanedPaymentMethods,
+          updatedAt: new Date(),
+        });
+        
+        console.log('4. ✅ User document UPDATED!');
+      }
+
+      console.log('=== PAYMENT SAVE SUCCESS ===');
 
       setPaymentSuccess(true);
       setEditingPayment(false);
       
-      // Hide success message after 3 seconds
+      // Update local state
+      setUserData(prev => ({
+        ...prev,
+        paymentMethods: cleanedPaymentMethods
+      }));
+      
       setTimeout(() => setPaymentSuccess(false), 3000);
+      
     } catch (err) {
-      console.error('Error saving payment methods:', err);
-      setPaymentError('Failed to save payment methods. Please try again.');
+      console.error('=== PAYMENT SAVE ERROR ===');
+      console.error('Error:', err);
+      
+      let errorMessage = 'Failed to save payment methods. ';
+      
+      if (err.message?.includes('Encryption failed')) {
+        errorMessage = 'Encryption error: ' + err.message;
+      } else if (err.code === 'permission-denied') {
+        errorMessage = 'Permission denied. Check Firestore security rules.';
+      } else if (err.code === 'unavailable') {
+        errorMessage = 'Network error. Check your internet connection.';
+      } else {
+        errorMessage += err.message || 'Please try again.';
+      }
+      
+      setPaymentError(errorMessage);
+      
     } finally {
       setSavingPayment(false);
     }
@@ -313,7 +405,6 @@ export default function Profile() {
 
     setEditingPayment(true);
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">

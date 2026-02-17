@@ -29,7 +29,7 @@ export default function OnboardingWizard({ open, onClose, onFinish, navigate }) 
               SplitSync helps you create or join groups, add expenses, and settle balances fairly.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-3">
-              This quick tour shows the fastest path to “done”.
+              This quick tour shows the fastest path to “done”. To explore all features, check out the Help and Info section in Settings anytime.
             </p>
           </>
         ),
@@ -40,7 +40,7 @@ export default function OnboardingWizard({ open, onClose, onFinish, navigate }) 
         body: (
           <div className="space-y-3">
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Everything happens inside a group (Trip, Rent, Housemates, Party, etc.).
+              Everything happens inside a group (Trip, Rent, Housemates, Party,  etc.).
             </p>
             <div className="flex flex-wrap gap-2">
               <button
@@ -67,7 +67,7 @@ export default function OnboardingWizard({ open, onClose, onFinish, navigate }) 
         body: (
           <div className="space-y-3">
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Add an expense and choose how to split: Equal, Percentage, Exact, or Shares.
+              Invite others(or join), manually enter or scan the receipt of what you have paid for, review the details and choose how to split: Equal, Percentage, Exact, or Shares.
             </p>
             <button
               type="button"
@@ -138,6 +138,7 @@ export default function OnboardingWizard({ open, onClose, onFinish, navigate }) 
               <li>Use a strong password (or Google sign-in).</li>
               <li>Don’t share invite links publicly; treat them like keys.</li>
               <li>Log out on shared devices.</li>
+              <li>Check Settings for more info in the Help and Info section.</li>
             </ul>
             <button
               type="button"
@@ -157,6 +158,7 @@ export default function OnboardingWizard({ open, onClose, onFinish, navigate }) 
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Keep notifications on so you don’t miss group invites and settlement updates.
           </p>
+          
         ),
       },
     ],

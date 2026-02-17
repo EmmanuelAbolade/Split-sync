@@ -146,10 +146,10 @@ export default function ContactFinder({ currentUser, onAddContact, onClose }) {
         </div>
 
         {/* Privacy Note */}
-        <div className="bg-gray-50 dark:bg-gray-750 border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-6">
+        <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-6">
           <div className="flex items-start gap-2">
             <AlertCircle size={16} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-gray-700 dark:text-gray-300">
+            <p className="text-xs text-gray-700 dark:text-gray-200">
               <span className="font-medium">Privacy First:</span> Phone numbers are never stored in plain text. 
               We use one-way encryption (hashing) to match contacts while protecting your privacy.
             </p>

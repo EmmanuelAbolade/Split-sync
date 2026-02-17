@@ -33,6 +33,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
 
+
   // Fetch recipient's payment methods
   useEffect(() => {
     const fetchRecipientPaymentMethods = async () => {
@@ -56,6 +57,12 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       fetchRecipientPaymentMethods();
     }
   }, [settlement, isOpen]);
+
+  const hasRecipientPayment =
+  !!recipientPaymentMethods?.paypalUsername ||
+  !!recipientPaymentMethods?.revolutUsername ||
+  !!recipientPaymentMethods?.encryptedIBAN;
+
 
 
   const recordSettlement = async (paypalOrderId = null) => {
