@@ -17,6 +17,18 @@ export default function Activity() {
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [filter, setFilter] = useState('all'); // 'all', 'paid', 'owe'
 
+  // Get display title with current names for settlements
+  const getDisplayTitle = (expense, group) => {
+    if (!expense.isSettlement) return expense.title;
+    
+    const fromUserId = expense.paidBy; // Person who paid
+    const toUserId = expense.participants?.find(id => id !== expense.paidBy); // Receiver
+    
+    const fromMember = group?.members?.find(m => m.userId === fromUserId);
+    const toMember = group?.members?.find(m => m.userId === toUserId);
+    
+    return `Settlement: ${fromMember?.name || 'Unknown'} → ${toMember?.name || 'Unknown'}`;
+  };
   // Fetch user's groups
   useEffect(() => {
     if (!user) return;
@@ -199,7 +211,7 @@ export default function Activity() {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
-                        {expense.title}
+                        {getDisplayTitle(expense, group)}
                       </h4>
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                         <Users size={14} />

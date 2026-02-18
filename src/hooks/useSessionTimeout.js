@@ -5,7 +5,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 const TIMEOUT_OPTIONS = {
-  '5min': 60 * 1000,      // 5 minutes
+  '5min': 5 *60 * 1000,      // 5 minutes
   '10min': 10 * 60 * 1000,    // 10 minutes
   '20min': 20 * 60 * 1000,    // 20 minutes
   '30min': 30 * 60 * 1000,    // 30 minutes

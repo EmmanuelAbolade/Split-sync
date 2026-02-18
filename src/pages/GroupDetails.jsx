@@ -62,6 +62,20 @@ export default function GroupDetails() {
   const [memberPaymentMethods, setMemberPaymentMethods] = useState({});
   const [pendingPaymentBanner, setPendingPaymentBanner] = useState(null);
 
+
+  // Get display title with current names for settlements
+  const getDisplayTitle = (expense) => {
+    if (!expense.isSettlement) return expense.title;
+    
+    const fromUserId = expense.paidBy;
+    const toUserId = expense.participants?.find(id => id !== expense.paidBy);
+    
+    const fromMember = group.members?.find(m => m.userId === fromUserId);
+    const toMember = group.members?.find(m => m.userId === toUserId);
+    
+    return `Settlement: ${fromMember?.name || 'Unknown'} → ${toMember?.name || 'Unknown'}`;
+  };
+
   useEffect(() => {
     const fetchGroup = async () => {
       try {
@@ -174,8 +188,7 @@ export default function GroupDetails() {
     if (!group.members || !Array.isArray(group.members)) return;
     
     const checkPendingOnFocus = () => {
-      const timestamp = new Date().toLocaleTimeString();
-      
+        
       try {
         const pending = sessionStorage.getItem('pendingPayment');
         
@@ -754,7 +767,7 @@ export default function GroupDetails() {
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold text-gray-900 dark:text-white">{expense.title}</h4>
+                              <h4 className="font-semibold text-gray-900 dark:text-white">{getDisplayTitle(expense)}</h4>
                 
                               {/* Category Icon Badge */}
                               <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">

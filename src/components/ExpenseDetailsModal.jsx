@@ -7,6 +7,26 @@ export default function ExpenseDetailsModal({ isOpen, onClose, expense, group })
   const payer = group?.members?.find(m => m.userId === expense.paidBy);
   const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
   
+  // Get current names for settlement participants
+  const getSettlementParticipants = () => {
+    if (!expense.isSettlement || !expense.participants || expense.participants.length !== 2) {
+      return null;
+    }
+    
+    const fromUserId = expense.paidBy; // Person who paid (sender)
+    const toUserId = expense.participants.find(id => id !== expense.paidBy); // Receiver
+    
+    const fromMember = group?.members?.find(m => m.userId === fromUserId);
+    const toMember = group?.members?.find(m => m.userId === toUserId);
+    
+    return {
+      from: fromMember?.name || 'Unknown',
+      to: toMember?.name || 'Unknown',
+    };
+  };
+  
+  const settlementParticipants = getSettlementParticipants();
+
   // Get participant details with their shares
   const participantShares = expense.participants?.map(userId => {
     const member = group?.members?.find(m => m.userId === userId);
@@ -35,7 +55,12 @@ export default function ExpenseDetailsModal({ isOpen, onClose, expense, group })
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{expense.title}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {expense.isSettlement && settlementParticipants
+                ? `Settlement: ${settlementParticipants.from} → ${settlementParticipants.to}`
+                : expense.title
+              }
+            </h2>
             {expense.isSettlement && (
               <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded border border-green-200 dark:border-green-800">
                 Settlement
