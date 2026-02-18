@@ -82,6 +82,8 @@ export default function GroupDetails() {
 
     fetchGroup();
   }, [groupId, navigate]);
+
+
   // Fetch member photos
   useEffect(() => {
     if (!group?.members) return;
@@ -106,52 +108,7 @@ export default function GroupDetails() {
 
     fetchMemberPhotos();
   }, [group?.members]);
-
-
-  // Detect pending payment when page gains focus (user returns from PayPal/Revolut)
-  useEffect(() => {
-    const checkPendingOnFocus = () => {
-      try {
-        const pending = sessionStorage.getItem('pendingPayment');
-        if (pending) {
-          const paymentData = JSON.parse(pending);
-          
-          // Check if this pending payment belongs to THIS group
-          if (paymentData.groupId === groupId) {
-            console.log('🔔 Pending payment detected on focus:', paymentData);
-            setPendingPaymentBanner(paymentData);
-            
-            // Auto-open SettleUpModal with the matching settlement
-            const matchingSettlement = settlements.find(
-              s => s.from === paymentData.fromUserId && s.to === paymentData.toUserId
-            );
-            
-            if (matchingSettlement) {
-              setSelectedSettlement(matchingSettlement);
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Error checking pending payment:', err);
-      }
-    };
-
-    // Check on page load
-    checkPendingOnFocus();
-    
-    // Check when user returns to this tab/window from external payment app
-    window.addEventListener('focus', checkPendingOnFocus);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        checkPendingOnFocus();
-      }
-    });
-
-    return () => {
-      window.removeEventListener('focus', checkPendingOnFocus);
-    };
-  }, [groupId, settlements]);
-
+  
   // Fetch member payment methods
   useEffect(() => {
     if (!group?.members) return;
@@ -175,7 +132,6 @@ export default function GroupDetails() {
     fetchPaymentMethods();
   }, [group?.members]);
 
-
   // Fetch expenses in real-time
   useEffect(() => {
     if (!groupId) return;
@@ -192,11 +148,11 @@ export default function GroupDetails() {
       }));
 
       // Sort by date manually
-    expensesData.sort((a, b) => {
-      const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-      const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-      return dateB - dateA; // Newest first
-    });
+      expensesData.sort((a, b) => {
+        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA; // Newest first
+      });
       
       setExpenses(expensesData);
       setLoadingExpenses(false);
@@ -208,7 +164,90 @@ export default function GroupDetails() {
     return () => unsubscribe();
   }, [groupId]);
 
-  
+  // Detect pending payment when user returns from external payment
+  useEffect(() => {
+    // Safety checks - don't run if data isn't ready
+    if (!groupId) return;
+    if (!group) return;
+    if (!expenses) return;
+    if (!Array.isArray(expenses)) return;
+    if (!group.members || !Array.isArray(group.members)) return;
+    
+    const checkPendingOnFocus = () => {
+      const timestamp = new Date().toLocaleTimeString();
+      
+      try {
+        const pending = sessionStorage.getItem('pendingPayment');
+        
+        console.log('🔍 [' + timestamp + '] Checking pending payment...');
+        console.log('📦 SessionStorage:', pending ? 'EXISTS' : 'EMPTY');
+        console.log('🆔 GroupId:', groupId);
+        
+        if (!pending) {
+          console.log('❌ No pending payment');
+          return;
+        }
+        
+        const paymentData = JSON.parse(pending);
+        console.log('💳 Payment data:', paymentData);
+        
+        // Check if this payment belongs to THIS group
+        if (paymentData.groupId !== groupId) {
+          console.log('❌ Different group');
+          return;
+        }
+        
+        console.log('🎯 MATCH! Setting banner...');
+        setPendingPaymentBanner(paymentData);
+        
+        // Calculate settlements to find matching one
+        const balances = calculateBalances(expenses, group.members);
+        const settlements = calculateSettlements(balances);
+        
+        console.log('📊 Settlements:', settlements);
+        
+        const matchingSettlement = settlements.find(
+          s => s.from === paymentData.fromUserId && s.to === paymentData.toUserId
+        );
+        
+        console.log('🔎 Match:', matchingSettlement || 'NOT FOUND');
+        
+        if (matchingSettlement) {
+          console.log('✅ Settlement found - banner will appear');
+          //setSelectedSettlement(matchingSettlement);
+        }
+        
+      } catch (err) {
+        console.error('💥 Error:', err);
+      }
+    };
+
+    // Check on mount
+    console.log('🏁 Checking pending payment on mount');
+    checkPendingOnFocus();
+    
+    // Check on window focus (user returns from PayPal)
+    const handleFocus = () => {
+      console.log('👁️ Window focused');
+      checkPendingOnFocus();
+    };
+    
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        console.log('👁️ Tab visible');
+        checkPendingOnFocus();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [groupId, group, expenses]); // Safe dependencies
+
   // LOADING CHECK FIRST
   if (loading) {
     return (
@@ -224,7 +263,6 @@ export default function GroupDetails() {
   // NULL CHECK SECOND
   if (!group) return null;
 
-  // Calculate balances (only if group exists)
   const balances = calculateBalances(expenses, group.members || []);
   const settlements = calculateSettlements(balances);
   const userBalance = getUserBalanceSummary(balances, user.uid, group.members);

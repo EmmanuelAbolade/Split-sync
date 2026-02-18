@@ -330,6 +330,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           const link = generatePayPalLink(method.username, amountNum, group.currency);
           window.open(link, '_blank');
           setShowPaymentInfo(false);
+          onClose();
         }
       });
       setShowPaymentInfo(true);
@@ -344,6 +345,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           const link = generateRevolutLink(method.username, amountNum, group.currency);
           window.open(link, '_blank');
           setShowPaymentInfo(false);
+          onClose();
         }
       });
       setShowPaymentInfo(true);
