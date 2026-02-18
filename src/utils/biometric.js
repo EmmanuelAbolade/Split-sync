@@ -31,23 +31,21 @@ export const isBiometricEnabledOnDevice = (userId) => {
  * @param {string} challenge - Optional challenge text
  * @returns {Promise<boolean>} - True if authentication successful
  */
-export const authenticateWithBiometric = async (userId, challenge = 'Verify your identity') => {
-  try {
-    // Check if biometric is available on this device
-    if (!isBiometricAvailable()) {
-      console.log('Biometric not available on this device');
-      alert('Biometric authentication is not available on this device.\n\nSupported browsers: Chrome, Safari, Edge\nRequired: Fingerprint reader or Face ID');
-      return false;
-    }
+  export const authenticateWithBiometric = async (userId, challenge = 'Verify your identity') => {
+    try {
+      // Check if biometric is available on this device
+      if (!isBiometricAvailable()) {
+        console.log('❌ Biometric not available on this device');
+        return false; // No alert - let the calling code handle the error
+      }
 
-    // Check if user has registered credentials on THIS device
-    const credentialId = localStorage.getItem(`biometric_credential_${userId}`);
-    
-    if (!credentialId) {
-      console.log('No biometric credential found on this device');
-      alert('Biometric authentication is not set up on this device.\n\nEnable it in Settings → Biometric Authentication');
-      return false;
-    }
+      // Check if user has registered credentials on THIS device
+      const credentialId = localStorage.getItem(`biometric_credential_${userId}`);
+      
+      if (!credentialId) {
+        console.log('❌ No biometric credential found on this device');
+        return false; // No alert - let the calling code handle the error
+      }
 
     // Generate a random challenge for this authentication
     const randomChallenge = new Uint8Array(32);
@@ -97,7 +95,6 @@ export const authenticateWithBiometric = async (userId, challenge = 'Verify your
       console.log('Invalid biometric credential - clearing...');
       localStorage.removeItem(`biometric_credential_${userId}`);
       localStorage.removeItem(`biometric_enabled_${userId}`);
-      alert('Biometric credential is invalid. Please enable biometric authentication again in Settings.');
       return false;
     }
     

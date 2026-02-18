@@ -475,9 +475,19 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
                 value={amount}
                 onChange={(e) => {
                   const value = e.target.value;
+
+                  // Check if amount exceeds limit
+                  if (value && parseFloat(value) > 1000000) {
+                    setError('Amount cannot exceed 1,000,000');
+                    return;
+                  }
+
                   // Allow empty or valid numbers with max 2 decimals
                   if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
                     setAmount(value);
+                    if (error && error.includes('Amount cannot exceed')) {
+                      setError(''); // Clear error when user fixes amount
+                    }
                   }
                 }}
                 onBlur={(e) => {
@@ -491,6 +501,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
                 required
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Maximum: {group.currency} 1,000,000.00
+              </p>
             </div>
           </div>
 

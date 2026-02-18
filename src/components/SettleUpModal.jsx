@@ -203,6 +203,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       return;
     }
 
+    // Set loading BEFORE biometric check
+    setLoading(true);
+
     if (userIsReceiving && showConfirmation) {
       try {
         const authenticated = await authenticateWithBiometric(
@@ -211,18 +214,19 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         );
         
         if (!authenticated) {
-          setError('Authentication required to confirm receipt');
+          setError('Biometric authentication was cancelled or failed. Please try again.');
           setLoading(false);
+          setShowConfirmation(false); // Reset confirmation state
           return;
         }
       } catch (err) {
-        setError('Authentication failed. Please try again.');
+        console.error('Biometric error:', err);
+        setError('Authentication failed. Please enable biometric authentication in Settings or try again.');
         setLoading(false);
+        setShowConfirmation(false); // Reset confirmation state
         return;
       }
     }
-    
-    setLoading(true);
 
     try {
       await recordSettlement();
@@ -562,9 +566,16 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             <button
               onClick={handleManualSettle}
               disabled={loading}
-              className="flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? 'Confirming...' : 'Confirm Receipt'}
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Authenticating...
+                </>
+              ) : (
+                'Confirm Receipt'
+              )}
             </button>
           </div>
         </div>
@@ -614,15 +625,39 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             type="number"
             step="0.01"
             min="0.01"
+            max="1000000"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              
+              // Check if amount exceeds limit
+              if (value && parseFloat(value) > 1000000) {
+                setError('Settlement amount cannot exceed 1,000,000');
+                return;
+              }
+              
+              // Allow empty or valid numbers with max 2 decimals
+              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                setAmount(value);
+                if (error && error.includes('cannot exceed')) {
+                  setError(''); // Clear error when user fixes amount
+                }
+              }
+            }}
+            onBlur={(e) => {
+              // Format to 2 decimals when user leaves field
+              if (e.target.value && !isNaN(e.target.value)) {
+                const formatted = parseFloat(e.target.value).toFixed(2);
+                setAmount(formatted);
+              }
+            }}
             placeholder="0.00"
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none text-lg font-semibold"
             required
             autoFocus
           />
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Suggested: {group?.currency} {settlement?.amount?.toFixed(2)}
+            Suggested: {group?.currency} {settlement?.amount?.toFixed(2)} • Maximum: {group?.currency} 1,000,000.00
           </p>
         </div>
 
