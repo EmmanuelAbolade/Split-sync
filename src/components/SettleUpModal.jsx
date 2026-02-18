@@ -9,6 +9,7 @@ import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } f
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { authenticateWithBiometric } from '../utils/biometric';
+import { createNotification } from '../stores/notificationsStore';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
   const [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || '');
@@ -121,6 +122,40 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       };
 
       await addDoc(collection(db, 'expenses'), settlementData);
+
+      // ⭐ Notify the OTHER person (not the one who recorded it)
+      if (userIsReceiving) {
+        // Receiver marked as received → Notify the PAYER
+        await createNotification({
+          userId: settlement.from, // Notify the payer
+          type: 'payment',
+          title: '✅ Payment Confirmed',
+          message: `${toMember?.name} confirmed receiving ${group.currency} ${amountNum.toFixed(2)} from you in ${group.name}`,
+          data: {
+            groupId: group.id,
+            amount: amountNum,
+            currency: group.currency,
+            toUserId: settlement.to,
+            toName: toMember?.name,
+          },
+        });
+      } else {
+        // Payer marked as sent → Notify the RECEIVER
+        await createNotification({
+          userId: settlement.to, // Notify the receiver
+          type: 'payment',
+          title: '💰 Payment Received',
+          message: `${fromMember?.name} paid you ${group.currency} ${amountNum.toFixed(2)} in ${group.name}`,
+          data: {
+            groupId: group.id,
+            amount: amountNum,
+            currency: group.currency,
+            fromUserId: settlement.from,
+            fromName: fromMember?.name,
+          },
+        });
+      }
+
       return true;
     } catch (err) {
       console.error('Error recording settlement:', err);
@@ -160,6 +195,21 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       };
 
       await addDoc(collection(db, 'expenses'), settlementData);
+
+      // Create notification for recipient
+      await createNotification({
+        userId: settlement.to,
+        type: 'payment',
+        title: '💰 Payment Received',
+        message: `${pendingPayment.fromName} paid you ${pendingPayment.currency} ${pendingPayment.amount.toFixed(2)} in ${group.name}`,
+        data: {
+          groupId: group.id,
+          amount: pendingPayment.amount,
+          currency: pendingPayment.currency,
+          fromUserId: settlement.from,
+          fromName: pendingPayment.fromName,
+        },
+      });
 
       // Clear sessionStorage
       sessionStorage.removeItem('pendingPayment');

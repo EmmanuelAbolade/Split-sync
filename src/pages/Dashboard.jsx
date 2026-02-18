@@ -11,7 +11,8 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Settings, Bell } from 'lucide-react';
 import InvitationNotification from '../components/InvitationNotification';
 import OnboardingWizard from "../components/OnboardingWizard";
-
+import NotificationsDropdown from '../components/NotificationsDropdown'; 
+import { useNotificationsStore } from '../stores/notificationsStore';
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -48,6 +49,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Notifications state
+  const [showNotifications, setShowNotifications] = useState(false);
+  const { unreadCount, subscribeToNotifications } = useNotificationsStore();
 
   // Fetch user data
   useEffect(() => {
@@ -166,6 +171,15 @@ export default function Dashboard() {
   }, [user]);
 
 
+  // Subscribe to notifications
+  useEffect(() => {
+    if (!user) return;
+    
+    const unsubscribe = subscribeToNotifications(user.uid);
+    return () => unsubscribe();
+  }, [user, subscribeToNotifications]);
+
+
   // Handle invitation count updates
   const handleInvitationUpdate = (count) => {
     setInvitationCount(count);
@@ -245,14 +259,17 @@ export default function Dashboard() {
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {user?.displayName || user?.email}
             </span>
-            <div className="relative">
-              <Bell size={24} className="text-gray-600 dark:text-gray-300" />
-              {invitationCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                  {invitationCount}
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
+            >
+              <Bell size={24} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {unreadCount}
                 </span>
               )}
-            </div>
+            </button>
             <button
               onClick={() => navigate('/settings')}
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -389,6 +406,12 @@ export default function Dashboard() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onGroupCreated={handleGroupCreated}
+      />
+
+      {/* Notifications Dropdown */}
+      <NotificationsDropdown
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
       />
     </div>
   );

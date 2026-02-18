@@ -13,7 +13,7 @@ import {
   deleteUser
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
-import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, deleteDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { QrCode, HelpCircle } from 'lucide-react';
 import QRCodeModal from '../components/QRCodeModal';
 import InfoHubModal from '../components/InfoHubModal';
@@ -55,11 +55,43 @@ export default function Settings() {
     setSuccess('');
 
     try {
+      // 1. Update Firebase Auth
       await updateProfile(auth.currentUser, {
         displayName: newName.trim()
       });
       
-      setSuccess('Name updated successfully!');
+      // 2. Update Firestore user document
+      await updateDoc(doc(db, 'users', user.uid), {
+        displayName: newName.trim(),
+        updatedAt: new Date(),
+      });
+
+      // 3. Update user's name in ALL groups where they're a member
+      const groupsQuery = query(
+        collection(db, 'groups'),
+        where('memberIds', 'array-contains', user.uid)
+      );
+      
+      const groupsSnapshot = await getDocs(groupsQuery);
+      
+      // Update each group's members array
+      const groupUpdates = groupsSnapshot.docs.map(async (groupDoc) => {
+        const groupData = groupDoc.data();
+        const updatedMembers = groupData.members.map(member => {
+          if (member.userId === user.uid) {
+            return { ...member, name: newName.trim() };
+          }
+          return member;
+        });
+        
+        return updateDoc(doc(db, 'groups', groupDoc.id), {
+          members: updatedMembers,
+        });
+      });
+      
+      await Promise.all(groupUpdates);
+      
+      setSuccess('Name updated successfully across all groups!');
       setEditingName(false);
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {

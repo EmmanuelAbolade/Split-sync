@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import Tooltip from './Tooltip';
+import { createNotification } from '../stores/notificationsStore'; 
 
 const CATEGORIES = [
   { id: 'food', name: 'Food & Dining' },
@@ -284,8 +285,62 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
       };
 
       await addDoc(collection(db, 'expenses'), expenseData);
-      
-      // Reset form
+
+
+      console.log('🔔 Creating notifications...');
+      console.log('Group members:', group.members);
+      console.log('Current user:', user.uid);
+      console.log('📧 User display name:', user.displayName);
+
+      // Notify all group members except the creator
+      const memberIds = group.members
+        .map(m => m.userId)
+        .filter(id => id !== user.uid); // Don't notify yourself
+
+        console.log('Member IDs to notify:', memberIds);
+        console.log('📝 Expense details:', {
+        title: title.trim(),
+        amount: parseFloat(amount),
+        currency: group.currency,
+        groupName: group.name
+      });
+
+        if (memberIds.length === 0) {
+          console.log('⚠️ No members to notify (you are the only member)');
+        } else {
+          console.log(`📤 Sending ${memberIds.length} notification(s)...`);
+          try {
+
+                // Create notification for each member
+                //await Promise.all(
+                 // memberIds.map(async (memberId) => {
+                    //console.log('📤 Sending notification to:', memberId);
+                    const notificationPromises = memberIds.map(async (memberId) => {
+                    console.log(`   → Sending to: ${memberId}`);
+                    return await createNotification({
+                      userId: memberId,
+                      type: 'expense',
+                      title: '🧾 New Expense Added',
+                      message: `${user.displayName || 'Someone'} added "${title.trim()}" (${group.currency} ${parseFloat(amount).toFixed(2)}) in ${group.name}`,
+                      data: {
+                        groupId: group.id,
+                        expenseTitle: title.trim(),
+                        amount: parseFloat(amount),
+                        currency: group.currency,
+                        addedBy: user.uid,
+                        addedByName: user.displayName,
+                      },
+                    });
+                });
+                //);
+                await Promise.all(notificationPromises);
+                console.log('✅ Notifications created successfully!');
+              } catch (error) {
+                console.error('❌ Error creating notifications:', error);
+                console.error('Error details:', error.message);
+              }
+            }
+      //  Reset form
       setTitle('');
       setAmount('');
       setDescription('');
