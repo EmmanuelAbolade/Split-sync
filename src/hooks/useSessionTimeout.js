@@ -53,7 +53,6 @@ export const useSessionTimeout = () => {
 
   // Show warning modal
   const showWarningModal = useCallback(() => {
-    console.log('⚠️ SHOWING WARNING MODAL NOW!');
     setShowWarning(true);
     setCountdown(30);
     
@@ -81,7 +80,6 @@ const resetTimer = useCallback(() => {
   
   // Close warning if open
   if (showWarning) {
-    console.log('🔄 Warning was open, closing and resetting');
     setShowWarning(false);
     clearTimers();
   }
@@ -96,8 +94,6 @@ const resetTimer = useCallback(() => {
 
   const timeoutDuration = TIMEOUT_OPTIONS[timeoutSetting];
   const warningTime = timeoutDuration - WARNING_TIME;
-  
-  console.log(`⏱️ Setting timer: Warning in ${warningTime/1000}s, Logout in ${timeoutDuration/1000}s`);
   
   // Set warning timer (timeout - 30 seconds)
   warningTimeoutRef.current = setTimeout(() => {
@@ -137,26 +133,15 @@ const resetTimer = useCallback(() => {
 
   // Track user activity
   useEffect(() => {
-    console.log('🔒 Session Timeout Status:', {
-      user: user ? 'logged in' : 'not logged in',
-      timeoutSetting: timeoutSetting,
-      showWarning: showWarning,
-      timeoutDuration: TIMEOUT_OPTIONS[timeoutSetting]
-    });
-
     if (!user || timeoutSetting === 'never') {
-      console.log('⏸️ Session timeout disabled (user not logged in or set to never)');
       clearTimers();
       return;
     }
 
-    // ⭐ DON'T track activity while warning is shown!
+    // DON'T track activity while warning is shown!
     if (showWarning) {
-      console.log('⚠️ Warning is showing - NOT tracking activity (waiting for user decision)');
       return;
     }
-
-    console.log('✅ Session timeout ENABLED - starting timer...');
 
     // Activity events to track
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];

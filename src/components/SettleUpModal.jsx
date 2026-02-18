@@ -30,10 +30,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   // Pending payment confirmation state
   const [pendingPayment, setPendingPayment] = useState(null);
   const [showPendingConfirmation, setShowPendingConfirmation] = useState(false);
-  
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
-
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
 
@@ -53,7 +51,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             paymentData.fromUserId === settlement?.from &&
             paymentData.toUserId === settlement?.to
           ) {
-            console.log('📋 Found pending payment:', paymentData);
             setPendingPayment(paymentData);
             setShowPendingConfirmation(true);
           } else {
@@ -123,7 +120,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
       await addDoc(collection(db, 'expenses'), settlementData);
 
-      // ⭐ Notify the OTHER person (not the one who recorded it)
+      // Notify the OTHER person (not the one who recorded it)
       if (userIsReceiving) {
         // Receiver marked as received → Notify the PAYER
         await createNotification({
@@ -371,7 +368,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       timestamp: Date.now(),
     };
 
-    console.log('💾 Saving pending payment:', pendingPaymentData);
     sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
     
     if (method.id === 'paypal' || method.id === 'paypal-link') {
@@ -460,7 +456,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   if (!isOpen) return null;
 
-  // ⭐ NEW: Pending payment confirmation dialog
+  // Pending payment confirmation dialog
   if (showPendingConfirmation && pendingPayment) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">

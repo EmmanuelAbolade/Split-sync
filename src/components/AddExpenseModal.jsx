@@ -155,14 +155,16 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
   }
 };
 
+  // Function to calculate splits based on current method and inputs
   const calculateSplits = () => {
     const amountNum = parseFloat(amount) || 0;
     const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
     
+    // If no members selected, return empty splits
     if (selected.length === 0) return {};
 
     const result = {};
-
+    // Calculate splits based on method
     switch (splitMethod) {
       case 'equal':
         const equalAmount = amountNum / selected.length;
@@ -199,6 +201,7 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
     return result;
   };
 
+  // Validation function to check splits before submission
   const validateSplits = () => {
     const amountNum = parseFloat(amount) || 0;
     const calculated = calculateSplits();
@@ -223,6 +226,7 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
     return null;
   };
 
+  // Main submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -233,23 +237,27 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
       return;
     }
 
+    //
     const amountNum = parseFloat(amount);
     if (!amountNum || amountNum <= 0) {
       setError('Please enter a valid amount greater than 0');
       return;
     }
 
+    // New validation for maximum amount
     if (amountNum > 1000000) {
       setError('Amount cannot exceed €1,000,000');
       return;
     }
 
+    // Ensure at least one member is selected
     const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
     if (selected.length === 0) {
       setError('Select at least one member');
       return;
     }
 
+    // Validate splits based on method
     const validationError = validateSplits();
     if (validationError) {
       setError(validationError);
@@ -260,10 +268,12 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
     setShowConfirmation(true);
   };
 
+  // Final submission after confirmation
   const handleConfirmSubmit = async () => {
     setShowConfirmation(false);
     setLoading(true);
 
+    // Re-validate splits before final submission
     try {
       const calculated = calculateSplits();
       
@@ -286,18 +296,10 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
 
       await addDoc(collection(db, 'expenses'), expenseData);
 
-
-      console.log('🔔 Creating notifications...');
-      console.log('Group members:', group.members);
-      console.log('Current user:', user.uid);
-      console.log('📧 User display name:', user.displayName);
-
       // Notify all group members except the creator
       const memberIds = group.members
         .map(m => m.userId)
         .filter(id => id !== user.uid); // Don't notify yourself
-
-        console.log('Member IDs to notify:', memberIds);
         console.log('📝 Expense details:', {
         title: title.trim(),
         amount: parseFloat(amount),
@@ -306,17 +308,14 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
       });
 
         if (memberIds.length === 0) {
-          console.log('⚠️ No members to notify (you are the only member)');
+          
         } else {
-          console.log(`📤 Sending ${memberIds.length} notification(s)...`);
+          
           try {
 
                 // Create notification for each member
-                //await Promise.all(
-                 // memberIds.map(async (memberId) => {
-                    //console.log('📤 Sending notification to:', memberId);
                     const notificationPromises = memberIds.map(async (memberId) => {
-                    console.log(`   → Sending to: ${memberId}`);
+                    
                     return await createNotification({
                       userId: memberId,
                       type: 'expense',
@@ -334,7 +333,6 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
                 });
                 //);
                 await Promise.all(notificationPromises);
-                console.log('✅ Notifications created successfully!');
               } catch (error) {
                 console.error('❌ Error creating notifications:', error);
                 console.error('Error details:', error.message);

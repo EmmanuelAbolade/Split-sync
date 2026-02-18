@@ -146,8 +146,6 @@ export const registerBiometric = async (userId, userEmail, userName) => {
       timeout: 60000,
       attestation: 'none'
     };
-
-    console.log('🔐 Requesting biometric registration...');
     
     // THIS WILL PROMPT FOR FINGERPRINT/FACE ID TO REGISTER
     const credential = await navigator.credentials.create({
@@ -159,18 +157,13 @@ export const registerBiometric = async (userId, userEmail, userName) => {
       const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
       localStorage.setItem(`biometric_credential_${userId}`, credentialId);
       localStorage.setItem(`biometric_enabled_${userId}`, 'true');
-      
-      console.log('✅ Biometric registration successful on this device!');
       return true;
     }
-
-    console.log('❌ Biometric registration failed');
     return false;
   } catch (error) {
     console.error('Biometric registration error:', error);
     
     if (error.name === 'NotAllowedError') {
-      console.log('User cancelled biometric registration');
       return false;
     }
     
@@ -181,7 +174,6 @@ export const registerBiometric = async (userId, userEmail, userName) => {
     
     if (error.name === 'InvalidStateError') {
       // Credential already exists - try to remove and retry
-      console.log('Credential already exists, clearing and retrying...');
       localStorage.removeItem(`biometric_credential_${userId}`);
       alert('Please try enabling biometric authentication again.');
       return false;
@@ -222,7 +214,7 @@ export const enableBiometric = async (userId, userEmail, userName) => {
 export const disableBiometric = (userId) => {
   localStorage.removeItem(`biometric_credential_${userId}`);
   localStorage.removeItem(`biometric_enabled_${userId}`);
-  console.log('✅ Biometric authentication disabled on this device');
+  
 };
 
 /**

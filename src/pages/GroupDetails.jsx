@@ -179,62 +179,46 @@ export default function GroupDetails() {
       try {
         const pending = sessionStorage.getItem('pendingPayment');
         
-        console.log('🔍 [' + timestamp + '] Checking pending payment...');
-        console.log('📦 SessionStorage:', pending ? 'EXISTS' : 'EMPTY');
-        console.log('🆔 GroupId:', groupId);
-        
         if (!pending) {
-          console.log('❌ No pending payment');
           return;
         }
         
         const paymentData = JSON.parse(pending);
-        console.log('💳 Payment data:', paymentData);
         
         // Check if this payment belongs to THIS group
         if (paymentData.groupId !== groupId) {
-          console.log('❌ Different group');
           return;
         }
-        
-        console.log('🎯 MATCH! Setting banner...');
         setPendingPaymentBanner(paymentData);
         
         // Calculate settlements to find matching one
         const balances = calculateBalances(expenses, group.members);
         const settlements = calculateSettlements(balances);
         
-        console.log('📊 Settlements:', settlements);
-        
         const matchingSettlement = settlements.find(
           s => s.from === paymentData.fromUserId && s.to === paymentData.toUserId
         );
-        
-        console.log('🔎 Match:', matchingSettlement || 'NOT FOUND');
-        
+
+        // If we find a matching settlement, open the SettleUpModal for it
         if (matchingSettlement) {
-          console.log('✅ Settlement found - banner will appear');
           //setSelectedSettlement(matchingSettlement);
         }
-        
+        // Clear pending payment from sessionStorage after processing
       } catch (err) {
-        console.error('💥 Error:', err);
       }
     };
 
-    // Check on mount
-    console.log('🏁 Checking pending payment on mount');
+    // Check on mount in case user is already back and focused
     checkPendingOnFocus();
     
     // Check on window focus (user returns from PayPal)
     const handleFocus = () => {
-      console.log('👁️ Window focused');
       checkPendingOnFocus();
     };
-    
+
+    // Also check when tab becomes visible (in case user switched tabs instead of windows)
     const handleVisibility = () => {
       if (!document.hidden) {
-        console.log('👁️ Tab visible');
         checkPendingOnFocus();
       }
     };
@@ -827,7 +811,7 @@ export default function GroupDetails() {
         isOpen={!!selectedSettlement}
         onClose={() => {
           setSelectedSettlement(null);
-          // ⭐ Clear banner if payment was confirmed
+          // Clear banner if payment was confirmed
           const pending = sessionStorage.getItem('pendingPayment');
           if (!pending) {
             setPendingPaymentBanner(null);
