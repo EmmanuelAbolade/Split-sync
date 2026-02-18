@@ -384,7 +384,7 @@ export default function Settings() {
                   </p>
                 </div>
               </div>
-              
+            
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { value: '5min', label: '5 min' },
@@ -395,7 +395,14 @@ export default function Settings() {
                 ].map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => updateTimeoutSetting(option.value)}
+                    onClick={async () => {               
+                      try {
+                        await updateTimeoutSetting(option.value);
+                        
+                      } catch (error) {
+                        
+                      }
+                    }}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                       timeoutSetting === option.value
                         ? 'bg-primary dark:bg-indigo-600 text-white'

@@ -5,7 +5,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 const TIMEOUT_OPTIONS = {
-  '5min': 5 * 60 * 1000,      // 5 minutes
+  '5min': 60 * 1000,      // 5 minutes
   '10min': 10 * 60 * 1000,    // 10 minutes
   '20min': 20 * 60 * 1000,    // 20 minutes
   '30min': 30 * 60 * 1000,    // 30 minutes
@@ -44,35 +44,70 @@ export const useSessionTimeout = () => {
     loadTimeoutSetting();
   }, [user?.uid]);
 
-  // Clear all timers
-  const clearTimers = useCallback(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-  }, []);
-
+  // Clear all timers (but preserve countdown if warning is showing)
+const clearTimers = useCallback((preserveCountdown = false) => {
+  
+  // If preserving countdown, also preserve logout timer!
+  if (!preserveCountdown && timeoutRef.current) {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = null;
+  } else if (timeoutRef.current) {
+  }
+  
+  // Always clear warning timeout (only used before modal opens)
+  if (warningTimeoutRef.current) {
+    clearTimeout(warningTimeoutRef.current);
+    warningTimeoutRef.current = null;
+  }
+  
+  // Preserve countdown interval if needed
+  if (!preserveCountdown && countdownIntervalRef.current) {
+    clearInterval(countdownIntervalRef.current);
+    countdownIntervalRef.current = null;
+  } else if (countdownIntervalRef.current) {
+  
+  }
+}, []);
   // Show warning modal
   const showWarningModal = useCallback(() => {
+   
     setShowWarning(true);
     setCountdown(30);
     
     // Start countdown
-    countdownIntervalRef.current = setInterval(() => {
+    const intervalId = setInterval(() => {
       setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownIntervalRef.current);
-          return 0;
+        const newValue = prev <= 1 ? 0 : prev - 1;
+        
+        if (newValue === 0) {
+          console.log('⏱️ [COUNTDOWN] Reached 0 - clearing interval');
+          clearInterval(intervalId);
         }
-        return prev - 1;
+        
+        return newValue;
       });
     }, 1000);
-
+    
+    countdownIntervalRef.current = intervalId;
+    
     // Auto-logout after 30 seconds
-    timeoutRef.current = setTimeout(() => {
-      clearTimers();
+    const logoutTimerId = setTimeout(() => {
+      
+      // Clear countdown interval
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      
+      // Close modal
+      setShowWarning(false);
+      
+      // Logout
       logout();
     }, WARNING_TIME);
-  }, [logout, clearTimers]);
+    
+    timeoutRef.current = logoutTimerId;
+    
+  }, [logout]);
 
   //  Reset activity timer
 const resetTimer = useCallback(() => {
@@ -80,26 +115,28 @@ const resetTimer = useCallback(() => {
   
   // Close warning if open
   if (showWarning) {
+    console.log('⚠️ [RESET] Warning was open, closing it');
     setShowWarning(false);
     clearTimers();
   }
-
+  
   // Don't set timer if timeout is disabled
   if (timeoutSetting === 'never' || !TIMEOUT_OPTIONS[timeoutSetting]) {
+    
     return;
   }
-
   // Clear existing timers
   clearTimers();
 
   const timeoutDuration = TIMEOUT_OPTIONS[timeoutSetting];
   const warningTime = timeoutDuration - WARNING_TIME;
-  
+
   // Set warning timer (timeout - 30 seconds)
   warningTimeoutRef.current = setTimeout(() => {
     showWarningModal();
   }, warningTime);
     
+  
   }, [timeoutSetting, showWarning, clearTimers, showWarningModal]);
 
   // Stay logged in - dismiss warning
@@ -110,26 +147,36 @@ const resetTimer = useCallback(() => {
   }, [clearTimers, resetTimer]);
 
   // Logout now
-  const logoutNow = useCallback(() => {
-    clearTimers();
-    logout();
-  }, [logout, clearTimers]);
+const logoutNow = useCallback(() => {
+  setShowWarning(false); // Close modal first
+  clearTimers();
+  logout();
+}, [logout, clearTimers]);
 
   // Update timeout setting
-  const updateTimeoutSetting = useCallback(async (newSetting) => {
-    if (!user?.uid) return;
+const updateTimeoutSetting = useCallback(async (newSetting) => {
+  
+  if (!user?.uid) {
+    console.error('❌ [HOOK] No user ID - cannot update setting');
+    return;
+  }
+  
+  try {
     
-    try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        sessionTimeout: newSetting
-      });
-      setTimeoutSetting(newSetting);
-      clearTimers();
-      resetTimer();
-    } catch (error) {
-      console.error('Error updating timeout setting:', error);
-    }
-  }, [user?.uid, clearTimers, resetTimer]);
+    await updateDoc(doc(db, 'users', user.uid), {
+      sessionTimeout: newSetting
+    });
+    setTimeoutSetting(newSetting);
+
+    clearTimers();
+    
+    // The useEffect depends on timeoutSetting and will re-run automatically
+    
+    
+  } catch (error) {
+    console.error('❌ [HOOK] Error updating timeout setting:', error);
+  }
+}, [user?.uid, clearTimers]);
 
   // Track user activity
   useEffect(() => {
@@ -142,7 +189,7 @@ const resetTimer = useCallback(() => {
     if (showWarning) {
       return;
     }
-
+    
     // Activity events to track
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
     
@@ -163,13 +210,17 @@ const resetTimer = useCallback(() => {
     resetTimer();
 
     // Cleanup
-    return () => {
-      events.forEach(event => {
-        window.removeEventListener(event, handleActivity);
-      });
-      clearTimers();
-    };
-  }, [user, timeoutSetting, showWarning, resetTimer, clearTimers]);
+return () => {
+  
+  events.forEach(event => {
+    window.removeEventListener(event, handleActivity);
+  });
+  
+  // Preserve countdown if it exists (modal is open)
+  const hasCountdown = !!countdownIntervalRef.current;
+  clearTimers(hasCountdown);
+};
+}, [user, timeoutSetting, showWarning, resetTimer, clearTimers]);
 
   return {
     showWarning,
