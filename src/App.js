@@ -15,6 +15,8 @@ import QuickAdd from './pages/QuickAdd';
 import BottomNav from './components/BottomNav';
 import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
+import { useSessionTimeout } from './hooks/useSessionTimeout';
+import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 
 
 
@@ -36,6 +38,15 @@ function ProtectedLayout({ children }) {
 
 function App() {
   const { setUser, setLoading, isAuthenticated, loading } = useAuthStore();
+
+
+  // ⭐ Session timeout hook
+  const {
+    showWarning,
+    countdown,
+    stayLoggedIn,
+    logoutNow,
+  } = useSessionTimeout();
 
   useEffect(() => {
     // Listen for auth state changes
@@ -61,6 +72,13 @@ function App() {
 
   return (
     <BrowserRouter>
+      {/* Session Timeout Warning Modal */}
+      <SessionTimeoutWarning
+        isOpen={showWarning}
+        countdown={countdown}
+        onStayLoggedIn={stayLoggedIn}
+        onLogoutNow={logoutNow}
+      />
       <Routes>
         {/* Public Routes */}
         <Route 
@@ -104,7 +122,18 @@ function App() {
           } 
         />
 
-        <Route path="/settings" element={<Settings />} />
+        <Route 
+          path="/settings" 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <Settings />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
         
         <Route 
           path="/add" 

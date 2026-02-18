@@ -19,13 +19,14 @@ import QRCodeModal from '../components/QRCodeModal';
 import InfoHubModal from '../components/InfoHubModal';
 import DarkModeToggle from '../components/DarkModeToggle';
 import { registerBiometric, authenticateWithBiometric, disableBiometric, isBiometricEnabledOnDevice, getDeviceInfo } from '../utils/biometric';
-
+import { useSessionTimeout } from '../hooks/useSessionTimeout';
 
 export default function Settings() {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [notifications, setNotifications] = useState(true);
+  const { timeoutSetting, updateTimeoutSetting } = useSessionTimeout();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -326,6 +327,61 @@ export default function Settings() {
                   }`}
                 />
               </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Session Timeout Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Shield size={20} />
+            Security & Privacy
+          </h2>
+
+          <div className="space-y-4">
+            {/* Session Timeout Setting */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield size={20} className="text-orange-600 dark:text-orange-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900 dark:text-white">Auto-Logout Timer</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Automatically log out after a period of inactivity to protect your account
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: '5min', label: '5 min' },
+                  { value: '10min', label: '10 min' },
+                  { value: '20min', label: '20 min' },
+                  { value: '30min', label: '30 min' },
+                  { value: 'never', label: 'Never' },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => updateTimeoutSetting(option.value)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      timeoutSetting === option.value
+                        ? 'bg-primary dark:bg-indigo-600 text-white'
+                        : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              
+              {timeoutSetting !== 'never' && (
+                <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-xs text-blue-800 dark:text-blue-300">
+                    You'll be warned 30 seconds before auto-logout and can choose to stay logged in.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
