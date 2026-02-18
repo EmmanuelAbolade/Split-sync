@@ -47,6 +47,11 @@ export default function Profile() {
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   
+  // Phone number state
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [phoneSuccess, setPhoneSuccess] = useState('');
 
 
   // Biometric state
@@ -73,6 +78,26 @@ export default function Profile() {
 
     return () => unsubscribe();
   }, [user]);
+
+  // Load user data including phone number
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!user?.uid) return;
+      
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setUserData(data);
+          setPhoneNumber(data.phoneNumber || ''); // ⭐ Load phone
+        }
+      } catch (err) {
+        console.error('Error loading user data:', err);
+      }
+    };
+    
+    loadUserData();
+  }, [user?.uid]);
 
   // Check biometric availability on mount
   useEffect(() => {
@@ -151,6 +176,49 @@ export default function Profile() {
     
     fetchUserData();
   }, [user]);
+
+
+  // ⭐ Save phone number with hash
+const handleSavePhone = async () => {
+  if (!phoneNumber.trim()) {
+    setPhoneError('Phone number cannot be empty');
+    return;
+  }
+  
+  // Basic phone validation (adjust regex for your region)
+  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(phoneNumber.replace(/\s/g, ''))) {
+      setPhoneError('Please enter a valid phone number (e.g., +353871234567)');
+      return;
+    }
+    
+    setPhoneError('');
+    setPhoneSuccess('');
+    
+    try {
+      // Hash the phone number for privacy
+      const cleanPhone = phoneNumber.replace(/\s/g, ''); // Remove spaces
+      const encoder = new TextEncoder();
+      const data = encoder.encode(cleanPhone);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const phoneHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      // Save to Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        phoneNumber: cleanPhone,
+        phoneHash: phoneHash,
+        updatedAt: new Date(),
+      });
+      
+      setPhoneSuccess('✅ Phone number saved! Friends can now find you via contacts.');
+      setEditingPhone(false);
+      setTimeout(() => setPhoneSuccess(''), 4000);
+    } catch (err) {
+      console.error('Error saving phone:', err);
+      setPhoneError('Failed to save phone number. Please try again.');
+    }
+  };
 
   // Update local state when photo is updated
   const handlePhotoUpdated = async (photoURL) => {
@@ -529,6 +597,85 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+
+        {/* Phone Number Section - ADD THIS */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-6 mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Users size={20} className="text-primary dark:text-indigo-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Contact Discovery
+              </h2>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-900 dark:text-blue-300">
+                <strong>Optional:</strong> Add your phone number to let friends find you when they sync their contacts. 
+                We store only a hash, never the actual number.
+              </p>
+            </div>
+
+            {phoneSuccess && (
+              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-300 text-sm">
+                {phoneSuccess}
+              </div>
+            )}
+
+            {phoneError && (
+              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
+                {phoneError}
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Phone Number (Optional)
+              </label>
+              {editingPhone ? (
+                <div className="flex gap-2">
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+353871234567"
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
+                  />
+                  <button
+                    onClick={handleSavePhone}
+                    className="px-4 py-2 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-dark dark:hover:bg-indigo-700 transition"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingPhone(false);
+                      setPhoneNumber(userData?.phoneNumber || '');
+                      setPhoneError('');
+                    }}
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <span className="text-gray-900 dark:text-white">
+                    {phoneNumber || 'Not set'}
+                  </span>
+                  <button
+                    onClick={() => setEditingPhone(true)}
+                    className="text-primary dark:text-indigo-400 text-sm hover:underline"
+                  >
+                    {phoneNumber ? 'Edit' : 'Add'}
+                  </button>
+                </div>
+              )}
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Format: +[country code][number] (e.g., +353871234567)
+              </p>
+            </div>
+          </div>
+
 
 
         {/* Payment Settings */}

@@ -7,10 +7,10 @@ import IconSelector from './IconSelector';
 
 // IMPORTS - ADDED FOR QUICK ADD & CONTACT SYNC
 import QuickAddMembers from './QuickAddMembers';
-import ContactFinder from './ContactFinder';
+import ContactSyncButton from './ContactSyncButton';
 import { sendBulkInvitations } from '../utils/invitationSystem';
 import { updateGroupConnections } from '../utils/userConnectionsManager';
-import { Users, PhoneCall, X } from 'lucide-react';
+import { Users, X } from 'lucide-react';
 
 export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   const [groupName, setGroupName] = useState('');
@@ -21,7 +21,6 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   
   // STATE - ADDED FOR QUICK ADD & CONTACT SYNC
   const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [showContactFinder, setShowContactFinder] = useState(false);
   const [pendingInvitations, setPendingInvitations] = useState([]);
   
   const { user } = useAuthStore();
@@ -49,22 +48,22 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
     alert(`✅ ${selectedConnections.length} member(s) will be invited when you create the group`);
   };
 
-  // HANDLER - Handle adding members from Contact Finder
-  const handleContactFinderAdd = (selectedContacts) => {
+  // HANDLER - Handle adding members from Contact Sync
+  const handleContactSyncMembers = (selectedUsers) => {
     // Store pending invitations
-    const invites = selectedContacts.map(contact => ({
-      userId: contact.userId,
-      name: contact.userName,
-      email: contact.userEmail,
-      photoURL: contact.userPhoto
+    const invites = selectedUsers.map(user => ({
+      userId: user.userId,
+      name: user.name,
+      email: user.email,
+      photoURL: user.photoURL
     }));
     
     setPendingInvitations(prev => [...prev, ...invites]);
-    setShowContactFinder(false);
     
     // Show success message
-    alert(`✅ ${selectedContacts.length} member(s) will be invited when you create the group`);
+    alert(`✅ ${selectedUsers.length} member(s) will be invited when you create the group`);
   };
+
 
   // HANDLER - Remove pending invitation
   const removePendingInvitation = (userId) => {
@@ -142,7 +141,6 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
       setIcon('home');
       setCurrency('EUR');
       setShowQuickAdd(false);
-      setShowContactFinder(false);
       
       if (onGroupCreated) {
         onGroupCreated(docRef.id);
@@ -160,7 +158,6 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   // HANDLER - Handle modal close with reset
   const handleClose = () => {
     setShowQuickAdd(false);
-    setShowContactFinder(false);
     setPendingInvitations([]);
     onClose();
   };
@@ -294,17 +291,21 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
                 </div>
               )}
 
-              {/* Contact Finder Button */}
-              <button
-                type="button"
-                onClick={() => setShowContactFinder(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition font-medium"
-              >
-                <PhoneCall size={20} />
-                <span>Find Contacts on Split-Sync</span>
-              </button>
+              {/* ⭐ ADD CONTACT SYNC - ADD THIS ENTIRE SECTION */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Or find friends via phone contacts:
+                </p>
+                <ContactSyncButton
+                  currentUser={user}
+                  onAddMembers={handleContactSyncMembers}
+                  excludeUserIds={[
+                    user.uid,
+                    ...pendingInvitations.map(inv => inv.userId)
+                  ]}
+                />
+              </div>
             </div>
-
             {/* Divider */}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
@@ -336,19 +337,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
           </form>
         </div>
       </div>
-
-      {/* Contact Finder Modal */}
-      {showContactFinder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="max-w-2xl w-full">
-            <ContactFinder
-              currentUser={user}
-              onAddContact={handleContactFinderAdd}
-              onClose={() => setShowContactFinder(false)}
-            />
-          </div>
-        </div>
-      )}
+      
     </>
   );
 }
