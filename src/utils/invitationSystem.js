@@ -15,6 +15,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { createNotification } from '../stores/notificationsStore';
 
 /**
  * Send a group invitation to a user
@@ -71,13 +72,29 @@ export const sendInvitation = async (fromUser, toUserId, groupId, groupName) => 
 
     await setDoc(invitationRef, invitationData);
 
-    console.log(`✅ Invitation sent: ${fromUser.displayName} → ${toUserData.fullName} for ${groupName}`);
-    
-    return { 
-      success: true, 
-      invitationId: invitationRef.id,
-      message: 'Invitation sent successfully'
-    };
+// Create bell notification for recipient
+await createNotification({
+  userId: toUserId,
+  type: 'invitation',
+  title: '📨 Group Invitation',
+  message: `${fromUser.displayName || 'Someone'} invited you to join "${groupName}"`,
+  data: {
+    invitationId: invitationRef.id,
+    groupId: groupId,
+    groupName: groupName,
+    fromUserId: fromUser.uid,
+    fromUserName: fromUser.displayName || fromUser.email,
+  },
+});
+
+console.log(`✅ Invitation sent: ${fromUser.displayName} → ${toUserData.fullName} for ${groupName}`);
+
+return { 
+  success: true, 
+  invitationId: invitationRef.id,
+  message: 'Invitation sent successfully'
+};
+
   } catch (error) {
     console.error('Error sending invitation:', error);
     return { success: false, message: 'Failed to send invitation' };

@@ -106,10 +106,45 @@ export const getConnections = async (userId) => {
     const connectionsRef = collection(db, 'connections', userId, 'connectedUsers');
     const snapshot = await getDocs(connectionsRef);
 
-    const connections = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    // ⭐ Fetch FRESH user data from users collection
+    const connections = await Promise.all(
+      snapshot.docs.map(async (docSnap) => {
+        const connectionData = docSnap.data();
+        const connectedUserId = docSnap.id;
+        
+        try {
+          // Fetch current user data
+          const userDoc = await getDoc(doc(db, 'users', connectedUserId));
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            // Use CURRENT name from users collection
+            return {
+              id: connectedUserId,
+              userId: connectedUserId,
+              name: userData.displayName || userData.fullName || connectionData.name || 'Unknown',
+              email: userData.email || connectionData.email || '',
+              photoURL: userData.photoURL || connectionData.photoURL || null,
+              // Keep connection metadata
+              sharedGroups: connectionData.sharedGroups,
+              lastGroupTogether: connectionData.lastGroupTogether,
+              lastGroupId: connectionData.lastGroupId,
+              updatedAt: connectionData.updatedAt,
+              connectedAt: connectionData.connectedAt,
+            };
+          }
+        } catch (err) {
+          console.log(`Could not fetch fresh data for ${connectedUserId}, using cached`);
+        }
+        
+        // Fallback to cached data if user fetch fails
+        return {
+          id: connectedUserId,
+          userId: connectedUserId,
+          ...connectionData
+        };
+      })
+    );
 
     // Sort by most recent connection
     connections.sort((a, b) => {

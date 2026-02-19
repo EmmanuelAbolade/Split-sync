@@ -13,7 +13,7 @@ import {
   deleteUser
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
-import { doc, deleteDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { doc, deleteDoc, collection, query, where, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { QrCode, HelpCircle } from 'lucide-react';
 import QRCodeModal from '../components/QRCodeModal';
 import InfoHubModal from '../components/InfoHubModal';
@@ -88,11 +88,69 @@ export default function Settings() {
           members: updatedMembers,
         });
       });
-      
+
       await Promise.all(groupUpdates);
+
+    // ⭐ 4. Update name in connections (via group members)
+    console.log('🔄 [NAME UPDATE] Starting connections update...');
+    try {
+      // Get all groups where user is a member
+      const myGroups = groupsSnapshot.docs;
+      const allMemberIds = new Set();
       
-      setSuccess('Name updated successfully across all groups!');
-      setEditingName(false);
+      // Collect all unique member IDs from all groups
+      myGroups.forEach(groupDoc => {
+        const groupData = groupDoc.data();
+        const memberIds = groupData.memberIds || [];
+        memberIds.forEach(id => {
+          if (id !== user.uid) { // Exclude self
+            allMemberIds.add(id);
+          }
+        });
+      });
+      
+      console.log(`👥 [NAME UPDATE] Found ${allMemberIds.size} unique connections to update`);
+      
+      // Update connection in each member's connections subcollection
+      const connectionUpdates = [];
+      
+      for (const memberId of allMemberIds) {
+        try {
+          const connectionRef = doc(db, 'connections', memberId, 'connectedUsers', user.uid);
+          const connectionDoc = await getDoc(connectionRef);
+          
+          if (connectionDoc.exists()) {
+            console.log(`✅ [NAME UPDATE] Updating connection for user: ${memberId}`);
+            connectionUpdates.push(
+              updateDoc(connectionRef, {
+                name: newName.trim(),
+                updatedAt: new Date()
+              })
+            );
+          }
+        } catch (err) {
+          console.log(`⚠️ [NAME UPDATE] Could not access connection for ${memberId}:`, err.message);
+          // Skip this user, might not have permission
+        }
+      }
+      
+      if (connectionUpdates.length > 0) {
+        await Promise.all(connectionUpdates);
+        console.log(`✅ [NAME UPDATE] Updated ${connectionUpdates.length} connections`);
+      } else {
+        console.log('⚠️ [NAME UPDATE] No connections were updated');
+      }
+    } catch (connError) {
+      console.error('❌ [NAME UPDATE] Error updating connections:', connError);
+      // Don't fail the whole operation
+    }
+    
+    console.log('🎉 [NAME UPDATE] Name update complete!');
+    
+    // Success!
+    setEditingName(false);
+    setSuccess('✅ Name updated successfully across all groups and connections!');
+     
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error('Error updating name:', err);

@@ -8,13 +8,14 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
 import SettleUpModal from '../components/SettleUpModal';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 import ShareInviteModal from '../components/ShareInviteModal';
+import { getMySentInvitations, cancelInvitation, sendInvitation } from '../utils/invitationSystem'; 
 
 const ICON_MAP = {
   home: Home, plane: Plane, pizza: Pizza, party: PartyPopper,
@@ -61,7 +62,7 @@ export default function GroupDetails() {
   const [memberPhotos, setMemberPhotos] = useState({});
   const [memberPaymentMethods, setMemberPaymentMethods] = useState({});
   const [pendingPaymentBanner, setPendingPaymentBanner] = useState(null);
-
+  const [pendingInvitations, setPendingInvitations] = useState([]);
 
   // Get display title with current names for settlements
   const getDisplayTitle = (expense) => {
@@ -74,6 +75,20 @@ export default function GroupDetails() {
     const toMember = group.members?.find(m => m.userId === toUserId);
     
     return `Settlement: ${fromMember?.name || 'Unknown'} → ${toMember?.name || 'Unknown'}`;
+  };
+
+  // Helper to format time ago
+  const formatTimeAgo = (date) => {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
   };
 
   useEffect(() => {
@@ -245,6 +260,27 @@ export default function GroupDetails() {
     };
   }, [groupId, group, expenses]); // Safe dependencies
 
+  // ⭐ Load pending invitations
+  useEffect(() => {
+    const loadPendingInvitations = async () => {
+      if (!group?.id || !user?.uid) return;
+      
+      try {
+        const invitations = await getMySentInvitations(user.uid, group.id);
+        const pending = invitations.filter(inv => inv.status === 'pending');
+        setPendingInvitations(pending);
+      } catch (error) {
+        console.error('Error loading pending invitations:', error);
+      }
+    };
+    
+    loadPendingInvitations();
+    
+    // Refresh every 30 seconds
+    const interval = setInterval(loadPendingInvitations, 30000);
+    return () => clearInterval(interval);
+  }, [group?.id, user?.uid]);
+  
   // LOADING CHECK FIRST
   if (loading) {
     return (
@@ -403,6 +439,83 @@ export default function GroupDetails() {
           </div>
         )}
 
+        {/* Pending Invitations Section */}
+        {pendingInvitations.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Clock size={20} className="text-orange-600 dark:text-orange-400" />
+                Pending Invitations ({pendingInvitations.length})
+              </h3>
+            </div>
+
+            <div className="space-y-3">
+              {pendingInvitations.map((invitation) => {
+                const createdAt = invitation.createdAt?.toDate?.() || new Date(invitation.createdAt);
+                const timeAgo = formatTimeAgo(createdAt);
+
+                return (
+                  <div
+                    key={invitation.id}
+                    className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                        <Mail size={20} className="text-orange-600 dark:text-orange-400" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {invitation.toUserName}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {invitation.toUserEmail}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                          Invited {timeAgo}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          if (window.confirm('Resend invitation?')) {
+                            await sendInvitation(
+                              user,
+                              invitation.toUserId,
+                              group.id,
+                              group.name
+                            );
+                            alert('✅ Invitation resent!');
+                          }
+                        }}
+                        className="px-3 py-1.5 text-sm border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 rounded hover:bg-orange-100 dark:hover:bg-orange-900/40 transition"
+                      >
+                        Resend
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (window.confirm('Cancel this invitation?')) {
+                            const result = await cancelInvitation(invitation.id, user.uid);
+                            if (result.success) {
+                              setPendingInvitations(prev => 
+                                prev.filter(inv => inv.id !== invitation.id)
+                              );
+                              alert('✅ Invitation cancelled');
+                            }
+                          }
+                        }}
+                        className="px-3 py-1.5 text-sm border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded hover:bg-red-100 dark:hover:bg-red-900/40 transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         
         {/* Members Section */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
