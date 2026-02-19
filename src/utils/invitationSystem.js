@@ -21,21 +21,8 @@ import { createNotification } from '../stores/notificationsStore';
  * Send a group invitation to a user
  */
 export const sendInvitation = async (fromUser, toUserId, groupId, groupName) => {
-  try {
-    // Check if invitation already exists
-    const existingQuery = query(
-      collection(db, 'invitations'),
-      where('toUserId', '==', toUserId),
-      where('groupId', '==', groupId),
-      where('status', '==', 'pending')
-    );
-    
-    const existingSnap = await getDocs(existingQuery);
-    if (!existingSnap.empty) {
-      console.log('Invitation already exists');
-      return { success: false, message: 'Invitation already sent' };
-    }
-
+  
+  try {    
     // Check if user is already in the group
     const groupDoc = await getDoc(doc(db, 'groups', groupId));
     if (groupDoc.exists()) {
@@ -51,6 +38,8 @@ export const sendInvitation = async (fromUser, toUserId, groupId, groupName) => 
       return { success: false, message: 'User not found' };
     }
     const toUserData = toUserDoc.data();
+
+    
 
     // Create invitation
     const invitationRef = doc(collection(db, 'invitations'));
@@ -70,22 +59,37 @@ export const sendInvitation = async (fromUser, toUserId, groupId, groupName) => 
       notificationSent: false
     };
 
-    await setDoc(invitationRef, invitationData);
+    try {
+      await setDoc(invitationRef, invitationData);
+    } catch (inviteError) {
+      throw inviteError; // Re-throw to maintain existing error handling
+    }
 
-// Create bell notification for recipient
-await createNotification({
-  userId: toUserId,
-  type: 'invitation',
-  title: '📨 Group Invitation',
-  message: `${fromUser.displayName || 'Someone'} invited you to join "${groupName}"`,
-  data: {
-    invitationId: invitationRef.id,
-    groupId: groupId,
-    groupName: groupName,
-    fromUserId: fromUser.uid,
-    fromUserName: fromUser.displayName || fromUser.email,
-  },
-});
+    // Create bell notification for recipient
+    try {
+      console.log('🔔 [INVITE] Notification data:', {
+        userId: toUserId,
+        type: 'invitation',
+        groupName: groupName
+      });
+      
+      await createNotification({
+        userId: toUserId,
+        type: 'invitation',
+        title: '📨 Group Invitation',
+        message: `${fromUser.displayName || 'Someone'} invited you to join "${groupName}"`,
+        data: {
+          invitationId: invitationRef.id,
+          groupId: groupId,
+          groupName: groupName,
+          fromUserId: fromUser.uid,
+          fromUserName: fromUser.displayName || fromUser.email,
+        },
+      });
+  
+} catch (notifError) {
+  // Don't fail the invitation if notification fails
+}
 
 console.log(`✅ Invitation sent: ${fromUser.displayName} → ${toUserData.fullName} for ${groupName}`);
 
