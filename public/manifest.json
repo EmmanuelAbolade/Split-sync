@@ -8,6 +8,21 @@
       "type": "image/x-icon"
     },
     {
+      "short_name": "Split-Sync",
+      "name": "Split-Sync - Expense Management",
+      "icons": [
+        {
+          "src": "logo.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ],
+      "start_url": ".",
+      "display": "standalone",
+      "theme_color": "#6366f1",
+      "background_color": "#ffffff"
+    },
+    {
       "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192"

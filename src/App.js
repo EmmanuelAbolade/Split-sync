@@ -1,5 +1,5 @@
 // src/App.js - WITH BOTTOM NAVIGATION
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebase';
@@ -17,8 +17,6 @@ import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
-
-
 
 // Layout wrapper for protected routes with bottom nav
 function ProtectedLayout({ children }) {

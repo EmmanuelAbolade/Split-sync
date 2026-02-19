@@ -1,6 +1,8 @@
 // src/stores/authStore.js
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { signOut } from 'firebase/auth'; 
+import { auth } from '../services/firebase'; 
 
 export const useAuthStore = create(
   persist(
@@ -30,11 +32,37 @@ export const useAuthStore = create(
         }
       },
 
-      logout: () => set({ 
-        user: null, 
-        isAuthenticated: false,
-        loading: false
-      }),
+      logout: async () => {
+        try {
+          // Clear state first
+          set({ 
+            user: null, 
+            isAuthenticated: false,
+            loading: false
+          });
+          
+          // Sign out from Firebase
+          await signOut(auth);
+          
+          // Clear all storage
+          localStorage.removeItem('auth-storage'); // Clear persisted Zustand state
+          sessionStorage.clear();
+          
+          // Clear service worker caches
+          if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+          }
+          
+          // Force redirect to login (prevents back button)
+          window.location.href = '/login';
+          
+        } catch (error) {
+          console.error('Logout error:', error);
+          // Still redirect even if error
+          window.location.href = '/login';
+        }
+      },
 
       setLoading: (loading) => set({ loading }),
     }),

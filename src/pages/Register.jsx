@@ -79,6 +79,13 @@ export default function Register() {
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/50 p-8">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex flex-col items-center mb-2">
+            <img 
+              src="/logo.png" 
+              alt="Split-Sync Logo" 
+              className="h-32 w-auto mb-4"
+            />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create Your Account</h1>
           <p className="text-gray-600 dark:text-gray-300 mt-1">Join SplitSync today</p>
         </div>

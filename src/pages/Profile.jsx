@@ -7,7 +7,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 import { 
   User, Mail, Calendar, LogOut,
-  TrendingUp, TrendingDown, Users, Wallet, CreditCard, Save, Info, ChevronDown, Shield, Fingerprint, Lock 
+  TrendingUp, TrendingDown, Users, Wallet, CreditCard, Save, Info, ChevronDown, Shield, Lock, ArrowLeft 
 } from 'lucide-react';
 import { calculateBalances } from '../utils/balanceCalculator';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
@@ -21,8 +21,6 @@ import {
   authenticateWithBiometric,
   isBiometricAvailable,
   isBiometricEnabledOnDevice,
-  enableBiometric,
-  disableBiometric
 } from '../utils/biometric';
 
 export default function Profile() {
@@ -477,8 +475,16 @@ const handleSavePhone = async () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
+     <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Back Arrow - Mobile Only */}
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-white hover:text-gray-200 mb-4 md:hidden"
+          >
+            <ArrowLeft size={24} />
+          </button>
+          
           <div className="flex flex-col items-center">
             <CloudinaryUpload
               user={user}
