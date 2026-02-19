@@ -155,7 +155,12 @@ export default function Register() {
             </div>
             <PasswordStrength 
               password={password}
-              onPasswordGenerate={setPassword}
+              onPasswordGenerate={(generatedPassword) => {
+                setPassword(generatedPassword);
+                setConfirmPassword(generatedPassword); // Auto-fill confirm
+                setShowPassword(false); // No Show password field
+                setShowConfirmPassword(false); // No Show confirm field
+              }}
             />
           </div>
 

@@ -38,7 +38,7 @@ function App() {
   const { setUser, setLoading, isAuthenticated, loading } = useAuthStore();
 
 
-  // ⭐ Session timeout hook
+  // Session timeout hook
   const {
     showWarning,
     countdown,
@@ -59,10 +59,17 @@ function App() {
   // Show loading while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          {/* Your Logo */}
+          <img 
+            src="/logo.png" 
+            alt="Split-Sync" 
+            className="h-32 w-auto mx-auto mb-8 animate-pulse"
+          />
+          {/* Loading Spinner */}
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="mt-4 text-white">Loading Split-Sync...</p>
         </div>
       </div>
     );
