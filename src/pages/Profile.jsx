@@ -22,6 +22,7 @@ import {
   isBiometricAvailable,
   isBiometricEnabledOnDevice,
 } from '../utils/biometric';
+import BalanceBreakdownModal from '../components/BalanceBreakdownModal';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -56,6 +57,11 @@ export default function Profile() {
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Balance breakdown modal state
+  const [showBreakdownModal, setShowBreakdownModal] = useState(false);
+  const [breakdownType, setBreakdownType] = useState('owed'); // 'owed' or 'owing'
+  const [breakdownData, setBreakdownData] = useState([]);
 
   // Fetch user's groups and expenses
   useEffect(() => {
@@ -265,6 +271,58 @@ const handleSavePhone = async () => {
 
     return { totalOwed, totalOwing };
   };
+
+  // Calculate detailed breakdown of who owes what
+  const calculateDetailedBreakdown = (type) => {
+    const breakdowns = [];
+
+    groups.forEach(group => {
+      const groupExpenses = expenses.filter(e => e.groupId === group.id);
+      const balances = calculateBalances(groupExpenses, group.members || []);
+
+      // For each member in the group
+      Object.entries(balances).forEach(([memberId, balance]) => {
+        if (memberId === user.uid) return; // Skip self
+
+        const shouldInclude = type === 'owed' 
+          ? balances[user.uid] > 0 && balance < 0 // Others owe me
+          : balances[user.uid] < 0 && balance > 0; // I owe others
+
+        if (shouldInclude) {
+          const member = group.members.find(m => m.userId === memberId);
+          const amount = Math.abs(balance);
+
+          // Find or create entry for this person
+          let personEntry = breakdowns.find(b => b.userId === memberId);
+          
+          if (!personEntry) {
+            personEntry = {
+              userId: memberId,
+              name: member?.name || 'Unknown',
+              email: member?.email || '',
+              photoURL: member?.photoURL || null,
+              amount: 0,
+              groups: []
+            };
+            breakdowns.push(personEntry);
+          }
+
+          personEntry.amount += amount;
+          personEntry.groups.push({
+            groupId: group.id,
+            groupName: group.name,
+            amount: amount
+          });
+        }
+      });
+    });
+
+    // Sort by amount (highest first)
+    breakdowns.sort((a, b) => b.amount - a.amount);
+
+    return breakdowns;
+  };
+
 
   const handleSavePaymentMethods = async () => {
     setPaymentError('');
@@ -532,26 +590,46 @@ const handleSavePhone = async () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp size={16} className="text-green-600 dark:text-green-400" />
-                <p className="text-xs text-green-700 dark:text-green-300 font-medium">Owed to You</p>
-              </div>
-              <p className="text-xl font-bold text-green-900 dark:text-green-100">
-                €{totalOwed.toFixed(2)}
-              </p>
+          {/* Owed to You - Clickable */}
+          <div 
+            onClick={() => {
+              const data = calculateDetailedBreakdown('owed');
+              setBreakdownData(data);
+              setBreakdownType('owed');
+              setShowBreakdownModal(true);
+            }}
+            className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 border border-green-200 dark:border-green-800 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp size={16} className="text-green-600 dark:text-green-400" />
+              <p className="text-xs text-green-700 dark:text-green-300 font-medium">Owed to You</p>
             </div>
-
-            <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown size={16} className="text-orange-600 dark:text-orange-400" />
-                <p className="text-xs text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
-              </div>
-              <p className="text-xl font-bold text-orange-900 dark:text-orange-100">
-                €{totalOwing.toFixed(2)}
-              </p>
-            </div>
+            <p className="text-xl font-bold text-green-900 dark:text-green-100">
+              €{totalOwed.toFixed(2)}
+            </p>
+            <p className="text-xs text-green-600 dark:text-green-400 mt-1">Click for details</p>
           </div>
+
+          {/* You Owe - Clickable */}
+          <div 
+            onClick={() => {
+              const data = calculateDetailedBreakdown('owing');
+              setBreakdownData(data);
+              setBreakdownType('owing');
+              setShowBreakdownModal(true);
+            }}
+            className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border border-orange-200 dark:border-orange-800 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingDown size={16} className="text-orange-600 dark:text-orange-400" />
+              <p className="text-xs text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
+            </div>
+            <p className="text-xl font-bold text-orange-900 dark:text-orange-100">
+              €{totalOwing.toFixed(2)}
+            </p>
+            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Click for details</p>
+          </div>
+        </div>
         </div>
 
         {/* Stats */}
@@ -897,6 +975,14 @@ const handleSavePhone = async () => {
           </button>
         </div>
       </div>
+      {/* Balance Breakdown Modal */}
+      <BalanceBreakdownModal
+        isOpen={showBreakdownModal}
+        onClose={() => setShowBreakdownModal(false)}
+        type={breakdownType}
+        breakdowns={breakdownData}
+        totalAmount={breakdownType === 'owed' ? totalOwed : totalOwing}
+      />
     </div>
   );
 }
