@@ -2,69 +2,69 @@
 > split-sync-app@0.1.0 test
 > react-scripts test --coverage --watchAll=false
 
--------------------------------|---------|----------|---------|---------|-------------------
-File                           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
--------------------------------|---------|----------|---------|---------|-------------------
-All files                      |    1.32 |     1.05 |    1.31 |    1.29 |                   
- src                           |       0 |        0 |       0 |       0 |                   
-  App.js                       |       0 |        0 |       0 |       0 | 23-78             
-  index.js                     |       0 |      100 |     100 |       0 | 11-28             
-  reportWebVitals.js           |       0 |        0 |       0 |       0 | 2-9               
-  serviceWorkerRegistration.js |       0 |        0 |       0 |       0 | 2-71              
- src/components                |       0 |        0 |       0 |       0 |                   
-  AddExpenseModal.jsx          |       0 |        0 |       0 |       0 | 11-764            
-  BalanceBreakdownModal.jsx    |       0 |        0 |       0 |       0 | 12-109            
-  BottomNav.jsx                |       0 |        0 |       0 |       0 | 6-77              
-  CloudinaryUpload.jsx         |       0 |        0 |       0 |       0 | 8-252             
-  ContactSyncButton.jsx        |       0 |        0 |       0 |       0 | 7-221             
-  CreateGroupModal.jsx         |       0 |        0 |       0 |       0 | 16-304            
-  DarkModeToggle.jsx           |       0 |        0 |       0 |       0 | 6-8               
-  ExpenseDetailsModal.jsx      |       0 |        0 |       0 |       0 | 5-202             
-  IconSelector.jsx             |       0 |        0 |       0 |       0 | 9-41              
-  InfoHubModal.jsx             |       0 |        0 |       0 |       0 | 6-47              
-  InvitationNotification.jsx   |       0 |        0 |       0 |       0 | 10-208            
-  NotificationsDropdown.jsx    |       0 |        0 |       0 |       0 | 6-129             
-  OnboardingWizard.jsx         |       0 |        0 |       0 |       0 | 21-228            
-  PasswordStrength.jsx         |       0 |        0 |       0 |       0 | 6-108             
-  PaymentInfoModal.jsx         |       0 |        0 |       0 |       0 | 5-30              
-  ProfilePhotoUpload.jsx       |       0 |        0 |       0 |       0 | 9-91              
-  QRCodeCanvas.jsx             |       0 |        0 |       0 |       0 | 6-28              
-  QRCodeModal.jsx              |       0 |        0 |       0 |       0 | 7-138             
-  QuickAddMembers.jsx          |       0 |        0 |       0 |       0 | 10-253            
-  ReceiptScanner.jsx           |       0 |        0 |       0 |       0 | 8-318             
-  SepaPaymentModal.jsx         |       0 |        0 |       0 |       0 | 25-415            
-  SessionTimeoutWarning.jsx    |       0 |        0 |       0 |       0 | 10-12             
-  SettleUpModal.jsx            |       0 |        0 |       0 |       0 | 15-965            
-  ShareInviteModal.jsx         |       0 |        0 |       0 |       0 | 7-125             
-  Tooltip.jsx                  |       0 |        0 |       0 |       0 | 6-16              
- src/contexts                  |       0 |        0 |       0 |       0 |                   
-  DarkModeContext.jsx          |       0 |        0 |       0 |       0 | 4-40              
- src/hooks                     |       0 |        0 |       0 |       0 |                   
-  useKeyboardAware.js          |       0 |        0 |       0 |       0 | 6-23              
-  useSessionTimeout.js         |       0 |        0 |       0 |       0 | 7-223             
- src/pages                     |       0 |        0 |       0 |       0 |                   
-  Activity.jsx                 |       0 |        0 |       0 |       0 | 11-256            
-  Dashboard.jsx                |       0 |        0 |       0 |       0 | 18-418            
-  ForgotPassword.jsx           |       0 |        0 |       0 |       0 | 9-127             
-  GroupDetails.jsx             |       0 |        0 |       0 |       0 | 20-962            
-  JoinGroup.jsx                |       0 |        0 |       0 |       0 | 10-232            
-  Login.jsx                    |       0 |        0 |       0 |       0 | 12-304            
-  Profile.jsx                  |       0 |        0 |       0 |       0 | 28-981            
-  QuickAdd.jsx                 |       0 |        0 |       0 |       0 | 11-89             
-  Register.jsx                 |       0 |        0 |       0 |       0 | 12-206            
-  Settings.jsx                 |       0 |        0 |       0 |       0 | 25-697            
- src/services                  |       0 |      100 |     100 |       0 |                   
-  firebase.js                  |       0 |      100 |     100 |       0 | 8-24              
- src/stores                    |       0 |        0 |       0 |       0 |                   
-  authStore.js                 |       0 |        0 |       0 |       0 | 7-67              
-  notificationsStore.js        |       0 |        0 |       0 |       0 | 6-111             
- src/utils                     |    7.11 |      7.6 |   11.84 |    6.89 |                   
-  balanceCalculator.js         |     100 |    95.45 |     100 |     100 | 23                
-  biometric.js                 |       0 |        0 |       0 |       0 | 8-234             
-  contactSyncManager.js        |       0 |        0 |       0 |       0 | 10-165            
-  encryption.js                |       0 |        0 |       0 |       0 | 6-92              
-  invitationSystem.js          |       0 |        0 |       0 |       0 | 23-398            
-  paymentLinks.js              |       0 |        0 |       0 |       0 | 8-72              
-  sepaPayment.js               |       0 |        0 |       0 |       0 | 16-228            
-  userConnectionsManager.js    |       0 |        0 |       0 |       0 | 23-325            
--------------------------------|---------|----------|---------|---------|-------------------
+-------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------
+File                           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                      
+-------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------
+All files                      |    2.95 |     1.96 |    2.04 |    2.85 |                                                                        
+ src                           |       0 |        0 |       0 |       0 |                                                                        
+  App.js                       |       0 |        0 |       0 |       0 | 23-78                                                                  
+  index.js                     |       0 |      100 |     100 |       0 | 11-28                                                                  
+  reportWebVitals.js           |       0 |        0 |       0 |       0 | 2-9                                                                    
+  serviceWorkerRegistration.js |       0 |        0 |       0 |       0 | 2-71                                                                   
+ src/components                |       0 |        0 |       0 |       0 |                                                                        
+  AddExpenseModal.jsx          |       0 |        0 |       0 |       0 | 11-764                                                                 
+  BalanceBreakdownModal.jsx    |       0 |        0 |       0 |       0 | 12-109                                                                 
+  BottomNav.jsx                |       0 |        0 |       0 |       0 | 6-77                                                                   
+  CloudinaryUpload.jsx         |       0 |        0 |       0 |       0 | 8-252                                                                  
+  ContactSyncButton.jsx        |       0 |        0 |       0 |       0 | 7-221                                                                  
+  CreateGroupModal.jsx         |       0 |        0 |       0 |       0 | 16-304                                                                 
+  DarkModeToggle.jsx           |       0 |        0 |       0 |       0 | 6-8                                                                    
+  ExpenseDetailsModal.jsx      |       0 |        0 |       0 |       0 | 5-202                                                                  
+  IconSelector.jsx             |       0 |        0 |       0 |       0 | 9-41                                                                   
+  InfoHubModal.jsx             |       0 |        0 |       0 |       0 | 6-47                                                                   
+  InvitationNotification.jsx   |       0 |        0 |       0 |       0 | 10-208                                                                 
+  NotificationsDropdown.jsx    |       0 |        0 |       0 |       0 | 6-129                                                                  
+  OnboardingWizard.jsx         |       0 |        0 |       0 |       0 | 21-228                                                                 
+  PasswordStrength.jsx         |       0 |        0 |       0 |       0 | 6-108                                                                  
+  PaymentInfoModal.jsx         |       0 |        0 |       0 |       0 | 5-30                                                                   
+  ProfilePhotoUpload.jsx       |       0 |        0 |       0 |       0 | 9-91                                                                   
+  QRCodeCanvas.jsx             |       0 |        0 |       0 |       0 | 6-28                                                                   
+  QRCodeModal.jsx              |       0 |        0 |       0 |       0 | 7-138                                                                  
+  QuickAddMembers.jsx          |       0 |        0 |       0 |       0 | 10-253                                                                 
+  ReceiptScanner.jsx           |       0 |        0 |       0 |       0 | 8-318                                                                  
+  SepaPaymentModal.jsx         |       0 |        0 |       0 |       0 | 25-415                                                                 
+  SessionTimeoutWarning.jsx    |       0 |        0 |       0 |       0 | 10-12                                                                  
+  SettleUpModal.jsx            |       0 |        0 |       0 |       0 | 15-965                                                                 
+  ShareInviteModal.jsx         |       0 |        0 |       0 |       0 | 7-125                                                                  
+  Tooltip.jsx                  |       0 |        0 |       0 |       0 | 6-16                                                                   
+ src/contexts                  |       0 |        0 |       0 |       0 |                                                                        
+  DarkModeContext.jsx          |       0 |        0 |       0 |       0 | 4-40                                                                   
+ src/hooks                     |       0 |        0 |       0 |       0 |                                                                        
+  useKeyboardAware.js          |       0 |        0 |       0 |       0 | 6-23                                                                   
+  useSessionTimeout.js         |       0 |        0 |       0 |       0 | 7-223                                                                  
+ src/pages                     |       0 |        0 |       0 |       0 |                                                                        
+  Activity.jsx                 |       0 |        0 |       0 |       0 | 11-256                                                                 
+  Dashboard.jsx                |       0 |        0 |       0 |       0 | 18-418                                                                 
+  ForgotPassword.jsx           |       0 |        0 |       0 |       0 | 9-127                                                                  
+  GroupDetails.jsx             |       0 |        0 |       0 |       0 | 20-962                                                                 
+  JoinGroup.jsx                |       0 |        0 |       0 |       0 | 10-232                                                                 
+  Login.jsx                    |       0 |        0 |       0 |       0 | 12-304                                                                 
+  Profile.jsx                  |       0 |        0 |       0 |       0 | 28-981                                                                 
+  QuickAdd.jsx                 |       0 |        0 |       0 |       0 | 11-89                                                                  
+  Register.jsx                 |       0 |        0 |       0 |       0 | 12-206                                                                 
+  Settings.jsx                 |       0 |        0 |       0 |       0 | 25-697                                                                 
+ src/services                  |       0 |      100 |     100 |       0 |                                                                        
+  firebase.js                  |       0 |      100 |     100 |       0 | 8-24                                                                   
+ src/stores                    |       0 |        0 |       0 |       0 |                                                                        
+  authStore.js                 |       0 |        0 |       0 |       0 | 7-67                                                                   
+  notificationsStore.js        |       0 |        0 |       0 |       0 | 6-111                                                                  
+ src/utils                     |   15.93 |    14.13 |   18.42 |   15.24 |                                                                        
+  balanceCalculator.js         |     100 |    95.45 |     100 |     100 | 23                                                                     
+  biometric.js                 |       0 |        0 |       0 |       0 | 8-234                                                                  
+  contactSyncManager.js        |       0 |        0 |       0 |       0 | 10-165                                                                 
+  encryption.js                |   89.74 |       90 |     100 |   87.87 | 20-21,38-39                                                            
+  invitationSystem.js          |    6.56 |        0 |       0 |    6.61 | 25-104,112-127,134-173,181-203,211-281,289-317,325-350,359-385,393-398 
+  paymentLinks.js              |       0 |        0 |       0 |       0 | 8-72                                                                   
+  sepaPayment.js               |       0 |        0 |       0 |       0 | 16-228                                                                 
+  userConnectionsManager.js    |    6.72 |        0 |       0 |     7.2 | 24-75,84-96,105-159,165-195,206-220,229-244,253-277,286-325            
+-------------------------------|---------|----------|---------|---------|------------------------------------------------------------------------
