@@ -24,6 +24,14 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "jest": {
+  "transformIgnorePatterns": [
+    "node_modules/(?!(firebase|@firebase)/)"
+  ],
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  }
+},
   "eslintConfig": {
     "extends": [
       "react-app",
