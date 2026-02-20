@@ -5,9 +5,6 @@
   "dependencies": {
     "@paypal/react-paypal-js": "^8.9.2",
     "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
     "crypto-js": "^4.2.0",
     "firebase": "^12.6.0",
     "lucide-react": "^0.555.0",
@@ -46,7 +43,11 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "autoprefixer": "^10.4.20",
+    "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17"
   }
