@@ -176,7 +176,10 @@ describe('SEPA Payment - Payment Processing', () => {
     mockRandom.mockRestore();
     });
 
-  test('Masks IBANs in payment result', async () => {
+    test('Masks IBANs in payment result', async () => {
+    // Mock Math.random to ensure success (> 0.05)
+    const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+    
     const paymentData = {
       amount: 100,
       fromUserId: 'user1',
@@ -189,6 +192,8 @@ describe('SEPA Payment - Payment Processing', () => {
 
     expect(result.fromIBAN).toContain('*');
     expect(result.toIBAN).toContain('*');
+    
+    mockRandom.mockRestore();
   });
 
   test('Generates payment reference if not provided', async () => {
@@ -221,6 +226,9 @@ describe('SEPA Payment - Payment Processing', () => {
   });
 
   test('Includes processedAt timestamp', async () => {
+    // Mock Math.random to ensure success (> 0.05)
+    const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+    
     const paymentData = {
       amount: 50,
       fromUserId: 'user1',
@@ -233,6 +241,8 @@ describe('SEPA Payment - Payment Processing', () => {
 
     expect(result.processedAt).toBeDefined();
     expect(new Date(result.processedAt)).toBeInstanceOf(Date);
+    
+    mockRandom.mockRestore();
   });
 });
 

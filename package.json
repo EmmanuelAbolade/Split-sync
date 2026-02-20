@@ -12,7 +12,7 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.6",
+    "react-router-dom": "^7.13.0",
     "react-scripts": "5.0.1",
     "tesseract.js": "^7.0.0",
     "web-vitals": "^2.1.4",
@@ -25,13 +25,13 @@
     "eject": "react-scripts eject"
   },
   "jest": {
-  "transformIgnorePatterns": [
-    "node_modules/(?!(firebase|@firebase)/)"
-  ],
-  "moduleNameMapper": {
-    "^@/(.*)$": "<rootDir>/src/$1"
-  }
-},
+    "transformIgnorePatterns": [
+      "node_modules/(?!(firebase|@firebase)/)"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
