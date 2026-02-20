@@ -211,6 +211,9 @@ describe('SEPA Payment - Payment Processing', () => {
   });
 
   test('Includes estimated arrival time', async () => {
+    // Mock Math.random to ensure success (> 0.05)
+    const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+    
     const paymentData = {
       amount: 50,
       fromUserId: 'user1',
@@ -223,6 +226,8 @@ describe('SEPA Payment - Payment Processing', () => {
 
     expect(result.estimatedArrival).toBeDefined();
     expect(new Date(result.estimatedArrival)).toBeInstanceOf(Date);
+    
+    mockRandom.mockRestore();
   });
 
   test('Includes processedAt timestamp', async () => {
