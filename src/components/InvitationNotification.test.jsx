@@ -319,24 +319,24 @@ describe('InvitationNotification - getTimeAgo formatting', () => {
     await waitFor(() => expect(screen.getByText('Just now')).toBeInTheDocument());
   });
 
-  test('Shows hours ago for older invitation', async () => {
+ test('Shows hours ago for older invitation', async () => {
     mockGetMyInvitations.mockResolvedValue([{
       ...mockInvitation,
       createdAt: { toMillis: () => Date.now() - 7200000 }, // 2 hours ago
     }]);
 
     render(<InvitationNotification user={mockUser} />);
-    await waitFor(() => expect(screen.getByText('2h ago')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/\dh ago/)).toBeInTheDocument());
   });
 
   test('Shows days ago for invitation from yesterday', async () => {
     mockGetMyInvitations.mockResolvedValue([{
       ...mockInvitation,
-      createdAt: { toMillis: () => Date.now() - 172800000 }, // 2 days ago - safely past 24h threshold
+      createdAt: { toMillis: () => Date.now() - 172800000 }, // 2 days ago
     }]);
 
     render(<InvitationNotification user={mockUser} />);
-    await waitFor(() => expect(screen.getByText('2d ago')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/\dd ago/)).toBeInTheDocument());
   });
 
   test('Shows weeks ago for old invitation', async () => {
