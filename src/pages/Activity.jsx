@@ -44,6 +44,10 @@ export default function Activity() {
         ...doc.data(),
       }));
       setGroups(groupsData);
+      // If user has no groups, stop loading immediately — expenses will never load
+      if (snapshot.docs.length === 0) {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
