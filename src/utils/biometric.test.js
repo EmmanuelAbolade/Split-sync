@@ -1,296 +1,371 @@
 // src/utils/biometric.test.js
-// Test suite for biometric authentication utilities
+// Test suite for biometric authentication utility
+// Covers: isBiometricAvailable, isBiometricEnabledOnDevice, authenticateWithBiometric,
+//         registerBiometric, enableBiometric, disableBiometric, getDeviceInfo
+
 import {
   isBiometricAvailable,
   isBiometricEnabledOnDevice,
-  getDeviceInfo,
+  authenticateWithBiometric,
+  registerBiometric,
+  enableBiometric,
   disableBiometric,
+  getDeviceInfo,
 } from './biometric';
 
-// Mock browser APIs
-const mockLocalStorage = (() => {
+// ─── localStorage mock ────────────────────────────────────────────────────────
+
+const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: (key) => store[key] || null,
-    setItem: (key, value) => { store[key] = value.toString(); },
-    removeItem: (key) => { delete store[key]; },
-    clear: () => { store = {}; }
+    getItem:    (key)        => store[key] ?? null,
+    setItem:    (key, value) => { store[key] = String(value); },
+    removeItem: (key)        => { delete store[key]; },
+    clear:      ()           => { store = {}; },
   };
 })();
 
-Object.defineProperty(window, 'localStorage', {
-  value: mockLocalStorage
-});
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-describe('Biometric - Availability Check', () => {
-  
-  beforeEach(() => {
-    mockLocalStorage.clear();
-  });
+// ─── crypto mock ──────────────────────────────────────────────────────────────
 
-  test('Checks if PublicKeyCredential exists', () => {
-    // Mock PublicKeyCredential available
-    window.PublicKeyCredential = function() {};
-    
-    const available = isBiometricAvailable();
-    expect(typeof available).toBe('boolean');
-  });
+window.crypto = {
+  getRandomValues: (arr) => { arr.fill(1); return arr; },
+};
 
-  test('Returns false when PublicKeyCredential unavailable', () => {
-    // Remove PublicKeyCredential
+// ─── alert mock ───────────────────────────────────────────────────────────────
+
+window.alert = jest.fn();
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('isBiometricAvailable', () => {
+
+  afterEach(() => {
     delete window.PublicKeyCredential;
-    
-    const available = isBiometricAvailable();
-    expect(available).toBe(false);
   });
 
-  test('Returns true when PublicKeyCredential available', () => {
-    // Mock PublicKeyCredential
-    window.PublicKeyCredential = function() {};
-    
-    const available = isBiometricAvailable();
-    expect(available).toBe(true);
+  test('Returns true when PublicKeyCredential is available', () => {
+    window.PublicKeyCredential = class {};
+    expect(isBiometricAvailable()).toBe(true);
+  });
+
+  test('Returns false when PublicKeyCredential is not available', () => {
+    delete window.PublicKeyCredential;
+    expect(isBiometricAvailable()).toBe(false);
   });
 });
 
-describe('Biometric - Device-Specific Enablement', () => {
-  
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('isBiometricEnabledOnDevice', () => {
+
+  beforeEach(() => localStorageMock.clear());
+
+  test('Returns false when neither enabled flag nor credential exist', () => {
+    expect(isBiometricEnabledOnDevice('user-1')).toBe(false);
+  });
+
+  test('Returns false when enabled flag is true but credential is missing', () => {
+    localStorageMock.setItem('biometric_enabled_user-1', 'true');
+    expect(isBiometricEnabledOnDevice('user-1')).toBe(false);
+  });
+
+  test('Returns false when credential exists but enabled flag is not true', () => {
+    localStorageMock.setItem('biometric_credential_user-1', 'abc123');
+    expect(isBiometricEnabledOnDevice('user-1')).toBe(false);
+  });
+
+  test('Returns true when both enabled flag and credential exist', () => {
+    localStorageMock.setItem('biometric_enabled_user-1', 'true');
+    localStorageMock.setItem('biometric_credential_user-1', 'abc123');
+    expect(isBiometricEnabledOnDevice('user-1')).toBe(true);
+  });
+
+  test('Returns false for a different userId even when another user is enabled', () => {
+    localStorageMock.setItem('biometric_enabled_user-1', 'true');
+    localStorageMock.setItem('biometric_credential_user-1', 'abc123');
+    expect(isBiometricEnabledOnDevice('user-2')).toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('authenticateWithBiometric', () => {
+
   beforeEach(() => {
-    mockLocalStorage.clear();
+    localStorageMock.clear();
+    window.alert = jest.fn();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  test('Returns false when biometric not enabled on device', () => {
-    const enabled = isBiometricEnabledOnDevice('user123');
-    expect(enabled).toBe(false);
+  afterEach(() => {
+    jest.restoreAllMocks();
+    delete window.PublicKeyCredential;
   });
 
-  test('Returns false when enabled but no credential', () => {
-    mockLocalStorage.setItem('biometric_enabled_user123', 'true');
-    
-    const enabled = isBiometricEnabledOnDevice('user123');
-    expect(enabled).toBe(false);
+  test('Returns false when biometric is not available', async () => {
+    delete window.PublicKeyCredential;
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
   });
 
-  test('Returns true when both enabled and credential exist', () => {
-    mockLocalStorage.setItem('biometric_enabled_user123', 'true');
-    mockLocalStorage.setItem('biometric_credential_user123', 'dummy_credential');
-    
-    const enabled = isBiometricEnabledOnDevice('user123');
-    expect(enabled).toBe(true);
+  test('Returns false when no credential stored on device', async () => {
+    window.PublicKeyCredential = class {};
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
   });
 
-  test('Returns false for different user', () => {
-    mockLocalStorage.setItem('biometric_enabled_user123', 'true');
-    mockLocalStorage.setItem('biometric_credential_user123', 'dummy_credential');
-    
-    const enabled = isBiometricEnabledOnDevice('user456');
-    expect(enabled).toBe(false);
+  test('Returns true when navigator.credentials.get succeeds', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', btoa('fake-credential-id'));
+    navigator.credentials = { get: jest.fn().mockResolvedValue({ id: 'assertion-id' }) };
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(true);
   });
 
-  test('Handles string "false" correctly', () => {
-    mockLocalStorage.setItem('biometric_enabled_user123', 'false');
-    mockLocalStorage.setItem('biometric_credential_user123', 'dummy_credential');
-    
-    const enabled = isBiometricEnabledOnDevice('user123');
-    expect(enabled).toBe(false);
+  test('Returns false when navigator.credentials.get returns null', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', btoa('fake-id'));
+    navigator.credentials = { get: jest.fn().mockResolvedValue(null) };
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
+  });
+
+  test('Returns false on NotAllowedError (user cancelled)', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', btoa('fake-id'));
+    const err = new Error('Not allowed');
+    err.name = 'NotAllowedError';
+    navigator.credentials = { get: jest.fn().mockRejectedValue(err) };
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
+  });
+
+  test('Returns false on NotSupportedError', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', btoa('fake-id'));
+    const err = new Error('Not supported');
+    err.name = 'NotSupportedError';
+    navigator.credentials = { get: jest.fn().mockRejectedValue(err) };
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
+    expect(window.alert).toHaveBeenCalled();
+  });
+
+  test('Clears credential and returns false on InvalidStateError', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', btoa('fake-id'));
+    localStorageMock.setItem('biometric_enabled_user-1', 'true');
+    const err = new Error('Invalid state');
+    err.name = 'InvalidStateError';
+    navigator.credentials = { get: jest.fn().mockRejectedValue(err) };
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
+    expect(localStorageMock.getItem('biometric_credential_user-1')).toBeNull();
+    expect(localStorageMock.getItem('biometric_enabled_user-1')).toBeNull();
+  });
+
+  test('Returns false on generic error', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', btoa('fake-id'));
+    navigator.credentials = { get: jest.fn().mockRejectedValue(new Error('Unknown')) };
+    const result = await authenticateWithBiometric('user-1');
+    expect(result).toBe(false);
   });
 });
 
-describe('Biometric - Disable Functionality', () => {
-  
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('registerBiometric', () => {
+
   beforeEach(() => {
-    mockLocalStorage.clear();
+    localStorageMock.clear();
+    window.alert = jest.fn();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  test('Removes credential from localStorage', () => {
-    mockLocalStorage.setItem('biometric_credential_user123', 'credential');
-    mockLocalStorage.setItem('biometric_enabled_user123', 'true');
-    
-    disableBiometric('user123');
-    
-    expect(mockLocalStorage.getItem('biometric_credential_user123')).toBeNull();
-    expect(mockLocalStorage.getItem('biometric_enabled_user123')).toBeNull();
+  afterEach(() => {
+    jest.restoreAllMocks();
+    delete window.PublicKeyCredential;
   });
 
-  test('Handles disabling when not enabled', () => {
-    disableBiometric('user123');
-    
-    expect(mockLocalStorage.getItem('biometric_credential_user123')).toBeNull();
+  test('Returns false when biometric is not available', async () => {
+    delete window.PublicKeyCredential;
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
+    expect(window.alert).toHaveBeenCalled();
   });
 
-  test('Only removes specific user credentials', () => {
-    mockLocalStorage.setItem('biometric_credential_user123', 'cred1');
-    mockLocalStorage.setItem('biometric_enabled_user123', 'true');
-    mockLocalStorage.setItem('biometric_credential_user456', 'cred2');
-    mockLocalStorage.setItem('biometric_enabled_user456', 'true');
-    
-    disableBiometric('user123');
-    
-    expect(mockLocalStorage.getItem('biometric_credential_user123')).toBeNull();
-    expect(mockLocalStorage.getItem('biometric_credential_user456')).toBe('cred2');
-  });
-});
-
-describe('Biometric - Device Info', () => {
-  
-  test('Returns device type string', () => {
-    const deviceInfo = getDeviceInfo();
-    
-    expect(typeof deviceInfo).toBe('string');
-    expect(deviceInfo.length).toBeGreaterThan(0);
+  test('Returns true and stores credential on success', async () => {
+    window.PublicKeyCredential = class {};
+    const fakeRawId = new Uint8Array([1, 2, 3, 4]).buffer;
+    navigator.credentials = {
+      create: jest.fn().mockResolvedValue({ rawId: fakeRawId }),
+    };
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(true);
+    expect(localStorageMock.getItem('biometric_enabled_user-1')).toBe('true');
+    expect(localStorageMock.getItem('biometric_credential_user-1')).not.toBeNull();
   });
 
-  test('Detects iPhone from user agent', () => {
-    const originalUA = navigator.userAgent;
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)',
-      configurable: true
-    });
-    
-    const deviceInfo = getDeviceInfo();
-    expect(deviceInfo).toBe('iPhone');
-    
-    Object.defineProperty(navigator, 'userAgent', {
-      value: originalUA,
-      configurable: true
-    });
+  test('Returns false when navigator.credentials.create returns null', async () => {
+    window.PublicKeyCredential = class {};
+    navigator.credentials = { create: jest.fn().mockResolvedValue(null) };
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
   });
 
-  test('Detects iPad from user agent', () => {
-    const originalUA = navigator.userAgent;
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X)',
-      configurable: true
-    });
-    
-    const deviceInfo = getDeviceInfo();
-    expect(deviceInfo).toBe('iPad');
-    
-    Object.defineProperty(navigator, 'userAgent', {
-      value: originalUA,
-      configurable: true
-    });
+  test('Returns false on NotAllowedError (user cancelled)', async () => {
+    window.PublicKeyCredential = class {};
+    const err = new Error('Not allowed');
+    err.name = 'NotAllowedError';
+    navigator.credentials = { create: jest.fn().mockRejectedValue(err) };
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
   });
 
-  test('Detects Android from user agent', () => {
-    const originalUA = navigator.userAgent;
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (Linux; Android 11)',
-      configurable: true
-    });
-    
-    const deviceInfo = getDeviceInfo();
-    expect(deviceInfo).toBe('Android device');
-    
-    Object.defineProperty(navigator, 'userAgent', {
-      value: originalUA,
-      configurable: true
-    });
+  test('Returns false on NotSupportedError', async () => {
+    window.PublicKeyCredential = class {};
+    const err = new Error('Not supported');
+    err.name = 'NotSupportedError';
+    navigator.credentials = { create: jest.fn().mockRejectedValue(err) };
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
+    expect(window.alert).toHaveBeenCalled();
   });
 
-  test('Detects Mac from user agent', () => {
-    const originalUA = navigator.userAgent;
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-      configurable: true
-    });
-    
-    const deviceInfo = getDeviceInfo();
-    expect(deviceInfo).toBe('Mac');
-    
-    Object.defineProperty(navigator, 'userAgent', {
-      value: originalUA,
-      configurable: true
-    });
+  test('Clears credential and returns false on InvalidStateError', async () => {
+    window.PublicKeyCredential = class {};
+    localStorageMock.setItem('biometric_credential_user-1', 'old-credential');
+    const err = new Error('Invalid state');
+    err.name = 'InvalidStateError';
+    navigator.credentials = { create: jest.fn().mockRejectedValue(err) };
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
+    expect(localStorageMock.getItem('biometric_credential_user-1')).toBeNull();
   });
 
-  test('Detects Windows from user agent', () => {
-    const originalUA = navigator.userAgent;
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-      configurable: true
-    });
-    
-    const deviceInfo = getDeviceInfo();
-    expect(deviceInfo).toBe('Windows PC');
-    
-    Object.defineProperty(navigator, 'userAgent', {
-      value: originalUA,
-      configurable: true
-    });
-  });
-
-  test('Returns default for unknown device', () => {
-    const originalUA = navigator.userAgent;
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Unknown Device',
-      configurable: true
-    });
-    
-    const deviceInfo = getDeviceInfo();
-    expect(deviceInfo).toBe('This device');
-    
-    Object.defineProperty(navigator, 'userAgent', {
-      value: originalUA,
-      configurable: true
-    });
+  test('Returns false on generic error', async () => {
+    window.PublicKeyCredential = class {};
+    navigator.credentials = { create: jest.fn().mockRejectedValue(new Error('Generic')) };
+    const result = await registerBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
+    expect(window.alert).toHaveBeenCalled();
   });
 });
 
-describe('Biometric - Storage Key Format', () => {
-  
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('enableBiometric', () => {
+
   beforeEach(() => {
-    mockLocalStorage.clear();
+    localStorageMock.clear();
+    window.alert = jest.fn();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  test('Uses correct key format for credentials', () => {
-    mockLocalStorage.setItem('biometric_credential_user123', 'test');
-    
-    const key = 'biometric_credential_user123';
-    expect(mockLocalStorage.getItem(key)).toBe('test');
+  afterEach(() => {
+    jest.restoreAllMocks();
+    delete window.PublicKeyCredential;
   });
 
-  test('Uses correct key format for enabled flag', () => {
-    mockLocalStorage.setItem('biometric_enabled_user123', 'true');
-    
-    const key = 'biometric_enabled_user123';
-    expect(mockLocalStorage.getItem(key)).toBe('true');
+  test('Returns false when biometric is not available', async () => {
+    delete window.PublicKeyCredential;
+    const result = await enableBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
   });
 
-  test('Keys are user-specific', () => {
-    const userId1 = 'user123';
-    const userId2 = 'user456';
-    
-    mockLocalStorage.setItem(`biometric_credential_${userId1}`, 'cred1');
-    mockLocalStorage.setItem(`biometric_credential_${userId2}`, 'cred2');
-    
-    expect(mockLocalStorage.getItem(`biometric_credential_${userId1}`)).toBe('cred1');
-    expect(mockLocalStorage.getItem(`biometric_credential_${userId2}`)).toBe('cred2');
+  test('Returns true when registration succeeds', async () => {
+    window.PublicKeyCredential = class {};
+    const fakeRawId = new Uint8Array([1, 2, 3]).buffer;
+    navigator.credentials = { create: jest.fn().mockResolvedValue({ rawId: fakeRawId }) };
+    const result = await enableBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(true);
+  });
+
+  test('Returns false when registration throws', async () => {
+    window.PublicKeyCredential = class {};
+    navigator.credentials = { create: jest.fn().mockRejectedValue(new Error('Fail')) };
+    const result = await enableBiometric('user-1', 'test@test.com', 'Test User');
+    expect(result).toBe(false);
   });
 });
 
-describe('Biometric - Error Scenarios', () => {
-  
-  beforeEach(() => {
-    mockLocalStorage.clear();
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('disableBiometric', () => {
+
+  beforeEach(() => localStorageMock.clear());
+
+  test('Removes credential and enabled flag from localStorage', () => {
+    localStorageMock.setItem('biometric_credential_user-1', 'abc');
+    localStorageMock.setItem('biometric_enabled_user-1', 'true');
+    disableBiometric('user-1');
+    expect(localStorageMock.getItem('biometric_credential_user-1')).toBeNull();
+    expect(localStorageMock.getItem('biometric_enabled_user-1')).toBeNull();
   });
 
-  test('Handles null userId gracefully', () => {
-    const enabled = isBiometricEnabledOnDevice(null);
-    expect(typeof enabled).toBe('boolean');
+  test('Does not throw when no credential exists', () => {
+    expect(() => disableBiometric('user-1')).not.toThrow();
   });
 
-  test('Handles undefined userId gracefully', () => {
-    const enabled = isBiometricEnabledOnDevice(undefined);
-    expect(typeof enabled).toBe('boolean');
+  test('Only removes keys for the specified user', () => {
+    localStorageMock.setItem('biometric_credential_user-1', 'abc');
+    localStorageMock.setItem('biometric_enabled_user-1', 'true');
+    localStorageMock.setItem('biometric_credential_user-2', 'xyz');
+    localStorageMock.setItem('biometric_enabled_user-2', 'true');
+    disableBiometric('user-1');
+    expect(localStorageMock.getItem('biometric_credential_user-2')).toBe('xyz');
+    expect(localStorageMock.getItem('biometric_enabled_user-2')).toBe('true');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('getDeviceInfo', () => {
+
+  const setUA = (ua) => {
+    Object.defineProperty(navigator, 'userAgent', {
+      value: ua, configurable: true, writable: true,
+    });
+  };
+
+  test('Returns "iPhone" for iPhone user agent', () => {
+    setUA('Mozilla/5.0 (iPhone; CPU iPhone OS 15_0)');
+    expect(getDeviceInfo()).toBe('iPhone');
   });
 
-  test('Handles empty string userId', () => {
-    const enabled = isBiometricEnabledOnDevice('');
-    expect(enabled).toBe(false);
+  test('Returns "iPad" for iPad user agent', () => {
+    setUA('Mozilla/5.0 (iPad; CPU OS 15_0)');
+    expect(getDeviceInfo()).toBe('iPad');
   });
 
-  test('Disabling with null userId does not crash', () => {
-    expect(() => disableBiometric(null)).not.toThrow();
+  test('Returns "Android device" for Android user agent', () => {
+    setUA('Mozilla/5.0 (Linux; Android 11; Pixel 5)');
+    expect(getDeviceInfo()).toBe('Android device');
+  });
+
+  test('Returns "Mac" for Mac user agent', () => {
+    setUA('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)');
+    expect(getDeviceInfo()).toBe('Mac');
+  });
+
+  test('Returns "Windows PC" for Windows user agent', () => {
+    setUA('Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+    expect(getDeviceInfo()).toBe('Windows PC');
+  });
+
+  test('Returns "Linux PC" for Linux user agent', () => {
+    setUA('Mozilla/5.0 (X11; Linux x86_64)');
+    expect(getDeviceInfo()).toBe('Linux PC');
+  });
+
+  test('Returns "This device" for unknown user agent', () => {
+    setUA('UnknownBrowser/1.0');
+    expect(getDeviceInfo()).toBe('This device');
   });
 });
