@@ -1,5 +1,5 @@
 // src/utils/paymentLinks.test.js
-// Test suite for paymentLinks utility - payment link generation and method detection
+// Test suite for paymentLinks utility - PayPal, Revolut, bank transfer, available methods
 
 import {
   generatePayPalLink,
@@ -12,51 +12,46 @@ import {
 
 describe('generatePayPalLink', () => {
 
-  test('Generates correct PayPal link with username and amount', () => {
-    const result = generatePayPalLink('johnsmith', 25.50);
-    expect(result).toBe('https://paypal.me/johnsmith/25.5EUR');
-  });
-
-  test('Strips @ from username', () => {
-    const result = generatePayPalLink('@johnsmith', 10);
-    expect(result).toBe('https://paypal.me/johnsmith/10EUR');
-  });
-
-  test('Uses default EUR currency', () => {
-    const result = generatePayPalLink('alice', 50);
-    expect(result).toContain('EUR');
-  });
-
-  test('Supports custom currency', () => {
-    const result = generatePayPalLink('alice', 50, 'USD');
-    expect(result).toBe('https://paypal.me/alice/50USD');
-  });
-
   test('Returns null when username is empty string', () => {
-    expect(generatePayPalLink('', 10)).toBeNull();
+    expect(generatePayPalLink('')).toBeNull();
   });
 
   test('Returns null when username is null', () => {
-    expect(generatePayPalLink(null, 10)).toBeNull();
+    expect(generatePayPalLink(null)).toBeNull();
   });
 
   test('Returns null when username is undefined', () => {
-    expect(generatePayPalLink(undefined, 10)).toBeNull();
+    expect(generatePayPalLink(undefined)).toBeNull();
   });
 
-  test('Handles username with numbers', () => {
-    const result = generatePayPalLink('user123', 15);
-    expect(result).toBe('https://paypal.me/user123/15EUR');
+  test('Generates correct PayPal link with plain username', () => {
+    expect(generatePayPalLink('johndoe', 50, 'EUR'))
+      .toBe('https://paypal.me/johndoe/50EUR');
   });
 
-  test('Generates link starting with https://paypal.me/', () => {
-    const result = generatePayPalLink('bob', 20);
-    expect(result).toMatch(/^https:\/\/paypal\.me\//);
+  test('Strips @ symbol from username', () => {
+    expect(generatePayPalLink('@johndoe', 50, 'EUR'))
+      .toBe('https://paypal.me/johndoe/50EUR');
   });
 
-  test('Handles zero amount', () => {
-    const result = generatePayPalLink('alice', 0);
-    expect(result).toBe('https://paypal.me/alice/0EUR');
+  test('Uses EUR as default currency', () => {
+    expect(generatePayPalLink('johndoe', 25))
+      .toBe('https://paypal.me/johndoe/25EUR');
+  });
+
+  test('Supports USD currency', () => {
+    expect(generatePayPalLink('johndoe', 100, 'USD'))
+      .toBe('https://paypal.me/johndoe/100USD');
+  });
+
+  test('Supports decimal amounts', () => {
+    expect(generatePayPalLink('johndoe', 12.5, 'EUR'))
+      .toBe('https://paypal.me/johndoe/12.5EUR');
+  });
+
+  test('Link starts with https://paypal.me/', () => {
+    const link = generatePayPalLink('alice', 10);
+    expect(link).toMatch(/^https:\/\/paypal\.me\//);
   });
 });
 
@@ -64,46 +59,37 @@ describe('generatePayPalLink', () => {
 
 describe('generateRevolutLink', () => {
 
-  test('Generates correct Revolut link with username', () => {
-    const result = generateRevolutLink('johnsmith', 25);
-    expect(result).toBe('https://revolut.me/johnsmith');
-  });
-
-  test('Strips @ from username', () => {
-    const result = generateRevolutLink('@johnsmith', 10);
-    expect(result).toBe('https://revolut.me/johnsmith');
-  });
-
   test('Returns null when username is empty string', () => {
-    expect(generateRevolutLink('', 10)).toBeNull();
+    expect(generateRevolutLink('')).toBeNull();
   });
 
   test('Returns null when username is null', () => {
-    expect(generateRevolutLink(null, 10)).toBeNull();
+    expect(generateRevolutLink(null)).toBeNull();
   });
 
   test('Returns null when username is undefined', () => {
-    expect(generateRevolutLink(undefined, 10)).toBeNull();
+    expect(generateRevolutLink(undefined)).toBeNull();
   });
 
-  test('Generates link starting with https://revolut.me/', () => {
-    const result = generateRevolutLink('alice', 30);
-    expect(result).toMatch(/^https:\/\/revolut\.me\//);
+  test('Generates correct Revolut link with plain username', () => {
+    expect(generateRevolutLink('johndoe', 50, 'EUR'))
+      .toBe('https://revolut.me/johndoe');
   });
 
-  test('Handles username with numbers', () => {
-    const result = generateRevolutLink('user456', 50);
-    expect(result).toBe('https://revolut.me/user456');
+  test('Strips @ symbol from username', () => {
+    expect(generateRevolutLink('@johndoe', 50, 'EUR'))
+      .toBe('https://revolut.me/johndoe');
   });
 
-  test('Does not include amount in the URL', () => {
-    const result = generateRevolutLink('bob', 99);
-    expect(result).not.toContain('99');
+  test('Link starts with https://revolut.me/', () => {
+    const link = generateRevolutLink('alice', 10);
+    expect(link).toMatch(/^https:\/\/revolut\.me\//);
   });
 
-  test('Does not include currency in the URL', () => {
-    const result = generateRevolutLink('bob', 99, 'EUR');
-    expect(result).not.toContain('EUR');
+  test('Returns same link regardless of amount', () => {
+    const link1 = generateRevolutLink('alice', 10);
+    const link2 = generateRevolutLink('alice', 200);
+    expect(link1).toBe(link2);
   });
 });
 
@@ -111,63 +97,55 @@ describe('generateRevolutLink', () => {
 
 describe('formatBankTransferInfo', () => {
 
-  test('Returns object with all required fields', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 50);
-    expect(result).toHaveProperty('recipientName');
-    expect(result).toHaveProperty('iban');
-    expect(result).toHaveProperty('bic');
-    expect(result).toHaveProperty('amount');
-    expect(result).toHaveProperty('reference');
+  test('Returns object with correct recipientName', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12BOFI90001710023456', 'BOFIIE2D', 50);
+    expect(result.recipientName).toBe('Alice');
   });
 
-  test('Sets recipientName correctly', () => {
-    const result = formatBankTransferInfo('Alice Smith', 'IE29AIBK93115212345678', 'AIBKIE2D', 50);
-    expect(result.recipientName).toBe('Alice Smith');
+  test('Returns object with formatted IBAN', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12BOFI90001710023456', 'BOFIIE2D', 50);
+    expect(result.iban).toBe('IE12BOFI90001710023456');
   });
 
-  test('Sets IBAN correctly', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 50);
-    expect(result.iban).toBe('IE29AIBK93115212345678');
+  test('Returns object with BIC', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12BOFI90001710023456', 'BOFIIE2D', 50);
+    expect(result.bic).toBe('BOFIIE2D');
   });
 
-  test('Sets BIC correctly', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 50);
-    expect(result.bic).toBe('AIBKIE2D');
-  });
-
-  test('Formats amount with EUR prefix by default', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 50);
+  test('Returns formatted amount with currency', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12', 'BOFI', 50, 'EUR');
     expect(result.amount).toBe('EUR 50.00');
   });
 
-  test('Formats amount with 2 decimal places', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 25.5);
-    expect(result.amount).toBe('EUR 25.50');
+  test('Uses EUR as default currency', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12', 'BOFI', 75);
+    expect(result.amount).toBe('EUR 75.00');
   });
 
-  test('Supports custom currency', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 50, 'USD');
-    expect(result.amount).toBe('USD 50.00');
-  });
-
-  test('Uses "Not provided" when IBAN is null', () => {
-    const result = formatBankTransferInfo('Alice', null, 'AIBKIE2D', 50);
+  test('Returns "Not provided" when IBAN is null', () => {
+    const result = formatBankTransferInfo('Alice', null, 'BOFI', 50);
     expect(result.iban).toBe('Not provided');
   });
 
-  test('Uses "Not provided" when BIC is null', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', null, 50);
+  test('Returns "Not provided" when BIC is null', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12', null, 50);
     expect(result.bic).toBe('Not provided');
   });
 
-  test('Uses "Not provided" when IBAN is empty string', () => {
-    const result = formatBankTransferInfo('Alice', '', 'AIBKIE2D', 50);
+  test('Returns "Not provided" when IBAN is undefined', () => {
+    const result = formatBankTransferInfo('Alice', undefined, undefined, 50);
     expect(result.iban).toBe('Not provided');
+    expect(result.bic).toBe('Not provided');
   });
 
-  test('Sets reference to SplitSync Settlement', () => {
-    const result = formatBankTransferInfo('Alice', 'IE29AIBK93115212345678', 'AIBKIE2D', 50);
+  test('Includes reference field with SplitSync Settlement', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12', 'BOFI', 50);
     expect(result.reference).toBe('SplitSync Settlement');
+  });
+
+  test('Formats decimal amounts to 2 decimal places', () => {
+    const result = formatBankTransferInfo('Alice', 'IE12', 'BOFI', 33.3333);
+    expect(result.amount).toBe('EUR 33.33');
   });
 });
 
@@ -188,79 +166,89 @@ describe('getAvailablePaymentMethods', () => {
   });
 
   test('Includes PayPal when paypalUsername is set', () => {
-    const result = getAvailablePaymentMethods({ paypalUsername: 'alice' });
-    expect(result.some(m => m.id === 'paypal')).toBe(true);
-  });
-
-  test('Includes Revolut when revolutUsername is set', () => {
-    const result = getAvailablePaymentMethods({ revolutUsername: 'alice' });
-    expect(result.some(m => m.id === 'revolut')).toBe(true);
-  });
-
-  test('Includes bank transfer when iban is set', () => {
-    const result = getAvailablePaymentMethods({ iban: 'IE29AIBK93115212345678' });
-    expect(result.some(m => m.id === 'bank')).toBe(true);
-  });
-
-  test('Returns all three methods when all are set', () => {
-    const result = getAvailablePaymentMethods({
-      paypalUsername: 'alice',
-      revolutUsername: 'alice',
-      iban: 'IE29AIBK93115212345678',
-    });
-    expect(result).toHaveLength(3);
+    const methods = getAvailablePaymentMethods({ paypalUsername: 'johndoe' });
+    expect(methods.find(m => m.id === 'paypal')).toBeTruthy();
   });
 
   test('PayPal entry has correct name', () => {
-    const result = getAvailablePaymentMethods({ paypalUsername: 'alice' });
-    const paypal = result.find(m => m.id === 'paypal');
+    const methods = getAvailablePaymentMethods({ paypalUsername: 'johndoe' });
+    const paypal = methods.find(m => m.id === 'paypal');
     expect(paypal.name).toBe('PayPal');
   });
 
+  test('PayPal entry includes username', () => {
+    const methods = getAvailablePaymentMethods({ paypalUsername: 'johndoe' });
+    const paypal = methods.find(m => m.id === 'paypal');
+    expect(paypal.username).toBe('johndoe');
+  });
+
+  test('PayPal description mentions username', () => {
+    const methods = getAvailablePaymentMethods({ paypalUsername: 'johndoe' });
+    const paypal = methods.find(m => m.id === 'paypal');
+    expect(paypal.description).toContain('johndoe');
+  });
+
+  test('Includes Revolut when revolutUsername is set', () => {
+    const methods = getAvailablePaymentMethods({ revolutUsername: 'alice' });
+    expect(methods.find(m => m.id === 'revolut')).toBeTruthy();
+  });
+
   test('Revolut entry has correct name', () => {
-    const result = getAvailablePaymentMethods({ revolutUsername: 'alice' });
-    const revolut = result.find(m => m.id === 'revolut');
+    const methods = getAvailablePaymentMethods({ revolutUsername: 'alice' });
+    const revolut = methods.find(m => m.id === 'revolut');
     expect(revolut.name).toBe('Revolut');
   });
 
-  test('Bank entry has correct name', () => {
-    const result = getAvailablePaymentMethods({ iban: 'IE29AIBK93115212345678' });
-    const bank = result.find(m => m.id === 'bank');
+  test('Revolut entry includes username', () => {
+    const methods = getAvailablePaymentMethods({ revolutUsername: 'alice' });
+    const revolut = methods.find(m => m.id === 'revolut');
+    expect(revolut.username).toBe('alice');
+  });
+
+  test('Includes Bank Transfer when iban is set', () => {
+    const methods = getAvailablePaymentMethods({ iban: 'IE12BOFI90001710023456' });
+    expect(methods.find(m => m.id === 'bank')).toBeTruthy();
+  });
+
+  test('Bank Transfer entry has correct name', () => {
+    const methods = getAvailablePaymentMethods({ iban: 'IE12' });
+    const bank = methods.find(m => m.id === 'bank');
     expect(bank.name).toBe('Bank Transfer');
   });
 
-  test('PayPal entry includes username', () => {
-    const result = getAvailablePaymentMethods({ paypalUsername: 'alice' });
-    const paypal = result.find(m => m.id === 'paypal');
-    expect(paypal.username).toBe('alice');
+  test('Bank Transfer entry includes IBAN', () => {
+    const methods = getAvailablePaymentMethods({ iban: 'IE12BOFI90001710023456' });
+    const bank = methods.find(m => m.id === 'bank');
+    expect(bank.iban).toBe('IE12BOFI90001710023456');
   });
 
-  test('Revolut entry includes username', () => {
-    const result = getAvailablePaymentMethods({ revolutUsername: 'bob' });
-    const revolut = result.find(m => m.id === 'revolut');
-    expect(revolut.username).toBe('bob');
+  test('Bank Transfer entry includes BIC', () => {
+    const methods = getAvailablePaymentMethods({ iban: 'IE12', bic: 'BOFIIE2D' });
+    const bank = methods.find(m => m.id === 'bank');
+    expect(bank.bic).toBe('BOFIIE2D');
   });
 
-  test('Bank entry includes IBAN', () => {
-    const result = getAvailablePaymentMethods({ iban: 'IE29AIBK93115212345678', bic: 'AIBKIE2D' });
-    const bank = result.find(m => m.id === 'bank');
-    expect(bank.iban).toBe('IE29AIBK93115212345678');
-    expect(bank.bic).toBe('AIBKIE2D');
-  });
-
-  test('PayPal description contains username', () => {
-    const result = getAvailablePaymentMethods({ paypalUsername: 'alice' });
-    const paypal = result.find(m => m.id === 'paypal');
-    expect(paypal.description).toContain('alice');
+  test('Returns all three methods when all are set', () => {
+    const methods = getAvailablePaymentMethods({
+      paypalUsername: 'johndoe',
+      revolutUsername: 'alice',
+      iban: 'IE12',
+    });
+    expect(methods).toHaveLength(3);
   });
 
   test('Does not include PayPal when paypalUsername is missing', () => {
-    const result = getAvailablePaymentMethods({ revolutUsername: 'alice' });
-    expect(result.some(m => m.id === 'paypal')).toBe(false);
+    const methods = getAvailablePaymentMethods({ revolutUsername: 'alice' });
+    expect(methods.find(m => m.id === 'paypal')).toBeUndefined();
   });
 
   test('Does not include Revolut when revolutUsername is missing', () => {
-    const result = getAvailablePaymentMethods({ paypalUsername: 'alice' });
-    expect(result.some(m => m.id === 'revolut')).toBe(false);
+    const methods = getAvailablePaymentMethods({ paypalUsername: 'johndoe' });
+    expect(methods.find(m => m.id === 'revolut')).toBeUndefined();
+  });
+
+  test('Does not include Bank when iban is missing', () => {
+    const methods = getAvailablePaymentMethods({ paypalUsername: 'johndoe' });
+    expect(methods.find(m => m.id === 'bank')).toBeUndefined();
   });
 });

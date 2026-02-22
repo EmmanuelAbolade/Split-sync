@@ -1,346 +1,322 @@
 // src/utils/userConnectionsManager.test.js
-// Test suite for user connections manager
-import { 
-  getConnections 
+// Test suite for userConnectionsManager - connection tracking, retrieval, removal
+
+// ─── Mocks ────────────────────────────────────────────────────────────────────
+
+const mockSetDoc    = jest.fn();
+const mockGetDoc    = jest.fn();
+const mockUpdateDoc = jest.fn();
+const mockDeleteDoc = jest.fn();
+const mockGetDocs   = jest.fn();
+const mockDoc       = jest.fn((...args) => args.join('/'));
+const mockCollection= jest.fn((...args) => args.join('/'));
+const mockQuery     = jest.fn(q => q);
+const mockWhere     = jest.fn();
+const mockArrayUnion= jest.fn(val => val);
+const mockServerTimestamp = jest.fn(() => 'TIMESTAMP');
+
+jest.mock('firebase/firestore', () => ({
+  doc:             (...a) => mockDoc(...a),
+  getDoc:          (...a) => mockGetDoc(...a),
+  setDoc:          (...a) => mockSetDoc(...a),
+  updateDoc:       (...a) => mockUpdateDoc(...a),
+  deleteDoc:       (...a) => mockDeleteDoc(...a),
+  getDocs:         (...a) => mockGetDocs(...a),
+  collection:      (...a) => mockCollection(...a),
+  query:           (...a) => mockQuery(...a),
+  where:           (...a) => mockWhere(...a),
+  arrayUnion:      (...a) => mockArrayUnion(...a),
+  serverTimestamp: ()     => mockServerTimestamp(),
+}));
+
+jest.mock('../services/firebase', () => ({ db: {} }));
+
+// ─── Import after mocks ───────────────────────────────────────────────────────
+import {
+  trackConnection,
+  getConnections,
+  getConnectionDetails,
+  removeConnection,
+  updateConnectionOnLeaveGroup,
+  updateGroupConnections,
+  syncMyConnectionsFromGroups,
 } from './userConnectionsManager';
 
-// Mock Firestore
-jest.mock('firebase/firestore', () => ({
-  collection: jest.fn(),
-  doc: jest.fn(),
-  getDoc: jest.fn(),
-  getDocs: jest.fn(),
-  setDoc: jest.fn(),
-  query: jest.fn(),
-  where: jest.fn(),
-  serverTimestamp: jest.fn(() => new Date()),
-}));
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Mock Firebase db
-jest.mock('../services/firebase', () => ({
-  db: {},
-  auth: {},
-}));
+describe('trackConnection', () => {
 
-describe('User Connections - Data Validation', () => {
-  
-  test('Validates connection object structure', () => {
-    const connection = {
-      userId: 'user123',
-      name: 'John Doe',
-      email: 'john@example.com',
-      phoneNumber: '+353871234567',
-      photoURL: 'https://example.com/photo.jpg',
-      connectedAt: new Date(),
-    };
+  beforeEach(() => jest.clearAllMocks());
 
-    expect(connection).toHaveProperty('userId');
-    expect(connection).toHaveProperty('name');
-    expect(connection).toHaveProperty('email');
-    expect(connection).toHaveProperty('connectedAt');
+  test('Does nothing when userId equals otherUserId (self-connection)', async () => {
+    await trackConnection('user-1', 'user-1', 'group-1', 'Trip');
+    expect(mockGetDoc).not.toHaveBeenCalled();
   });
 
-  test('Validates userId is string', () => {
-    const userId = 'abc123xyz';
-    expect(typeof userId).toBe('string');
-    expect(userId.length).toBeGreaterThan(0);
+  test('Returns early when other user doc does not exist', async () => {
+    mockGetDoc.mockResolvedValueOnce({ exists: () => false });
+    await trackConnection('user-1', 'user-2', 'group-1', 'Trip');
+    expect(mockSetDoc).not.toHaveBeenCalled();
   });
 
-  test('Validates name is string', () => {
-    const name = 'John Doe';
-    expect(typeof name).toBe('string');
-    expect(name.trim().length).toBeGreaterThan(0);
+  test('Creates new connection when none exists', async () => {
+    mockGetDoc
+      .mockResolvedValueOnce({
+        exists: () => true,
+        data: () => ({ fullName: 'Bob', email: 'bob@test.com', photoURL: null }),
+      })
+      .mockResolvedValueOnce({ exists: () => false }); // no existing connection
+
+    await trackConnection('user-1', 'user-2', 'group-1', 'Trip');
+    expect(mockSetDoc).toHaveBeenCalled();
   });
 
-  test('Validates email format', () => {
-    const validEmails = [
-      'user@example.com',
-      'test.user@domain.co.uk',
-      'admin+tag@company.org',
-    ];
+  test('Updates existing connection when one exists', async () => {
+    mockGetDoc
+      .mockResolvedValueOnce({
+        exists: () => true,
+        data: () => ({ fullName: 'Bob', email: 'bob@test.com', photoURL: null }),
+      })
+      .mockResolvedValueOnce({ exists: () => true }); // existing connection
 
-    validEmails.forEach(email => {
-      expect(email).toMatch(/@/);
-      expect(email.split('@').length).toBe(2);
+    await trackConnection('user-1', 'user-2', 'group-1', 'Trip');
+    expect(mockUpdateDoc).toHaveBeenCalled();
+  });
+
+  test('Does not throw on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    await expect(trackConnection('user-1', 'user-2', 'group-1', 'Trip')).resolves.not.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('getConnections', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns empty array on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const result = await getConnections('user-1');
+    expect(result).toEqual([]);
+  });
+
+  test('Returns empty array when no connections exist', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    const result = await getConnections('user-1');
+    expect(result).toEqual([]);
+  });
+
+  test('Returns connections array with correct data', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'user-2', data: () => ({ userId: 'user-2', name: 'Bob', updatedAt: null }) },
+        { id: 'user-3', data: () => ({ userId: 'user-3', name: 'Carol', updatedAt: null }) },
+      ],
     });
+    const result = await getConnections('user-1');
+    expect(result).toHaveLength(2);
+    expect(result[0].name).toBeDefined();
   });
 
-  test('Validates phone number format', () => {
-    const validPhones = [
-      '+353871234567',
-      '+447123456789',
-      '+1234567890',
-    ];
-
-    validPhones.forEach(phone => {
-      expect(phone).toMatch(/^\+/);
-      expect(phone.length).toBeGreaterThan(10);
+  test('Sorts connections by most recent updatedAt', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'user-2', data: () => ({ userId: 'user-2', name: 'Bob',   updatedAt: { toMillis: () => 1000 } }) },
+        { id: 'user-3', data: () => ({ userId: 'user-3', name: 'Carol', updatedAt: { toMillis: () => 5000 } }) },
+      ],
     });
+    const result = await getConnections('user-1');
+    expect(result[0].name).toBe('Carol'); // most recent first
   });
 
-  test('Handles missing optional fields', () => {
-    const minimalConnection = {
-      userId: 'user123',
-      name: 'John Doe',
-      email: 'john@example.com',
-    };
-
-    expect(minimalConnection.userId).toBeDefined();
-    expect(minimalConnection.phoneNumber).toBeUndefined();
-    expect(minimalConnection.photoURL).toBeUndefined();
-  });
-});
-
-describe('Connection Tracking', () => {
-  
-  test('Tracks connection with valid data', () => {
-    const connection = {
-      userId: 'user123',
-      connectedUserId: 'user456',
-      groupId: 'group789',
-      groupName: 'Test Group',
-      connectedAt: new Date(),
-    };
-
-    expect(connection.userId).toBeDefined();
-    expect(connection.connectedUserId).toBeDefined();
-    expect(connection.groupId).toBeDefined();
-  });
-
-  test('Validates bidirectional connection', () => {
-    const connection1 = {
-      from: 'user123',
-      to: 'user456',
-    };
-
-    const connection2 = {
-      from: 'user456',
-      to: 'user123',
-    };
-
-    expect(connection1.from).toBe(connection2.to);
-    expect(connection1.to).toBe(connection2.from);
-  });
-
-  test('Prevents self-connection', () => {
-    const userId = 'user123';
-    const connectedUserId = 'user123';
-    
-    const isSelfConnection = userId === connectedUserId;
-    expect(isSelfConnection).toBe(true);
-  });
-
-  test('Tracks connection timestamp', () => {
-    const timestamp = new Date();
-    expect(timestamp).toBeInstanceOf(Date);
-    expect(timestamp.getTime()).toBeLessThanOrEqual(Date.now());
-  });
-
-  test('Stores group context with connection', () => {
-    const connectionContext = {
-      groupId: 'group789',
-      groupName: 'Test Group',
-      connectedVia: 'invitation',
-    };
-
-    expect(connectionContext.groupId).toBeDefined();
-    expect(connectionContext.groupName).toBeDefined();
-  });
-});
-
-describe('Connection Retrieval', () => {
-  
-  test('Retrieves empty connections list', () => {
-    const connections = [];
-    expect(Array.isArray(connections)).toBe(true);
-    expect(connections.length).toBe(0);
-  });
-
-  test('Retrieves single connection', () => {
-    const connections = [{
-      userId: 'user123',
-      name: 'John Doe',
-    }];
-
-    expect(connections.length).toBe(1);
-    expect(connections[0].userId).toBe('user123');
-  });
-
-  test('Retrieves multiple connections', () => {
-    const connections = [
-      { userId: 'user1', name: 'Alice' },
-      { userId: 'user2', name: 'Bob' },
-      { userId: 'user3', name: 'Charlie' },
-    ];
-
-    expect(connections.length).toBe(3);
-    expect(connections.every(c => c.userId && c.name)).toBe(true);
-  });
-
-  test('Filters connections by user', () => {
-    const allConnections = [
-      { userId: 'user1', connectedWith: 'user2' },
-      { userId: 'user1', connectedWith: 'user3' },
-      { userId: 'user2', connectedWith: 'user3' },
-    ];
-
-    const user1Connections = allConnections.filter(c => c.userId === 'user1');
-    expect(user1Connections.length).toBe(2);
-  });
-
-  test('Sorts connections by name', () => {
-    const connections = [
-      { name: 'Charlie' },
-      { name: 'Alice' },
-      { name: 'Bob' },
-    ];
-
-    const sorted = [...connections].sort((a, b) => a.name.localeCompare(b.name));
-    expect(sorted[0].name).toBe('Alice');
-    expect(sorted[2].name).toBe('Charlie');
-  });
-
-  test('Sorts connections by date', () => {
-    const now = Date.now();
-    const connections = [
-      { connectedAt: new Date(now - 2000) },
-      { connectedAt: new Date(now - 1000) },
-      { connectedAt: new Date(now) },
-    ];
-
-    const sorted = [...connections].sort((a, b) => 
-      b.connectedAt.getTime() - a.connectedAt.getTime()
-    );
-    
-    expect(sorted[0].connectedAt.getTime()).toBeGreaterThan(
-      sorted[2].connectedAt.getTime()
-    );
-  });
-});
-
-describe('Connection Deduplication', () => {
-  
-  test('Identifies duplicate connections', () => {
-    const connections = [
-      { userId: 'user123', connectedWith: 'user456' },
-      { userId: 'user123', connectedWith: 'user456' },
-    ];
-
-    const uniqueConnections = connections.filter((conn, index, self) =>
-      index === self.findIndex(c => 
-        c.userId === conn.userId && c.connectedWith === conn.connectedWith
-      )
-    );
-
-    expect(uniqueConnections.length).toBe(1);
-  });
-
-  test('Preserves unique connections', () => {
-    const connections = [
-      { userId: 'user123', connectedWith: 'user456' },
-      { userId: 'user123', connectedWith: 'user789' },
-      { userId: 'user456', connectedWith: 'user789' },
-    ];
-
-    const uniqueIds = new Set(connections.map(c => `${c.userId}-${c.connectedWith}`));
-    expect(uniqueIds.size).toBe(3);
-  });
-
-  test('Removes duplicate user IDs', () => {
-    const userIds = ['user1', 'user2', 'user1', 'user3', 'user2'];
-    const uniqueIds = [...new Set(userIds)];
-    
-    expect(uniqueIds.length).toBe(3);
-    expect(uniqueIds).toContain('user1');
-    expect(uniqueIds).toContain('user2');
-    expect(uniqueIds).toContain('user3');
-  });
-});
-
-describe('Phone Number Hashing', () => {
-  
-  test('Validates phone hash format', () => {
-    const phoneHash = 'a1b2c3d4e5f6...'; // SHA-256 hash example
-    expect(typeof phoneHash).toBe('string');
-    expect(phoneHash.length).toBeGreaterThan(0);
-  });
-
-  test('Hash is consistent for same number', () => {
-    const phone1 = '+353871234567';
-    const phone2 = '+353871234567';
-    
-    expect(phone1).toBe(phone2);
-  });
-
-  test('Hash differs for different numbers', () => {
-    const phone1 = '+353871234567';
-    const phone2 = '+353879876543';
-    
-    expect(phone1).not.toBe(phone2);
-  });
-
-  test('Removes spaces before hashing', () => {
-    const phoneWithSpaces = '+353 87 123 4567';
-    const phoneWithoutSpaces = '+353871234567';
-    
-    const cleaned1 = phoneWithSpaces.replace(/\s/g, '');
-    const cleaned2 = phoneWithoutSpaces.replace(/\s/g, '');
-    
-    expect(cleaned1).toBe(cleaned2);
-  });
-});
-
-describe('Connection Metadata', () => {
-  
-  test('Stores connection source', () => {
-    const sources = ['invitation', 'contact_sync', 'manual_add'];
-    
-    sources.forEach(source => {
-      expect(['invitation', 'contact_sync', 'manual_add']).toContain(source);
+  test('Handles connections with null updatedAt', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'user-2', data: () => ({ userId: 'user-2', name: 'Bob', updatedAt: null }) },
+      ],
     });
-  });
-
-  test('Tracks last interaction time', () => {
-    const lastInteraction = new Date();
-    expect(lastInteraction).toBeInstanceOf(Date);
-  });
-
-  test('Stores mutual groups count', () => {
-    const mutualGroupsCount = 3;
-    expect(typeof mutualGroupsCount).toBe('number');
-    expect(mutualGroupsCount).toBeGreaterThanOrEqual(0);
-  });
-
-  test('Validates connection status', () => {
-    const validStatuses = ['active', 'inactive', 'blocked'];
-    const status = 'active';
-    
-    expect(validStatuses).toContain(status);
+    const result = await getConnections('user-1');
+    expect(result).toHaveLength(1);
   });
 });
 
-describe('Error Handling', () => {
-  
-  test('Handles missing user data', () => {
-    const user = null;
-    expect(user).toBeNull();
-  });
+// ─────────────────────────────────────────────────────────────────────────────
 
-  test('Handles invalid user ID', () => {
-    const invalidIds = ['', null, undefined];
-    
-    invalidIds.forEach(id => {
-      expect(!id || id === '').toBeTruthy();
+describe('getConnectionDetails', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns connection data when it exists', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      id: 'user-2',
+      data: () => ({ userId: 'user-2', name: 'Bob' }),
     });
+    const result = await getConnectionDetails('user-1', 'user-2');
+    expect(result).not.toBeNull();
+    expect(result.name).toBe('Bob');
   });
 
-  test('Handles network errors gracefully', () => {
-    const error = new Error('Network error');
-    expect(error.message).toContain('Network');
+  test('Returns null when connection does not exist', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    const result = await getConnectionDetails('user-1', 'user-2');
+    expect(result).toBeNull();
   });
 
-  test('Handles permission errors', () => {
-    const error = new Error('Permission denied');
-    expect(error.message).toContain('Permission denied');
+  test('Returns null on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    const result = await getConnectionDetails('user-1', 'user-2');
+    expect(result).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('removeConnection', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Does nothing when connection does not exist', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    await removeConnection('user-1', 'user-2');
+    expect(mockDeleteDoc).not.toHaveBeenCalled();
+  });
+
+  test('Removes connection when sharedGroups is empty', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ sharedGroups: [] }),
+    });
+    await removeConnection('user-1', 'user-2');
+    expect(mockDeleteDoc).toHaveBeenCalled();
+  });
+
+  test('Does not remove connection when shared groups remain', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ sharedGroups: [{ groupId: 'g1', groupName: 'Trip' }] }),
+    });
+    await removeConnection('user-1', 'user-2');
+    expect(mockDeleteDoc).not.toHaveBeenCalled();
+  });
+
+  test('Does not throw on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    await expect(removeConnection('user-1', 'user-2')).resolves.not.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('updateConnectionOnLeaveGroup', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Does nothing when connection does not exist', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    await updateConnectionOnLeaveGroup('user-1', 'user-2', 'group-1');
+    expect(mockDeleteDoc).not.toHaveBeenCalled();
+    expect(mockUpdateDoc).not.toHaveBeenCalled();
+  });
+
+  test('Deletes connection when no shared groups remain after removal', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ sharedGroups: [{ groupId: 'group-1', groupName: 'Trip' }] }),
+    });
+    await updateConnectionOnLeaveGroup('user-1', 'user-2', 'group-1');
+    expect(mockDeleteDoc).toHaveBeenCalled();
+  });
+
+  test('Updates connection when other shared groups remain', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        sharedGroups: [
+          { groupId: 'group-1', groupName: 'Trip' },
+          { groupId: 'group-2', groupName: 'Dinner' },
+        ],
+      }),
+    });
+    await updateConnectionOnLeaveGroup('user-1', 'user-2', 'group-1');
+    expect(mockUpdateDoc).toHaveBeenCalled();
+    expect(mockDeleteDoc).not.toHaveBeenCalled();
+  });
+
+  test('Does not throw on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    await expect(
+      updateConnectionOnLeaveGroup('user-1', 'user-2', 'group-1')
+    ).resolves.not.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('updateGroupConnections', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Does nothing with empty member list', async () => {
+    await updateGroupConnections('group-1', 'Trip', []);
+    expect(mockGetDoc).not.toHaveBeenCalled();
+  });
+
+  test('Does nothing with single member', async () => {
+    await updateGroupConnections('group-1', 'Trip', ['user-1']);
+    expect(mockGetDoc).not.toHaveBeenCalled();
+  });
+
+  test('Does not throw on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    await expect(
+      updateGroupConnections('group-1', 'Trip', ['user-1', 'user-2'])
+    ).resolves.not.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('syncMyConnectionsFromGroups', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns failure when userId is null', async () => {
+    const result = await syncMyConnectionsFromGroups(null);
+    expect(result.success).toBe(false);
+  });
+
+  test('Returns failure when userId is undefined', async () => {
+    const result = await syncMyConnectionsFromGroups(undefined);
+    expect(result.success).toBe(false);
+  });
+
+  test('Returns success with 0 when user has no groups', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    const result = await syncMyConnectionsFromGroups('user-1');
+    expect(result.success).toBe(true);
+    expect(result.synced).toBe(0);
+  });
+
+  test('Returns failure on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const result = await syncMyConnectionsFromGroups('user-1');
+    expect(result.success).toBe(false);
+  });
+
+  test('Syncs connections for group members', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{
+        id: 'group-1',
+        data: () => ({ name: 'Trip', memberIds: ['user-1', 'user-2', 'user-3'] }),
+      }],
+    });
+    // trackConnection calls getDoc for each other member
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+
+    const result = await syncMyConnectionsFromGroups('user-1');
+    expect(result.success).toBe(true);
+    expect(result.synced).toBe(2); // user-2 and user-3
   });
 });
