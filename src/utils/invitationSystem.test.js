@@ -1,266 +1,516 @@
 // src/utils/invitationSystem.test.js
-// Test suite for invitation system functions
-import { 
-  sendBulkInvitations 
+// Test suite for invitationSystem utility
+// Covers: getMyInvitations, getMySentInvitations, acceptInvitation,
+//         declineInvitation, cancelInvitation, cleanupExpiredInvitations,
+//         getInvitationCount, sendBulkInvitations (error paths)
+
+// ─── Mocks ────────────────────────────────────────────────────────────────────
+
+const mockSetDoc          = jest.fn();
+const mockGetDoc          = jest.fn();
+const mockUpdateDoc       = jest.fn();
+const mockDeleteDoc       = jest.fn();
+const mockGetDocs         = jest.fn();
+const mockServerTimestamp = jest.fn(() => 'TIMESTAMP');
+const mockArrayUnion      = jest.fn(val => val);
+const mockWhere           = jest.fn();
+const mockQuery           = jest.fn(q => q);
+const mockCollection      = jest.fn(() => ({ _collectionPath: 'mock-collection' }));
+const mockDoc             = jest.fn(() => ({ id: 'mock-ref-id' }));
+
+jest.mock('firebase/firestore', () => ({
+  doc:             (...a) => mockDoc(...a),
+  getDoc:          (...a) => mockGetDoc(...a),
+  setDoc:          (...a) => mockSetDoc(...a),
+  updateDoc:       (...a) => mockUpdateDoc(...a),
+  deleteDoc:       (...a) => mockDeleteDoc(...a),
+  getDocs:         (...a) => mockGetDocs(...a),
+  collection:      (...a) => mockCollection(...a),
+  query:           (...a) => mockQuery(...a),
+  where:           (...a) => mockWhere(...a),
+  arrayUnion:      (...a) => mockArrayUnion(...a),
+  serverTimestamp: ()     => mockServerTimestamp(),
+}));
+
+jest.mock('../services/firebase', () => ({ db: {} }));
+
+// ─── Import after mocks ───────────────────────────────────────────────────────
+import {
+  sendInvitation,
+  sendBulkInvitations,
+  getMyInvitations,
+  getMySentInvitations,
+  acceptInvitation,
+  declineInvitation,
+  cancelInvitation,
+  cleanupExpiredInvitations,
+  getInvitationCount,
 } from './invitationSystem';
 
-// Mock Firestore
-jest.mock('firebase/firestore', () => ({
-  collection: jest.fn(),
-  doc: jest.fn(),
-  setDoc: jest.fn(),
-  getDoc: jest.fn(),
-  getDocs: jest.fn(),
-  query: jest.fn(),
-  where: jest.fn(),
-  updateDoc: jest.fn(),
-  arrayUnion: jest.fn(),
-  serverTimestamp: jest.fn(() => new Date()),
-}));
+// ─── Shared fixtures ──────────────────────────────────────────────────────────
 
-// Mock Firebase db
-jest.mock('../services/firebase', () => ({
-  db: {},
-  auth: {},
-}));
+const mockFromUser = {
+  uid: 'user-1',
+  displayName: 'Alice',
+  email: 'alice@test.com',
+  photoURL: null,
+};
 
-// Mock notifications store
-jest.mock('../stores/notificationsStore', () => ({
-  createNotification: jest.fn(),
-}));
+const futureExpiry = { toMillis: () => Date.now() + 86400000 }; // 1 day ahead
+const pastExpiry   = { toMillis: () => Date.now() - 86400000 }; // 1 day ago
 
-describe('Invitation System - Input Validation', () => {
-  
-  test('Validates fromUser parameter', () => {
-    expect(() => {
-      // Should not crash with valid fromUser
-      const validUser = { uid: 'user123', displayName: 'Test User' };
-      expect(validUser.uid).toBeDefined();
-      expect(validUser.displayName).toBeDefined();
-    }).not.toThrow();
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('sendInvitation', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns failure when user is already in the group', async () => {
+    mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
+    mockGetDoc
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'] }) })
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
+    const result = await sendInvitation(mockFromUser, 'user-2', 'group-1', 'Trip');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('User is already in this group');
   });
 
-  test('Validates toUserId format', () => {
-    const validUserId = 'abc123xyz';
-    expect(typeof validUserId).toBe('string');
-    expect(validUserId.length).toBeGreaterThan(0);
+  test('Returns failure when recipient user not found', async () => {
+    mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
+    mockGetDoc
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: [] }) })
+      .mockResolvedValueOnce({ exists: () => false });
+    const result = await sendInvitation(mockFromUser, 'user-2', 'group-1', 'Trip');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('User not found');
   });
 
-  test('Validates groupId format', () => {
-    const validGroupId = 'group123';
-    expect(typeof validGroupId).toBe('string');
-    expect(validGroupId.length).toBeGreaterThan(0);
-  });
-
-  test('Validates groupName is string', () => {
-    const validGroupName = 'Test Group';
-    expect(typeof validGroupName).toBe('string');
-    expect(validGroupName.trim().length).toBeGreaterThan(0);
-  });
-
-  test('Handles empty userIds array', () => {
-    const emptyArray = [];
-    expect(Array.isArray(emptyArray)).toBe(true);
-    expect(emptyArray.length).toBe(0);
-  });
-
-  test('Handles single user invitation', () => {
-    const singleUser = ['user123'];
-    expect(Array.isArray(singleUser)).toBe(true);
-    expect(singleUser.length).toBe(1);
-  });
-
-  test('Handles multiple user invitations', () => {
-    const multipleUsers = ['user1', 'user2', 'user3'];
-    expect(Array.isArray(multipleUsers)).toBe(true);
-    expect(multipleUsers.length).toBe(3);
+  test('Returns failure on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const result = await sendInvitation(mockFromUser, 'user-2', 'group-1', 'Trip');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Failed to send invitation');
   });
 });
 
-describe('Invitation Data Structure', () => {
-  
-  test('Creates valid invitation object structure', () => {
-    const invitation = {
-      fromUserId: 'user123',
-      fromUserName: 'Test User',
-      toUserId: 'user456',
-      toUserName: 'Recipient',
-      groupId: 'group789',
-      groupName: 'Test Group',
-      status: 'pending',
-      createdAt: new Date(),
-    };
+// ─────────────────────────────────────────────────────────────────────────────
 
-    expect(invitation).toHaveProperty('fromUserId');
-    expect(invitation).toHaveProperty('fromUserName');
-    expect(invitation).toHaveProperty('toUserId');
-    expect(invitation).toHaveProperty('toUserName');
-    expect(invitation).toHaveProperty('groupId');
-    expect(invitation).toHaveProperty('groupName');
-    expect(invitation).toHaveProperty('status');
-    expect(invitation).toHaveProperty('createdAt');
+describe('sendBulkInvitations', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns empty arrays when no user IDs are provided', async () => {
+    const result = await sendBulkInvitations(mockFromUser, [], 'group-1', 'Trip');
+    expect(result.successful).toEqual([]);
+    expect(result.failed).toEqual([]);
   });
 
-  test('Invitation status is pending by default', () => {
-    const status = 'pending';
-    expect(status).toBe('pending');
-    expect(['pending', 'accepted', 'declined']).toContain(status);
+  test('Fails all users when Firebase throws on getDocs', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const result = await sendBulkInvitations(mockFromUser, ['user-2', 'user-3'], 'group-1', 'Trip');
+    expect(result.successful).toEqual([]);
+    expect(result.failed).toHaveLength(2);
   });
 
-  test('Invitation has valid timestamps', () => {
-    const timestamp = new Date();
-    expect(timestamp).toBeInstanceOf(Date);
-    expect(timestamp.getTime()).toBeLessThanOrEqual(Date.now());
-  });
-
-  test('Validates invitation status values', () => {
-    const validStatuses = ['pending', 'accepted', 'declined'];
-    
-    validStatuses.forEach(status => {
-      expect(['pending', 'accepted', 'declined']).toContain(status);
+  test('Fails specific users who are already members', async () => {
+    mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ memberIds: ['user-2', 'user-3'] }), // both already in group
     });
+    const result = await sendBulkInvitations(mockFromUser, ['user-2', 'user-3'], 'group-1', 'Trip');
+    expect(result.failed).toHaveLength(2);
+    expect(result.successful).toHaveLength(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('getMyInvitations', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns empty array on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const result = await getMyInvitations('user-1');
+    expect(result).toEqual([]);
   });
 
-  test('Rejects invalid invitation status', () => {
-    const invalidStatuses = ['invalid', 'unknown', '', null];
-    
-    invalidStatuses.forEach(status => {
-      expect(['pending', 'accepted', 'declined']).not.toContain(status);
+  test('Returns empty array when user has no invitations', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    const result = await getMyInvitations('user-1');
+    expect(result).toEqual([]);
+  });
+
+  test('Returns valid non-expired invitations', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{
+        id: 'inv-1',
+        data: () => ({ groupName: 'Trip', expiresAt: futureExpiry, createdAt: { toMillis: () => Date.now() } }),
+      }],
     });
+    const result = await getMyInvitations('user-1');
+    expect(result).toHaveLength(1);
+    expect(result[0].groupName).toBe('Trip');
+  });
+
+  test('Skips expired invitations and marks them via updateDoc', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{
+        id: 'inv-expired',
+        data: () => ({ groupName: 'Old Trip', expiresAt: pastExpiry, createdAt: { toMillis: () => 0 } }),
+      }],
+    });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    const result = await getMyInvitations('user-1');
+    expect(result).toHaveLength(0);
+    expect(mockUpdateDoc).toHaveBeenCalled();
+  });
+
+  test('Sorts invitations by most recent createdAt', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'inv-1', data: () => ({ groupName: 'Old', expiresAt: futureExpiry, createdAt: { toMillis: () => 1000 } }) },
+        { id: 'inv-2', data: () => ({ groupName: 'New', expiresAt: futureExpiry, createdAt: { toMillis: () => 5000 } }) },
+      ],
+    });
+    const result = await getMyInvitations('user-1');
+    expect(result[0].groupName).toBe('New');
+  });
+
+  test('Handles invitations with null createdAt without crashing', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'inv-1', data: () => ({ groupName: 'Trip', expiresAt: futureExpiry, createdAt: null }) }],
+    });
+    const result = await getMyInvitations('user-1');
+    expect(result).toHaveLength(1);
+  });
+
+  test('Returns correct id on each invitation', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'inv-abc', data: () => ({ groupName: 'Trip', expiresAt: futureExpiry, createdAt: null }) }],
+    });
+    const result = await getMyInvitations('user-1');
+    expect(result[0].id).toBe('inv-abc');
   });
 });
 
-describe('Invitation Notification Data', () => {
-  
-  test('Creates notification for invitation', () => {
-    const notification = {
-      userId: 'user456',
-      type: 'invitation',
-      title: 'Group Invitation',
-      message: 'You have been invited to join Test Group',
-      data: {
-        invitationId: 'inv123',
-        groupId: 'group789',
-        groupName: 'Test Group',
-        fromUserId: 'user123',
-        fromUserName: 'Test User',
-      },
-    };
+// ─────────────────────────────────────────────────────────────────────────────
 
-    expect(notification.type).toBe('invitation');
-    expect(notification.data).toHaveProperty('invitationId');
-    expect(notification.data).toHaveProperty('groupId');
-    expect(notification.data).toHaveProperty('groupName');
+describe('getMySentInvitations', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns empty array on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const result = await getMySentInvitations('user-1');
+    expect(result).toEqual([]);
   });
 
-  test('Notification contains group information', () => {
-    const notificationData = {
-      groupId: 'group789',
-      groupName: 'Test Group',
-    };
-
-    expect(notificationData.groupId).toBeDefined();
-    expect(notificationData.groupName).toBeDefined();
-    expect(typeof notificationData.groupName).toBe('string');
+  test('Returns invitations sent by the user', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'inv-1', data: () => ({ groupName: 'Trip', fromUserId: 'user-1' }) }],
+    });
+    const result = await getMySentInvitations('user-1');
+    expect(result).toHaveLength(1);
+    expect(result[0].groupName).toBe('Trip');
   });
 
-  test('Notification contains sender information', () => {
-    const notificationData = {
-      fromUserId: 'user123',
-      fromUserName: 'Test User',
-    };
-
-    expect(notificationData.fromUserId).toBeDefined();
-    expect(notificationData.fromUserName).toBeDefined();
-    expect(typeof notificationData.fromUserName).toBe('string');
-  });
-});
-
-describe('Bulk Invitation Processing', () => {
-  
-  test('Processes empty invitation list', () => {
-    const invitations = [];
-    const successCount = invitations.filter(inv => inv.success).length;
-    const failCount = invitations.filter(inv => !inv.success).length;
-    
-    expect(successCount).toBe(0);
-    expect(failCount).toBe(0);
+  test('Returns empty array when user has sent no invitations', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    const result = await getMySentInvitations('user-1');
+    expect(result).toEqual([]);
   });
 
-  test('Counts successful invitations', () => {
-    const results = [
-      { success: true, userId: 'user1' },
-      { success: true, userId: 'user2' },
-      { success: false, userId: 'user3' },
-    ];
-
-    const successCount = results.filter(r => r.success).length;
-    expect(successCount).toBe(2);
+  test('Applies groupId filter when provided', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    await getMySentInvitations('user-1', 'group-1');
+    expect(mockQuery).toHaveBeenCalled();
   });
 
-  test('Counts failed invitations', () => {
-    const results = [
-      { success: true, userId: 'user1' },
-      { success: false, userId: 'user2' },
-      { success: false, userId: 'user3' },
-    ];
-
-    const failCount = results.filter(r => !r.success).length;
-    expect(failCount).toBe(2);
-  });
-
-  test('Validates all invitations sent', () => {
-    const userIds = ['user1', 'user2', 'user3'];
-    const results = [
-      { success: true, userId: 'user1' },
-      { success: true, userId: 'user2' },
-      { success: true, userId: 'user3' },
-    ];
-
-    expect(results.length).toBe(userIds.length);
+  test('Returns multiple invitations sent by user', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'inv-1', data: () => ({ groupName: 'Trip', fromUserId: 'user-1' }) },
+        { id: 'inv-2', data: () => ({ groupName: 'Dinner', fromUserId: 'user-1' }) },
+      ],
+    });
+    const result = await getMySentInvitations('user-1');
+    expect(result).toHaveLength(2);
   });
 });
 
-describe('Invitation Error Handling', () => {
-  
-  test('Handles duplicate invitation error', () => {
-    const errorMessage = 'Invitation already sent';
-    expect(errorMessage).toContain('already sent');
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('acceptInvitation', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns failure when invitation not found', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Invitation not found');
   });
 
-  test('Handles user not found error', () => {
-    const errorMessage = 'User not found';
-    expect(errorMessage).toContain('not found');
+  test('Returns failure when invitation is for a different user', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ toUserId: 'user-99', expiresAt: futureExpiry }),
+    });
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('This invitation is not for you');
   });
 
-  test('Handles permission error', () => {
-    const errorMessage = 'Permission denied';
-    expect(errorMessage).toContain('Permission denied');
+  test('Returns failure when invitation is expired', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ toUserId: 'user-2', expiresAt: pastExpiry }),
+    });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Invitation has expired');
   });
 
-  test('Handles network error gracefully', () => {
-    const error = new Error('Network error');
-    expect(error.message).toContain('Network');
+  test('Marks invitation as expired via updateDoc when expired', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ toUserId: 'user-2', expiresAt: pastExpiry }),
+    });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    await acceptInvitation('inv-1', 'user-2');
+    expect(mockUpdateDoc).toHaveBeenCalled();
+  });
+
+  test('Returns failure when group not found', async () => {
+    mockGetDoc
+      .mockResolvedValueOnce({
+        exists: () => true,
+        data: () => ({ toUserId: 'user-2', expiresAt: futureExpiry, groupId: 'group-1' }),
+      })
+      .mockResolvedValueOnce({ exists: () => false });
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Group not found');
+  });
+
+  test('Returns failure when user is already a group member', async () => {
+    mockGetDoc
+      .mockResolvedValueOnce({
+        exists: () => true,
+        data: () => ({ toUserId: 'user-2', expiresAt: futureExpiry, groupId: 'group-1' }),
+      })
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'] }) });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('You are already a member of this group');
+  });
+
+  test('Returns success and correct groupId when accepted', async () => {
+    mockGetDoc
+      .mockResolvedValueOnce({
+        exists: () => true,
+        data: () => ({ toUserId: 'user-2', expiresAt: futureExpiry, groupId: 'group-1', groupName: 'Trip' }),
+      })
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: [] }) })
+      .mockResolvedValueOnce({ data: () => ({ fullName: 'Bob', email: 'bob@test.com', photoURL: null }) });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(true);
+    expect(result.groupId).toBe('group-1');
+  });
+
+  test('Returns failure on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    const result = await acceptInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Failed to accept invitation');
   });
 });
 
-describe('Invitation ID Generation', () => {
-  
-  test('Generates unique invitation IDs', () => {
-    const id1 = `inv_${Date.now()}_1`;
-    const id2 = `inv_${Date.now()}_2`;
-    
-    expect(id1).not.toBe(id2);
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('declineInvitation', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns failure when invitation not found', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    const result = await declineInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Invitation not found');
   });
 
-  test('Invitation ID has correct format', () => {
-    const invitationId = 'abc123xyz';
-    expect(typeof invitationId).toBe('string');
-    expect(invitationId.length).toBeGreaterThan(0);
+  test('Returns failure when invitation is for a different user', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ toUserId: 'user-99' }) });
+    const result = await declineInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('This invitation is not for you');
   });
 
-  test('Invitation ID is unique per user', () => {
-    const ids = new Set(['id1', 'id2', 'id3']);
-    expect(ids.size).toBe(3);
+  test('Returns success when invitation is declined', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ toUserId: 'user-2' }) });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    const result = await declineInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(true);
+    expect(result.message).toBe('Invitation declined');
+  });
+
+  test('Calls updateDoc when declining', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ toUserId: 'user-2' }) });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    await declineInvitation('inv-1', 'user-2');
+    expect(mockUpdateDoc).toHaveBeenCalled();
+  });
+
+  test('Does not call updateDoc when invitation not found', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    await declineInvitation('inv-1', 'user-2');
+    expect(mockUpdateDoc).not.toHaveBeenCalled();
+  });
+
+  test('Returns failure on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    const result = await declineInvitation('inv-1', 'user-2');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Failed to decline invitation');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('cancelInvitation', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns failure when invitation not found', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => false });
+    const result = await cancelInvitation('inv-1', 'user-1');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Invitation not found');
+  });
+
+  test('Returns failure when user is not the original sender', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ fromUserId: 'user-99' }) });
+    const result = await cancelInvitation('inv-1', 'user-1');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('You can only cancel invitations you sent');
+  });
+
+  test('Returns success when invitation is cancelled', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ fromUserId: 'user-1' }) });
+    mockDeleteDoc.mockResolvedValue(undefined);
+    const result = await cancelInvitation('inv-1', 'user-1');
+    expect(result.success).toBe(true);
+    expect(result.message).toBe('Invitation cancelled');
+  });
+
+  test('Calls deleteDoc when cancelling', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ fromUserId: 'user-1' }) });
+    mockDeleteDoc.mockResolvedValue(undefined);
+    await cancelInvitation('inv-1', 'user-1');
+    expect(mockDeleteDoc).toHaveBeenCalled();
+  });
+
+  test('Does not call deleteDoc when user is not the sender', async () => {
+    mockGetDoc.mockResolvedValue({ exists: () => true, data: () => ({ fromUserId: 'user-99' }) });
+    await cancelInvitation('inv-1', 'user-1');
+    expect(mockDeleteDoc).not.toHaveBeenCalled();
+  });
+
+  test('Returns failure on Firebase error', async () => {
+    mockGetDoc.mockRejectedValue(new Error('Firebase error'));
+    const result = await cancelInvitation('inv-1', 'user-1');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe('Failed to cancel invitation');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('cleanupExpiredInvitations', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns 0 when there are no pending invitations', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    const count = await cleanupExpiredInvitations();
+    expect(count).toBe(0);
+  });
+
+  test('Returns 0 when all invitations are still valid', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'inv-1', data: () => ({ expiresAt: futureExpiry }) }],
+    });
+    const count = await cleanupExpiredInvitations();
+    expect(count).toBe(0);
+  });
+
+  test('Returns count of expired invitations cleaned up', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'inv-1', data: () => ({ expiresAt: pastExpiry }) },
+        { id: 'inv-2', data: () => ({ expiresAt: pastExpiry }) },
+      ],
+    });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    const count = await cleanupExpiredInvitations();
+    expect(count).toBe(2);
+  });
+
+  test('Calls updateDoc once per expired invitation', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'inv-1', data: () => ({ expiresAt: pastExpiry }) }],
+    });
+    mockUpdateDoc.mockResolvedValue(undefined);
+    await cleanupExpiredInvitations();
+    expect(mockUpdateDoc).toHaveBeenCalledTimes(1);
+  });
+
+  test('Does not call updateDoc for valid invitations', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'inv-1', data: () => ({ expiresAt: futureExpiry }) }],
+    });
+    await cleanupExpiredInvitations();
+    expect(mockUpdateDoc).not.toHaveBeenCalled();
+  });
+
+  test('Returns 0 on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const count = await cleanupExpiredInvitations();
+    expect(count).toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('getInvitationCount', () => {
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Returns 0 when user has no pending invitations', async () => {
+    mockGetDocs.mockResolvedValue({ docs: [] });
+    const count = await getInvitationCount('user-1');
+    expect(count).toBe(0);
+  });
+
+  test('Returns correct count for multiple pending invitations', async () => {
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'inv-1', data: () => ({ groupName: 'Trip',   expiresAt: futureExpiry, createdAt: null }) },
+        { id: 'inv-2', data: () => ({ groupName: 'Dinner', expiresAt: futureExpiry, createdAt: null }) },
+      ],
+    });
+    const count = await getInvitationCount('user-1');
+    expect(count).toBe(2);
+  });
+
+  test('Returns 0 on Firebase error', async () => {
+    mockGetDocs.mockRejectedValue(new Error('Firebase error'));
+    const count = await getInvitationCount('user-1');
+    expect(count).toBe(0);
   });
 });
