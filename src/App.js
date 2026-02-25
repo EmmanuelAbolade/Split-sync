@@ -1,5 +1,5 @@
 // src/App.js - WITH BOTTOM NAVIGATION
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebase';
@@ -12,6 +12,7 @@ import GroupDetails from './pages/GroupDetails';
 import Activity from './pages/Activity';
 import Profile from './pages/Profile';
 import QuickAdd from './pages/QuickAdd';
+import Analytics      from './pages/Analytics';
 import BottomNav from './components/BottomNav';
 import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
@@ -61,7 +62,7 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
-          {/* Your Logo */}
+          {/* Logo */}
           <img 
             src="/logo.png" 
             alt="Split-Sync" 
@@ -74,6 +75,14 @@ function App() {
       </div>
     );
   }
+
+  // Helper — wraps a page in ProtectedLayout, redirects to /login if not authed
+  const Protected = ({ element }) =>
+    isAuthenticated ? (
+      <ProtectedLayout>{element}</ProtectedLayout>
+    ) : (
+      <Navigate to="/login" />
+    );
 
   return (
     <BrowserRouter>
@@ -95,6 +104,11 @@ function App() {
           element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
         />
 
+        <Route 
+          path="/forgot-password" 
+          element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} 
+        />
+
         {/* Protected Routes with Bottom Nav */}
         <Route 
           path="/dashboard" 
@@ -110,8 +124,16 @@ function App() {
         />
 
         <Route 
-          path="/forgot-password" 
-          element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} 
+          path="/analytics" 
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout>
+                <Analytics />
+              </ProtectedLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
         />
         
         <Route 

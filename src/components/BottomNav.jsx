@@ -1,6 +1,7 @@
 // src/components/BottomNav.jsx
+// Bottom navigation bar — Home, Activity, Add (FAB), Analytics, Profile
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Activity, Plus, User } from 'lucide-react';
+import { Home, Activity, Plus, User, BarChart2 } from 'lucide-react';
 
 export default function BottomNav() {
   const navigate = useNavigate();
@@ -28,6 +29,13 @@ export default function BottomNav() {
       path: '/add',
       activeColor: 'text-green-600 dark:text-green-400',
       isSpecial: true
+    },
+    {
+      id:          'analytics',
+      label:       'Stats',
+      icon:        BarChart2,
+      path:        '/analytics',
+      activeColor: 'text-amber-500 dark:text-amber-400',
     },
     { 
       id: 'profile', 
@@ -60,6 +68,7 @@ export default function BottomNav() {
                   key={tab.id}
                   onClick={() => navigate(tab.path)}
                   className="relative -mt-6"
+                  aria-label="Add expense"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-full flex items-center justify-center shadow-card-hover hover:shadow-card-3d dark:shadow-gray-900/50 transition-all duration-300 transform hover:scale-110 active:scale-95">
                     <Icon size={24} className="text-white" strokeWidth={2.5} />
@@ -80,6 +89,7 @@ export default function BottomNav() {
                     ? 'transform scale-105' 
                     : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
+                aria-label={tab.label}
               >
                 <Icon 
                   size={24} 
