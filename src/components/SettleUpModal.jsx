@@ -1,6 +1,6 @@
 // src/components/SettleUpModal.jsx - WITH PAYMENT CONFIRMATION FLOW
 import { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp, runTransaction, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark } from 'lucide-react';
@@ -90,6 +90,20 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       fetchRecipientPaymentMethods();
     }
   }, [settlement, isOpen]);
+
+  // Reset all transient state each time the modal opens
+  // Prevents stale paymentSuccess from a previous transaction showing immediately
+  useEffect(() => {
+    if (isOpen) {
+      setPaymentSuccess(false);
+      setError('');
+      setLoading(false);
+      setShowConfirmation(false);
+      setShowPendingConfirmation(false);
+      setCopiedIban(false);
+      setAmount(settlement?.amount?.toFixed(2) || '');
+    }
+  }, [isOpen]);
 
   const recordSettlement = async (paypalOrderId = null) => {
     const amountNum = parseFloat(amount);
