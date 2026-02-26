@@ -16,9 +16,23 @@ const SUGGESTIONS = [
   'How do I set up my payment methods?',
 ];
 
+// Format assistant response: strip markdown symbols and insert line breaks before numbered steps
+function formatMessage(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')     // remove **bold**
+    .replace(/\*(.*?)\*/g, '$1')            // remove *italic*
+    .replace(/^#+\s/gm, '')                  // remove # headers
+    .replace(/(\s)(\d+\.\s)/g, '\n$2')  // line break before "2. " "3. " etc
+    .trim();
+}
+
 // Single chat message bubble
 function MessageBubble({ msg }) {
   const isUser = msg.role === 'user';
+  const lines  = isUser
+    ? [msg.content]
+    : formatMessage(msg.content).split('\n');
+
   return (
     <div className={`flex gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {/* Avatar */}
@@ -36,12 +50,12 @@ function MessageBubble({ msg }) {
           ? 'bg-indigo-600 text-white rounded-tr-sm'
           : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-600 rounded-tl-sm shadow-sm'
       }`}>
-        {msg.content.split('\n').map((line, i) => (
-        <span key={i}>
-          {line}
-          {i < msg.content.split('\n').length - 1 && <br />}
-        </span>
-      ))}
+        {lines.map((line, i) => (
+          <span key={i} className={line.match(/^\d+\./) ? 'block mt-1' : ''}>
+            {line}
+            {!line.match(/^\d+\./) && i < lines.length - 1 && <br />}
+          </span>
+        ))}
       </div>
     </div>
   );
