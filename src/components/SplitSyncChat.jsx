@@ -3,7 +3,7 @@
 // Renders on all authenticated pages as a floating action button (bottom-right).
 
 import { useState, useEffect, useRef } from 'react';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthStore } from '../stores/authStore';
 import { MessageCircle, X, Send, Bot, User, Loader, RotateCcw } from 'lucide-react';
 import app from '../services/firebase';
@@ -36,7 +36,12 @@ function MessageBubble({ msg }) {
           ? 'bg-indigo-600 text-white rounded-tr-sm'
           : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-600 rounded-tl-sm shadow-sm'
       }`}>
-        {msg.content}
+        {msg.content.split('\n').map((line, i) => (
+        <span key={i}>
+          {line}
+          {i < msg.content.split('\n').length - 1 && <br />}
+        </span>
+      ))}
       </div>
     </div>
   );

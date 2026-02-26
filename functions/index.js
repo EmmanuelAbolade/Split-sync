@@ -163,7 +163,13 @@ Tone and style:
 - Never make up features that do not exist
 - If unsure, say so and suggest the user check Settings or contact support
 
-Keep replies short — ideally 2 to 4 sentences unless a step-by-step explanation is needed.`;
+Keep replies short — ideally 2 to 4 sentences unless a step-by-step explanation is needed.
+
+Formatting rules — always follow these:
+- Never use markdown — no **bold**, no *italic*, no # headers
+- For numbered steps, write them as plain text: "1. Do this  2. Then this" — each on its own line
+- Never use bullet points with * or - symbols
+- Write in plain conversational sentences only`;
 
     // Call Anthropic API via Node https module (no extra SDK needed in functions)
     const requestBody = JSON.stringify({
