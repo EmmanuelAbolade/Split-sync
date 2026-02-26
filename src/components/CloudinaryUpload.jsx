@@ -278,7 +278,7 @@ export default function CloudinaryUpload({ user, currentPhotoURL, onPhotoUpdated
 
       {/* Helper Text */}
       {!preview && !uploading && !error && (
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+        <p className="text-xs text-gray-300 dark:text-gray-400 text-center mt-1">
           {currentPhotoURL ? 'Click camera to change' : 'Click camera to upload'}
         </p>
       )}

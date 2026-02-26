@@ -45,13 +45,16 @@ export default function Profile() {
   const [showPaymentSettings, setShowPaymentSettings] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  
+
   // Phone number state
   const [phoneNumber, setPhoneNumber] = useState('');
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneError, setPhoneError] = useState('');
   const [phoneSuccess, setPhoneSuccess] = useState('');
 
+  // Collapsible section states
+  const [showAccountInfo, setShowAccountInfo] = useState(false);
+  const [showContactDisc, setShowContactDisc] = useState(false);
 
   // Biometric state
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -60,26 +63,20 @@ export default function Profile() {
 
   // Balance breakdown modal state
   const [showBreakdownModal, setShowBreakdownModal] = useState(false);
-  const [breakdownType, setBreakdownType] = useState('owed'); // 'owed' or 'owing'
+  const [breakdownType, setBreakdownType] = useState('owed');
   const [breakdownData, setBreakdownData] = useState([]);
 
   // Fetch user's groups and expenses
   useEffect(() => {
     if (!user) return;
-
     const groupsQuery = query(
       collection(db, 'groups'),
       where('memberIds', 'array-contains', user.uid)
     );
-
     const unsubscribe = onSnapshot(groupsQuery, (snapshot) => {
-      const groupsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const groupsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setGroups(groupsData);
     });
-
     return () => unsubscribe();
   }, [user]);
 
@@ -87,19 +84,17 @@ export default function Profile() {
   useEffect(() => {
     const loadUserData = async () => {
       if (!user?.uid) return;
-      
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
           setUserData(data);
-          setPhoneNumber(data.phoneNumber || ''); // ⭐ Load phone
+          setPhoneNumber(data.phoneNumber || '');
         }
       } catch (err) {
         console.error('Error loading user data:', err);
       }
     };
-    
     loadUserData();
   }, [user?.uid]);
 
@@ -107,48 +102,36 @@ export default function Profile() {
   useEffect(() => {
     if (user) {
       setBiometricAvailable(isBiometricAvailable());
-      setBiometricEnabled(isBiometricEnabledOnDevice(user.uid));  
+      setBiometricEnabled(isBiometricEnabledOnDevice(user.uid));
     }
   }, [user]);
 
   useEffect(() => {
     if (!user || groups.length === 0) return;
-
     const groupIds = groups.map(g => g.id);
-    
     const expensesQuery = query(
       collection(db, 'expenses'),
       where('groupId', 'in', groupIds)
     );
-
     const unsubscribe = onSnapshot(expensesQuery, (snapshot) => {
-      const expensesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const expensesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setExpenses(expensesData);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, [user, groups]);
 
-  // fetch user data
+  // Fetch user data including payment methods
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user) return;
-      
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
           setUserData(data);
-          
-          // Load payment methods if they exist
           if (data.paymentMethods) {
             const methods = data.paymentMethods;
-            
-            // Decrypt IBAN if it exists and is encrypted
             if (methods.encryptedIBAN) {
               try {
                 const decryptedIBAN = decryptData(methods.encryptedIBAN);
@@ -168,7 +151,6 @@ export default function Profile() {
                 });
               }
             } else {
-              // Legacy: IBAN stored unencrypted
               setPaymentMethods(methods);
             }
           }
@@ -177,45 +159,35 @@ export default function Profile() {
         console.error('Error fetching user data:', err);
       }
     };
-    
     fetchUserData();
   }, [user]);
 
-
-  // ⭐ Save phone number with hash
-const handleSavePhone = async () => {
-  if (!phoneNumber.trim()) {
-    setPhoneError('Phone number cannot be empty');
-    return;
-  }
-  
-  // Basic phone validation (adjust regex for your region)
-  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+  // Save phone number with hash
+  const handleSavePhone = async () => {
+    if (!phoneNumber.trim()) {
+      setPhoneError('Phone number cannot be empty');
+      return;
+    }
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
     if (!phoneRegex.test(phoneNumber.replace(/\s/g, ''))) {
       setPhoneError('Please enter a valid phone number (e.g., +353871234567)');
       return;
     }
-    
     setPhoneError('');
     setPhoneSuccess('');
-    
     try {
-      // Hash the phone number for privacy
-      const cleanPhone = phoneNumber.replace(/\s/g, ''); // Remove spaces
+      const cleanPhone = phoneNumber.replace(/\s/g, '');
       const encoder = new TextEncoder();
       const data = encoder.encode(cleanPhone);
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const phoneHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      
-      // Save to Firestore
       await updateDoc(doc(db, 'users', user.uid), {
         phoneNumber: cleanPhone,
         phoneHash: phoneHash,
         updatedAt: new Date(),
       });
-      
-      setPhoneSuccess('✅ Phone number saved! Friends can now find you via contacts.');
+      setPhoneSuccess('Phone number saved! Friends can now find you via contacts.');
       setEditingPhone(false);
       setTimeout(() => setPhoneSuccess(''), 4000);
     } catch (err) {
@@ -226,75 +198,50 @@ const handleSavePhone = async () => {
 
   // Update local state when photo is updated
   const handlePhotoUpdated = async (photoURL) => {
-    console.log('📸 Photo updated callback received:', photoURL);
-  
-  // Update local userData state
-  setUserData(prev => ({ 
-    ...prev, 
-    photoURL: photoURL 
-  }));
-  
-  // ALSO update authStore so it persists
-  updateUserPhoto(photoURL);
-  
-  // Force re-fetch from Firestore to ensure sync
-  setTimeout(async () => {
-    try {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const freshData = userDoc.data();
-        console.log('🔄 Refreshed user data from Firestore:', freshData.photoURL);
-        setUserData(freshData);
+    console.log('Photo updated callback received:', photoURL);
+    setUserData(prev => ({ ...prev, photoURL }));
+    updateUserPhoto(photoURL);
+    setTimeout(async () => {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        }
+      } catch (err) {
+        console.error('Error refreshing user data:', err);
       }
-    } catch (err) {
-      console.error('Error refreshing user data:', err);
-    }
-  }, 500); // Small delay to ensure Firestore has propagated
-};
+    }, 500);
+  };
 
   // Calculate overall balance across all groups
   const calculateOverallBalance = () => {
-    let totalOwed = 0; // Money owed to you
-    let totalOwing = 0; // Money you owe
-
+    let totalOwed = 0;
+    let totalOwing = 0;
     groups.forEach(group => {
       const groupExpenses = expenses.filter(e => e.groupId === group.id);
       const balances = calculateBalances(groupExpenses, group.members || []);
       const userBalance = balances[user.uid] || 0;
-
-      if (userBalance > 0) {
-        totalOwed += userBalance;
-      } else if (userBalance < 0) {
-        totalOwing += Math.abs(userBalance);
-      }
+      if (userBalance > 0) totalOwed += userBalance;
+      else if (userBalance < 0) totalOwing += Math.abs(userBalance);
     });
-
     return { totalOwed, totalOwing };
   };
 
   // Calculate detailed breakdown of who owes what
   const calculateDetailedBreakdown = (type) => {
     const breakdowns = [];
-
     groups.forEach(group => {
       const groupExpenses = expenses.filter(e => e.groupId === group.id);
       const balances = calculateBalances(groupExpenses, group.members || []);
-
-      // For each member in the group
       Object.entries(balances).forEach(([memberId, balance]) => {
-        if (memberId === user.uid) return; // Skip self
-
-        const shouldInclude = type === 'owed' 
-          ? balances[user.uid] > 0 && balance < 0 // Others owe me
-          : balances[user.uid] < 0 && balance > 0; // I owe others
-
+        if (memberId === user.uid) return;
+        const shouldInclude = type === 'owed'
+          ? balances[user.uid] > 0 && balance < 0
+          : balances[user.uid] < 0 && balance > 0;
         if (shouldInclude) {
           const member = group.members.find(m => m.userId === memberId);
           const amount = Math.abs(balance);
-
-          // Find or create entry for this person
           let personEntry = breakdowns.find(b => b.userId === memberId);
-          
           if (!personEntry) {
             personEntry = {
               userId: memberId,
@@ -306,34 +253,21 @@ const handleSavePhone = async () => {
             };
             breakdowns.push(personEntry);
           }
-
           personEntry.amount += amount;
-          personEntry.groups.push({
-            groupId: group.id,
-            groupName: group.name,
-            amount: amount
-          });
+          personEntry.groups.push({ groupId: group.id, groupName: group.name, amount });
         }
       });
     });
-
-    // Sort by amount (highest first)
     breakdowns.sort((a, b) => b.amount - a.amount);
-
     return breakdowns;
   };
 
-
+  // Save payment methods
   const handleSavePaymentMethods = async () => {
     setPaymentError('');
     setPaymentSuccess(false);
     setSavingPayment(true);
-
     try {
-      console.log('=== PAYMENT SAVE DEBUG START ===');
-      console.log('1. User UID:', user.uid);
-
-      // Validate IBAN
       if (paymentMethods.iban && paymentMethods.iban.trim()) {
         if (!validateIBAN(paymentMethods.iban)) {
           setPaymentError('Invalid IBAN format. Example: IE29 AIBK 9311 5212 3456 78');
@@ -341,8 +275,6 @@ const handleSavePhone = async () => {
           return;
         }
       }
-    
-      // Validate PayPal username
       if (paymentMethods.paypalUsername && paymentMethods.paypalUsername.trim()) {
         const paypalRegex = /^[a-zA-Z0-9_]+$/;
         if (!paypalRegex.test(paymentMethods.paypalUsername)) {
@@ -351,37 +283,20 @@ const handleSavePhone = async () => {
           return;
         }
       }
-
-      // Prepare data
       const cleanedPaymentMethods = {};
-
-      if (paymentMethods.paypalUsername?.trim()) {
+      if (paymentMethods.paypalUsername?.trim())
         cleanedPaymentMethods.paypalUsername = paymentMethods.paypalUsername.trim();
-      }
-      if (paymentMethods.revolutUsername?.trim()) {
+      if (paymentMethods.revolutUsername?.trim())
         cleanedPaymentMethods.revolutUsername = paymentMethods.revolutUsername.trim();
-      }
-      if (paymentMethods.bic?.trim()) {
+      if (paymentMethods.bic?.trim())
         cleanedPaymentMethods.bic = paymentMethods.bic.trim().toUpperCase();
-      }
-
-      // Encrypt IBAN
       if (paymentMethods.iban?.trim()) {
         const cleanIBAN = paymentMethods.iban.replace(/\s/g, '').toUpperCase();
-        const encryptedIBAN = encryptData(cleanIBAN);
-        cleanedPaymentMethods.encryptedIBAN = encryptedIBAN;
+        cleanedPaymentMethods.encryptedIBAN = encryptData(cleanIBAN);
       }
-
-      console.log('2. Data prepared, checking if user document exists...');
-
-      // ⭐ KEY FIX: Check if document exists before updating
       const userDocRef = doc(db, 'users', user.uid);
       const userDocSnap = await getDoc(userDocRef);
-
       if (!userDocSnap.exists()) {
-        console.log('3. ⚠️ User document does NOT exist. Creating it now...');
-        
-        // Create the document with setDoc
         await setDoc(userDocRef, {
           userId: user.uid,
           email: user.email,
@@ -393,62 +308,25 @@ const handleSavePhone = async () => {
           defaultCurrency: 'EUR',
           allowContactSync: false,
           biometricEnabled: false,
-          notificationPreferences: {
-            email: true,
-            push: true,
-            invitations: true,
-            payments: true,
-            expenses: true
-          },
+          notificationPreferences: { email: true, push: true, invitations: true, payments: true, expenses: true },
           onboardingCompleted: false,
           isActive: true
         });
-        
-        console.log('4. ✅ User document CREATED with payment methods!');
-        
       } else {
-        console.log('3. ✓ User document exists. Updating...');
-        
-        // Document exists, update it
-        await updateDoc(userDocRef, {
-          paymentMethods: cleanedPaymentMethods,
-          updatedAt: new Date(),
-        });
-        
-        console.log('4. ✅ User document UPDATED!');
+        await updateDoc(userDocRef, { paymentMethods: cleanedPaymentMethods, updatedAt: new Date() });
       }
-
-      console.log('=== PAYMENT SAVE SUCCESS ===');
-
       setPaymentSuccess(true);
       setEditingPayment(false);
-      
-      // Update local state
-      setUserData(prev => ({
-        ...prev,
-        paymentMethods: cleanedPaymentMethods
-      }));
-      
+      setUserData(prev => ({ ...prev, paymentMethods: cleanedPaymentMethods }));
       setTimeout(() => setPaymentSuccess(false), 3000);
-      
     } catch (err) {
-      console.error('=== PAYMENT SAVE ERROR ===');
-      console.error('Error:', err);
-      
+      console.error('Payment save error:', err);
       let errorMessage = 'Failed to save payment methods. ';
-      
-      if (err.message?.includes('Encryption failed')) {
-        errorMessage = 'Encryption error: ' + err.message;
-      } else if (err.code === 'permission-denied') {
-        errorMessage = 'Permission denied. Check Firestore security rules.';
-      } else if (err.code === 'unavailable') {
-        errorMessage = 'Network error. Check your internet connection.';
-      } else {
-        errorMessage += err.message || 'Please try again.';
-      }
-      
+      if (err.message?.includes('Encryption failed')) errorMessage = 'Encryption error: ' + err.message;
+      else if (err.code === 'permission-denied') errorMessage = 'Permission denied. Check Firestore security rules.';
+      else if (err.code === 'unavailable') errorMessage = 'Network error. Check your internet connection.';
+      else errorMessage += err.message || 'Please try again.';
       setPaymentError(errorMessage);
-      
     } finally {
       setSavingPayment(false);
     }
@@ -456,7 +334,6 @@ const handleSavePhone = async () => {
 
   const { totalOwed, totalOwing } = calculateOverallBalance();
   const netBalance = totalOwed - totalOwing;
-
   const totalPaid = expenses
     .filter(e => e.paidBy === user.uid)
     .reduce((sum, e) => sum + e.amount, 0);
@@ -471,106 +348,80 @@ const handleSavePhone = async () => {
     }
   };
 
-  const joinDate = user?.metadata?.creationTime 
-    ? new Date(user.metadata.creationTime).toLocaleDateString('en-IE', {
-        month: 'long',
-        year: 'numeric'
-      })
+  const joinDate = user?.metadata?.creationTime
+    ? new Date(user.metadata.creationTime).toLocaleDateString('en-IE', { month: 'long', year: 'numeric' })
     : 'Unknown';
-
 
   // Handle showing payment settings with biometric check
   const handleShowPaymentSettings = async () => {
     if (!user) return;
-
-    // If already open, just toggle closed
     if (showPaymentSettings) {
       setShowPaymentSettings(false);
       setIsAuthenticated(false);
       return;
     }
-
-    // Check if biometric is enabled
     if (biometricEnabled) {
-      const authenticated = await authenticateWithBiometric(
-        user.uid, 
-        'Authenticate to view payment settings'
-      );
-      
+      const authenticated = await authenticateWithBiometric(user.uid, 'Authenticate to view payment settings');
       if (!authenticated) {
         alert('Authentication failed. Cannot access payment settings.');
         return;
       }
-      
       setIsAuthenticated(true);
     }
-
     setShowPaymentSettings(true);
   };
 
   // Handle editing payment with biometric check
   const handleEditPayment = async () => {
     if (!user) return;
-
-    // Check if biometric is enabled
     if (biometricEnabled && !isAuthenticated) {
-      const authenticated = await authenticateWithBiometric(
-        user.uid, 
-        'Authenticate to edit payment settings'
-      );
-      
+      const authenticated = await authenticateWithBiometric(user.uid, 'Authenticate to edit payment settings');
       if (!authenticated) {
         alert('Authentication failed. Cannot edit payment settings.');
         return;
       }
-      
       setIsAuthenticated(true);
     }
-
     setEditingPayment(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
-      {/* Header */}
-     <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
+
+      {/* ── Header ── */}
+      <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          {/* Back Arrow - Mobile Only */}
           <button
             onClick={() => navigate('/dashboard')}
             className="text-white hover:text-gray-200 mb-4 md:hidden"
           >
             <ArrowLeft size={24} />
           </button>
-          
           <div className="flex flex-col items-center">
             <CloudinaryUpload
               user={user}
               currentPhotoURL={userData?.photoURL}
               onPhotoUpdated={handlePhotoUpdated}
             />
-            <h1 className="text-2xl font-bold mb-1">
-              {user?.displayName || 'User'}
-            </h1>
-            <p className="text-white text-opacity-90 text-sm">
-              {user?.email}
-            </p>
+            <h1 className="text-2xl font-bold mb-1">{user?.displayName || 'User'}</h1>
+            <p className="text-white text-opacity-90 text-sm">{user?.email}</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Balance Overview */}
+
+        {/* ── Balance Overview ── */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <Wallet size={20} className="text-primary dark:text-indigo-400" />
             Overall Balance
           </h2>
-          
+
           <div className={`text-center p-6 rounded-xl mb-4 border ${
-            netBalance > 0 
-              ? 'bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-800' 
-              : netBalance < 0 
+            netBalance > 0
+              ? 'bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-800'
+              : netBalance < 0
               ? 'bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 border-orange-200 dark:border-orange-800'
               : 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 border-gray-200 dark:border-gray-600'
           }`}>
@@ -583,56 +434,48 @@ const handleSavePhone = async () => {
               €{Math.abs(netBalance).toFixed(2)}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-              {netBalance > 0 ? 'You are owed' :
-               netBalance < 0 ? 'You owe' :
-               'All settled up!'}
+              {netBalance > 0 ? 'You are owed' : netBalance < 0 ? 'You owe' : 'All settled up!'}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-          {/* Owed to You - Clickable */}
-          <div 
-            onClick={() => {
-              const data = calculateDetailedBreakdown('owed');
-              setBreakdownData(data);
-              setBreakdownType('owed');
-              setShowBreakdownModal(true);
-            }}
-            className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 border border-green-200 dark:border-green-800 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp size={16} className="text-green-600 dark:text-green-400" />
-              <p className="text-xs text-green-700 dark:text-green-300 font-medium">Owed to You</p>
+            {/* Owed to You */}
+            <div
+              onClick={() => {
+                setBreakdownData(calculateDetailedBreakdown('owed'));
+                setBreakdownType('owed');
+                setShowBreakdownModal(true);
+              }}
+              className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 border border-green-200 dark:border-green-800 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp size={16} className="text-green-600 dark:text-green-400" />
+                <p className="text-xs text-green-700 dark:text-green-300 font-medium">Owed to You</p>
+              </div>
+              <p className="text-xl font-bold text-green-900 dark:text-green-100">€{totalOwed.toFixed(2)}</p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">Click for details</p>
             </div>
-            <p className="text-xl font-bold text-green-900 dark:text-green-100">
-              €{totalOwed.toFixed(2)}
-            </p>
-            <p className="text-xs text-green-600 dark:text-green-400 mt-1">Click for details</p>
-          </div>
 
-          {/* You Owe - Clickable */}
-          <div 
-            onClick={() => {
-              const data = calculateDetailedBreakdown('owing');
-              setBreakdownData(data);
-              setBreakdownType('owing');
-              setShowBreakdownModal(true);
-            }}
-            className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border border-orange-200 dark:border-orange-800 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingDown size={16} className="text-orange-600 dark:text-orange-400" />
-              <p className="text-xs text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
+            {/* You Owe */}
+            <div
+              onClick={() => {
+                setBreakdownData(calculateDetailedBreakdown('owing'));
+                setBreakdownType('owing');
+                setShowBreakdownModal(true);
+              }}
+              className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border border-orange-200 dark:border-orange-800 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingDown size={16} className="text-orange-600 dark:text-orange-400" />
+                <p className="text-xs text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
+              </div>
+              <p className="text-xl font-bold text-orange-900 dark:text-orange-100">€{totalOwing.toFixed(2)}</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Click for details</p>
             </div>
-            <p className="text-xl font-bold text-orange-900 dark:text-orange-100">
-              €{totalOwing.toFixed(2)}
-            </p>
-            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Click for details</p>
           </div>
         </div>
-        </div>
 
-        {/* Stats */}
+        {/* ── Stats ── */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -641,7 +484,6 @@ const handleSavePhone = async () => {
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{groups.length}</p>
           </div>
-
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-4">
             <div className="flex items-center gap-2 mb-2">
               <Wallet size={20} className="text-green-600 dark:text-green-400" />
@@ -651,121 +493,145 @@ const handleSavePhone = async () => {
           </div>
         </div>
 
-        {/* Account Info */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Account Information</h2>
-          
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <User size={20} className="text-gray-400 dark:text-gray-500 mt-1" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Name</p>
-                <p className="font-medium text-gray-900 dark:text-white">{user?.displayName || 'Not set'}</p>
+        {/* ── Account Information — collapsible ── */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 mb-4 overflow-hidden">
+          <button
+            onClick={() => setShowAccountInfo(o => !o)}
+            className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                <User size={18} className="text-blue-600 dark:text-blue-400" />
               </div>
+              <span className="font-semibold text-gray-900 dark:text-white">Account Information</span>
             </div>
-
-            <div className="flex items-start gap-3">
-              <Mail size={20} className="text-gray-400 dark:text-gray-500 mt-1" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-                <p className="font-medium text-gray-900 dark:text-white">{user?.email}</p>
+            <ChevronDown
+              size={18}
+              className={`text-gray-400 transition-transform duration-300 ${showAccountInfo ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {/* Collapsible body */}
+          <div className={`transition-all duration-300 overflow-hidden ${showAccountInfo ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className="px-6 pb-5 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-4">
+              <div className="flex items-start gap-3">
+                <User size={18} className="text-gray-400 dark:text-gray-500 mt-1" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Name</p>
+                  <p className="font-medium text-gray-900 dark:text-white mt-0.5">{user?.displayName || 'Not set'}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Calendar size={20} className="text-gray-400 dark:text-gray-500 mt-1" />
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
-                <p className="font-medium text-gray-900 dark:text-white">{joinDate}</p>
+              <div className="flex items-start gap-3">
+                <Mail size={18} className="text-gray-400 dark:text-gray-500 mt-1" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Email</p>
+                  <p className="font-medium text-gray-900 dark:text-white mt-0.5">{user?.email}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Calendar size={18} className="text-gray-400 dark:text-gray-500 mt-1" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Member Since</p>
+                  <p className="font-medium text-gray-900 dark:text-white mt-0.5">{joinDate}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        {/* END Account Information */}
 
-
-        {/* Phone Number Section - ADD THIS */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-6 mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Users size={20} className="text-primary dark:text-indigo-400" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Contact Discovery
-              </h2>
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
-              <p className="text-sm text-blue-900 dark:text-blue-300">
-                <strong>Optional:</strong> Add your phone number to let friends find you when they sync their contacts. 
-                We store only a hash, never the actual number.
-              </p>
-            </div>
-
-            {phoneSuccess && (
-              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-300 text-sm">
-                {phoneSuccess}
+        {/* ── Contact Discovery — collapsible ── */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 mb-4 overflow-hidden">
+          <button
+            onClick={() => setShowContactDisc(o => !o)}
+            className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+                <Users size={18} className="text-emerald-600 dark:text-emerald-400" />
               </div>
-            )}
-
-            {phoneError && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
-                {phoneError}
+              <div className="text-left">
+                <span className="font-semibold text-gray-900 dark:text-white">Contact Discovery</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add your number so friends can find you</p>
               </div>
-            )}
+            </div>
+            <ChevronDown
+              size={18}
+              className={`text-gray-400 transition-transform duration-300 ${showContactDisc ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {/* Collapsible body */}
+          <div className={`transition-all duration-300 overflow-hidden ${showContactDisc ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className="px-6 pb-5 pt-3 border-t border-gray-100 dark:border-gray-700">
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Phone Number (Optional)
-              </label>
-              {editingPhone ? (
-                <div className="flex gap-2">
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="+353871234567"
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
-                  />
-                  <button
-                    onClick={handleSavePhone}
-                    className="px-4 py-2 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-dark dark:hover:bg-indigo-700 transition"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingPhone(false);
-                      setPhoneNumber(userData?.phoneNumber || '');
-                      setPhoneError('');
-                    }}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-gray-900 dark:text-white">
-                    {phoneNumber || 'Not set'}
-                  </span>
-                  <button
-                    onClick={() => setEditingPhone(true)}
-                    className="text-primary dark:text-indigo-400 text-sm hover:underline"
-                  >
-                    {phoneNumber ? 'Edit' : 'Add'}
-                  </button>
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-900 dark:text-blue-300">
+                  <strong>Optional:</strong> Add your phone number to let friends find you when they sync their contacts.
+                  We store only a hash, never the actual number.
+                </p>
+              </div>
+
+              {phoneSuccess && (
+                <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-300 text-sm">
+                  {phoneSuccess}
                 </div>
               )}
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Format: +[country code][number] (e.g., +353871234567)
-              </p>
+              {phoneError && (
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
+                  {phoneError}
+                </div>
+              )}
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Phone Number (Optional)
+                </label>
+                {editingPhone ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+353871234567"
+                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
+                    />
+                    <button
+                      onClick={handleSavePhone}
+                      className="px-4 py-2 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-dark dark:hover:bg-indigo-700 transition"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => { setEditingPhone(false); setPhoneNumber(userData?.phoneNumber || ''); setPhoneError(''); }}
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <span className="text-gray-900 dark:text-white">{phoneNumber || 'Not set'}</span>
+                    <button
+                      onClick={() => setEditingPhone(true)}
+                      className="text-primary dark:text-indigo-400 text-sm hover:underline"
+                    >
+                      {phoneNumber ? 'Edit' : 'Add'}
+                    </button>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Format: +[country code][number] (e.g., +353871234567)
+                </p>
+              </div>
+
             </div>
           </div>
+        </div>
+        {/* END Contact Discovery */}
 
-
-
-        {/* Payment Settings */}
+        {/* ── Payment Settings — collapsible ── */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
-          {/* Collapsible Header */}
-          <div 
+          {/* Header */}
+          <div
             className="flex items-center justify-between cursor-pointer select-none"
             onClick={handleShowPaymentSettings}
           >
@@ -776,9 +642,7 @@ const handleSavePhone = async () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Settings</h2>
-                  {biometricEnabled && (
-                    <Lock size={16} className="text-indigo-600 dark:text-indigo-400" />
-                  )}
+                  {biometricEnabled && <Lock size={16} className="text-indigo-600 dark:text-indigo-400" />}
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {showPaymentSettings ? 'Click to hide' : 'Click to show'}
@@ -786,25 +650,19 @@ const handleSavePhone = async () => {
                 </p>
               </div>
             </div>
-            <ChevronDown 
-              size={24} 
-              className={`text-gray-400 dark:text-gray-500 transition-transform duration-300 ${
-                showPaymentSettings ? 'rotate-180' : ''
-              }`}
+            <ChevronDown
+              size={24}
+              className={`text-gray-400 dark:text-gray-500 transition-transform duration-300 ${showPaymentSettings ? 'rotate-180' : ''}`}
             />
           </div>
 
           {/* Collapsible Content */}
           {showPaymentSettings && (
             <div className="mt-4 animate-scale-in">
-              {/* Edit button */}
               {!editingPayment && (
                 <div className="flex justify-end mb-4">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditPayment();
-                    }}
+                    onClick={(e) => { e.stopPropagation(); handleEditPayment(); }}
                     className="px-4 py-2 text-primary dark:text-indigo-400 border border-primary dark:border-indigo-600 rounded-lg hover:bg-primary-light dark:hover:bg-indigo-900/30 transition"
                   >
                     Edit Payment Methods
@@ -812,7 +670,6 @@ const handleSavePhone = async () => {
                 </div>
               )}
 
-              {/* Info banner */}
               <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
                 <div className="flex items-start gap-2">
                   <Info size={16} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
@@ -823,68 +680,51 @@ const handleSavePhone = async () => {
                 </div>
               </div>
 
-              {/* Success/Error Messages */}
               {paymentSuccess && (
                 <div className="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-300 p-3 rounded-lg mb-4 text-sm flex items-center gap-2 border border-green-200 dark:border-green-800">
                   <Shield size={16} />
                   Payment settings saved successfully! IBAN encrypted.
                 </div>
               )}
-
               {paymentError && (
                 <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">
                   {paymentError}
                 </div>
               )}
 
-              {/* Payment Method Inputs */}
               <div className="space-y-4">
                 {/* PayPal Username */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    PayPal.me Username
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">PayPal.me Username</label>
                   <div className="relative">
                     <span className="absolute left-3 top-3 text-gray-400 dark:text-gray-500">paypal.me/</span>
                     <input
                       type="text"
                       value={paymentMethods.paypalUsername}
-                      onChange={(e) => setPaymentMethods(prev => ({
-                        ...prev, 
-                        paypalUsername: e.target.value
-                      }))}
+                      onChange={(e) => setPaymentMethods(prev => ({ ...prev, paypalUsername: e.target.value }))}
                       disabled={!editingPayment}
                       placeholder="username"
                       className="w-full pl-24 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Your PayPal.me link (e.g., "alice" for paypal.me/alice)
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your PayPal.me link (e.g., "alice" for paypal.me/alice)</p>
                 </div>
 
                 {/* Revolut Username */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Revolut Username
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Revolut Username</label>
                   <div className="relative">
                     <span className="absolute left-3 top-3 text-gray-400 dark:text-gray-500">@</span>
                     <input
                       type="text"
                       value={paymentMethods.revolutUsername}
-                      onChange={(e) => setPaymentMethods(prev => ({
-                        ...prev, 
-                        revolutUsername: e.target.value
-                      }))}
+                      onChange={(e) => setPaymentMethods(prev => ({ ...prev, revolutUsername: e.target.value }))}
                       disabled={!editingPayment}
                       placeholder="username"
                       className="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Your Revolut @username (e.g., "@alice")
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your Revolut @username (e.g., "@alice")</p>
                 </div>
 
                 {/* IBAN */}
@@ -896,59 +736,39 @@ const handleSavePhone = async () => {
                   <input
                     type="text"
                     value={paymentMethods.iban}
-                    onChange={(e) => setPaymentMethods(prev => ({
-                      ...prev, 
-                      iban: e.target.value.toUpperCase()
-                    }))}
+                    onChange={(e) => setPaymentMethods(prev => ({ ...prev, iban: e.target.value.toUpperCase() }))}
                     disabled={!editingPayment}
                     placeholder="IE29AIBK12345678901234"
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 font-mono text-sm"
                   />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Your bank account IBAN for SEPA transfers
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your bank account IBAN for SEPA transfers</p>
                 </div>
 
-                {/* BIC (Optional) */}
+                {/* BIC */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    BIC/SWIFT Code (Optional)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">BIC/SWIFT Code (Optional)</label>
                   <input
                     type="text"
                     value={paymentMethods.bic}
-                    onChange={(e) => setPaymentMethods(prev => ({
-                      ...prev, 
-                      bic: e.target.value.toUpperCase()
-                    }))}
+                    onChange={(e) => setPaymentMethods(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))}
                     disabled={!editingPayment}
                     placeholder="AIBKIE2D"
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 font-mono text-sm"
                   />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Your bank's BIC/SWIFT code (usually not required for SEPA)
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your bank's BIC/SWIFT code (usually not required for SEPA)</p>
                 </div>
               </div>
 
-              {/* Save/Cancel Buttons */}
               {editingPayment && (
                 <div className="flex gap-3 mt-6">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditingPayment(false);
-                      setPaymentError('');
-                    }}
+                    onClick={(e) => { e.stopPropagation(); setEditingPayment(false); setPaymentError(''); }}
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSavePaymentMethods();
-                    }}
+                    onClick={(e) => { e.stopPropagation(); handleSavePaymentMethods(); }}
                     disabled={savingPayment}
                     className="flex-1 px-4 py-2 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition disabled:opacity-50 font-medium flex items-center justify-center gap-2"
                   >
@@ -960,11 +780,9 @@ const handleSavePhone = async () => {
             </div>
           )}
         </div>
+        {/* END Payment Settings */}
 
-      
-
-
-        {/* Actions */}
+        {/* ── Actions ── */}
         <div className="space-y-3">
           <button
             onClick={handleLogout}
@@ -974,8 +792,10 @@ const handleSavePhone = async () => {
             <span className="font-medium">Log Out</span>
           </button>
         </div>
+
       </div>
-      {/* Balance Breakdown Modal */}
+
+      {/* ── Balance Breakdown Modal ── */}
       <BalanceBreakdownModal
         isOpen={showBreakdownModal}
         onClose={() => setShowBreakdownModal(false)}
@@ -983,6 +803,7 @@ const handleSavePhone = async () => {
         breakdowns={breakdownData}
         totalAmount={breakdownType === 'owed' ? totalOwed : totalOwing}
       />
+
     </div>
   );
 }
