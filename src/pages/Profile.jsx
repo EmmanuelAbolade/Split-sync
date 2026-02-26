@@ -57,9 +57,10 @@ export default function Profile() {
   const [showContactDisc, setShowContactDisc] = useState(false);
 
   // Biometric state
-  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
 
   // Balance breakdown modal state
   const [showBreakdownModal, setShowBreakdownModal] = useState(false);
@@ -362,6 +363,7 @@ export default function Profile() {
     }
     if (biometricEnabled) {
       const authenticated = await authenticateWithBiometric(user.uid, 'Authenticate to view payment settings');
+      setBiometricLoading(false);
       if (!authenticated) {
         alert('Authentication failed. Cannot access payment settings.');
         return;
@@ -376,6 +378,7 @@ export default function Profile() {
     if (!user) return;
     if (biometricEnabled && !isAuthenticated) {
       const authenticated = await authenticateWithBiometric(user.uid, 'Authenticate to edit payment settings');
+      setBiometricLoading(false);
       if (!authenticated) {
         alert('Authentication failed. Cannot edit payment settings.');
         return;
@@ -388,6 +391,23 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
 
+      {/* Biometric authentication loading overlay — prevents black screen during fingerprint prompt */}
+      {biometricLoading && (
+        <div className="fixed inset-0 z-[100] bg-gray-900/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
+          <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+            <Lock size={28} className="text-white" />
+          </div>
+          <div className="text-center">
+            <p className="text-white font-semibold text-lg">Verifying Identity</p>
+            <p className="text-gray-300 text-sm mt-1">Use your fingerprint or Face ID to continue</p>
+          </div>
+          <div className="flex gap-1 mt-2">
+            <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      )}
       {/* ── Header ── */}
       <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
         <div className="max-w-7xl mx-auto px-4 py-8">
