@@ -49,10 +49,20 @@ function monthKey(ts) {
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-3 text-sm">
-      <p className="font-semibold text-gray-700 dark:text-gray-200 mb-1">{label}</p>
+    <div style={{
+      backgroundColor: 'rgba(15, 23, 42, 0.92)',
+      border: '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '12px',
+      padding: '10px 14px',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+      fontSize: '13px',
+      backdropFilter: 'blur(8px)',
+    }}>
+      <p style={{ color: '#f1f5f9', fontWeight: 600, marginBottom: 4 }}>
+        {label}
+      </p>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color }} className="font-medium">
+        <p key={i} style={{ color: p.color || '#94a3b8', fontWeight: 500 }}>
           {p.name}: {fmt(p.value)}
         </p>
       ))}
@@ -399,17 +409,12 @@ export default function Analytics() {
                   </Pie>
                   <Tooltip
                     formatter={(value, name) => [fmt(value), name]}
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '12px',
-                      fontSize: '13px',
-                    }}
+                    content={<CustomTooltip />}
                   />
                   <Legend
                     iconType="circle"
                     iconSize={8}
-                    formatter={(v) => <span className="text-xs text-gray-600 dark:text-gray-300">{v}</span>}
+                    formatter={(v) => <span className="text-xs text-gray-600 dark:text-gray-200">{v}</span>}
                   />
                 </PieChart>
               </ResponsiveContainer>
