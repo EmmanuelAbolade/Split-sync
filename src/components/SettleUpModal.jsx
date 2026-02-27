@@ -915,7 +915,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                     </div>
                     <div className="text-left">
                       <p className="text-sm font-bold text-yellow-900 dark:text-yellow-200">
-                        Future Feature - Settlement Payment Flow
+                        Future feature - Settlement Payment Flow
                       </p>
                       <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-0.5">
                         {showDemoInfo ? 'Tap to collapse' : 'PayPal or Credit/Debit Card payment demo'}
