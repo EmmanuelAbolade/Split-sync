@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark,  QrCode, Smartphone, Loader } from 'lucide-react';
+import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark, QrCode, Smartphone, ChevronDown } from 'lucide-react';
 import { getDoc } from 'firebase/firestore';
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
 import PaymentInfoModal from './PaymentInfoModal';
@@ -32,6 +32,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [pendingPayment, setPendingPayment] = useState(null);
   const [showPendingConfirmation, setShowPendingConfirmation] = useState(false);
   const [activeQR, setActiveQR] = useState('paypal');
+  const [showQR, setShowQR] = useState(false);
+  const [showDemoInfo, setShowDemoInfo] = useState(false);
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
   const userIsPaying = currentUserId === settlement?.from;
@@ -726,8 +728,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         {userIsPaying ? (
           /* User is paying - show payment options */
           <div className="mb-6">
-            {/* Quick Payment Links Section */}
-            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
+            {/* Quick Payment Links Section — hidden when Paid Offline is selected */}
+            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
               <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="relative group">
@@ -767,8 +769,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
               </div>
             )}
 
-            {/* SEPA Bank Transfer Button */}
-            {!loadingPaymentMethods && recipientPaymentMethods?.encryptedIBAN && !selectedPaymentLink && (
+            {/* SEPA Bank Transfer Button — hidden when Paid Offline is selected */}
+            {!loadingPaymentMethods && recipientPaymentMethods?.encryptedIBAN && !selectedPaymentLink && paymentMethod !== 'manual' && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Or pay directly with SEPA</h3>
                 <button
@@ -860,8 +862,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
               </div>
             )}
 
-            {/* Divider */}
-            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && (
+            {/* Divider — hidden when Paid Offline is selected */}
+            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
@@ -901,26 +903,62 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
             {paymentMethod === 'paypal' ? (
               <div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-4">
-                  <p className="text-xs text-yellow-800 dark:text-yellow-300">
-                    <strong>Demo Mode:</strong> Using PayPal Sandbox for demonstration.
-                  </p>
-                </div>
-                {parseFloat(amount) > 0 ? (
-                  <PayPalButtons
-                    style={{ layout: 'vertical', label: 'pay' }}
-                    createOrder={createPayPalOrder}
-                    onApprove={onPayPalApprove}
-                    onError={onPayPalError}
-                    disabled={loading}
+                {/* Demo Mode — collapsible panel containing all PayPal sandbox UI */}
+                <button
+                  type="button"
+                  onClick={() => setShowDemoInfo(prev => !prev)}
+                  className="w-full flex items-center justify-between px-4 py-3 mb-2 rounded-xl border-2 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-yellow-400 dark:bg-yellow-600 rounded-lg flex items-center justify-center shrink-0">
+                      <CreditCard size={16} className="text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-bold text-yellow-900 dark:text-yellow-200">
+                        Future Feature - Settlement Payment Flow
+                      </p>
+                      <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-0.5">
+                        {showDemoInfo ? 'Tap to collapse' : 'PayPal or Credit/Debit Card payment demo'}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronDown
+                    size={18}
+                    className={`text-yellow-600 dark:text-yellow-400 transition-transform duration-300 shrink-0 ${showDemoInfo ? 'rotate-180' : ''}`}
                   />
-                ) : (
-                  <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                    Enter an amount to continue
+                </button>
+
+                {/* Expanded PayPal sandbox panel */}
+                {showDemoInfo && (
+                  <div className="mb-2 border border-yellow-200 dark:border-yellow-800 rounded-xl overflow-hidden">
+                    {/* Demo notice */}
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 flex items-start gap-2 border-b border-yellow-200 dark:border-yellow-800">
+                      <Info size={14} className="text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
+                      <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                        <strong>Demo Mode:</strong> This uses a PayPal Sandbox environment. No real money is transferred. Use sandbox test credentials to complete the payment flow.
+                      </p>
+                    </div>
+                    {/* PayPal buttons */}
+                    <div className="px-4 py-4 bg-white dark:bg-gray-800">
+                      {parseFloat(amount) > 0 ? (
+                        <PayPalButtons
+                          style={{ layout: 'vertical', label: 'pay' }}
+                          createOrder={createPayPalOrder}
+                          onApprove={onPayPalApprove}
+                          onError={onPayPalError}
+                          disabled={loading}
+                        />
+                      ) : (
+                        <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                          Enter an amount above to continue
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
+              /* Paid Offline — payer confirms they paid outside the app */
               <form onSubmit={handleManualSettle}>
                 <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-4">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -938,94 +976,131 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             )}
           </div>
         ) : (
-          /* User is receiving — show QR codes for payer to scan */
+          /* ── Receiver view: collapsible QR + confirm received ── */
           <div>
-            {/* Instruction banner */}
-            <div className="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3 mb-4 flex items-start gap-2">
-              <Smartphone size={16} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-indigo-800 dark:text-indigo-300">
-                Show this QR code to <strong>{fromMember?.name}</strong>. They scan it with their phone camera to pay you directly.
-              </p>
-            </div>
 
-            {/* Tab selector — only show tabs for methods the receiver has set up */}
-            {recipientPaymentMethods && (
-              <div className="flex gap-2 mb-4">
-                {recipientPaymentMethods.paypalUsername && (
-                  <button
-                    type="button"
-                    onClick={() => setActiveQR('paypal')}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-                      activeQR === 'paypal'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    PayPal
-                  </button>
+            {/* QR toggle button — hidden by default, tap to reveal for payer to scan */}
+            <button
+              type="button"
+              onClick={() => setShowQR(prev => !prev)}
+              className="w-full flex items-center justify-between px-4 py-3 mb-3 rounded-xl border-2 border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-lg flex items-center justify-center shrink-0">
+                  <QrCode size={16} className="text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200">
+                    Let {fromMember?.name} scan to pay you
+                  </p>
+                  <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
+                    {showQR ? 'Tap to hide QR code' : 'Tap to show PayPal or Revolut QR code'}
+                  </p>
+                </div>
+              </div>
+              <ChevronDown
+                size={18}
+                className={`text-indigo-500 dark:text-indigo-400 transition-transform duration-300 shrink-0 ${showQR ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {/* Collapsible QR panel */}
+            {showQR && (
+              <div className="mb-4 border border-indigo-200 dark:border-indigo-800 rounded-xl overflow-hidden">
+
+                {/* Instruction */}
+                <div className="bg-indigo-50 dark:bg-indigo-900/30 px-4 py-3 flex items-start gap-2">
+                  <Smartphone size={15} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
+                  <p className="text-xs font-semibold text-indigo-800 dark:text-indigo-300">
+                    Show this screen to <strong>{fromMember?.name}</strong> — they scan the QR code with their phone camera to pay you instantly via PayPal or Revolut.
+                  </p>
+                </div>
+
+                {/* Tab selector — only show tabs for methods the receiver has configured */}
+                {recipientPaymentMethods && (recipientPaymentMethods.paypalUsername || recipientPaymentMethods.revolutUsername) && (
+                  <div className="flex gap-2 px-4 pt-3">
+                    {recipientPaymentMethods.paypalUsername && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveQR('paypal')}
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                          activeQR === 'paypal'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        PayPal
+                      </button>
+                    )}
+                    {recipientPaymentMethods.revolutUsername && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveQR('revolut')}
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                          activeQR === 'revolut'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Revolut
+                      </button>
+                    )}
+                  </div>
                 )}
-                {recipientPaymentMethods.revolutUsername && (
-                  <button
-                    type="button"
-                    onClick={() => setActiveQR('revolut')}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-                      activeQR === 'revolut'
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    Revolut
-                  </button>
-                )}
+
+                {/* QR code display */}
+                <div className="flex flex-col items-center py-4 px-4">
+                  {recipientPaymentMethods?.paypalUsername && activeQR === 'paypal' && (
+                    <>
+                      <QRCodeCanvas
+                        value={generatePayPalLink(
+                          recipientPaymentMethods.paypalUsername,
+                          parseFloat(amount),
+                          group?.currency || 'EUR'
+                        )}
+                        size={200}
+                      />
+                      <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">
+                        Scan to pay via PayPal
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        Opens PayPal pre-filled with {group?.currency || 'EUR'} {parseFloat(amount || 0).toFixed(2)}
+                      </p>
+                    </>
+                  )}
+                  {recipientPaymentMethods?.revolutUsername && activeQR === 'revolut' && (
+                    <>
+                      <QRCodeCanvas
+                        value={generateRevolutLink(
+                          recipientPaymentMethods.revolutUsername,
+                          parseFloat(amount),
+                          group?.currency || 'EUR'
+                        )}
+                        size={200}
+                      />
+                      <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">
+                        Scan to pay via Revolut
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        Opens Revolut — enter {group?.currency || 'EUR'} {parseFloat(amount || 0).toFixed(2)} to complete
+                      </p>
+                    </>
+                  )}
+                  {/* Fallback — no payment methods configured */}
+                  {!recipientPaymentMethods?.paypalUsername && !recipientPaymentMethods?.revolutUsername && (
+                    <div className="text-center py-4">
+                      <QrCode size={36} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500 dark:text-gray-400">No payment methods set up yet.</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                        Add your PayPal or Revolut username in Profile to enable QR payments.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
-            {/* QR code display */}
-            <div className="flex flex-col items-center py-2 mb-4">
-              {recipientPaymentMethods?.paypalUsername && activeQR === 'paypal' && (
-                <>
-                  <QRCodeCanvas
-                    value={generatePayPalLink(
-                      recipientPaymentMethods.paypalUsername,
-                      parseFloat(amount),
-                      group?.currency || 'EUR'
-                    )}
-                    size={200}
-                  />
-                  <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">Scan to pay via PayPal</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Opens PayPal pre-filled with {group?.currency || 'EUR'} {parseFloat(amount || 0).toFixed(2)}
-                  </p>
-                </>
-              )}
-              {recipientPaymentMethods?.revolutUsername && activeQR === 'revolut' && (
-                <>
-                  <QRCodeCanvas
-                    value={generateRevolutLink(
-                      recipientPaymentMethods.revolutUsername,
-                      parseFloat(amount),
-                      group?.currency || 'EUR'
-                    )}
-                    size={200}
-                  />
-                  <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">Scan to pay via Revolut</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Opens Revolut — enter {group?.currency || 'EUR'} {parseFloat(amount || 0).toFixed(2)} to complete
-                  </p>
-                </>
-              )}
-              {!recipientPaymentMethods?.paypalUsername && !recipientPaymentMethods?.revolutUsername && (
-                <div className="text-center py-4">
-                  <QrCode size={36} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">No payment methods set up yet.</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    Add your PayPal or Revolut username in Profile to enable QR payments.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Confirm received button */}
+            {/* Confirm received button — always visible regardless of QR state */}
             <form onSubmit={handleManualSettle}>
               <button
                 type="submit"
