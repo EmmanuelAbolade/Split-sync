@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark,  QrCode, Smartphone } from 'lucide-react';
+import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark,  QrCode, Smartphone, Loader } from 'lucide-react';
 import { getDoc } from 'firebase/firestore';
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
 import PaymentInfoModal from './PaymentInfoModal';
@@ -923,6 +923,14 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             ) : (
             /* User is receiving — show QR codes for payer to scan */
             <div>
+              {/* Loading state while fetching receiver payment methods */}
+              {loadingPaymentMethods && (
+                <div className="flex items-center justify-center py-8 text-gray-400 dark:text-gray-500 gap-2">
+                  <Loader size={16} className="animate-spin" />
+                  <span className="text-sm">Loading payment options...</span>
+                </div>
+              )}
+
               {/* Instruction banner */}
               <div className="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3 mb-4 flex items-start gap-2">
                 <Smartphone size={16} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
