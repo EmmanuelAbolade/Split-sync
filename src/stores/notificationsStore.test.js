@@ -467,6 +467,7 @@ describe('createNotification helper', () => {
       title: 'New Expense',
       message: 'Alice added €20',
       data: { groupId: 'group-001' },
+      requiresAction: false,
       read: false,
       createdAt: 'SERVER_TIMESTAMP',
     });
@@ -492,7 +493,10 @@ describe('createNotification helper', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const { createNotification } = getStore();
-    await createNotification({ userId: 'u1', type: 'expense', title: 'T', message: 'M', data: {} });
+    // createNotification re-throws — catch it so the assertion below can run
+    try {
+      await createNotification({ userId: 'u1', type: 'expense', title: 'T', message: 'M', data: {} });
+    } catch (_) {}
 
     expect(consoleSpy).toHaveBeenCalledWith('Error creating notification:', expect.any(Error));
     consoleSpy.mockRestore();
@@ -505,7 +509,7 @@ describe('createNotification helper', () => {
     const { createNotification } = getStore();
     await expect(
       createNotification({ userId: 'u1', type: 'expense', title: 'T', message: 'M', data: {} })
-    ).resolves.not.toThrow();
+    ).rejects.toThrow();
     consoleSpy.mockRestore();
   });
 });

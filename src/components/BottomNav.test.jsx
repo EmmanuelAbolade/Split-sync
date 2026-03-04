@@ -39,10 +39,10 @@ describe('BottomNav Component - Rendering', () => {
     expect(screen.getByText('You')).toBeInTheDocument();
   });
 
-  test('Renders four buttons total', () => {
+  test('Renders five buttons total', () => {
     render(<BottomNav />);
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(4);
+    expect(buttons).toHaveLength(5);
   });
 
   test('Nav is fixed to the bottom', () => {
