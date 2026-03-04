@@ -127,7 +127,7 @@ describe('Settings - Rendering', () => {
 
   test('Renders app version', () => {
     render(<Settings />);
-    expect(screen.getByText('SplitSync v1.0.0')).toBeInTheDocument();
+    expect(screen.getByText('Split-Sync v1.0.0')).toBeInTheDocument();
   });
 });
 
@@ -214,7 +214,7 @@ describe('Settings - Logout', () => {
     render(<Settings />);
     fireEvent.click(screen.getByText('Log Out'));
     await waitFor(() =>
-      expect(screen.getByText('Failed to logout. Please try again.')).toBeInTheDocument()
+      expect(screen.getByText('Failed to log out. Please try again.')).toBeInTheDocument()
     );
     consoleSpy.mockRestore();
   });
@@ -232,21 +232,21 @@ describe('Settings - Delete account modal', () => {
   test('Opens delete modal when Delete Account is clicked', () => {
     render(<Settings />);
     fireEvent.click(screen.getByText('Delete Account'));
-    expect(screen.getByPlaceholderText('Enter password')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Your password')).toBeInTheDocument();
   });
 
   test('Closes delete modal when Cancel is clicked', () => {
     render(<Settings />);
     fireEvent.click(screen.getByText('Delete Account'));
     fireEvent.click(screen.getByText('Cancel'));
-    expect(screen.queryByPlaceholderText('Enter password')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Your password')).not.toBeInTheDocument();
   });
 
   test('Shows error when submitting without password', async () => {
     render(<Settings />);
     fireEvent.click(screen.getByText('Delete Account'));
     // Button is disabled when password is empty — enter and clear to trigger validation
-    const input = screen.getByPlaceholderText('Enter password');
+    const input = screen.getByPlaceholderText('Your password');
     fireEvent.change(input, { target: { value: 'x' } });
     fireEvent.change(input, { target: { value: '' } });
     // Directly call the handler by finding the enabled-state button
@@ -259,7 +259,7 @@ describe('Settings - Delete account modal', () => {
   test('Toggles password visibility in delete modal', () => {
     render(<Settings />);
     fireEvent.click(screen.getByText('Delete Account'));
-    const input = screen.getByPlaceholderText('Enter password');
+    const input = screen.getByPlaceholderText('Your password');
     expect(input).toHaveAttribute('type', 'password');
     // Find the toggle button inside the modal
     const toggleBtn = input.parentElement.querySelector('button');
@@ -284,7 +284,7 @@ describe('Settings - Delete account submission', () => {
 
   const openModalAndEnterPassword = (password = 'password123') => {
     fireEvent.click(screen.getByText('Delete Account'));
-    fireEvent.change(screen.getByPlaceholderText('Enter password'), {
+    fireEvent.change(screen.getByPlaceholderText('Your password'), {
       target: { value: password },
     });
     const deleteButtons = screen.getAllByText('Delete Account');
@@ -400,7 +400,7 @@ describe('Settings - Biometric toggle', () => {
     render(<Settings />);
     fireEvent.click(screen.getByLabelText('Toggle biometric authentication'));
     await waitFor(() =>
-      expect(screen.getByText('Failed to enable biometric authentication. Please try again.')).toBeInTheDocument()
+      expect(screen.getByText('Failed to enable biometric. Please try again.')).toBeInTheDocument()
     );
   });
 
