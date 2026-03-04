@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { confirmPaymentReceived, declinePaymentReceived } from '../stores/notificationsStore';
+import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived } from '../stores/notificationsStore';
 import { 
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
@@ -64,12 +64,26 @@ export default function GroupDetails() {
   const [memberPaymentMethods, setMemberPaymentMethods] = useState({});
   const [pendingPaymentBanner, setPendingPaymentBanner] = useState(null);
   const [pendingInvitations, setPendingInvitations] = useState([]);
-  // Pending settlements waiting for payee confirmation (from Firestore)
-  const [pendingSettlements, setPendingSettlements] = useState([]);
   const [settlementActionLoading, setSettlementActionLoading] = useState({});
-  // Full payment history for the current user as payer (all statuses)
-  const [myPaymentHistory, setMyPaymentHistory] = useState([]);
   const [showPaymentHistory, setShowPaymentHistory] = useState(true);
+
+  // Derive pending settlement data from the global notifications store.
+  // This avoids a separate Firestore query and requires no new collection.
+  const { notifications: allNotifications } = useNotificationsStore();
+
+  // payment_confirmation_needed notifications addressed to THIS user for THIS group
+  // Used to show payee confirm/decline banners and payer "awaiting" banners
+  const groupPaymentActions = allNotifications.filter(
+    n => n.data?.groupId === groupId &&
+      n.type === 'payment_confirmation_needed' &&
+      n.requiresAction === true &&
+      !n.read
+  );
+
+  // payment_log notifications owned by THIS user for THIS group (payer's activity record)
+  const groupPaymentLog = allNotifications.filter(
+    n => n.data?.groupId === groupId && n.type === 'payment_log'
+  );
 
   // Get display title with current names for settlements
   const getDisplayTitle = (expense) => {
@@ -207,57 +221,6 @@ export default function GroupDetails() {
     return () => unsubscribe();
   }, [groupId]);
 
-  // Subscribe to pending settlements for this group where the current user is involved
-  // Used to show confirm/decline banners to the payee, and awaiting banners to the payer
-  useEffect(() => {
-    if (!groupId || !user?.uid) return;
-
-    const q = query(
-      collection(db, 'pendingSettlements'),
-      where('groupId', '==', groupId),
-      where('status', '==', 'pending_confirmation')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Filter client-side to only those involving the current user
-      const involved = records.filter(
-        r => r.fromUserId === user.uid || r.toUserId === user.uid
-      );
-      setPendingSettlements(involved);
-    }, (err) => {
-      console.error('Error listening to pendingSettlements:', err);
-    });
-
-    return () => unsubscribe();
-  }, [groupId, user?.uid]);
-
-  // Subscribe to all settlement records for this user as PAYER across all statuses.
-  // This is the source of truth for "My Payment Activity" — the payer's personal log.
-  useEffect(() => {
-    if (!groupId || !user?.uid) return;
-
-    const q = query(
-      collection(db, 'pendingSettlements'),
-      where('groupId', '==', groupId),
-      where('fromUserId', '==', user.uid)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Sort newest first
-      records.sort((a, b) => {
-        const tA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-        const tB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-        return tB - tA;
-      });
-      setMyPaymentHistory(records);
-    }, (err) => {
-      console.error('Error listening to payment history:', err);
-    });
-
-    return () => unsubscribe();
-  }, [groupId, user?.uid]);
   useEffect(() => {
     // Safety checks - don't run if data isn't ready
     if (!groupId) return;
@@ -509,103 +472,74 @@ export default function GroupDetails() {
           </div>
         )}
 
-        {/* Pending Settlements Banners - Firestore-backed, persisted across sessions */}
-        {pendingSettlements.map((ps) => {
-          const isPayee = ps.toUserId === user.uid;
-          const isPayer = ps.fromUserId === user.uid;
-          const actionLoading = settlementActionLoading[ps.id];
+        {/* Payment Action Banners - derived from notifications store, no separate Firestore query.
+            Payee sees confirm/decline; payer sees "awaiting confirmation" notice. */}
+        {groupPaymentActions.map((notif) => {
+          const pd = notif.data || {};
+          const isPayee = notif.userId === user.uid; // always true here (payee's notification)
+          const actionLoading = settlementActionLoading[notif.id];
 
           return (
             <div
-              key={ps.id}
-              className={`border rounded-xl p-4 mb-4 animate-scale-in ${
-                isPayee
-                  ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700'
-                  : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
-              }`}
+              key={notif.id}
+              className="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-4 animate-scale-in"
             >
               <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  isPayee
-                    ? 'bg-amber-100 dark:bg-amber-900/50'
-                    : 'bg-blue-100 dark:bg-blue-900/50'
-                }`}>
-                  {isPayee
-                    ? <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400" />
-                    : <Clock size={20} className="text-blue-600 dark:text-blue-400" />
-                  }
+                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400" />
                 </div>
                 <div className="flex-1">
-                  {isPayee ? (
-                    <>
-                      <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
-                        Payment Confirmation Required
-                      </p>
-                      <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">
-                        <strong>{ps.fromName}</strong> claims to have paid you{' '}
-                        <strong>{ps.currency} {ps.amount?.toFixed(2)}</strong> via{' '}
-                        <strong>{ps.method?.toUpperCase()}</strong>.
-                      </p>
-                      <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
-                        Confirm only if you actually received the money.
-                      </p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={async () => {
-                            setSettlementActionLoading(prev => ({ ...prev, [ps.id]: 'confirming' }));
-                            try {
-                              await confirmPaymentReceived(ps.id);
-                            } catch (err) {
-                              console.error('Error confirming:', err);
-                            } finally {
-                              setSettlementActionLoading(prev => ({ ...prev, [ps.id]: null }));
-                            }
-                          }}
-                          disabled={!!actionLoading}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-sm font-medium disabled:opacity-60"
-                        >
-                          {actionLoading === 'confirming' ? (
-                            <Clock size={14} className="animate-spin" />
-                          ) : (
-                            <CheckCircle2 size={14} />
-                          )}
-                          {actionLoading === 'confirming' ? 'Confirming...' : 'Confirm Received'}
-                        </button>
-                        <button
-                          onClick={async () => {
-                            setSettlementActionLoading(prev => ({ ...prev, [ps.id]: 'declining' }));
-                            try {
-                              await declinePaymentReceived(ps.id);
-                            } catch (err) {
-                              console.error('Error declining:', err);
-                            } finally {
-                              setSettlementActionLoading(prev => ({ ...prev, [ps.id]: null }));
-                            }
-                          }}
-                          disabled={!!actionLoading}
-                          className="flex items-center gap-1.5 px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm disabled:opacity-60"
-                        >
-                          {actionLoading === 'declining' ? (
-                            <Clock size={14} className="animate-spin" />
-                          ) : (
-                            <XCircle size={14} />
-                          )}
-                          {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p className="font-semibold text-blue-900 dark:text-blue-200 mb-1">
-                        Awaiting Payment Confirmation
-                      </p>
-                      <p className="text-sm text-blue-800 dark:text-blue-300">
-                        Your <strong>{ps.method?.toUpperCase()}</strong> payment of{' '}
-                        <strong>{ps.currency} {ps.amount?.toFixed(2)}</strong> to{' '}
-                        <strong>{ps.toName}</strong> is pending their confirmation. The balance will update once they confirm.
-                      </p>
-                    </>
-                  )}
+                  <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                    Payment Confirmation Required
+                  </p>
+                  <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">
+                    <strong>{pd.payerName}</strong> claims to have paid you{' '}
+                    <strong>{pd.currency} {Number(pd.amount).toFixed(2)}</strong> via{' '}
+                    <strong>{pd.method?.toUpperCase()}</strong>.
+                  </p>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
+                    Confirm only if you actually received the money. The balance updates only after your confirmation.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'confirming' }));
+                        try {
+                          await confirmPaymentReceived(notif.id);
+                        } catch (err) {
+                          console.error('Error confirming payment:', err);
+                        } finally {
+                          setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
+                        }
+                      }}
+                      disabled={!!actionLoading}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-sm font-medium disabled:opacity-60"
+                    >
+                      {actionLoading === 'confirming'
+                        ? <Clock size={14} className="animate-spin" />
+                        : <CheckCircle2 size={14} />}
+                      {actionLoading === 'confirming' ? 'Confirming...' : 'Confirm Received'}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'declining' }));
+                        try {
+                          await declinePaymentReceived(notif.id);
+                        } catch (err) {
+                          console.error('Error declining payment:', err);
+                        } finally {
+                          setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
+                        }
+                      }}
+                      disabled={!!actionLoading}
+                      className="flex items-center gap-1.5 px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm disabled:opacity-60"
+                    >
+                      {actionLoading === 'declining'
+                        ? <Clock size={14} className="animate-spin" />
+                        : <XCircle size={14} />}
+                      {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -980,9 +914,9 @@ export default function GroupDetails() {
           </div>
         )}   
         
-        {/* My Payment Activity - shown only to the payer; provides a persistent record of
-            all settlements they have initiated in this group, with status tracking */}
-        {myPaymentHistory.length > 0 && (
+        {/* My Payment Activity - payer's personal record of all payments sent in this group.
+            Sourced from payment_log notifications in the existing notifications collection. */}
+        {groupPaymentLog.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
             {/* Collapsible header */}
             <button
@@ -996,7 +930,7 @@ export default function GroupDetails() {
                   My Payment Activity
                 </h3>
                 <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full">
-                  {myPaymentHistory.length}
+                  {groupPaymentLog.length}
                 </span>
               </div>
               <ChevronDown
@@ -1010,7 +944,11 @@ export default function GroupDetails() {
 
             {showPaymentHistory && (
               <div className="space-y-3">
-                {myPaymentHistory.map((record) => {
+                {groupPaymentLog.map((record) => {
+                  // payment_log uses notification-level status field
+                  const status = record.status || 'pending_confirmation';
+                  const pd = record.data || {};
+
                   const statusConfig = {
                     pending_confirmation: {
                       label: 'Awaiting Confirmation',
@@ -1018,7 +956,7 @@ export default function GroupDetails() {
                       pill: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
                       border: 'border-amber-200 dark:border-amber-800',
                       bg: 'bg-amber-50 dark:bg-amber-900/10',
-                      hint: `Waiting for ${record.toName} to confirm receipt.`,
+                      hint: `Waiting for ${pd.payeeName} to confirm receipt.`,
                     },
                     confirmed: {
                       label: 'Confirmed',
@@ -1026,7 +964,7 @@ export default function GroupDetails() {
                       pill: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
                       border: 'border-green-200 dark:border-green-800',
                       bg: 'bg-green-50 dark:bg-green-900/10',
-                      hint: `${record.toName} confirmed receiving this payment.`,
+                      hint: `${pd.payeeName} confirmed receiving this payment. Balance updated.`,
                     },
                     declined: {
                       label: 'Not Confirmed',
@@ -1034,11 +972,11 @@ export default function GroupDetails() {
                       pill: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
                       border: 'border-red-200 dark:border-red-800',
                       bg: 'bg-red-50 dark:bg-red-900/10',
-                      hint: `${record.toName} could not confirm this payment. Please retry.`,
+                      hint: `${pd.payeeName} could not confirm this payment. Use Retry to try again.`,
                     },
                   };
 
-                  const cfg = statusConfig[record.status] || statusConfig.pending_confirmation;
+                  const cfg = statusConfig[status] || statusConfig.pending_confirmation;
                   const date = formatDate(record.createdAt);
 
                   return (
@@ -1046,19 +984,17 @@ export default function GroupDetails() {
                       key={record.id}
                       className={`flex items-start gap-4 p-4 rounded-xl border ${cfg.border} ${cfg.bg} transition-all duration-200`}
                     >
-                      {/* Payment method icon column */}
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-sm">
                         <DollarSign size={18} className="text-indigo-500 dark:text-indigo-400" />
                       </div>
 
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {record.currency} {record.amount?.toFixed(2)}
+                            {pd.currency} {Number(pd.amount).toFixed(2)}
                           </span>
                           <span className="text-xs text-gray-500 dark:text-gray-400">
-                            to {record.toName}
+                            to {pd.payeeName}
                           </span>
                           <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.pill}`}>
                             {cfg.icon}
@@ -1067,9 +1003,7 @@ export default function GroupDetails() {
                         </div>
 
                         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1 flex-wrap">
-                          <span className="uppercase font-medium tracking-wide">
-                            {record.method}
-                          </span>
+                          <span className="uppercase font-medium tracking-wide">{pd.method}</span>
                           <span>•</span>
                           <span>{date}</span>
                         </div>
@@ -1078,13 +1012,13 @@ export default function GroupDetails() {
                           {cfg.hint}
                         </p>
 
-                        {/* Retry nudge for declined payments */}
-                        {record.status === 'declined' && (
+                        {/* Retry button only appears when the payment was declined */}
+                        {status === 'declined' && (
                           <button
                             type="button"
                             onClick={() => {
                               const matching = settlements.find(
-                                s => s.from === user.uid && s.to === record.toUserId
+                                s => s.from === user.uid && s.to === pd.payeeId
                               );
                               if (matching) setSelectedSettlement(matching);
                             }}

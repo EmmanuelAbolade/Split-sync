@@ -1,46 +1,45 @@
 // src/stores/notificationsStore.js
 import { create } from 'zustand';
-import { collection, query, where, onSnapshot, doc, updateDoc, writeBatch, addDoc, serverTimestamp, getDoc } from 'firebase/firestore';
+import {
+  collection, query, where, onSnapshot,
+  doc, updateDoc, writeBatch, addDoc,
+  serverTimestamp, getDoc,
+} from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 export const useNotificationsStore = create((set, get) => ({
   notifications: [],
   unreadCount: 0,
   loading: false,
-  
-  // Subscribe to user's notifications
+
+  // Subscribe to all of this user's notifications in real time
   subscribeToNotifications: (userId) => {
     if (!userId) return () => {};
-    
     set({ loading: true });
-    
+
     const notificationsQuery = query(
       collection(db, 'notifications'),
       where('userId', '==', userId)
     );
-    
+
     const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
-      const notifs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      
-      // Sort by newest first
+      const notifs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
       notifs.sort((a, b) => {
-        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
-        return dateB - dateA;
+        const dA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const dB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return dB - dA;
       });
-      
-      const unreadCount = notifs.filter(n => !n.read).length;
-      
+
+      // payment_log entries are silent records - exclude from badge count
+      const unreadCount = notifs.filter(n => !n.read && n.type !== 'payment_log').length;
+
       set({ notifications: notifs, unreadCount, loading: false });
     });
-    
+
     return unsubscribe;
   },
-  
-  // Mark notification as read
+
   markAsRead: async (notificationId) => {
     try {
       await updateDoc(doc(db, 'notifications', notificationId), {
@@ -51,43 +50,30 @@ export const useNotificationsStore = create((set, get) => ({
       console.error('Error marking notification as read:', error);
     }
   },
-  
-  // Mark all as read
-  markAllAsRead: async (userId) => {
+
+  markAllAsRead: async () => {
     const { notifications } = get();
-    const unreadNotifs = notifications.filter(n => !n.read);
-    
-    if (unreadNotifs.length === 0) return;
-    
+    const unread = notifications.filter(n => !n.read && n.type !== 'payment_log');
+    if (unread.length === 0) return;
     try {
       const batch = writeBatch(db);
-      
-      unreadNotifs.forEach(notif => {
-        const notifRef = doc(db, 'notifications', notif.id);
-        batch.update(notifRef, {
+      unread.forEach(n => {
+        batch.update(doc(db, 'notifications', n.id), {
           read: true,
           readAt: serverTimestamp(),
         });
       });
-      
       await batch.commit();
     } catch (error) {
       console.error('Error marking all as read:', error);
     }
   },
-  
-  // Clear all notifications
-  clearAll: async (userId) => {
+
+  clearAll: async () => {
     const { notifications } = get();
-    
     try {
       const batch = writeBatch(db);
-      
-      notifications.forEach(notif => {
-        const notifRef = doc(db, 'notifications', notif.id);
-        batch.delete(notifRef);
-      });
-      
+      notifications.forEach(n => batch.delete(doc(db, 'notifications', n.id)));
       await batch.commit();
     } catch (error) {
       console.error('Error clearing notifications:', error);
@@ -95,81 +81,154 @@ export const useNotificationsStore = create((set, get) => ({
   },
 }));
 
-// Helper function to create notifications
-// requiresAction: if true, the notification shows confirm/decline buttons in the UI
-export const createNotification = async ({ userId, type, title, message, data, requiresAction = false }) => {
+// ---------------------------------------------------------------------------
+// Standalone helpers called from components
+// ---------------------------------------------------------------------------
+
+/**
+ * createNotification - generic helper for one-off notification writes.
+ */
+export const createNotification = async ({
+  userId, type, title, message, data, requiresAction = false,
+}) => {
   try {
     await addDoc(collection(db, 'notifications'), {
-      userId,
-      type,
-      title,
-      message,
-      data,
+      userId, type, title, message, data,
       requiresAction,
       read: false,
       createdAt: serverTimestamp(),
     });
   } catch (error) {
     console.error('Error creating notification:', error);
+    throw error;
   }
 };
 
-// Confirm a pending payment - payee confirms they received the money
-// Writes the expense (updates balance) and notifies the payer
-export const confirmPaymentReceived = async (pendingSettlementId) => {
+/**
+ * recordPaymentSent
+ * Called when the PAYER marks a payment as sent via an external link (PayPal / Revolut).
+ * Uses ONLY the existing notifications collection - no new Firestore collection needed.
+ *
+ * Creates two notification documents:
+ *   1. payee notification  - type: payment_confirmation_needed, requiresAction: true
+ *   2. payer log entry     - type: payment_log, auto-read, tracks status changes
+ *
+ * Both documents cross-reference each other via payeeNotifId / payerLogNotifId
+ * so that confirm / decline can update both in one operation.
+ */
+export const recordPaymentSent = async ({
+  payerId, payerName,
+  payeeId, payeeName,
+  groupId, groupName,
+  amount, currency, method,
+}) => {
   try {
-    const pendingRef = doc(db, 'pendingSettlements', pendingSettlementId);
-    const pendingDoc = await getDoc(pendingRef);
+    const amountFixed = Number(amount).toFixed(2);
 
-    if (!pendingDoc.exists()) {
-      throw new Error('Pending settlement record not found');
-    }
-
-    const payment = pendingDoc.data();
-
-    // Record as a confirmed expense - this updates the group balance
-    await addDoc(collection(db, 'expenses'), {
-      groupId: payment.groupId,
-      title: `Settlement: ${payment.fromName} to ${payment.toName}`,
-      amount: payment.amount,
-      currency: payment.currency,
-      paidBy: payment.fromUserId,
-      category: 'settlement',
-      description: `${payment.method.toUpperCase()} Payment - Confirmed by ${payment.toName}`,
-      date: new Date(),
-      splitMethod: 'exact',
-      splits: { [payment.toUserId]: payment.amount },
-      participants: [payment.fromUserId, payment.toUserId],
-      createdAt: serverTimestamp(),
-      isSettlement: true,
-      paymentMethod: payment.method,
-      confirmedAt: serverTimestamp(),
-      pendingSettlementId,
-    });
-
-    // Mark pending settlement as confirmed
-    await updateDoc(pendingRef, {
-      status: 'confirmed',
-      confirmedAt: serverTimestamp(),
-    });
-
-    // Notify payer that their payment was confirmed
-    await addDoc(collection(db, 'notifications'), {
-      userId: payment.fromUserId,
-      type: 'payment_confirmed',
-      title: 'Payment Confirmed',
-      message: `${payment.toName} confirmed receiving ${payment.currency} ${payment.amount.toFixed(2)} in ${payment.groupName}. Balance has been updated.`,
+    // 1 - Create the payee's actionable notification
+    const payeeNotifRef = await addDoc(collection(db, 'notifications'), {
+      userId: payeeId,
+      type: 'payment_confirmation_needed',
+      title: 'Payment Confirmation Needed',
+      message: `${payerName} claims to have paid you ${currency} ${amountFixed} via ${method.toUpperCase()} in ${groupName}. Did you receive it?`,
+      requiresAction: true,
+      actionStatus: 'pending',
       data: {
-        groupId: payment.groupId,
-        amount: payment.amount,
-        currency: payment.currency,
-        toUserId: payment.toUserId,
-        toName: payment.toName,
+        groupId, groupName,
+        payerId, payerName,
+        payeeId, payeeName,
+        amount: Number(amount),
+        currency, method,
+        // payerLogNotifId is backfilled in step 3
       },
-      requiresAction: false,
       read: false,
       createdAt: serverTimestamp(),
     });
+
+    // 2 - Create the payer's personal log entry
+    const payerLogRef = await addDoc(collection(db, 'notifications'), {
+      userId: payerId,
+      type: 'payment_log',
+      title: 'Payment Sent — Awaiting Confirmation',
+      message: `You paid ${currency} ${amountFixed} via ${method.toUpperCase()} to ${payeeName} in ${groupName}. Waiting for ${payeeName} to confirm.`,
+      requiresAction: false,
+      status: 'pending_confirmation',
+      data: {
+        groupId, groupName,
+        payerId, payerName,
+        payeeId, payeeName,
+        amount: Number(amount),
+        currency, method,
+        payeeNotifId: payeeNotifRef.id,
+      },
+      read: true, // Auto-read: payer initiated this, no badge increment
+      createdAt: serverTimestamp(),
+    });
+
+    // 3 - Backfill the payee notification with the payer log ID
+    await updateDoc(payeeNotifRef, {
+      'data.payerLogNotifId': payerLogRef.id,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error recording payment sent:', error);
+    throw error;
+  }
+};
+
+/**
+ * confirmPaymentReceived
+ * Called by the PAYEE via their notification action button.
+ * - Writes the expense (triggers balance recalculation)
+ * - Removes the action buttons from the payee notification
+ * - Updates the payer log so the payer sees the confirmed status
+ */
+export const confirmPaymentReceived = async (payeeNotifId) => {
+  try {
+    const payeeNotifRef = doc(db, 'notifications', payeeNotifId);
+    const payeeNotifDoc = await getDoc(payeeNotifRef);
+
+    if (!payeeNotifDoc.exists()) throw new Error('Payment notification not found');
+
+    const { data } = payeeNotifDoc.data();
+
+    // Write the expense - this is the only thing that updates the balance
+    await addDoc(collection(db, 'expenses'), {
+      groupId: data.groupId,
+      title: `Settlement: ${data.payerName} to ${data.payeeName}`,
+      amount: data.amount,
+      currency: data.currency,
+      paidBy: data.payerId,
+      category: 'settlement',
+      description: `${data.method.toUpperCase()} Payment — confirmed by ${data.payeeName}`,
+      date: new Date(),
+      splitMethod: 'exact',
+      splits: { [data.payeeId]: data.amount },
+      participants: [data.payerId, data.payeeId],
+      createdAt: serverTimestamp(),
+      isSettlement: true,
+      paymentMethod: data.method,
+      confirmedAt: serverTimestamp(),
+    });
+
+    // Remove action buttons from payee notification
+    await updateDoc(payeeNotifRef, {
+      requiresAction: false,
+      actionStatus: 'confirmed',
+      read: true,
+      readAt: serverTimestamp(),
+    });
+
+    // Update payer log so payer sees confirmed status (unread so they notice)
+    if (data.payerLogNotifId) {
+      await updateDoc(doc(db, 'notifications', data.payerLogNotifId), {
+        status: 'confirmed',
+        title: 'Payment Confirmed',
+        message: `${data.payeeName} confirmed receiving ${data.currency} ${Number(data.amount).toFixed(2)} in ${data.groupName}. Your balance has been updated.`,
+        read: false,
+      });
+    }
 
     return { success: true };
   } catch (error) {
@@ -178,42 +237,37 @@ export const confirmPaymentReceived = async (pendingSettlementId) => {
   }
 };
 
-// Decline a pending payment - payee indicates they did not receive the money
-// Notifies the payer to retry without touching the balance
-export const declinePaymentReceived = async (pendingSettlementId) => {
+/**
+ * declinePaymentReceived
+ * Called by the PAYEE when they did not receive the money.
+ * Balance is NOT updated. Payer log is updated so payer knows to retry.
+ */
+export const declinePaymentReceived = async (payeeNotifId) => {
   try {
-    const pendingRef = doc(db, 'pendingSettlements', pendingSettlementId);
-    const pendingDoc = await getDoc(pendingRef);
+    const payeeNotifRef = doc(db, 'notifications', payeeNotifId);
+    const payeeNotifDoc = await getDoc(payeeNotifRef);
 
-    if (!pendingDoc.exists()) {
-      throw new Error('Pending settlement record not found');
-    }
+    if (!payeeNotifDoc.exists()) throw new Error('Payment notification not found');
 
-    const payment = pendingDoc.data();
+    const { data } = payeeNotifDoc.data();
 
-    // Mark pending settlement as declined
-    await updateDoc(pendingRef, {
-      status: 'declined',
-      declinedAt: serverTimestamp(),
-    });
-
-    // Notify payer that their payment was not confirmed
-    await addDoc(collection(db, 'notifications'), {
-      userId: payment.fromUserId,
-      type: 'payment_declined',
-      title: 'Payment Not Confirmed',
-      message: `${payment.toName} could not confirm your ${payment.currency} ${payment.amount.toFixed(2)} ${payment.method.toUpperCase()} payment in ${payment.groupName}. Please check and retry.`,
-      data: {
-        groupId: payment.groupId,
-        amount: payment.amount,
-        currency: payment.currency,
-        toUserId: payment.toUserId,
-        toName: payment.toName,
-      },
+    // Remove action buttons from payee notification
+    await updateDoc(payeeNotifRef, {
       requiresAction: false,
-      read: false,
-      createdAt: serverTimestamp(),
+      actionStatus: 'declined',
+      read: true,
+      readAt: serverTimestamp(),
     });
+
+    // Update payer log — declined status, make unread so payer notices
+    if (data.payerLogNotifId) {
+      await updateDoc(doc(db, 'notifications', data.payerLogNotifId), {
+        status: 'declined',
+        title: 'Payment Not Confirmed',
+        message: `${data.payeeName} could not confirm your ${data.currency} ${Number(data.amount).toFixed(2)} ${data.method.toUpperCase()} payment in ${data.groupName}. Please check and retry.`,
+        read: false,
+      });
+    }
 
     return { success: true };
   } catch (error) {

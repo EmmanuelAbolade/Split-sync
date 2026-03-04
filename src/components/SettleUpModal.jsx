@@ -9,7 +9,7 @@ import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } f
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { authenticateWithBiometric } from '../utils/biometric';
-import { createNotification } from '../stores/notificationsStore';
+import { createNotification, recordPaymentSent } from '../stores/notificationsStore';
 import QRCodeCanvas from './QRCodeCanvas';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
@@ -176,8 +176,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
   // Handle "Mark as Paid" for pending payment
   // Handle "Mark as Paid" for pending payment.
-  // Writes a pendingSettlements document rather than an expense so the balance
-  // only updates once the payee explicitly confirms receipt.
+  // Uses recordPaymentSent which writes to the existing notifications collection only —
+  // no new Firestore collection, no additional security rules required.
   const handleMarkAsPaid = async () => {
     if (!pendingPayment) return;
 
@@ -185,52 +185,32 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setError('');
 
     try {
-      // Create a pending settlement record - NOT an expense yet
-      const pendingSettlementRef = await addDoc(collection(db, 'pendingSettlements'), {
+      await recordPaymentSent({
+        payerId: settlement.from,
+        payerName: fromMember?.name || 'Unknown',
+        payeeId: settlement.to,
+        payeeName: toMember?.name || 'Unknown',
         groupId: group.id,
-        fromUserId: settlement.from,
-        toUserId: settlement.to,
-        fromName: fromMember?.name || 'Unknown',
-        toName: toMember?.name || 'Unknown',
         groupName: group.name,
         amount: pendingPayment.amount,
         currency: pendingPayment.currency,
         method: pendingPayment.method,
-        status: 'pending_confirmation',
-        createdAt: serverTimestamp(),
       });
 
-      // Send notification to payee with requiresAction so they see confirm/decline buttons
-      await createNotification({
-        userId: settlement.to,
-        type: 'payment_confirmation_needed',
-        title: 'Payment Confirmation Needed',
-        message: `${fromMember?.name} claims to have paid you ${pendingPayment.currency} ${pendingPayment.amount.toFixed(2)} via ${pendingPayment.method.toUpperCase()} in ${group.name}. Did you receive it?`,
-        requiresAction: true,
-        data: {
-          groupId: group.id,
-          pendingSettlementId: pendingSettlementRef.id,
-          amount: pendingPayment.amount,
-          currency: pendingPayment.currency,
-          fromUserId: settlement.from,
-          fromName: fromMember?.name,
-          method: pendingPayment.method,
-        },
-      });
-
-      // Clear sessionStorage
       sessionStorage.removeItem('pendingPayment');
       setPendingPayment(null);
       setShowPendingConfirmation(false);
       setPaymentSuccess(true);
 
-      setTimeout(() => {
-        onClose();
-      }, 2500);
-
+      setTimeout(() => { onClose(); }, 2500);
     } catch (err) {
       console.error('Error marking as paid:', err);
-      setError('Failed to record payment. Please try again.');
+      // Show the actual error message so it is debuggable
+      setError(
+        err?.code === 'permission-denied'
+          ? 'Permission denied. Please ensure you are signed in and try again.'
+          : `Failed to record payment: ${err?.message || 'Please try again.'}`
+      );
     } finally {
       setLoading(false);
     }

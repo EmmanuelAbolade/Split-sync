@@ -35,15 +35,12 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
     onClose();
   };
 
-  // Payee confirms they received the payment
+  // Payee confirms they received the payment.
+  // The notification's own ID is the payeeNotifId confirmPaymentReceived expects.
   const handleConfirmPayment = async (notification) => {
-    const { pendingSettlementId } = notification.data || {};
-    if (!pendingSettlementId) return;
-
     setActionLoading(prev => ({ ...prev, [notification.id]: 'confirming' }));
     try {
-      await confirmPaymentReceived(pendingSettlementId);
-      await markAsRead(notification.id);
+      await confirmPaymentReceived(notification.id);
     } catch (err) {
       console.error('Error confirming payment:', err);
     } finally {
@@ -51,15 +48,11 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
     }
   };
 
-  // Payee declines the payment claim
+  // Payee declines — balance unchanged, payer is notified to retry.
   const handleDeclinePayment = async (notification) => {
-    const { pendingSettlementId } = notification.data || {};
-    if (!pendingSettlementId) return;
-
     setActionLoading(prev => ({ ...prev, [notification.id]: 'declining' }));
     try {
-      await declinePaymentReceived(pendingSettlementId);
-      await markAsRead(notification.id);
+      await declinePaymentReceived(notification.id);
     } catch (err) {
       console.error('Error declining payment:', err);
     } finally {
@@ -120,7 +113,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
           <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
             {unreadCount > 0 && (
               <button
-                onClick={() => markAllAsRead(user)}
+                onClick={() => markAllAsRead()}
                 className="text-xs text-primary dark:text-indigo-400 hover:underline flex items-center gap-1"
               >
                 <Check size={14} />
@@ -130,7 +123,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
             <button
               onClick={() => {
                 if (window.confirm('Clear all notifications?')) {
-                  clearAll(user);
+                  clearAll();
                 }
               }}
               className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1 ml-auto"
