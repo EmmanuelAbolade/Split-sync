@@ -23,10 +23,10 @@
       "background_color": "#6366f1"
     },
     {
-      "src": "logo512.png",
+      "src": "logo.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "sizes": "512x512"
+      
     },
 
     {
@@ -35,7 +35,7 @@
       "sizes": "192x192",
       "purpose": "any maskable"
     },
-    { "src": "logo512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "logo.png", "type": "image/png", "sizes": "512x512" },
     { "src": "/icons/icon-72x72.png", "sizes": "72x72", "type": "image/png" },
     { "src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" },
     { "src": "/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png" },

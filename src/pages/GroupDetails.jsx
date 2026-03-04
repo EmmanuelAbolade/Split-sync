@@ -4,11 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
+import { confirmPaymentReceived, declinePaymentReceived } from '../stores/notificationsStore';
 import { 
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, XCircle
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -63,6 +64,12 @@ export default function GroupDetails() {
   const [memberPaymentMethods, setMemberPaymentMethods] = useState({});
   const [pendingPaymentBanner, setPendingPaymentBanner] = useState(null);
   const [pendingInvitations, setPendingInvitations] = useState([]);
+  // Pending settlements waiting for payee confirmation (from Firestore)
+  const [pendingSettlements, setPendingSettlements] = useState([]);
+  const [settlementActionLoading, setSettlementActionLoading] = useState({});
+  // Full payment history for the current user as payer (all statuses)
+  const [myPaymentHistory, setMyPaymentHistory] = useState([]);
+  const [showPaymentHistory, setShowPaymentHistory] = useState(true);
 
   // Get display title with current names for settlements
   const getDisplayTitle = (expense) => {
@@ -75,6 +82,13 @@ export default function GroupDetails() {
     const toMember = group.members?.find(m => m.userId === toUserId);
     
     return `Settlement: ${fromMember?.name || 'Unknown'} → ${toMember?.name || 'Unknown'}`;
+  };
+
+  // Format a timestamp into a short date string
+  const formatDate = (ts) => {
+    if (!ts) return '—';
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
   // Helper to format time ago
@@ -193,7 +207,57 @@ export default function GroupDetails() {
     return () => unsubscribe();
   }, [groupId]);
 
-  // Detect pending payment when user returns from external payment
+  // Subscribe to pending settlements for this group where the current user is involved
+  // Used to show confirm/decline banners to the payee, and awaiting banners to the payer
+  useEffect(() => {
+    if (!groupId || !user?.uid) return;
+
+    const q = query(
+      collection(db, 'pendingSettlements'),
+      where('groupId', '==', groupId),
+      where('status', '==', 'pending_confirmation')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Filter client-side to only those involving the current user
+      const involved = records.filter(
+        r => r.fromUserId === user.uid || r.toUserId === user.uid
+      );
+      setPendingSettlements(involved);
+    }, (err) => {
+      console.error('Error listening to pendingSettlements:', err);
+    });
+
+    return () => unsubscribe();
+  }, [groupId, user?.uid]);
+
+  // Subscribe to all settlement records for this user as PAYER across all statuses.
+  // This is the source of truth for "My Payment Activity" — the payer's personal log.
+  useEffect(() => {
+    if (!groupId || !user?.uid) return;
+
+    const q = query(
+      collection(db, 'pendingSettlements'),
+      where('groupId', '==', groupId),
+      where('fromUserId', '==', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Sort newest first
+      records.sort((a, b) => {
+        const tA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const tB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return tB - tA;
+      });
+      setMyPaymentHistory(records);
+    }, (err) => {
+      console.error('Error listening to payment history:', err);
+    });
+
+    return () => unsubscribe();
+  }, [groupId, user?.uid]);
   useEffect(() => {
     // Safety checks - don't run if data isn't ready
     if (!groupId) return;
@@ -373,18 +437,25 @@ export default function GroupDetails() {
                       </p>
                     )}
                     {userBalance.status === 'settled' && (
-                      <p className="text-lg font-semibold text-green-600 dark:text-green-400 mt-1">
-                        ✓ All settled up!
+                      <p className="text-lg font-semibold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                        <CheckCircle2 size={18} />
+                        All settled up!
                       </p>
                     )}
                   </div>
-                  <div className={`text-4xl ${
-                    userBalance.status === 'settled' ? '✓' :
-                    userBalance.status === 'owed' ? '💰' :
-                    '⚠️'
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                    userBalance.status === 'settled'
+                      ? 'bg-green-100 dark:bg-green-900/30'
+                      : userBalance.status === 'owed'
+                        ? 'bg-blue-100 dark:bg-blue-900/30'
+                        : 'bg-orange-100 dark:bg-orange-900/30'
                   }`}>
-                    {userBalance.status === 'settled' ? '✅' :
-                     userBalance.status === 'owed' ? '💰' : '⚠️'}
+                    {userBalance.status === 'settled'
+                      ? <CheckCircle2 size={22} className="text-green-600 dark:text-green-400" />
+                      : userBalance.status === 'owed'
+                        ? <DollarSign size={22} className="text-blue-600 dark:text-blue-400" />
+                        : <AlertTriangle size={22} className="text-orange-600 dark:text-orange-400" />
+                    }
                   </div>
                 </div>
               </div>
@@ -392,7 +463,7 @@ export default function GroupDetails() {
           )}
         </div>
 
-        {/* Pending Payment Banner */}
+        {/* Pending Payment Banner - sessionStorage-based (shown while user is in the same session) */}
         {pendingPaymentBanner && (
           <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-6 animate-scale-in">
             <div className="flex items-start gap-3">
@@ -411,7 +482,6 @@ export default function GroupDetails() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
-                      // Find and open the matching settlement modal
                       const matchingSettlement = settlements.find(
                         s => s.from === pendingPaymentBanner.fromUserId && 
                             s.to === pendingPaymentBanner.toUserId
@@ -438,6 +508,109 @@ export default function GroupDetails() {
             </div>
           </div>
         )}
+
+        {/* Pending Settlements Banners - Firestore-backed, persisted across sessions */}
+        {pendingSettlements.map((ps) => {
+          const isPayee = ps.toUserId === user.uid;
+          const isPayer = ps.fromUserId === user.uid;
+          const actionLoading = settlementActionLoading[ps.id];
+
+          return (
+            <div
+              key={ps.id}
+              className={`border rounded-xl p-4 mb-4 animate-scale-in ${
+                isPayee
+                  ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700'
+                  : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  isPayee
+                    ? 'bg-amber-100 dark:bg-amber-900/50'
+                    : 'bg-blue-100 dark:bg-blue-900/50'
+                }`}>
+                  {isPayee
+                    ? <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400" />
+                    : <Clock size={20} className="text-blue-600 dark:text-blue-400" />
+                  }
+                </div>
+                <div className="flex-1">
+                  {isPayee ? (
+                    <>
+                      <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                        Payment Confirmation Required
+                      </p>
+                      <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">
+                        <strong>{ps.fromName}</strong> claims to have paid you{' '}
+                        <strong>{ps.currency} {ps.amount?.toFixed(2)}</strong> via{' '}
+                        <strong>{ps.method?.toUpperCase()}</strong>.
+                      </p>
+                      <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
+                        Confirm only if you actually received the money.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            setSettlementActionLoading(prev => ({ ...prev, [ps.id]: 'confirming' }));
+                            try {
+                              await confirmPaymentReceived(ps.id);
+                            } catch (err) {
+                              console.error('Error confirming:', err);
+                            } finally {
+                              setSettlementActionLoading(prev => ({ ...prev, [ps.id]: null }));
+                            }
+                          }}
+                          disabled={!!actionLoading}
+                          className="flex items-center gap-1.5 px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-sm font-medium disabled:opacity-60"
+                        >
+                          {actionLoading === 'confirming' ? (
+                            <Clock size={14} className="animate-spin" />
+                          ) : (
+                            <CheckCircle2 size={14} />
+                          )}
+                          {actionLoading === 'confirming' ? 'Confirming...' : 'Confirm Received'}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setSettlementActionLoading(prev => ({ ...prev, [ps.id]: 'declining' }));
+                            try {
+                              await declinePaymentReceived(ps.id);
+                            } catch (err) {
+                              console.error('Error declining:', err);
+                            } finally {
+                              setSettlementActionLoading(prev => ({ ...prev, [ps.id]: null }));
+                            }
+                          }}
+                          disabled={!!actionLoading}
+                          className="flex items-center gap-1.5 px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm disabled:opacity-60"
+                        >
+                          {actionLoading === 'declining' ? (
+                            <Clock size={14} className="animate-spin" />
+                          ) : (
+                            <XCircle size={14} />
+                          )}
+                          {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-semibold text-blue-900 dark:text-blue-200 mb-1">
+                        Awaiting Payment Confirmation
+                      </p>
+                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                        Your <strong>{ps.method?.toUpperCase()}</strong> payment of{' '}
+                        <strong>{ps.currency} {ps.amount?.toFixed(2)}</strong> to{' '}
+                        <strong>{ps.toName}</strong> is pending their confirmation. The balance will update once they confirm.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
 
         {/* Pending Invitations Section */}
         {pendingInvitations.length > 0 && (
@@ -486,7 +659,7 @@ export default function GroupDetails() {
                               group.id,
                               group.name
                             );
-                            alert('✅ Invitation resent!');
+                            alert('Invitation resent!');
                           }
                         }}
                         className="px-3 py-1.5 text-sm border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 rounded hover:bg-orange-100 dark:hover:bg-orange-900/40 transition"
@@ -501,7 +674,7 @@ export default function GroupDetails() {
                               setPendingInvitations(prev => 
                                 prev.filter(inv => inv.id !== invitation.id)
                               );
-                              alert('✅ Invitation cancelled');
+                              alert('Invitation cancelled');
                             }
                           }
                         }}
@@ -726,8 +899,9 @@ export default function GroupDetails() {
             </div>
             
             {settlements.length === 0 && (
-              <div className="text-center py-6">
-                <p className="text-green-600 dark:text-green-400 font-semibold">✓ Everyone is settled up!</p>
+              <div className="text-center py-6 flex items-center justify-center gap-2">
+                <CheckCircle2 size={18} className="text-green-600 dark:text-green-400" />
+                <p className="text-green-600 dark:text-green-400 font-semibold">Everyone is settled up!</p>
               </div>
             )}
           </div>
@@ -806,6 +980,129 @@ export default function GroupDetails() {
           </div>
         )}   
         
+        {/* My Payment Activity - shown only to the payer; provides a persistent record of
+            all settlements they have initiated in this group, with status tracking */}
+        {myPaymentHistory.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
+            {/* Collapsible header */}
+            <button
+              type="button"
+              onClick={() => setShowPaymentHistory(prev => !prev)}
+              className="w-full flex items-center justify-between mb-1"
+            >
+              <div className="flex items-center gap-2">
+                <DollarSign size={20} className="text-indigo-500 dark:text-indigo-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  My Payment Activity
+                </h3>
+                <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full">
+                  {myPaymentHistory.length}
+                </span>
+              </div>
+              <ChevronDown
+                size={18}
+                className={`text-gray-400 dark:text-gray-500 transition-transform duration-300 ${showPaymentHistory ? 'rotate-180' : ''}`}
+              />
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 text-left">
+              Payments you have initiated — awaiting confirmation, confirmed, or declined.
+            </p>
+
+            {showPaymentHistory && (
+              <div className="space-y-3">
+                {myPaymentHistory.map((record) => {
+                  const statusConfig = {
+                    pending_confirmation: {
+                      label: 'Awaiting Confirmation',
+                      icon: <Clock size={14} className="text-amber-600 dark:text-amber-400" />,
+                      pill: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+                      border: 'border-amber-200 dark:border-amber-800',
+                      bg: 'bg-amber-50 dark:bg-amber-900/10',
+                      hint: `Waiting for ${record.toName} to confirm receipt.`,
+                    },
+                    confirmed: {
+                      label: 'Confirmed',
+                      icon: <CheckCircle2 size={14} className="text-green-600 dark:text-green-400" />,
+                      pill: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
+                      border: 'border-green-200 dark:border-green-800',
+                      bg: 'bg-green-50 dark:bg-green-900/10',
+                      hint: `${record.toName} confirmed receiving this payment.`,
+                    },
+                    declined: {
+                      label: 'Not Confirmed',
+                      icon: <XCircle size={14} className="text-red-600 dark:text-red-400" />,
+                      pill: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
+                      border: 'border-red-200 dark:border-red-800',
+                      bg: 'bg-red-50 dark:bg-red-900/10',
+                      hint: `${record.toName} could not confirm this payment. Please retry.`,
+                    },
+                  };
+
+                  const cfg = statusConfig[record.status] || statusConfig.pending_confirmation;
+                  const date = formatDate(record.createdAt);
+
+                  return (
+                    <div
+                      key={record.id}
+                      className={`flex items-start gap-4 p-4 rounded-xl border ${cfg.border} ${cfg.bg} transition-all duration-200`}
+                    >
+                      {/* Payment method icon column */}
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-sm">
+                        <DollarSign size={18} className="text-indigo-500 dark:text-indigo-400" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {record.currency} {record.amount?.toFixed(2)}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            to {record.toName}
+                          </span>
+                          <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.pill}`}>
+                            {cfg.icon}
+                            {cfg.label}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1 flex-wrap">
+                          <span className="uppercase font-medium tracking-wide">
+                            {record.method}
+                          </span>
+                          <span>•</span>
+                          <span>{date}</span>
+                        </div>
+
+                        <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                          {cfg.hint}
+                        </p>
+
+                        {/* Retry nudge for declined payments */}
+                        {record.status === 'declined' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const matching = settlements.find(
+                                s => s.from === user.uid && s.to === record.toUserId
+                              );
+                              if (matching) setSelectedSettlement(matching);
+                            }}
+                            className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 dark:bg-indigo-700 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition"
+                          >
+                            <DollarSign size={12} />
+                            Retry Payment
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Expenses Section */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/50 p-6">
           {/* Modified Header - Collapsible */}

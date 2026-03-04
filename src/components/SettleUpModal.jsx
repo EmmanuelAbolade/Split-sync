@@ -39,36 +39,46 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
 
-  // Check for pending payment on mount
+  // Merge reset + pending-check into a single effect so the reset never
+  // overrides the pending-check result (previous bug: two separate effects
+  // on [isOpen] ran in definition order, reset was second and cleared
+  // showPendingConfirmation that the check had just set to true).
   useEffect(() => {
     if (!isOpen) return;
-    
-    const checkPendingPayment = () => {
-      try {
-        const pending = sessionStorage.getItem('pendingPayment');
-        if (pending) {
-          const paymentData = JSON.parse(pending);
-          
-          // Verify this pending payment matches current settlement
-          if (
-            paymentData.groupId === group?.id &&
-            paymentData.fromUserId === settlement?.from &&
-            paymentData.toUserId === settlement?.to
-          ) {
-            setPendingPayment(paymentData);
-            setShowPendingConfirmation(true);
-          } else {
-            // Different settlement, clear old pending payment
-            sessionStorage.removeItem('pendingPayment');
-          }
-        }
-      } catch (err) {
-        console.error('Error checking pending payment:', err);
-        sessionStorage.removeItem('pendingPayment');
-      }
-    };
 
-    checkPendingPayment();
+    // Step 1: Reset all transient UI state
+    setPaymentSuccess(false);
+    setError('');
+    setLoading(false);
+    setShowConfirmation(false);
+    setCopiedIban(false);
+    setAmount(settlement?.amount?.toFixed(2) || '');
+
+    // Step 2: Check sessionStorage for a pending payment AFTER the reset,
+    // so the check result is the final value of showPendingConfirmation.
+    try {
+      const pending = sessionStorage.getItem('pendingPayment');
+      if (pending) {
+        const paymentData = JSON.parse(pending);
+        if (
+          paymentData.groupId === group?.id &&
+          paymentData.fromUserId === settlement?.from &&
+          paymentData.toUserId === settlement?.to
+        ) {
+          setPendingPayment(paymentData);
+          setShowPendingConfirmation(true);
+        } else {
+          sessionStorage.removeItem('pendingPayment');
+          setShowPendingConfirmation(false);
+        }
+      } else {
+        setShowPendingConfirmation(false);
+      }
+    } catch (err) {
+      console.error('Error checking pending payment:', err);
+      sessionStorage.removeItem('pendingPayment');
+      setShowPendingConfirmation(false);
+    }
   }, [isOpen, group?.id, settlement?.from, settlement?.to]);
 
   // Fetch recipient's payment methods
@@ -94,20 +104,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       fetchRecipientPaymentMethods();
     }
   }, [settlement, isOpen]);
-
-  // Reset all transient state each time the modal opens
-  // Prevents stale paymentSuccess from a previous transaction showing immediately
-  useEffect(() => {
-    if (isOpen) {
-      setPaymentSuccess(false);
-      setError('');
-      setLoading(false);
-      setShowConfirmation(false);
-      setShowPendingConfirmation(false);
-      setCopiedIban(false);
-      setAmount(settlement?.amount?.toFixed(2) || '');
-    }
-  }, [isOpen]);
 
   const recordSettlement = async (paypalOrderId = null) => {
     const amountNum = parseFloat(amount);
@@ -140,11 +136,11 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
       // Notify the OTHER person (not the one who recorded it)
       if (userIsReceiving) {
-        // Receiver marked as received → Notify the PAYER
+        // Receiver marked as received - notify the payer
         await createNotification({
-          userId: settlement.from, // Notify the payer
+          userId: settlement.from,
           type: 'payment',
-          title: '✅ Payment Confirmed',
+          title: 'Payment Confirmed',
           message: `${toMember?.name} confirmed receiving ${group.currency} ${amountNum.toFixed(2)} from you in ${group.name}`,
           data: {
             groupId: group.id,
@@ -155,11 +151,11 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           },
         });
       } else {
-        // Payer marked as sent → Notify the RECEIVER
+        // Payer marked as sent - notify the receiver
         await createNotification({
-          userId: settlement.to, // Notify the receiver
+          userId: settlement.to,
           type: 'payment',
-          title: '💰 Payment Received',
+          title: 'Payment Received',
           message: `${fromMember?.name} paid you ${group.currency} ${amountNum.toFixed(2)} in ${group.name}`,
           data: {
             groupId: group.id,
@@ -179,6 +175,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   };
 
   // Handle "Mark as Paid" for pending payment
+  // Handle "Mark as Paid" for pending payment.
+  // Writes a pendingSettlements document rather than an expense so the balance
+  // only updates once the payee explicitly confirms receipt.
   const handleMarkAsPaid = async () => {
     if (!pendingPayment) return;
 
@@ -186,60 +185,51 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setError('');
 
     try {
-      // Record settlement in Firestore
-      const settlementData = {
+      // Create a pending settlement record - NOT an expense yet
+      const pendingSettlementRef = await addDoc(collection(db, 'pendingSettlements'), {
         groupId: group.id,
-        title: `Settlement: ${fromMember?.name} → ${toMember?.name}`,
+        fromUserId: settlement.from,
+        toUserId: settlement.to,
+        fromName: fromMember?.name || 'Unknown',
+        toName: toMember?.name || 'Unknown',
+        groupName: group.name,
         amount: pendingPayment.amount,
         currency: pendingPayment.currency,
-        paidBy: settlement.from,
-        category: 'settlement',
-        description: `${pendingPayment.method.toUpperCase()} Payment - Confirmed by payer`,
-        date: new Date(),
-        splitMethod: 'exact',
-        splits: {
-          [settlement.to]: pendingPayment.amount,
-        },
-        participants: [settlement.from, settlement.to],
+        method: pendingPayment.method,
+        status: 'pending_confirmation',
         createdAt: serverTimestamp(),
-        isSettlement: true,
-        paymentMethod: pendingPayment.method,
-        paymentTimestamp: pendingPayment.timestamp,
-        recordedBy: currentUserId,
-        confirmedAt: serverTimestamp(),
-      };
+      });
 
-      await addDoc(collection(db, 'expenses'), settlementData);
-
-      // Create notification for recipient
+      // Send notification to payee with requiresAction so they see confirm/decline buttons
       await createNotification({
         userId: settlement.to,
-        type: 'payment',
-        title: '💰 Payment Received',
-        message: `${pendingPayment.fromName} paid you ${pendingPayment.currency} ${pendingPayment.amount.toFixed(2)} in ${group.name}`,
+        type: 'payment_confirmation_needed',
+        title: 'Payment Confirmation Needed',
+        message: `${fromMember?.name} claims to have paid you ${pendingPayment.currency} ${pendingPayment.amount.toFixed(2)} via ${pendingPayment.method.toUpperCase()} in ${group.name}. Did you receive it?`,
+        requiresAction: true,
         data: {
           groupId: group.id,
+          pendingSettlementId: pendingSettlementRef.id,
           amount: pendingPayment.amount,
           currency: pendingPayment.currency,
           fromUserId: settlement.from,
-          fromName: pendingPayment.fromName,
+          fromName: fromMember?.name,
+          method: pendingPayment.method,
         },
       });
 
       // Clear sessionStorage
       sessionStorage.removeItem('pendingPayment');
-      
-      // Show success
       setPendingPayment(null);
       setShowPendingConfirmation(false);
       setPaymentSuccess(true);
-      
+
       setTimeout(() => {
         onClose();
-      }, 2000);
+      }, 2500);
 
     } catch (err) {
-      console.error('❌ Error marking as paid:', err);
+      console.error('Error marking as paid:', err);
       setError('Failed to record payment. Please try again.');
     } finally {
       setLoading(false);
@@ -570,10 +560,12 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             <CheckCircle2 className="mx-auto text-green-500 dark:text-green-400" size={64} />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {userIsPaying ? 'Payment Sent!' : 'Payment Received!'}
+            {userIsPaying ? 'Payment Sent!' : 'Payment Recorded!'}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            {group?.currency} {amount} has been settled
+            {userIsPaying
+              ? `${toMember?.name} has been notified and will confirm receipt.`
+              : `${group?.currency} ${amount} has been settled.`}
           </p>
           <button
             onClick={onClose}
