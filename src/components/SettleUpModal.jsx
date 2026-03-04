@@ -701,7 +701,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           /* User is paying - show payment options */
           <div className="mb-6">
             {/* Quick Payment Links Section — hidden when Paid Offline is selected */}
-            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
+            {!loadingPaymentMethods && (getAvailablePaymentMethods(recipientPaymentMethods) || []).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
               <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="relative group">
@@ -835,7 +835,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             )}
 
             {/* Divider — hidden when Paid Offline is selected */}
-            {!loadingPaymentMethods && getAvailablePaymentMethods(recipientPaymentMethods).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
+{!loadingPaymentMethods && (getAvailablePaymentMethods(recipientPaymentMethods) || []).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
