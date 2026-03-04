@@ -165,10 +165,17 @@ export const recordPaymentSent = async ({
       createdAt: serverTimestamp(),
     });
 
-    // 3 - Backfill the payee notification with the payer log ID
-    await updateDoc(payeeNotifRef, {
-      'data.payerLogNotifId': payerLogRef.id,
-    });
+    // 3 - Backfill the payee notification with the payer log ID.
+    // This is a best-effort step — if it fails (e.g. rules not yet deployed),
+    // the confirm/decline flow still works; the payer log just won't update on
+    // payee action. Wrapped separately so it never cancels steps 1 and 2.
+    try {
+      await updateDoc(payeeNotifRef, {
+        'data.payerLogNotifId': payerLogRef.id,
+      });
+    } catch (backfillErr) {
+      console.warn('Could not backfill payerLogNotifId (non-critical):', backfillErr?.code);
+    }
 
     return { success: true };
   } catch (error) {
