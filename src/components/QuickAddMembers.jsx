@@ -35,7 +35,7 @@ export default function QuickAddMembers({ currentUser, onAddMembers, excludeUser
     } finally {
       setLoading(false);
     }
-  }, [currentUser, excludeUserIds]);
+  }, [currentUser]);
 
   const toggleUserSelection = (userId) => {
     if (selectedUsers.includes(userId)) {

@@ -19,16 +19,45 @@ const mockDoc        = jest.fn();
 const mockCollection = jest.fn();
 const mockQuery      = jest.fn();
 const mockWhere      = jest.fn();
+const mockUpdateDoc  = jest.fn(() => Promise.resolve());
+const mockDeleteDoc  = jest.fn(() => Promise.resolve());
+const mockGetDocs    = jest.fn(() => Promise.resolve({ docs: [], forEach: () => {} }));
+const mockWriteBatch = jest.fn(() => ({
+  delete: jest.fn(),
+  commit: jest.fn(() => Promise.resolve()),
+}));
+const mockArrayRemove = jest.fn((val) => val);
+
 jest.mock('firebase/firestore', () => ({
-  doc:        (...a) => mockDoc(...a),
-  getDoc:     (...a) => mockGetDoc(...a),
-  collection: (...a) => mockCollection(...a),
-  query:      (...a) => mockQuery(...a),
-  where:      (...a) => mockWhere(...a),
-  onSnapshot: (...a) => mockOnSnapshot(...a),
+  doc:         (...a) => mockDoc(...a),
+  getDoc:      (...a) => mockGetDoc(...a),
+  collection:  (...a) => mockCollection(...a),
+  query:       (...a) => mockQuery(...a),
+  where:       (...a) => mockWhere(...a),
+  onSnapshot:  (...a) => mockOnSnapshot(...a),
+  updateDoc:   (...a) => mockUpdateDoc(...a),
+  deleteDoc:   (...a) => mockDeleteDoc(...a),
+  getDocs:     (...a) => mockGetDocs(...a),
+  writeBatch:  (...a) => mockWriteBatch(...a),
+  arrayRemove: (...a) => mockArrayRemove(...a),
 }));
 
 jest.mock('../services/firebase', () => ({ db: {} }));
+
+// Mock invitationSystem — prevents getDocs calls leaking into firestore mock
+jest.mock('../utils/invitationSystem', () => ({
+  getMySentInvitations: jest.fn(() => Promise.resolve([])),
+  cancelInvitation:     jest.fn(() => Promise.resolve()),
+  sendInvitation:       jest.fn(() => Promise.resolve()),
+}));
+
+// Mock notificationsStore — prevents Firestore calls and provides stable state
+jest.mock('../stores/notificationsStore', () => ({
+  useNotificationsStore:    jest.fn(() => ({ notifications: [] })),
+  confirmPaymentReceived:   jest.fn(() => Promise.resolve()),
+  declinePaymentReceived:   jest.fn(() => Promise.resolve()),
+  createNotification:       jest.fn(() => Promise.resolve()),
+}));
 
 // Stable user reference — prevents infinite useEffect loop
 jest.mock('../stores/authStore', () => {
@@ -120,6 +149,19 @@ const resetBalanceMocks = () => {
   calculateBalances.mockReturnValue({ 'user-123': 30, 'user-456': -30 });
   calculateSettlements.mockReturnValue([{ from: 'user-456', to: 'user-123', amount: 30 }]);
   getUserBalanceSummary.mockReturnValue({ status: 'owed', amount: 30, message: 'You are owed' });
+
+  // Restore mocks that jest.clearAllMocks() wipes on every beforeEach
+  const { useNotificationsStore } = require('../stores/notificationsStore');
+  useNotificationsStore.mockReturnValue({ notifications: [] });
+
+  const { getMySentInvitations } = require('../utils/invitationSystem');
+  getMySentInvitations.mockResolvedValue([]);
+
+  mockGetDocs.mockResolvedValue({ docs: [], forEach: () => {} });
+  mockWriteBatch.mockReturnValue({
+    delete: jest.fn(),
+    commit: jest.fn(() => Promise.resolve()),
+  });
 };
 
 // getDoc: first call = group doc, subsequent calls = empty user docs (photos/payments)
@@ -159,6 +201,7 @@ describe('GroupDetails - Loading state', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    resetBalanceMocks();
     // Slow fetch — never resolves
     mockGetDoc.mockReturnValue(new Promise(() => {}));
     mockOnSnapshot.mockImplementation(() => jest.fn());
@@ -176,6 +219,7 @@ describe('GroupDetails - Group not found', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    resetBalanceMocks();
     setupGroupNotFound();
   });
 

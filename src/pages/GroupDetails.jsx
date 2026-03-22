@@ -1,15 +1,15 @@
 // src/pages/GroupDetails.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived } from '../stores/notificationsStore';
+import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived, createNotification } from '../stores/notificationsStore';
 import { 
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, XCircle
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, XCircle, LogOut, Trash2, MoreVertical
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -66,6 +66,16 @@ export default function GroupDetails() {
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [settlementActionLoading, setSettlementActionLoading] = useState({});
   const [showPaymentHistory, setShowPaymentHistory] = useState(true);
+  const [showGroupOptions, setShowGroupOptions] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
+  const [showConfirmLeave, setShowConfirmLeave] = useState(false);
+  const [leaveBlockReason, setLeaveBlockReason] = useState(null); // null | { amount, currency, direction }
+  const [groupActionLoading, setGroupActionLoading] = useState(false);
+  const [groupActionError, setGroupActionError] = useState('');
+
+  // Delete group
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deleteBlockReason, setDeleteBlockReason] = useState(null); // null | [{ name, amount, currency }]
 
   // Derive pending settlement data from the global notifications store.
   // This avoids a separate Firestore query and requires no new collection.
@@ -119,6 +129,7 @@ export default function GroupDetails() {
     return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
   };
 
+  // Fetch group details on mount
   useEffect(() => {
     const fetchGroup = async () => {
       try {
@@ -189,7 +200,7 @@ export default function GroupDetails() {
     fetchPaymentMethods();
   }, [group?.members]);
 
-  // Fetch expenses in real-time
+  // Fetch expenses in real-time (onSnapshot) and sort by date descending
   useEffect(() => {
     if (!groupId) return;
 
@@ -221,6 +232,8 @@ export default function GroupDetails() {
     return () => unsubscribe();
   }, [groupId]);
 
+
+  // Check for pending payment confirmations when the user returns to the tab (after PayPal flow)
   useEffect(() => {
     // Safety checks - don't run if data isn't ready
     if (!groupId) return;
@@ -287,7 +300,7 @@ export default function GroupDetails() {
     };
   }, [groupId, group, expenses]); // Safe dependencies
 
-  // ⭐ Load pending invitations
+  // Load pending invitations
   useEffect(() => {
     const loadPendingInvitations = async () => {
       if (!group?.id || !user?.uid) return;
@@ -308,6 +321,100 @@ export default function GroupDetails() {
     return () => clearInterval(interval);
   }, [group?.id, user?.uid]);
   
+  // Opens the leave confirmation — checks current user balance first.
+  // If the user has an unsettled balance, shows the blocking reason.
+  const handleOpenLeave = () => {
+    setShowGroupOptions(false);
+    setGroupActionError('');
+    const balances = calculateBalances(expenses, group.members || []);
+    const rawBalance = balances[user.uid] || 0;
+    const absBalance = Math.abs(rawBalance);
+    if (absBalance > 0.01) {
+      setLeaveBlockReason({
+        amount: absBalance.toFixed(2),
+        currency: group.currency,
+        direction: rawBalance < 0 ? 'owe' : 'are owed',
+      });
+    } else {
+      setLeaveBlockReason(null);
+    }
+    setShowConfirmLeave(true);
+  };
+
+  // Removes the current user from the group members array.
+  const handleLeaveGroup = async () => {
+    if (!user || !group) return;
+    setGroupActionLoading(true);
+    setGroupActionError('');
+    try {
+      const currentMember = group.members.find(m => m.userId === user.uid);
+      if (!currentMember) throw new Error('Member record not found.');
+      await updateDoc(doc(db, 'groups', groupId), {
+        members: arrayRemove(currentMember),
+      });
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('[GroupDetails] Leave group failed:', err);
+      setGroupActionError('Failed to leave the group. Please try again.');
+      setGroupActionLoading(false);
+    }
+  };
+
+  // Opens the delete confirmation — checks that ALL members are settled first.
+  const handleOpenDelete = () => {
+    setShowGroupOptions(false);
+    setGroupActionError('');
+    const balances = calculateBalances(expenses, group.members || []);
+    const unsettled = (group.members || [])
+      .filter(m => Math.abs(balances[m.userId] || 0) > 0.01)
+      .map(m => ({
+        name: m.name,
+        amount: Math.abs(balances[m.userId]).toFixed(2),
+        currency: group.currency,
+      }));
+    setDeleteBlockReason(unsettled.length > 0 ? unsettled : null);
+    setShowConfirmDelete(true);
+  };
+
+  // Deletes all expenses, notifies all members, then deletes the group document.
+  const handleDeleteGroup = async () => {
+    if (!user || !group || group.createdBy !== user.uid) return;
+    setGroupActionLoading(true);
+    setGroupActionError('');
+    try {
+      // Batch-delete all expenses in this group
+      const expensesSnap = await getDocs(
+        query(collection(db, 'expenses'), where('groupId', '==', groupId))
+      );
+      const batch = writeBatch(db);
+      expensesSnap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+
+      // Notify all other members
+      const otherMembers = (group.members || []).filter(m => m.userId !== user.uid);
+      await Promise.all(
+        otherMembers.map(m =>
+          createNotification({
+            userId: m.userId,
+            type: 'group_deleted',
+            title: 'Group Deleted',
+            message: `"${group.name}" was deleted by ${user.displayName || 'the group owner'}.`,
+            data: { groupId, groupName: group.name },
+          })
+        )
+      );
+
+      // Delete the group document itself
+      await deleteDoc(doc(db, 'groups', groupId));
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('[GroupDetails] Delete group failed:', err);
+      setGroupActionError('Failed to delete the group. Please try again.');
+      setGroupActionLoading(false);
+    }
+  };
+  
+  
   // LOADING CHECK FIRST
   if (loading) {
     return (
@@ -327,6 +434,7 @@ export default function GroupDetails() {
   const settlements = calculateSettlements(balances);
   const userBalance = getUserBalanceSummary(balances, user.uid, group.members);
   const IconComponent = getIconComponent(group.icon);
+  const isOwner = group.createdBy === user.uid;
 
   // THEN RETURN JSX
   return (
@@ -366,7 +474,7 @@ export default function GroupDetails() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 relative">
             <button
               onClick={() => setShowShareModal(true)}
               className="flex-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition flex items-center justify-center gap-2"
@@ -381,7 +489,45 @@ export default function GroupDetails() {
               <Plus size={18} />
               Add Expense
             </button>
+
+            {/* More options — leave (members) or delete (owner) */}
+            <div className="relative">
+              <button
+                onClick={() => setShowGroupOptions(prev => !prev)}
+                className="p-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                title="Group options"
+              >
+                <MoreVertical size={18} />
+              </button>
+
+              {showGroupOptions && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowGroupOptions(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
+                    {!isOwner && (
+                      <button
+                        onClick={handleOpenLeave}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition"
+                      >
+                        <LogOut size={16} />
+                        Leave Group
+                      </button>
+                    )}
+                    {isOwner && (
+                      <button
+                        onClick={handleOpenDelete}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                      >
+                        <Trash2 size={16} />
+                        Delete Group
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
+
 
           {/* Balance Summary */}
           {expenses.length > 0 && (
@@ -1160,8 +1306,12 @@ export default function GroupDetails() {
       {/* Add Expense Modal */}
       <AddExpenseModal
         isOpen={showAddExpense}
-        onClose={() => setShowAddExpense(false)}
+        onClose={() => {
+          setShowAddExpense(false);
+          setEditingExpense(null);
+        }}
         group={group}
+        initialExpense={editingExpense}
       />
       {/* Settle Up Modal */}
       <SettleUpModal
@@ -1185,6 +1335,14 @@ export default function GroupDetails() {
         onClose={() => setSelectedExpense(null)}
         expense={selectedExpense}
         group={group}
+        currentUserId={user.uid}
+        groupExpenses={expenses}
+        onEdit={(expense) => {
+          setSelectedExpense(null);
+          setEditingExpense(expense);
+          setShowAddExpense(true);
+        }}
+        onDeleted={() => setSelectedExpense(null)}
       />
 
       {/* Share Invite Modal */}
@@ -1194,6 +1352,133 @@ export default function GroupDetails() {
         inviteLink={`${process.env.REACT_APP_BASE_URL || window.location.origin}/invite/${groupId}`}
         groupName={group?.name}
       />
+    {/* ── Leave Group Confirmation Modal ──────────────────────────────────── */}
+      {showConfirmLeave && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl">
+            <div className="flex items-center justify-center w-14 h-14 bg-amber-100 dark:bg-amber-900/30 rounded-full mx-auto mb-4">
+              <LogOut size={28} className="text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Leave Group</h3>
+
+            {leaveBlockReason ? (
+              <>
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-3">
+                  You cannot leave <strong>{group.name}</strong> yet.
+                </p>
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-5 text-center">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                    You {leaveBlockReason.direction}{' '}
+                    <span className="text-amber-900 dark:text-amber-200">
+                      {leaveBlockReason.currency} {leaveBlockReason.amount}
+                    </span>
+                  </p>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                    Settle all balances before leaving.
+                  </p>
+                </div>
+                <button
+                  onClick={() => { setShowConfirmLeave(false); setLeaveBlockReason(null); }}
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium"
+                >
+                  OK, Got It
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
+                  Are you sure you want to leave <strong>{group.name}</strong>? You will lose access to this group.
+                </p>
+                {groupActionError && (
+                  <p className="text-sm text-red-600 dark:text-red-400 text-center mb-4">{groupActionError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setShowConfirmLeave(false); setGroupActionError(''); }}
+                    disabled={groupActionLoading}
+                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleLeaveGroup}
+                    disabled={groupActionLoading}
+                    className="flex-1 px-4 py-3 bg-amber-500 dark:bg-amber-600 text-white rounded-lg hover:bg-amber-600 dark:hover:bg-amber-700 transition font-medium disabled:opacity-50"
+                  >
+                    {groupActionLoading ? 'Leaving...' : 'Leave Group'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Group Confirmation Modal ─────────────────────────────────── */}
+      {showConfirmDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl">
+            <div className="flex items-center justify-center w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-4">
+              <Trash2 size={28} className="text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Delete Group</h3>
+
+            {deleteBlockReason ? (
+              <>
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-3">
+                  Cannot delete <strong>{group.name}</strong>. These members still have outstanding balances:
+                </p>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4 space-y-1 max-h-40 overflow-y-auto">
+                  {deleteBlockReason.map((m, i) => (
+                    <div key={i} className="flex justify-between text-sm">
+                      <span className="text-red-800 dark:text-red-300 font-medium">{m.name}</span>
+                      <span className="text-red-700 dark:text-red-400">{m.currency} {m.amount}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-5">
+                  All members must settle before the group can be deleted.
+                </p>
+                <button
+                  onClick={() => { setShowConfirmDelete(false); setDeleteBlockReason(null); }}
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium"
+                >
+                  OK, Got It
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-2">
+                  Are you sure you want to permanently delete <strong>{group.name}</strong>?
+                </p>
+                <p className="text-xs text-red-500 dark:text-red-400 text-center mb-6">
+                  All expenses will be deleted and all members will be notified. This cannot be undone.
+                </p>
+                {groupActionError && (
+                  <p className="text-sm text-red-600 dark:text-red-400 text-center mb-4">{groupActionError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setShowConfirmDelete(false); setGroupActionError(''); }}
+                    disabled={groupActionLoading}
+                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteGroup}
+                    disabled={groupActionLoading}
+                    className="flex-1 px-4 py-3 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition font-medium disabled:opacity-50"
+                  >
+                    {groupActionLoading ? 'Deleting...' : 'Delete Group'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

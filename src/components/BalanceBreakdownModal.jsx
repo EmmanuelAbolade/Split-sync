@@ -46,7 +46,7 @@ export default function BalanceBreakdownModal({
                   {title}
                 </h2>
                 <p className={`text-2xl font-bold ${colorClasses.split('bg-')[0]}`}>
-                  €{totalAmount.toFixed(2)}
+                  {totalAmount > 0 ? `${totalAmount.toFixed(2)}` : '—'}
                 </p>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function BalanceBreakdownModal({
                         {isOwed ? `${breakdown.name} owes you` : `You owe ${breakdown.name}`}
                       </p>
                       <p className={`text-lg font-bold ${colorClasses.split('bg-')[0]}`}>
-                        €{breakdown.amount.toFixed(2)}
+                        {breakdown.amount.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -114,7 +114,7 @@ export default function BalanceBreakdownModal({
                           </span>
                           <div className="flex items-center gap-2">
                             <span className={`font-medium ${colorClasses.split('bg-')[0]}`}>
-                              €{group.amount.toFixed(2)}
+                              {group.amount.toFixed(2)}
                             </span>
                             <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-primary dark:group-hover:text-indigo-400 transition" />
                           </div>

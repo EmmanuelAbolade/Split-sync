@@ -2,7 +2,7 @@
 import ReceiptScanner from './ReceiptScanner';
 import { Camera } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import Tooltip from './Tooltip';
@@ -25,7 +25,9 @@ const SPLIT_METHODS = [
   { id: 'shares', name: 'By Shares', description: 'Proportional shares (e.g., 2x, 1x)' },
 ];
 
-export default function AddExpenseModal({ isOpen, onClose, group }) {
+export default function AddExpenseModal({ isOpen, onClose, group, initialExpense = null }) {
+  // isEditing drives all conditional labels and the submit path
+  const isEditing = !!initialExpense;
   const { user } = useAuthStore();
   
   const [title, setTitle] = useState('');
@@ -97,6 +99,50 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
       // ... reinitialize splits based on new method
       setSplits(newSplits);
     }, [splitMethod]);
+
+    // Pre-populate form fields when opening in edit mode.
+    // Runs whenever the modal opens with an initialExpense provided.
+    useEffect(() => {
+      if (!isOpen || !initialExpense) return;
+
+      setTitle(initialExpense.title || '');
+      setAmount(String(initialExpense.amount || ''));
+      setPaidBy(initialExpense.paidBy || user?.uid || '');
+      setCategory(initialExpense.category || 'food');
+      setDescription(initialExpense.description || '');
+
+      // Convert Firestore Timestamp or JS Date to YYYY-MM-DD for the date input
+      const d = initialExpense.date?.toDate
+        ? initialExpense.date.toDate()
+        : new Date(initialExpense.date);
+      setDate(d.toISOString().split('T')[0]);
+
+      setSplitMethod(initialExpense.splitMethod || 'equal');
+
+      // Restore participant checkbox selections
+      if (initialExpense.participants && group?.members) {
+        const memberSelection = {};
+        group.members.forEach(m => {
+          memberSelection[m.userId] = initialExpense.participants.includes(m.userId);
+        });
+        setSelectedMembers(memberSelection);
+      }
+
+      // Restore split input values (back-calculate percentages from amounts)
+      if (initialExpense.splits && initialExpense.splitMethod !== 'equal') {
+        const rawSplits = {};
+        Object.entries(initialExpense.splits).forEach(([uid, val]) => {
+          if (initialExpense.splitMethod === 'percentage') {
+            rawSplits[uid] = ((val / initialExpense.amount) * 100).toFixed(1);
+          } else if (initialExpense.splitMethod === 'exact') {
+            rawSplits[uid] = val.toFixed(2);
+          } else {
+            rawSplits[uid] = String(val);
+          }
+        });
+        setSplits(rawSplits);
+      }
+    }, [isOpen, initialExpense]);
 
     // toggleMember function
     const toggleMember = (userId) => {
@@ -294,65 +340,67 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
         ...(scannedData?.receiptURL && { receiptURL: scannedData.receiptURL })
       };
 
-      await addDoc(collection(db, 'expenses'), expenseData);
+       if (isEditing) {
+        // Update existing document — do not overwrite groupId, createdAt, or createdBy
+        await updateDoc(doc(db, 'expenses', initialExpense.id), expenseData);
+      } else {
+        // Create a new expense document
+        const newExpense = {
+          ...expenseData,
+          groupId: group.id,
+          createdAt: serverTimestamp(),
+          createdBy: user.uid,
+        };
+        await addDoc(collection(db, 'expenses'), newExpense);
 
-      // Notify all group members except the creator
-      const memberIds = group.members
-        .map(m => m.userId)
-        .filter(id => id !== user.uid); // Don't notify yourself
-        console.log('📝 Expense details:', {
-        title: title.trim(),
-        amount: parseFloat(amount),
-        currency: group.currency,
-        groupName: group.name
-      });
+        // Notify other group members of the new expense
+        const memberIds = group.members
+          .map(m => m.userId)
+          .filter(id => id !== user.uid);
 
-        if (memberIds.length === 0) {
-          
-        } else {
-          
+        if (memberIds.length > 0) {
           try {
+            await Promise.all(
+              memberIds.map(memberId =>
+                createNotification({
+                  userId: memberId,
+                  type: 'expense',
+                  title: 'New Expense Added',
+                  message: `${user.displayName || 'Someone'} added "${title.trim()}" (${group.currency} ${parseFloat(amount).toFixed(2)}) in ${group.name}`,
+                  data: {
+                    groupId: group.id,
+                    expenseTitle: title.trim(),
+                    amount: parseFloat(amount),
+                    currency: group.currency,
+                    addedBy: user.uid,
+                    addedByName: user.displayName,
+                  },
+                })
+              )
+            );
+          } catch (notifyErr) {
+            console.error('[AddExpenseModal] Notification failed:', notifyErr);
+          }
+        }
+      }
 
-                // Create notification for each member
-                    const notificationPromises = memberIds.map(async (memberId) => {
-                    
-                    return await createNotification({
-                      userId: memberId,
-                      type: 'expense',
-                      title: '🧾 New Expense Added',
-                      message: `${user.displayName || 'Someone'} added "${title.trim()}" (${group.currency} ${parseFloat(amount).toFixed(2)}) in ${group.name}`,
-                      data: {
-                        groupId: group.id,
-                        expenseTitle: title.trim(),
-                        amount: parseFloat(amount),
-                        currency: group.currency,
-                        addedBy: user.uid,
-                        addedByName: user.displayName,
-                      },
-                    });
-                });
-                //);
-                await Promise.all(notificationPromises);
-              } catch (error) {
-                console.error('❌ Error creating notifications:', error);
-                console.error('Error details:', error.message);
-              }
-            }
-      //  Reset form
+      // Reset form state
       setTitle('');
       setAmount('');
       setDescription('');
       setDate(new Date().toISOString().split('T')[0]);
       setSplitMethod('equal');
-      
+      setScannedData(null);
+
       onClose();
     } catch (err) {
-      console.error('Error adding expense:', err);
-      setError('Failed to add expense. Please try again.');
+      console.error('[AddExpenseModal] Submit failed:', err);
+      setError('Failed to save expense. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
 
 
   const handleReceiptData = (data) => {
@@ -380,7 +428,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
         <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Confirm Expense</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            {isEditing ? 'Confirm Edit' : 'Confirm Expense'}
+          </h2>
           
           <div className="space-y-3 mb-6">
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -431,7 +481,7 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
           </div>
 
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 text-center">
-            Are you sure you want to add this expense?
+            {isEditing ? 'Confirm changes to this expense?' : 'Are you sure you want to add this expense?'}
           </p>
 
           <div className="flex gap-3">
@@ -446,7 +496,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
               disabled={loading}
               className="flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition disabled:opacity-50"
             >
-              {loading ? 'Adding...' : 'Confirm & Add'}
+              {loading
+                ? (isEditing ? 'Saving...' : 'Adding...')
+                : (isEditing ? 'Confirm & Save' : 'Confirm & Add')}
             </button>
           </div>
         </div>
@@ -468,7 +520,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-4">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Add Expense</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {isEditing ? 'Edit Expense' : 'Add Expense'}
+              </h2>
               <button
                 onClick={onClose}
                 className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
@@ -477,16 +531,16 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
               </button>
             </div>
            {/* Scan Receipt Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setShowReceiptScanner(true);
-              }}
-              className="w-full mb-4 px-4 py-3 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition flex items-center justify-center gap-2 font-medium"
-            >
-              <Camera size={20} />
-              Scan Receipt (Auto-fill)
-            </button>
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={() => setShowReceiptScanner(true)}
+                className="w-full mb-4 px-4 py-3 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition flex items-center justify-center gap-2 font-medium"
+              >
+                <Camera size={20} />
+                Scan Receipt (Auto-fill)
+              </button>
+            )}
 
           {/* Scrollable Content */}
       <div className="overflow-y-auto p-6 pt-4"></div>
@@ -801,7 +855,9 @@ export default function AddExpenseModal({ isOpen, onClose, group }) {
               disabled={loading}
               className="flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition disabled:opacity-50"
             >
-              {loading ? 'Adding...' : 'Add Expense'}
+              {loading
+                ? (isEditing ? 'Saving...' : 'Adding...')
+                : (isEditing ? 'Save Changes' : 'Add Expense')}
             </button>
           </div>
         </form>

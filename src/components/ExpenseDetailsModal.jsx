@@ -1,79 +1,197 @@
 // src/components/ExpenseDetailsModal.jsx
-import { X, User, Calendar, Tag, Users, DollarSign, FileText, Receipt, Download, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { X, User, Calendar, Tag, Users, DollarSign, FileText, Receipt, Download, ExternalLink, Pencil, Trash2, AlertTriangle, Lock } from 'lucide-react';
 
-export default function ExpenseDetailsModal({ isOpen, onClose, expense, group }) {
+export default function ExpenseDetailsModal({
+  isOpen,
+  onClose,
+  expense,
+  group,
+  currentUserId,
+  groupExpenses = [],  // all expenses in the group — used to detect if settlements exist
+  onEdit,             // (expense) => void — opens AddExpenseModal in edit mode
+  onDeleted,          // () => void — called after a successful deletion
+}) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
   if (!isOpen || !expense) return null;
 
   const payer = group?.members?.find(m => m.userId === expense.paidBy);
   const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
-  
-  // Get current names for settlement participants
-  const getSettlementParticipants = () => {
-    if (!expense.isSettlement || !expense.participants || expense.participants.length !== 2) {
-      return null;
-    }
-    
-    const fromUserId = expense.paidBy; // Person who paid (sender)
-    const toUserId = expense.participants.find(id => id !== expense.paidBy); // Receiver
-    
-    const fromMember = group?.members?.find(m => m.userId === fromUserId);
-    const toMember = group?.members?.find(m => m.userId === toUserId);
-    
-    return {
-      from: fromMember?.name || 'Unknown',
-      to: toMember?.name || 'Unknown',
-    };
-  };
-  
-  const settlementParticipants = getSettlementParticipants();
 
-  // Get participant details with their shares
+  // Settlement records represent confirmed money movements — always read-only
+  const isSettlement = !!expense.isSettlement;
+
+  // Only the person who created the expense may edit or delete it
+  const isCreator = expense.createdBy === currentUserId;
+
+  // If any settlement exists in the group, editing regular expenses is blocked
+  // because those settlements were calculated against the current balances
+  const groupHasSettlements = groupExpenses.some(e => e.isSettlement === true);
+
+  const canModify = isCreator && !isSettlement;
+  const editBlocked = canModify && groupHasSettlements;
+
+  const getSettlementTitle = () => {
+    if (!expense.participants || expense.participants.length !== 2) return 'Settlement';
+    const fromMember = group?.members?.find(m => m.userId === expense.paidBy);
+    const toUserId = expense.participants.find(id => id !== expense.paidBy);
+    const toMember = group?.members?.find(m => m.userId === toUserId);
+    return `Settlement: ${fromMember?.name || 'Unknown'} to ${toMember?.name || 'Unknown'}`;
+  };
+
   const participantShares = expense.participants?.map(userId => {
     const member = group?.members?.find(m => m.userId === userId);
     const share = expense.splits?.[userId] || 0;
     return {
       member,
       share,
-      percentage: ((share / expense.amount) * 100).toFixed(1)
+      percentage: expense.amount > 0 ? ((share / expense.amount) * 100).toFixed(1) : '0.0',
     };
   }) || [];
 
   // Format split method display
   const getSplitMethodDisplay = () => {
-    switch(expense.splitMethod) {
-      case 'equal': return 'Split Equally';
-      case 'percentage': return 'Split by Percentage';
-      case 'exact': return 'Exact Amounts';
-      case 'shares': return 'Split by Shares';
-      default: return expense.splitMethod;
+    const map = {
+      equal: 'Split Equally',
+      percentage: 'Split by Percentage',
+      exact: 'Exact Amounts',
+      shares: 'Split by Shares',
+    };
+    return map[expense.splitMethod] || expense.splitMethod;
+  };
+
+  const handleDelete = async () => {
+    setDeleteLoading(true);
+    setDeleteError('');
+    try {
+      await deleteDoc(doc(db, 'expenses', expense.id));
+      setShowDeleteConfirm(false);
+      onClose();
+      if (onDeleted) onDeleted();
+    } catch (err) {
+      console.error('[ExpenseDetailsModal] Delete failed:', err);
+      setDeleteError('Failed to delete expense. Please try again.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
+  // Delete Confirmation View 
+  if (showDeleteConfirm) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl">
+          <div className="flex items-center justify-center w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-4">
+            <AlertTriangle size={28} className="text-red-600 dark:text-red-400" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">
+            Delete Expense
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-1">
+            Are you sure you want to delete
+          </p>
+          <p className="text-sm font-semibold text-gray-900 dark:text-white text-center mb-3">
+            "{expense.title}"?
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-6">
+            This cannot be undone. All balances in the group will be recalculated.
+          </p>
+          {deleteError && (
+            <p className="text-sm text-red-600 dark:text-red-400 text-center mb-4">{deleteError}</p>
+          )}
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={deleteLoading}
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleteLoading}
+              className="flex-1 px-4 py-3 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition font-medium disabled:opacity-50"
+            >
+              {deleteLoading ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main Details View
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl">
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
-          <div className="flex-1">
+          <div className="flex-1 pr-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-              {expense.isSettlement && settlementParticipants
-                ? `Settlement: ${settlementParticipants.from} → ${settlementParticipants.to}`
-                : expense.title
-              }
+              {isSettlement ? getSettlementTitle() : expense.title}
             </h2>
-            {expense.isSettlement && (
-              <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded border border-green-200 dark:border-green-800">
-                Settlement
-              </span>
-            )}
+              {isSettlement && (
+                <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded border border-green-200 dark:border-green-800">
+                  Settlement
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Edit button — creator only, locked when settlements exist */}
+              {canModify && (
+                editBlocked ? (
+                  <div
+                    className="p-2 text-gray-300 dark:text-gray-600 cursor-not-allowed rounded-lg"
+                    title="Editing is locked because this group has recorded settlements."
+                  >
+                    <Lock size={18} />
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { onClose(); if (onEdit) onEdit(expense); }}
+                    className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition"
+                    title="Edit expense"
+                  >
+                    <Pencil size={18} />
+                  </button>
+                )
+              )}
+
+              {/* Delete button — creator only */}
+              {canModify && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
+                  title="Delete expense"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
+
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 ml-4"
-          >
-            <X size={24} />
-          </button>
-        </div>
+
+          {/* Edit locked notice — shown only when edit is blocked by settlements */}
+          {editBlocked && (
+            <div className="mb-4 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+              <Lock size={16} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                Editing is locked because this group has recorded settlements. Changing this expense would affect previously settled balances.
+              </p>
+            </div>
+          )}
 
         {/* Receipt Image Section - NEW! */}
         {expense.receiptURL && (
@@ -192,7 +310,7 @@ export default function ExpenseDetailsModal({ isOpen, onClose, expense, group })
         )}
 
         {/* Split Breakdown */}
-        <div className="mb-4">
+        <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <DollarSign size={18} className="text-gray-600 dark:text-gray-400" />
             <h3 className="font-semibold text-gray-900 dark:text-white">Split Breakdown</h3>
@@ -206,7 +324,7 @@ export default function ExpenseDetailsModal({ isOpen, onClose, expense, group })
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary-light dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
                     <span className="text-primary dark:text-indigo-400 font-semibold">
-                      {item.member?.name?.charAt(0).toUpperCase()}
+                      {item.member?.name?.charAt(0).toUpperCase() || '?'}
                     </span>
                   </div>
                   <div>
@@ -230,7 +348,7 @@ export default function ExpenseDetailsModal({ isOpen, onClose, expense, group })
         </div>
 
         {/* Payment Method Info (if settlement) */}
-        {expense.isSettlement && expense.paymentMethod && (
+        {isSettlement && expense.paymentMethod && (
           <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
             <p className="text-sm text-blue-900 dark:text-blue-300">
               <strong>Payment Method:</strong> {expense.paymentMethod === 'paypal' ? 'PayPal' : 'Manual Payment'}
