@@ -79,7 +79,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       sessionStorage.removeItem('pendingPayment');
       setShowPendingConfirmation(false);
     }
-  }, [isOpen, group?.id, settlement?.from, settlement?.to]);
+  }, [isOpen, group?.id, settlement?.from, settlement?.to, settlement?.amount]);
 
   // Fetch recipient's payment methods
   useEffect(() => {

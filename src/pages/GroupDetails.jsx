@@ -80,7 +80,6 @@ export default function GroupDetails() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteBlockReason, setDeleteBlockReason] = useState(null); // null | [{ name, amount, currency }]
   // Auth before delete
-  const [deleteAuthStep, setDeleteAuthStep] = useState(false); // shows auth screen
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteAuthError, setDeleteAuthError] = useState('');
   const [deleteAuthLoading, setDeleteAuthLoading] = useState(false);
@@ -380,7 +379,6 @@ export default function GroupDetails() {
         currency: group.currency,
       }));
     setDeleteBlockReason(unsettled.length > 0 ? unsettled : null);
-    setDeleteAuthStep(false);
     setDeletePassword('');
     setDeleteAuthError('');
     setShowConfirmDelete(true);
@@ -680,6 +678,7 @@ export default function GroupDetails() {
             Payee sees confirm/decline; payer sees "awaiting confirmation" notice. */}
         {groupPaymentActions.map((notif) => {
           const pd = notif.data || {};
+          // eslint-disable-next-line no-unused-vars
           const isPayee = notif.userId === user.uid; // always true here (payee's notification)
           const actionLoading = settlementActionLoading[notif.id];
 
