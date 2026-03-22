@@ -376,6 +376,7 @@ export default function Profile() {
       return;
     }
     if (biometricEnabled) {
+      setBiometricLoading(true); // show overlay BEFORE the prompt
       const authenticated = await authenticateWithBiometric(user.uid, 'Authenticate to view payment settings');
       setBiometricLoading(false);
       if (!authenticated) {
@@ -391,6 +392,7 @@ export default function Profile() {
   const handleEditPayment = async () => {
     if (!user) return;
     if (biometricEnabled && !isAuthenticated) {
+      setBiometricLoading(true);   // show overlay BEFORE the prompt
       const authenticated = await authenticateWithBiometric(user.uid, 'Authenticate to edit payment settings');
       setBiometricLoading(false);
       if (!authenticated) {
@@ -836,6 +838,9 @@ export default function Profile() {
         type={breakdownType}
         breakdowns={breakdownData}
         totalAmount={breakdownType === 'owed' ? totalOwed : totalOwing}
+        currency={
+          breakdownData[0]?.groups?.[0]?.currency || ''
+       }
       />
 
     </div>

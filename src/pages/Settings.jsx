@@ -18,7 +18,7 @@ import {
   deleteUser,
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
-import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import QRCodeModal    from '../components/QRCodeModal';
 import InfoHubModal   from '../components/InfoHubModal';
 import DarkModeToggle from '../components/DarkModeToggle';
@@ -156,11 +156,33 @@ export default function Settings() {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
+  // Update name across Firebase Auth, Firestore user doc, and all group member arrays
   const handleUpdateName = async () => {
     if (!newName.trim()) { setError('Name cannot be empty'); return; }
     setLoading(true); setError(''); setSuccess('');
     try {
-      await updateProfile(auth.currentUser, { displayName: newName.trim() });
+      const trimmedName = newName.trim();
+
+      // 1. Update Firebase Auth display name
+      await updateProfile(auth.currentUser, { displayName: trimmedName });
+
+      // 2. Update Firestore user document
+      await updateDoc(doc(db, 'users', user.uid), { displayName: trimmedName });
+
+      // 3. Update this user's name inside every group's members array
+      const groupsSnap = await getDocs(
+        query(collection(db, 'groups'), where('memberIds', 'array-contains', user.uid))
+      );
+      const batch = writeBatch(db);
+      groupsSnap.forEach(groupDoc => {
+        const members = groupDoc.data().members || [];
+        const updatedMembers = members.map(m =>
+          m.userId === user.uid ? { ...m, name: trimmedName } : m
+        );
+        batch.update(groupDoc.ref, { members: updatedMembers });
+      });
+      await batch.commit();
+
       setSuccess('Name updated successfully!');
       setEditingName(false);
       setTimeout(() => setSuccess(''), 3000);
