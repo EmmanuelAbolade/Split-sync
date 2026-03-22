@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove } from 'firebase/firestore';
+import { authenticateWithBiometric, isBiometricEnabledOnDevice } from '../utils/biometric';
+import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { auth } from '../services/firebase';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived, createNotification } from '../stores/notificationsStore';
@@ -76,7 +79,11 @@ export default function GroupDetails() {
   // Delete group
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteBlockReason, setDeleteBlockReason] = useState(null); // null | [{ name, amount, currency }]
-
+  // Auth before delete
+  const [deleteAuthStep, setDeleteAuthStep] = useState(false); // shows auth screen
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteAuthError, setDeleteAuthError] = useState('');
+  const [deleteAuthLoading, setDeleteAuthLoading] = useState(false);
   // Derive pending settlement data from the global notifications store.
   // This avoids a separate Firestore query and requires no new collection.
   const { notifications: allNotifications } = useNotificationsStore();
@@ -373,8 +380,59 @@ export default function GroupDetails() {
         currency: group.currency,
       }));
     setDeleteBlockReason(unsettled.length > 0 ? unsettled : null);
+    setDeleteAuthStep(false);
+    setDeletePassword('');
+    setDeleteAuthError('');
     setShowConfirmDelete(true);
   };
+
+    // Authenticates the user before allowing group deletion.
+    // Uses biometric if enabled on device, otherwise password re-entry.
+    // Google OAuth users skip re-auth (Firebase does not support password reauth for OAuth).
+    const handleAuthAndDelete = async () => {
+      setDeleteAuthLoading(true);
+      setDeleteAuthError('');
+
+      try {
+        const isGoogleUser = user.providerData?.some(p => p.providerId === 'google.com');
+
+        if (isGoogleUser) {
+          // Google OAuth — skip re-auth, proceed directly
+          await handleDeleteGroup();
+          return;
+        }
+
+        const biometricEnabled = isBiometricEnabledOnDevice(user.uid);
+
+        if (biometricEnabled) {
+          const authenticated = await authenticateWithBiometric(user.uid, 'Confirm group deletion');
+          if (!authenticated) {
+            setDeleteAuthError('Biometric authentication failed. Please try again.');
+            setDeleteAuthLoading(false);
+            return;
+          }
+          await handleDeleteGroup();
+        } else {
+          // Password re-entry
+          if (!deletePassword.trim()) {
+            setDeleteAuthError('Please enter your password to confirm.');
+            setDeleteAuthLoading(false);
+            return;
+          }
+          const credential = EmailAuthProvider.credential(user.email, deletePassword);
+          await reauthenticateWithCredential(auth.currentUser, credential);
+          await handleDeleteGroup();
+        }
+      } catch (err) {
+        console.error('[GroupDetails] Auth before delete failed:', err);
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          setDeleteAuthError('Incorrect password. Please try again.');
+        } else {
+          setDeleteAuthError('Authentication failed. Please try again.');
+        }
+        setDeleteAuthLoading(false);
+      }
+    };
 
   // Deletes all expenses, notifies all members, then deletes the group document.
   const handleDeleteGroup = async () => {
@@ -1451,26 +1509,47 @@ export default function GroupDetails() {
                 <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-2">
                   Are you sure you want to permanently delete <strong>{group.name}</strong>?
                 </p>
-                <p className="text-xs text-red-500 dark:text-red-400 text-center mb-6">
+                <p className="text-xs text-red-500 dark:text-red-400 text-center mb-4">
                   All expenses will be deleted and all members will be notified. This cannot be undone.
                 </p>
-                {groupActionError && (
-                  <p className="text-sm text-red-600 dark:text-red-400 text-center mb-4">{groupActionError}</p>
+
+                {/* Password input — only shown for email/password users without biometric */}
+                {!user.providerData?.some(p => p.providerId === 'google.com') &&
+                  !isBiometricEnabledOnDevice(user.uid) && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Enter your password to confirm
+                    </label>
+                    <input
+                      type="password"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      placeholder="Your password"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                    />
+                  </div>
                 )}
+
+                {(deleteAuthError || groupActionError) && (
+                  <p className="text-sm text-red-600 dark:text-red-400 text-center mb-4">
+                    {deleteAuthError || groupActionError}
+                  </p>
+                )}
+
                 <div className="flex gap-3">
                   <button
-                    onClick={() => { setShowConfirmDelete(false); setGroupActionError(''); }}
-                    disabled={groupActionLoading}
+                    onClick={() => { setShowConfirmDelete(false); setGroupActionError(''); setDeleteAuthError(''); setDeletePassword(''); }}
+                    disabled={groupActionLoading || deleteAuthLoading}
                     className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={handleDeleteGroup}
-                    disabled={groupActionLoading}
+                    onClick={handleAuthAndDelete}
+                    disabled={groupActionLoading || deleteAuthLoading}
                     className="flex-1 px-4 py-3 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition font-medium disabled:opacity-50"
                   >
-                    {groupActionLoading ? 'Deleting...' : 'Delete Group'}
+                    {(groupActionLoading || deleteAuthLoading) ? 'Verifying...' : 'Delete Group'}
                   </button>
                 </div>
               </>

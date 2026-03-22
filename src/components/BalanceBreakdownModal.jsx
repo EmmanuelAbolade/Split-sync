@@ -114,7 +114,7 @@ export default function BalanceBreakdownModal({
                           </span>
                           <div className="flex items-center gap-2">
                             <span className={`font-medium ${colorClasses.split('bg-')[0]}`}>
-                              {group.amount.toFixed(2)}
+                              {group.currency ? `${group.currency} ` : ''}{group.amount.toFixed(2)}
                             </span>
                             <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-primary dark:group-hover:text-indigo-400 transition" />
                           </div>

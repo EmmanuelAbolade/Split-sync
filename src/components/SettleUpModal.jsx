@@ -857,7 +857,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                 }`}
               >
                 <CreditCard size={18} />
-                <span className="font-medium">PayPal</span>
+                <span className="font-medium">Pay In-App</span>
               </button>
               <button
                 type="button"
@@ -875,6 +875,33 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
             {paymentMethod === 'paypal' ? (
               <div>
+
+                {/* Notice when recipient has no PayPal configured */}
+                {!loadingPaymentMethods && !recipientPaymentMethods?.paypalUsername && (
+                  <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4">
+                    <AlertCircle size={18} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                        {toMember?.name} has not set up PayPal
+                      </p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        They need to add their PayPal username in their Profile settings before you can pay via PayPal.
+                        Use <strong>Paid Offline</strong> to record a cash or bank transfer instead.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Notice when current user has no biometric set up — shown to payer only */}
+                {!loadingPaymentMethods && recipientPaymentMethods?.paypalUsername && (
+                  <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4">
+                    <Info size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Click a payment method above to open the app and complete the payment, then return here to confirm.
+                      For faster future payments, enable biometric authentication in your Profile settings.
+                    </p>
+                  </div>
+                )}
                 {/* Demo Mode — collapsible panel containing all PayPal sandbox UI */}
                 <button
                   type="button"
