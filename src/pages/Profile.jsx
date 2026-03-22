@@ -9,7 +9,7 @@ import {
   User, Mail, Calendar, LogOut,
   TrendingUp, TrendingDown, Users, Wallet, CreditCard, Save, Info, ChevronDown, Shield, Lock, ArrowLeft 
 } from 'lucide-react';
-import { calculateBalances } from '../utils/balanceCalculator';
+import { calculateBalances,  calculateSettlements  } from '../utils/balanceCalculator';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import CloudinaryUpload from '../components/CloudinaryUpload';
 import { 
@@ -228,37 +228,51 @@ export default function Profile() {
     return { totalOwed, totalOwing };
   };
 
-  // Calculate detailed breakdown of who owes what
+  // Calculate detailed breakdown of who owes what.
+  // Uses calculateSettlements so per-person amounts match exactly what the
+  // user owes or is owed — not the other person's raw group balance.
   const calculateDetailedBreakdown = (type) => {
     const breakdowns = [];
+
     groups.forEach(group => {
       const groupExpenses = expenses.filter(e => e.groupId === group.id);
       const balances = calculateBalances(groupExpenses, group.members || []);
-      Object.entries(balances).forEach(([memberId, balance]) => {
-        if (memberId === user.uid) return;
-        const shouldInclude = type === 'owed'
-          ? balances[user.uid] > 0 && balance < 0
-          : balances[user.uid] < 0 && balance > 0;
-        if (shouldInclude) {
-          const member = group.members.find(m => m.userId === memberId);
-          const amount = Math.abs(balance);
-          let personEntry = breakdowns.find(b => b.userId === memberId);
-          if (!personEntry) {
-            personEntry = {
-              userId: memberId,
-              name: member?.name || 'Unknown',
-              email: member?.email || '',
-              photoURL: member?.photoURL || null,
-              amount: 0,
-              groups: []
-            };
-            breakdowns.push(personEntry);
-          }
-          personEntry.amount += amount;
-          personEntry.groups.push({ groupId: group.id, groupName: group.name, amount });
+      const settlements = calculateSettlements(balances);
+
+      // For 'owing': find settlements where the current user is the payer
+      // For 'owed': find settlements where the current user is the payee
+      const relevant = type === 'owing'
+        ? settlements.filter(s => s.from === user.uid)
+        : settlements.filter(s => s.to === user.uid);
+
+      relevant.forEach(settlement => {
+        const otherUserId = type === 'owing' ? settlement.to : settlement.from;
+        const member = group.members.find(m => m.userId === otherUserId);
+        if (!member) return;
+
+        let personEntry = breakdowns.find(b => b.userId === otherUserId);
+        if (!personEntry) {
+          personEntry = {
+            userId: otherUserId,
+            name: member.name || 'Unknown',
+            email: member.email || '',
+            photoURL: member.photoURL || null,
+            amount: 0,
+            groups: [],
+          };
+          breakdowns.push(personEntry);
         }
+
+        personEntry.amount += settlement.amount;
+        personEntry.groups.push({
+          groupId: group.id,
+          groupName: group.name,
+          amount: settlement.amount,
+          currency: group.currency,
+        });
       });
     });
+
     breakdowns.sort((a, b) => b.amount - a.amount);
     return breakdowns;
   };
