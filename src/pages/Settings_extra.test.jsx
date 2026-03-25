@@ -89,6 +89,16 @@ import Settings from './Settings';
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
+  window.matchMedia = jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  }));
   jest.clearAllMocks();
   mockGetDeviceInfo.mockReturnValue('Chrome on Windows');
   mockIsBiometricEnabledOnDevice.mockReturnValue(false);

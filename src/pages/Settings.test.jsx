@@ -76,6 +76,21 @@ jest.mock('../components/DarkModeToggle', () => () => <div data-testid="dark-mod
 // ─── Import after mocks ───────────────────────────────────────────────────────
 import Settings from './Settings';
 
+// ─── Global setup ─────────────────────────────────────────────────────────────
+
+beforeEach(() => {
+  window.matchMedia = jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  }));
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Settings - Rendering', () => {
