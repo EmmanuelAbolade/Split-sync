@@ -249,7 +249,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         );
         
         if (!authenticated) {
-          setError('Biometric authentication was cancelled or failed. Please try again.');
+          setError('Biometric authentication was cancelled or failed. Please try again or Enable biometric authentication in Settings.');
           setLoading(false);
           setShowConfirmation(false); // Reset confirmation state
           return;
@@ -298,42 +298,40 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setShowSepaModal(true);
   };
 
+  // Handle SEPA payment success.
+  // Previously wrote the expense directly, bypassing recordPaymentSent — the payee
+  // received no notification and the balance updated without their confirmation.
+  // Now uses the same confirmation flow as PayPal and Revolut: recordPaymentSent
+  // sends the payee a payment_confirmation_needed notification. The expense (and
+  // balance update) only happens after the payee confirms receipt.
   const handleSepaPaymentSuccess = async (paymentResult) => {
     try {
-      const settlementData = {
+      await recordPaymentSent({
+        payerId: settlement.from,
+        payerName: fromMember?.name || 'Unknown',
+        payeeId: settlement.to,
+        payeeName: toMember?.name || 'Unknown',
         groupId: group.id,
-        title: `SEPA Settlement: ${fromMember?.name} → ${toMember?.name}`,
+        groupName: group.name,
         amount: paymentResult.amount,
         currency: group.currency,
-        paidBy: settlement.from,
-        category: 'settlement',
-        description: `SEPA Payment (Ref: ${paymentResult.reference})`,
-        date: new Date(),
-        splitMethod: 'exact',
-        splits: {
-          [settlement.to]: paymentResult.amount,
-        },
-        participants: [settlement.from, settlement.to],
-        createdAt: serverTimestamp(),
-        isSettlement: true,
-        paymentMethod: 'sepa',
-        sepaReference: paymentResult.reference,
-        sepaPaymentId: paymentResult.paymentId,
-        recordedBy: currentUserId,
-      };
+        method: 'sepa',
+      });
 
-      await addDoc(collection(db, 'expenses'), settlementData);
-      
       setPaymentSuccess(true);
       setShowSepaModal(false);
-      
+
       setTimeout(() => {
         onClose();
-      }, 2000);
-      
+      }, 2500);
+
     } catch (err) {
       console.error('Error recording SEPA settlement:', err);
-      setError('Payment processed but failed to record. Please contact support.');
+      setError(
+        err?.code === 'permission-denied'
+          ? 'Permission denied. Ensure you are signed in and try again.'
+          : 'Payment processed but notification failed to send. Please contact support.'
+      );
     }
   };
 

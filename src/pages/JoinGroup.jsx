@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { Users, CheckCircle } from 'lucide-react';
+import { Users, CheckCircle, AlertTriangle, DollarSign, BarChart2 } from 'lucide-react';
 
 export default function JoinGroup() {
   const { groupId } = useParams();
@@ -80,6 +80,27 @@ export default function JoinGroup() {
         memberIds: arrayUnion(user.uid),
       });
 
+      // Show onboarding wizard for users who have never completed it.
+      // Users who register via the normal flow have isFirstLogin set by Register.jsx.
+      // Users who arrive via an invite link skip registration, so the flag is never set.
+      // We check here and set it so Dashboard shows the wizard on their next load.
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const hasSeenOnboarding =
+            userData.isFirstLogin === false || !!userData.onboardingCompletedAt;
+          if (!hasSeenOnboarding) {
+            await updateDoc(doc(db, 'users', user.uid), {
+              isFirstLogin: true,
+            });
+          }
+        }
+      } catch (onboardingErr) {
+        // Non-critical — log and continue. Joining the group still succeeds.
+        console.warn('Could not set onboarding flag:', onboardingErr?.message);
+      }
+
       // Navigate to group after joining
       setTimeout(() => {
         navigate(`/group/${groupId}`);
@@ -106,7 +127,9 @@ export default function JoinGroup() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-8 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">⚠️</div>
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle size={32} className="text-red-600 dark:text-red-400" />
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Invalid Invite</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
           <button
@@ -199,21 +222,27 @@ export default function JoinGroup() {
 
         <div className="space-y-3 mb-6">
           <div className="flex items-start gap-3">
-            <div className="text-2xl">💰</div>
+            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
+              <DollarSign size={16} className="text-indigo-600 dark:text-indigo-400" />
+            </div>
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white">Track Expenses</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">Record shared expenses easily</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="text-2xl">📊</div>
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+              <BarChart2 size={16} className="text-blue-600 dark:text-blue-400" />
+            </div>
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white">See Balances</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">Know who owes what instantly</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="text-2xl">✅</div>
+            <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+              <CheckCircle size={16} className="text-green-600 dark:text-green-400" />
+            </div>
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white">Settle Up</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">Record payments when settled</p>

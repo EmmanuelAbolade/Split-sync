@@ -628,126 +628,131 @@ export default function GroupDetails() {
           )}
         </div>
 
-        {/* Pending Payment Banner - sessionStorage-based (shown while user is in the same session) */}
-        {pendingPaymentBanner && (
-          <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-6 animate-scale-in">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 size={20} className="text-amber-600 dark:text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
-                  Payment Confirmation Needed
-                </p>
-                <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
-                  Did you complete your {pendingPaymentBanner.method?.toUpperCase()} payment of{' '}
-                  <strong>{pendingPaymentBanner.currency} {pendingPaymentBanner.amount?.toFixed(2)}</strong>{' '}
-                  to <strong>{pendingPaymentBanner.toName}</strong>?
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      const matchingSettlement = settlements.find(
-                        s => s.from === pendingPaymentBanner.fromUserId && 
-                            s.to === pendingPaymentBanner.toUserId
-                      );
-                      if (matchingSettlement) {
-                        setSelectedSettlement(matchingSettlement);
-                      }
-                    }}
-                    className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition text-sm font-medium"
-                  >
-                    Yes, Mark as Paid
-                  </button>
-                  <button
-                    onClick={() => {
-                      sessionStorage.removeItem('pendingPayment');
-                      setPendingPaymentBanner(null);
-                    }}
-                    className="px-4 py-2 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition text-sm"
-                  >
-                    Not Yet
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Sticky Payment Confirmation Banner zone.
+            Only renders when there are actions the current user needs to take.
+            Positioned sticky below the top nav so it remains visible while scrolling. */}
+        {(pendingPaymentBanner || groupPaymentActions.length > 0) && (
+          <div className="sticky top-0 z-40 -mx-4 px-4 pt-2 pb-3 bg-gray-50 dark:bg-gray-900 border-b border-amber-200 dark:border-amber-800 shadow-sm mb-4">
 
-        {/* Payment Action Banners - derived from notifications store, no separate Firestore query.
-            Payee sees confirm/decline; payer sees "awaiting confirmation" notice. */}
-        {groupPaymentActions.map((notif) => {
-          const pd = notif.data || {};
-          // eslint-disable-next-line no-unused-vars
-          const isPayee = notif.userId === user.uid; // always true here (payee's notification)
-          const actionLoading = settlementActionLoading[notif.id];
-
-          return (
-            <div
-              key={notif.id}
-              className="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-4 animate-scale-in"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle size={20} className="text-amber-600 dark:text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
-                    Payment Confirmation Required
-                  </p>
-                  <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">
-                    <strong>{pd.payerName}</strong> claims to have paid you{' '}
-                    <strong>{pd.currency} {Number(pd.amount).toFixed(2)}</strong> via{' '}
-                    <strong>{pd.method?.toUpperCase()}</strong>.
-                  </p>
-                  <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
-                    Confirm only if you actually received the money. The balance updates only after your confirmation.
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={async () => {
-                        setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'confirming' }));
-                        try {
-                          await confirmPaymentReceived(notif.id);
-                        } catch (err) {
-                          console.error('Error confirming payment:', err);
-                        } finally {
-                          setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
-                        }
-                      }}
-                      disabled={!!actionLoading}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-sm font-medium disabled:opacity-60"
-                    >
-                      {actionLoading === 'confirming'
-                        ? <Clock size={14} className="animate-spin" />
-                        : <CheckCircle2 size={14} />}
-                      {actionLoading === 'confirming' ? 'Confirming...' : 'Confirm Received'}
-                    </button>
-                    <button
-                      onClick={async () => {
-                        setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'declining' }));
-                        try {
-                          await declinePaymentReceived(notif.id);
-                        } catch (err) {
-                          console.error('Error declining payment:', err);
-                        } finally {
-                          setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
-                        }
-                      }}
-                      disabled={!!actionLoading}
-                      className="flex items-center gap-1.5 px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm disabled:opacity-60"
-                    >
-                      {actionLoading === 'declining'
-                        ? <Clock size={14} className="animate-spin" />
-                        : <XCircle size={14} />}
-                      {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
-                    </button>
+            {/* Payer: sessionStorage-based pending confirmation (same session, link-based payments) */}
+            {pendingPaymentBanner && (
+              <div className="bg-amber-50 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 rounded-xl p-4 animate-scale-in">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/60 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 size={18} className="text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1 text-sm">
+                      Payment Confirmation Needed
+                    </p>
+                    <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
+                      Did you complete your {pendingPaymentBanner.method?.toUpperCase()} payment of{' '}
+                      <strong>{pendingPaymentBanner.currency} {pendingPaymentBanner.amount?.toFixed(2)}</strong>{' '}
+                      to <strong>{pendingPaymentBanner.toName}</strong>?
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        onClick={() => {
+                          const matchingSettlement = settlements.find(
+                            s => s.from === pendingPaymentBanner.fromUserId &&
+                                s.to === pendingPaymentBanner.toUserId
+                          );
+                          if (matchingSettlement) {
+                            setSelectedSettlement(matchingSettlement);
+                          }
+                        }}
+                        className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition text-sm font-medium"
+                      >
+                        Yes, Mark as Paid
+                      </button>
+                      <button
+                        onClick={() => {
+                          sessionStorage.removeItem('pendingPayment');
+                          setPendingPaymentBanner(null);
+                        }}
+                        className="px-4 py-2 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition text-sm"
+                      >
+                        Not Yet
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            )}
+
+            {/* Payee: notification-driven banners — confirm or decline each incoming payment */}
+            {groupPaymentActions.map((notif) => {
+              const pd = notif.data || {};
+              const actionLoading = settlementActionLoading[notif.id];
+
+              return (
+                <div
+                  key={notif.id}
+                  className="bg-amber-50 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mt-2 animate-scale-in"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/60 rounded-full flex items-center justify-center flex-shrink-0">
+                      <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1 text-sm">
+                        Payment Confirmation Required
+                      </p>
+                      <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">
+                        <strong>{pd.payerName}</strong> claims to have paid you{' '}
+                        <strong>{pd.currency} {Number(pd.amount).toFixed(2)}</strong> via{' '}
+                        <strong>{pd.method?.toUpperCase()}</strong>.
+                      </p>
+                      <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
+                        Confirm only if you actually received the money. The balance updates only after your confirmation.
+                      </p>
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={async () => {
+                            setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'confirming' }));
+                            try {
+                              await confirmPaymentReceived(notif.id);
+                            } catch (err) {
+                              console.error('Error confirming payment:', err);
+                            } finally {
+                              setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
+                            }
+                          }}
+                          disabled={!!actionLoading}
+                          className="flex items-center gap-1.5 px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-sm font-medium disabled:opacity-60"
+                        >
+                          {actionLoading === 'confirming'
+                            ? <Clock size={14} className="animate-spin" />
+                            : <CheckCircle2 size={14} />}
+                          {actionLoading === 'confirming' ? 'Confirming...' : 'Confirm Received'}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'declining' }));
+                            try {
+                              await declinePaymentReceived(notif.id);
+                            } catch (err) {
+                              console.error('Error declining payment:', err);
+                            } finally {
+                              setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
+                            }
+                          }}
+                          disabled={!!actionLoading}
+                          className="flex items-center gap-1.5 px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm disabled:opacity-60"
+                        >
+                          {actionLoading === 'declining'
+                            ? <Clock size={14} className="animate-spin" />
+                            : <XCircle size={14} />}
+                          {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Pending Invitations Section */}
         {pendingInvitations.length > 0 && (

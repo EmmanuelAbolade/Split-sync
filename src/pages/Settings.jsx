@@ -1,6 +1,6 @@
 // src/pages/Settings.jsx
 // Settings page — collapsible sections:
-// Profile | Notifications | Appearance | Security & Privacy | Account | Support
+// Profile | Notifications | Appearance | Install App | Security & Privacy | Account | Support
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import {
   ArrowLeft, User, Mail, Bell, Trash2, LogOut,
   Shield, Eye, EyeOff, AlertTriangle, ChevronDown,
   QrCode, HelpCircle, Moon, Fingerprint, Info, Timer,
+  MonitorDown, Smartphone, CheckCircle2, Share2,
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { useSessionTimeout } from '../hooks/useSessionTimeout';
@@ -153,6 +154,60 @@ export default function Settings() {
     { value: '30min', label: '30 minutes' },
     { value: 'never', label: 'Never' },
   ];
+
+  // ── PWA Install ────────────────────────────────────────────────────────────
+  // Captures the browser's beforeinstallprompt event so we can trigger it via
+  // a button. Works on Chrome and Edge (Android + desktop). iOS requires the
+  // user to use Safari's Share sheet manually, so we detect and show steps.
+
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [isInstalled,   setIsInstalled]   = useState(false);
+  const [installDone,   setInstallDone]   = useState(false);
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandaloneMode =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    navigator.standalone === true;
+
+  useEffect(() => {
+    if (isInStandaloneMode) {
+      setIsInstalled(true);
+      return;
+    }
+
+    const handler = (e) => {
+      e.preventDefault();          // Stop the browser's own mini-infobar
+      setInstallPrompt(e);         // Save the event for later use
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    // Detect successful install via appinstalled event
+    const onInstalled = () => {
+      setIsInstalled(true);
+      setInstallPrompt(null);
+    };
+    window.addEventListener('appinstalled', onInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, [isInStandaloneMode]);
+
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+    try {
+      await installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setInstallDone(true);
+        setInstallPrompt(null);
+      }
+    } catch (err) {
+      console.error('PWA install error:', err);
+    }
+  };
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -397,7 +452,89 @@ export default function Settings() {
           </div>
         </Section>
 
-        {/* ── 4. Security & Privacy ── */}
+        {/* ── 4. Install App ── */}
+        <Section
+          title="Install App"
+          icon={MonitorDown}
+          iconBg="bg-teal-50 dark:bg-teal-900/30"
+          iconColor="text-teal-600 dark:text-teal-400"
+        >
+          {/* Already installed */}
+          {isInstalled && (
+            <div className="flex items-center gap-3 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+              <CheckCircle2 size={18} className="text-green-600 dark:text-green-400 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                  Split-Sync is installed
+                </p>
+                <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">
+                  Open it from your home screen or app launcher.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Install completed this session */}
+          {!isInstalled && installDone && (
+            <div className="flex items-center gap-3 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+              <CheckCircle2 size={18} className="text-green-600 dark:text-green-400 shrink-0" />
+              <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                Installation started — check your home screen.
+              </p>
+            </div>
+          )}
+
+          {/* Chrome / Edge install button */}
+          {!isInstalled && !installDone && installPrompt && (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 px-1">
+                Install Split-Sync as an app for faster access, offline support, and a full-screen experience — no app store required.
+              </p>
+              <button
+                onClick={handleInstallClick}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 dark:bg-teal-700 text-white rounded-xl text-sm font-medium hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors"
+              >
+                <MonitorDown size={17} />
+                Install Split-Sync
+              </button>
+            </div>
+          )}
+
+          {/* iOS Safari instructions */}
+          {!isInstalled && !installDone && isIOS && (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 px-1">
+                To install on iOS, use Safari and follow these steps:
+              </p>
+              <ol className="space-y-2">
+                {[
+                  { icon: Share2,      text: 'Tap the Share button in Safari\'s toolbar' },
+                  { icon: Smartphone,  text: 'Scroll down and tap "Add to Home Screen"' },
+                  { icon: CheckCircle2,text: 'Tap "Add" to confirm' },
+                ].map(({ icon: Icon, text }, i) => (
+                  <li key={i} className="flex items-start gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl">
+                    <div className="w-7 h-7 bg-teal-100 dark:bg-teal-900/40 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                      <Icon size={14} className="text-teal-600 dark:text-teal-400" />
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{text}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Fallback: browser does not support install prompt and is not iOS */}
+          {!isInstalled && !installDone && !installPrompt && !isIOS && (
+            <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl space-y-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Install not available</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                To install Split-Sync, open it in Chrome or Edge on your device. The install option will appear here automatically.
+              </p>
+            </div>
+          )}
+        </Section>
+
+        {/* ── 5. Security & Privacy ── */}
         <Section
           title="Security & Privacy"
           icon={Shield}
@@ -462,7 +599,7 @@ export default function Settings() {
 
         </Section>
 
-        {/* ── 5. Account ── */}
+        {/* ── 6. Account ── */}
         <Section
           title="Account"
           icon={User}
@@ -491,7 +628,7 @@ export default function Settings() {
           />
         </Section>
 
-        {/* ── 6. Support ── */}
+        {/* ── 7. Support ── */}
         <Section
           title="Support"
           icon={HelpCircle}
