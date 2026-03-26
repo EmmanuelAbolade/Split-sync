@@ -16,11 +16,12 @@ jest.mock('../services/firebase', () => ({
 }));
 
 jest.mock('firebase/firestore', () => ({
-  collection: jest.fn(() => ({})),
-  addDoc: jest.fn(() => Promise.resolve({ id: 'new-expense-id' })),
+  collection:      jest.fn(() => ({})),
+  addDoc:          jest.fn(() => Promise.resolve({ id: 'new-expense-id' })),
   serverTimestamp: jest.fn(() => new Date()),
+  doc:             jest.fn(() => ({})),
+  updateDoc:       jest.fn(() => Promise.resolve()),
 }));
-
 jest.mock('../stores/authStore', () => ({
   useAuthStore: () => ({
     user: {
