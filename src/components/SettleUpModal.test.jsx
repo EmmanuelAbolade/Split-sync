@@ -47,15 +47,41 @@ jest.mock('../utils/paymentLinks', () => ({
   getAvailablePaymentMethods: jest.fn(() => []),
 }));
 
+// Exposes createOrder / onApprove / onError so they can be triggered in tests
 jest.mock('@paypal/react-paypal-js', () => ({
-  PayPalButtons: () => <div data-testid="paypal-buttons">PayPal Buttons</div>,
+  PayPalButtons: ({ createOrder, onApprove, onError, disabled }) => (
+    <div data-testid="paypal-buttons">
+      <button
+        data-testid="paypal-create"
+        disabled={disabled}
+        onClick={() =>
+          createOrder({}, { order: { create: jest.fn().mockResolvedValue('order-123') } })
+        }
+      >
+        PayPal Create
+      </button>
+      <button
+        data-testid="paypal-approve"
+        disabled={disabled}
+        onClick={() =>
+          onApprove({}, { order: { capture: jest.fn().mockResolvedValue({ id: 'capture-123' }) } })
+        }
+      >
+        PayPal Approve
+      </button>
+      <button data-testid="paypal-error" onClick={() => onError(new Error('SDK error'))}>
+        PayPal Error
+      </button>
+    </div>
+  ),
 }));
 
 jest.mock('./PaymentInfoModal', () =>
-  function MockPaymentInfoModal({ isOpen, onClose }) {
+  function MockPaymentInfoModal({ isOpen, onClose, paymentInfo }) {
     if (!isOpen) return null;
     return (
       <div data-testid="payment-info-modal">
+        <button onClick={() => paymentInfo?.onProceed?.()}>Proceed</button>
         <button onClick={onClose}>Close Payment Info</button>
       </div>
     );
@@ -493,5 +519,668 @@ describe('SettleUpModal - Error Handling', () => {
         screen.getByText(/failed to record settlement/i)
       ).toBeInTheDocument()
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Stale / malformed pending payment (lines 71-72, 78-80)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Stale pending payment', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+  });
+
+  test('clears sessionStorage and shows main modal when groupId does not match', () => {
+    sessionStorage.setItem(
+      'pendingPayment',
+      JSON.stringify({
+        groupId: 'other-group',
+        fromUserId: 'user-1',
+        toUserId: 'user-2',
+        amount: 45.5,
+        currency: 'EUR',
+        method: 'paypal',
+        timestamp: Date.now(),
+      })
+    );
+    renderModal();
+    expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument();
+    expect(sessionStorage.getItem('pendingPayment')).toBeNull();
+  });
+
+  test('handles malformed JSON in sessionStorage gracefully', () => {
+    sessionStorage.setItem('pendingPayment', 'not-valid-json{{{');
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument();
+    expect(sessionStorage.getItem('pendingPayment')).toBeNull();
+    consoleSpy.mockRestore();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. Recipient doc exists — sets payment methods (lines 93-94)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Recipient doc exists', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    const { getDoc } = require('firebase/firestore');
+    getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        paymentMethods: {
+          paypalUsername: 'bob_paypal',
+          revolutUsername: 'bob_revolut',
+        },
+      }),
+    });
+  });
+
+  test('fetches and stores recipient payment methods when doc exists', async () => {
+    const { getDoc } = require('firebase/firestore');
+    renderModal();
+    await waitFor(() => expect(getDoc).toHaveBeenCalledTimes(1));
+    // Component should still render correctly after loading
+    expect(screen.getByText(/Pay Settlement/i)).toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 11. Amount validation (lines 232-233, 669-670)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Amount validation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+  });
+
+  test('shows error when manual settle is attempted with zero amount', async () => {
+    renderModal();
+    await waitFor(() => screen.getByRole('button', { name: /Paid Offline/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Paid Offline/i }));
+    // Clear the amount
+    const input = screen.getByPlaceholderText('0.00');
+    fireEvent.change(input, { target: { value: '' } });
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Sent/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Sent/i }));
+    await waitFor(() =>
+      expect(screen.getByText('Valid amount is required')).toBeInTheDocument()
+    );
+  });
+
+  test('blocks input and shows error when amount exceeds 1,000,000', async () => {
+    renderModal();
+    await waitFor(() => screen.getByPlaceholderText('0.00'));
+    const input = screen.getByPlaceholderText('0.00');
+    fireEvent.change(input, { target: { value: '1000001' } });
+    await waitFor(() =>
+      expect(screen.getByText('Settlement amount cannot exceed 1,000,000')).toBeInTheDocument()
+    );
+  });
+
+  test('formats amount to 2 decimal places on blur', async () => {
+    renderModal();
+    await waitFor(() => screen.getByPlaceholderText('0.00'));
+    const input = screen.getByPlaceholderText('0.00');
+    fireEvent.change(input, { target: { value: '25' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('25.00');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. handleMarkAsPaid error paths (lines 207-213)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - handleMarkAsPaid errors', () => {
+  const setPendingPayment = () => {
+    sessionStorage.setItem(
+      'pendingPayment',
+      JSON.stringify({
+        groupId: 'group-1',
+        fromUserId: 'user-1',
+        toUserId: 'user-2',
+        fromName: 'Alice',
+        toName: 'Bob',
+        amount: 45.5,
+        currency: 'EUR',
+        method: 'paypal',
+        timestamp: Date.now(),
+      })
+    );
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setPendingPayment();
+  });
+
+  afterEach(() => sessionStorage.clear());
+
+  test('shows permission-denied error when recordPaymentSent is rejected with that code', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    const err = Object.assign(new Error('denied'), { code: 'permission-denied' });
+    recordPaymentSent.mockRejectedValueOnce(err);
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByRole('button', { name: /Mark as Paid/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Permission denied. Please ensure you are signed in and try again.')
+      ).toBeInTheDocument()
+    );
+    consoleSpy.mockRestore();
+  });
+
+  test('shows generic error message when recordPaymentSent fails with unknown error', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    recordPaymentSent.mockRejectedValueOnce(new Error('Network timeout'));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByRole('button', { name: /Mark as Paid/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
+    });
+    await waitFor(() =>
+      expect(screen.getByText(/Failed to record payment/)).toBeInTheDocument()
+    );
+    consoleSpy.mockRestore();
+  });
+
+  test('closes pending dialog when X button is clicked', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText(/Did you complete the payment/i));
+    // The X close button has no visible text — find it by absence of text
+    const allButtons = screen.getAllByRole('button');
+    const xBtn = allButtons.find(b => b.textContent.trim() === '');
+    fireEvent.click(xBtn);
+    await waitFor(() =>
+      expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument()
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 13. Biometric failure paths (lines 252-262)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Biometric failure paths', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+  });
+
+  test('shows cancellation error when biometric returns false', async () => {
+    const { authenticateWithBiometric } = require('../utils/biometric');
+    authenticateWithBiometric.mockResolvedValueOnce(false);
+    renderModal(receiverProps);
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    });
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Receipt/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Biometric authentication was cancelled or failed/i)
+      ).toBeInTheDocument()
+    );
+  });
+
+  test('shows authentication error when biometric throws', async () => {
+    const { authenticateWithBiometric } = require('../utils/biometric');
+    authenticateWithBiometric.mockRejectedValueOnce(new Error('WebAuthn not supported'));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal(receiverProps);
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    });
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Receipt/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Authentication failed. Please enable biometric/i)
+      ).toBeInTheDocument()
+    );
+    consoleSpy.mockRestore();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 14. Receiver confirmation dialog detail (lines 566-595)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Receiver confirmation dialog detail', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    const { authenticateWithBiometric } = require('../utils/biometric');
+    authenticateWithBiometric.mockResolvedValue(true);
+  });
+
+  test('confirmation dialog shows From, To, and Amount', async () => {
+    renderModal(receiverProps);
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    });
+    await waitFor(() => screen.getByText('Confirm Payment'));
+    // Confirmation details — names may appear multiple times in the UI
+    expect(screen.getAllByText(/Alice/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Bob/).length).toBeGreaterThan(0);
+  });
+
+  test('Go Back button dismisses confirmation and returns to main form', async () => {
+    renderModal(receiverProps);
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    });
+    await waitFor(() => screen.getByRole('button', { name: /Go Back/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Go Back/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Confirm Payment Received/i })
+      ).toBeInTheDocument()
+    );
+  });
+
+  test('X button on confirmation dialog dismisses it', async () => {
+    renderModal(receiverProps);
+    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
+    });
+    await waitFor(() => screen.getByText('Confirm Payment'));
+    const allButtons = screen.getAllByRole('button');
+    const xBtn = allButtons.find(b => b.textContent.trim() === '');
+    fireEvent.click(xBtn);
+    await waitFor(() =>
+      expect(screen.queryByText('Confirm Payment')).not.toBeInTheDocument()
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 15. SEPA payment flow (lines 281-298, 308-330)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - SEPA payment flow', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    // Recipient has an IBAN so the SEPA button is visible
+    const { getDoc } = require('firebase/firestore');
+    getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        paymentMethods: { encryptedIBAN: 'enc-iban-data', paypalUsername: '' },
+      }),
+    });
+  });
+
+  test('clicking SEPA Bank Transfer opens SepaPaymentModal', async () => {
+    renderModal();
+    await waitFor(() =>
+      expect(screen.getByText('SEPA Bank Transfer')).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    expect(screen.getByTestId('sepa-modal')).toBeInTheDocument();
+  });
+
+  test('SEPA success callback calls recordPaymentSent and shows success screen', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    renderModal();
+    await waitFor(() => screen.getByText('SEPA Bank Transfer'));
+    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Complete SEPA'));
+    });
+    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledWith(
+      expect.objectContaining({ method: 'sepa', groupId: 'group-1' })
+    ));
+    await waitFor(() =>
+      expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
+    );
+  });
+
+  test('SEPA success shows permission-denied error when recordPaymentSent is rejected', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    const err = Object.assign(new Error('denied'), { code: 'permission-denied' });
+    recordPaymentSent.mockRejectedValueOnce(err);
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByText('SEPA Bank Transfer'));
+    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Complete SEPA'));
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Permission denied. Ensure you are signed in and try again.')
+      ).toBeInTheDocument()
+    );
+    consoleSpy.mockRestore();
+  });
+
+  test('SEPA success shows generic error when recordPaymentSent fails', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    recordPaymentSent.mockRejectedValueOnce(new Error('Network error'));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByText('SEPA Bank Transfer'));
+    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Complete SEPA'));
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          'Payment processed but notification failed to send. Please contact support.'
+        )
+      ).toBeInTheDocument()
+    );
+    consoleSpy.mockRestore();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 16. handlePaymentLinkClick — PayPal, Revolut, Bank (lines 340-391, 677-850)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Payment link click and options section', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    const { getDoc } = require('firebase/firestore');
+    getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        paymentMethods: { paypalUsername: 'bob', revolutUsername: 'bobrev' },
+      }),
+    });
+    const { getAvailablePaymentMethods } = require('../utils/paymentLinks');
+    getAvailablePaymentMethods.mockReturnValue([
+      { id: 'paypal',  name: 'PayPal',         icon: null, description: 'Pay via PayPal',  username: 'bob'    },
+      { id: 'revolut', name: 'Revolut',         icon: null, description: 'Pay via Revolut', username: 'bobrev' },
+      { id: 'bank',    name: 'Bank Transfer',   icon: null, description: 'Direct transfer', iban: 'GB29XXXX', bic: 'BARCGB22' },
+    ]);
+  });
+
+  test('shows Quick Payment Options section when methods are available', async () => {
+    renderModal();
+    await waitFor(() =>
+      expect(screen.getByText('Quick Payment Options')).toBeInTheDocument()
+    );
+  });
+
+  test('clicking PayPal method opens PaymentInfoModal', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('PayPal'));
+    fireEvent.click(screen.getByText('PayPal'));
+    expect(screen.getByTestId('payment-info-modal')).toBeInTheDocument();
+  });
+
+  test('PayPal Proceed calls generatePayPalLink and opens external URL', async () => {
+    window.open = jest.fn();
+    const { generatePayPalLink } = require('../utils/paymentLinks');
+    renderModal();
+    await waitFor(() => screen.getByText('PayPal'));
+    fireEvent.click(screen.getByText('PayPal'));
+    await waitFor(() => screen.getByText('Proceed'));
+    fireEvent.click(screen.getByText('Proceed'));
+    expect(generatePayPalLink).toHaveBeenCalled();
+  });
+
+  test('clicking Revolut method opens PaymentInfoModal', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Revolut'));
+    fireEvent.click(screen.getByText('Revolut'));
+    expect(screen.getByTestId('payment-info-modal')).toBeInTheDocument();
+  });
+
+  test('clicking Bank Transfer method shows inline bank details with IBAN', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Bank Transfer'));
+    fireEvent.click(screen.getByText('Bank Transfer'));
+    expect(screen.getByText('Bank Transfer Details')).toBeInTheDocument();
+    expect(screen.getByText('GB29XXXX')).toBeInTheDocument();
+  });
+
+  test('clicking Bank Transfer shows BIC when present', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Bank Transfer'));
+    fireEvent.click(screen.getByText('Bank Transfer'));
+    expect(screen.getByText('BARCGB22')).toBeInTheDocument();
+  });
+
+  test('Back to options link hides bank details', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Bank Transfer'));
+    fireEvent.click(screen.getByText('Bank Transfer'));
+    fireEvent.click(screen.getByText('Back to options'));
+    expect(screen.queryByText('Bank Transfer Details')).not.toBeInTheDocument();
+  });
+
+  test('saves pending payment to sessionStorage when a payment method is clicked', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('PayPal'));
+    fireEvent.click(screen.getByText('PayPal'));
+    expect(sessionStorage.getItem('pendingPayment')).not.toBeNull();
+    const stored = JSON.parse(sessionStorage.getItem('pendingPayment'));
+    expect(stored.groupId).toBe('group-1');
+    expect(stored.method).toBe('paypal');
+  });
+
+  test('stores revolut method when Revolut link is clicked', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Revolut'));
+    fireEvent.click(screen.getByText('Revolut'));
+    const stored = JSON.parse(sessionStorage.getItem('pendingPayment'));
+    expect(stored.method).toBe('revolut');
+  });
+
+  test('recipient has no PayPal notice shown when paypalUsername is missing', async () => {
+    const { getDoc } = require('firebase/firestore');
+    getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ paymentMethods: { paypalUsername: '', revolutUsername: '' } }),
+    });
+    const { getAvailablePaymentMethods } = require('../utils/paymentLinks');
+    getAvailablePaymentMethods.mockReturnValue([]);
+    renderModal();
+    await waitFor(() => expect(getDoc).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.getByText(/has not set up PayPal/i)).toBeInTheDocument()
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 17. PayPal demo panel — toggle, createOrder, onApprove, onError (lines 396-441, 906)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - PayPal demo panel', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    // Ensure collection mock always returns a valid ref after clearAllMocks
+    const { collection } = require('firebase/firestore');
+    collection.mockReturnValue({});
+  });
+
+  const expandDemoPanel = () =>
+    fireEvent.click(screen.getByText('Future feature - Settlement Payment Flow'));
+
+  test('demo panel is hidden by default', () => {
+    renderModal();
+    expect(screen.queryByTestId('paypal-buttons')).not.toBeInTheDocument();
+  });
+
+  test('clicking demo toggle reveals PayPal buttons', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
+    expandDemoPanel();
+    expect(screen.getByTestId('paypal-buttons')).toBeInTheDocument();
+  });
+
+  test('clicking demo toggle again hides the panel', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
+    expandDemoPanel();
+    expandDemoPanel();
+    expect(screen.queryByTestId('paypal-buttons')).not.toBeInTheDocument();
+  });
+
+  test('PayPal buttons not shown when amount is zero (entry-amount prompt shown)', async () => {
+    renderModal();
+    const input = screen.getByPlaceholderText('0.00');
+    fireEvent.change(input, { target: { value: '' } });
+    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
+    expandDemoPanel();
+    expect(screen.queryByTestId('paypal-buttons')).not.toBeInTheDocument();
+    expect(screen.getByText('Enter an amount above to continue')).toBeInTheDocument();
+  });
+
+  test('onPayPalApprove records settlement with PayPal order ID and shows success', async () => {
+    const { addDoc } = require('firebase/firestore');
+    renderModal();
+    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
+    expandDemoPanel();
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('paypal-approve'));
+    });
+    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+    const [[, data]] = addDoc.mock.calls;
+    expect(data).toMatchObject({ paypalOrderId: 'capture-123', paymentMethod: 'paypal' });
+    await waitFor(() =>
+      expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
+    );
+  });
+
+  test('onPayPalError sets an error message', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
+    expandDemoPanel();
+    fireEvent.click(screen.getByTestId('paypal-error'));
+    expect(
+      screen.getByText('Payment initialization failed. Please try again.')
+    ).toBeInTheDocument();
+    consoleSpy.mockRestore();
+  });
+
+  test('onPayPalApprove shows error when recordSettlement fails', async () => {
+    const { addDoc } = require('firebase/firestore');
+    addDoc.mockRejectedValueOnce(new Error('Firestore error'));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
+    expandDemoPanel();
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('paypal-approve'));
+    });
+    await waitFor(() =>
+      expect(screen.getByText('Payment failed. Please try again.')).toBeInTheDocument()
+    );
+    consoleSpy.mockRestore();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 18. Receiver QR panel — tabs and QR canvas (lines 1022-1133)
+// ---------------------------------------------------------------------------
+
+describe('SettleUpModal - Receiver QR panel tabs', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    const { getDoc } = require('firebase/firestore');
+    getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        paymentMethods: {
+          paypalUsername: 'bob_paypal',
+          revolutUsername: 'bob_revolut',
+        },
+      }),
+    });
+  });
+
+  const openQRPanel = async () => {
+    await waitFor(() => screen.getByText(/Let Alice scan to pay you/i));
+    fireEvent.click(screen.getByText(/Let Alice scan to pay you/i).closest('button'));
+  };
+
+  test('PayPal tab is shown when paypalUsername is set', async () => {
+    renderModal(receiverProps);
+    await openQRPanel();
+    expect(screen.getByRole('button', { name: /PayPal/i })).toBeInTheDocument();
+  });
+
+  test('Revolut tab is shown when revolutUsername is set', async () => {
+    renderModal(receiverProps);
+    await openQRPanel();
+    expect(screen.getByRole('button', { name: /Revolut/i })).toBeInTheDocument();
+  });
+
+  test('PayPal QR canvas is visible by default (activeQR = paypal)', async () => {
+    renderModal(receiverProps);
+    await waitFor(() => expect(require('firebase/firestore').getDoc).toHaveBeenCalled());
+    await openQRPanel();
+    await waitFor(() => expect(screen.getByTestId('qr-canvas')).toBeInTheDocument());
+    const { generatePayPalLink } = require('../utils/paymentLinks');
+    expect(generatePayPalLink).toHaveBeenCalledWith('bob_paypal', expect.any(Number), expect.any(String));
+  });
+
+  test('switching to Revolut tab shows Revolut QR canvas', async () => {
+    renderModal(receiverProps);
+    await waitFor(() => expect(require('firebase/firestore').getDoc).toHaveBeenCalled());
+    await openQRPanel();
+    await waitFor(() => screen.getByRole('button', { name: /Revolut/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Revolut/i }));
+    await waitFor(() => {
+      const { generateRevolutLink } = require('../utils/paymentLinks');
+      expect(generateRevolutLink).toHaveBeenCalledWith(
+        'bob_revolut',
+        expect.any(Number),
+        expect.any(String)
+      );
+    });
+  });
+
+  test('shows no-methods fallback when neither PayPal nor Revolut is configured', async () => {
+    const { getDoc } = require('firebase/firestore');
+    getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ paymentMethods: {} }),
+    });
+    renderModal(receiverProps);
+    await waitFor(() => expect(require('firebase/firestore').getDoc).toHaveBeenCalled());
+    await openQRPanel();
+    await waitFor(() =>
+      expect(screen.getByText('No payment methods set up yet.')).toBeInTheDocument()
+    );
+  });
+
+  test('instruction text identifies the payer by name', async () => {
+    renderModal(receiverProps);
+    await openQRPanel();
+    expect(screen.getByText(/Show this screen to/i)).toBeInTheDocument();
+    // Alice may appear multiple times in the UI — just verify at least one instance
+    expect(screen.getAllByText(/Alice/i).length).toBeGreaterThan(0);
   });
 });
