@@ -104,3 +104,16 @@ export function getUserBalanceSummary(balances, userId, members) {
     amount: Math.abs(balance),
   };
 }
+
+/**
+ * Groups an array of { amount, currency } items by currency code.
+ * Returns an object like { GBP: 258.33, EUR: 18.33, USD: 10.00 }.
+ * Used across Profile, Activity, and Analytics to avoid summing different currencies.
+ */
+export function groupByCurrency(items) {
+  return items.reduce((acc, { amount, currency }) => {
+    if (!currency || !amount) return acc;
+    acc[currency] = (acc[currency] || 0) + amount;
+    return acc;
+  }, {});
+}

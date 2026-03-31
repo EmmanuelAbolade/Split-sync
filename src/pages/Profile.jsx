@@ -214,18 +214,26 @@ export default function Profile() {
     }, 500);
   };
 
-  // Calculate overall balance across all groups
+  // Calculate overall balance across all groups, grouped by currency.
+  // Never sums amounts across different currencies.
   const calculateOverallBalance = () => {
-    let totalOwed = 0;
-    let totalOwing = 0;
+    const owedByCurrency  = {}; // { GBP: X, EUR: Y } — others owe the user
+    const owingByCurrency = {}; // { GBP: Z }          — user owes others
+
     groups.forEach(group => {
+      const currency     = group.currency || 'EUR';
       const groupExpenses = expenses.filter(e => e.groupId === group.id);
-      const balances = calculateBalances(groupExpenses, group.members || []);
-      const userBalance = balances[user.uid] || 0;
-      if (userBalance > 0) totalOwed += userBalance;
-      else if (userBalance < 0) totalOwing += Math.abs(userBalance);
+      const balances      = calculateBalances(groupExpenses, group.members || []);
+      const userBalance   = balances[user.uid] || 0;
+
+      if (userBalance > 0.01) {
+        owedByCurrency[currency] = (owedByCurrency[currency] || 0) + userBalance;
+      } else if (userBalance < -0.01) {
+        owingByCurrency[currency] = (owingByCurrency[currency] || 0) + Math.abs(userBalance);
+      }
     });
-    return { totalOwed, totalOwing };
+
+    return { owedByCurrency, owingByCurrency };
   };
 
   // Calculate detailed breakdown of who owes what.
@@ -257,13 +265,16 @@ export default function Profile() {
             name: member.name || 'Unknown',
             email: member.email || '',
             photoURL: member.photoURL || null,
-            amount: 0,
+            amountsByCurrency: {}, // { GBP: X, EUR: Y } — replaces single amount
             groups: [],
           };
           breakdowns.push(personEntry);
         }
 
-        personEntry.amount += settlement.amount;
+        // Accumulate per currency — never sum across currencies
+        const currency = group.currency || 'EUR';
+        personEntry.amountsByCurrency[currency] =
+          (personEntry.amountsByCurrency[currency] || 0) + settlement.amount;
         personEntry.groups.push({
           groupId: group.id,
           groupName: group.name,
@@ -273,7 +284,12 @@ export default function Profile() {
       });
     });
 
-    breakdowns.sort((a, b) => b.amount - a.amount);
+    // Sort by total amount across all currencies for display order
+    breakdowns.sort((a, b) => {
+      const sumA = Object.values(a.amountsByCurrency).reduce((s, v) => s + v, 0);
+      const sumB = Object.values(b.amountsByCurrency).reduce((s, v) => s + v, 0);
+      return sumB - sumA;
+    });
     return breakdowns;
   };
 
@@ -347,11 +363,17 @@ export default function Profile() {
     }
   };
 
-  const { totalOwed, totalOwing } = calculateOverallBalance();
-  const netBalance = totalOwed - totalOwing;
-  const totalPaid = expenses
+  const { owedByCurrency, owingByCurrency } = calculateOverallBalance();
+
+  // Total paid per currency — looks up each expense's group currency
+  const paidByCurrency = {};
+  expenses
     .filter(e => e.paidBy === user.uid)
-    .reduce((sum, e) => sum + e.amount, 0);
+    .forEach(e => {
+      const group    = groups.find(g => g.id === e.groupId);
+      const currency = group?.currency || 'EUR';
+      paidByCurrency[currency] = (paidByCurrency[currency] || 0) + e.amount;
+    });
 
   const handleLogout = async () => {
     try {
@@ -454,24 +476,13 @@ export default function Profile() {
             Overall Balance
           </h2>
 
-          <div className={`text-center p-6 rounded-xl mb-4 border ${
-            netBalance > 0
-              ? 'bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-800'
-              : netBalance < 0
-              ? 'bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 border-orange-200 dark:border-orange-800'
-              : 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 border-gray-200 dark:border-gray-600'
-          }`}>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Net Balance</p>
-            <p className={`text-4xl font-bold ${
-              netBalance > 0 ? 'text-green-600 dark:text-green-400' :
-              netBalance < 0 ? 'text-orange-600 dark:text-orange-400' :
-              'text-gray-600 dark:text-gray-300'
-            }`}>
-              €{Math.abs(netBalance).toFixed(2)}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4 border border-gray-200 dark:border-gray-600">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 text-center">
+              Balances are shown per currency — no conversion applied
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-              {netBalance > 0 ? 'You are owed' : netBalance < 0 ? 'You owe' : 'All settled up!'}
-            </p>
+            {Object.keys(owedByCurrency).length === 0 && Object.keys(owingByCurrency).length === 0 && (
+              <p className="text-center text-gray-600 dark:text-gray-300 font-medium">All settled up!</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -488,7 +499,17 @@ export default function Profile() {
                 <TrendingUp size={16} className="text-green-600 dark:text-green-400" />
                 <p className="text-xs text-green-700 dark:text-green-300 font-medium">Owed to You</p>
               </div>
-              <p className="text-xl font-bold text-green-900 dark:text-green-100">€{totalOwed.toFixed(2)}</p>
+              <div className="space-y-0.5">
+                {Object.entries(owedByCurrency).length === 0 ? (
+                  <p className="text-xl font-bold text-green-900 dark:text-green-100">—</p>
+                ) : (
+                  Object.entries(owedByCurrency).map(([currency, amount]) => (
+                    <p key={currency} className="text-xl font-bold text-green-900 dark:text-green-100">
+                      {currency} {amount.toFixed(2)}
+                    </p>
+                  ))
+                )}
+              </div>
               <p className="text-xs text-green-600 dark:text-green-400 mt-1">Click for details</p>
             </div>
 
@@ -505,7 +526,17 @@ export default function Profile() {
                 <TrendingDown size={16} className="text-orange-600 dark:text-orange-400" />
                 <p className="text-xs text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
               </div>
-              <p className="text-xl font-bold text-orange-900 dark:text-orange-100">€{totalOwing.toFixed(2)}</p>
+              <div className="space-y-0.5">
+                {Object.entries(owingByCurrency).length === 0 ? (
+                  <p className="text-xl font-bold text-orange-900 dark:text-orange-100">—</p>
+                ) : (
+                  Object.entries(owingByCurrency).map(([currency, amount]) => (
+                    <p key={currency} className="text-xl font-bold text-orange-900 dark:text-orange-100">
+                      {currency} {amount.toFixed(2)}
+                    </p>
+                  ))
+                )}
+              </div>
               <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Click for details</p>
             </div>
           </div>
@@ -525,7 +556,17 @@ export default function Profile() {
               <Wallet size={20} className="text-green-600 dark:text-green-400" />
               <p className="text-sm text-gray-600 dark:text-gray-300">Total Paid</p>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">€{totalPaid.toFixed(2)}</p>
+            <div className="space-y-0.5">
+              {Object.entries(paidByCurrency).length === 0 ? (
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">—</p>
+              ) : (
+                Object.entries(paidByCurrency).map(([currency, amount]) => (
+                  <p key={currency} className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {currency} {amount.toFixed(2)}
+                  </p>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
@@ -837,9 +878,7 @@ export default function Profile() {
         onClose={() => setShowBreakdownModal(false)}
         type={breakdownType}
         breakdowns={breakdownData}
-        totalAmount={breakdownType === 'owed' ? totalOwed : totalOwing}
-        currency={
-          breakdownData[0]?.groups?.[0]?.currency || ''
+        amountsByCurrency={breakdownType === 'owed' ? owedByCurrency : owingByCurrency
        }
       />
 
