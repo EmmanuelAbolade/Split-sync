@@ -135,26 +135,28 @@ export default function GroupDetails() {
     return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
   };
 
-  // Fetch group details on mount
+  // Listen to group details in real-time
   useEffect(() => {
-    const fetchGroup = async () => {
-      try {
-        const groupDoc = await getDoc(doc(db, 'groups', groupId));
-        
+    if (!groupId) return;
+
+    const unsubscribe = onSnapshot(
+      doc(db, 'groups', groupId),
+      (groupDoc) => {
         if (groupDoc.exists()) {
           setGroup({ id: groupDoc.id, ...groupDoc.data() });
         } else {
           navigate('/dashboard');
         }
-      } catch (err) {
-        console.error('Error fetching group:', err);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error listening to group:', err);
         navigate('/dashboard');
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    fetchGroup();
+    return () => unsubscribe();
   }, [groupId, navigate]);
 
 
@@ -491,7 +493,8 @@ export default function GroupDetails() {
   const userBalance = getUserBalanceSummary(balances, user.uid, group.members);
   const IconComponent = getIconComponent(group.icon);
   const isOwner = group.createdBy === user.uid;
-
+  const isSoloGroup = (group?.members?.length || 0) <= 1; // true when no other members have joined
+  
   // THEN RETURN JSX
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
@@ -539,8 +542,14 @@ export default function GroupDetails() {
               {showInviteLink ? 'Link Copied!' : 'Invite Link'}
             </button>
             <button
-              className="flex-1 bg-primary dark:bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition flex items-center justify-center gap-2"
-              onClick={() => setShowAddExpense(true)}
+              className={`flex-1 px-4 py-3 rounded-lg transition flex items-center justify-center gap-2 ${
+                isSoloGroup
+                  ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                  : 'bg-primary dark:bg-indigo-600 text-white hover:bg-primary-hover dark:hover:bg-indigo-700 cursor-pointer'
+              }`}
+              onClick={() => !isSoloGroup && setShowAddExpense(true)}
+              title={isSoloGroup ? 'Invite at least one member before adding an expense' : ''}
+              aria-disabled={isSoloGroup}
             >
               <Plus size={18} />
               Add Expense
@@ -583,7 +592,16 @@ export default function GroupDetails() {
               )}
             </div>
           </div>
-
+          
+          {/* Invite prompt banner — shown when group has no other members */}
+          {isSoloGroup && (
+            <div className="mt-3 flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg px-4 py-3 text-sm">
+              <UserPlus size={16} className="mt-0.5 shrink-0" />
+              <span>
+                Your group has no other members yet. Use <strong>Invite Link</strong> to add someone before splitting expenses.
+              </span>
+            </div>
+          )}
 
           {/* Balance Summary */}
           {expenses.length > 0 && (

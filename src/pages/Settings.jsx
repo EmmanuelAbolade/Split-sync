@@ -8,7 +8,7 @@ import {
   ArrowLeft, User, Mail, Bell, Trash2, LogOut,
   Shield, Eye, EyeOff, AlertTriangle, ChevronDown,
   QrCode, HelpCircle, Moon, Fingerprint, Info, Timer,
-  MonitorDown, Smartphone, CheckCircle2, Share2,
+  MonitorDown, Smartphone, CheckCircle2, Share2, Compass,
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { useSessionTimeout } from '../hooks/useSessionTimeout';
@@ -652,6 +652,20 @@ export default function Settings() {
             onClick={() => setShowInfoHub(true)}
           />
         </Section>
+
+        <button
+          onClick={() => {
+            localStorage.setItem('splitsync_reopen_wizard', '1');
+            navigate('/dashboard');
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition rounded-lg"
+        >
+          <Compass size={18} className="text-indigo-500" />
+          <div className="text-left">
+            <p className="font-medium">Revisit Getting Started Guide</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Reopen the onboarding walkthrough</p>
+          </div>
+        </button>
 
         {/* ── App version ── */}
         <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4 mb-6">

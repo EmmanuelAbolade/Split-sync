@@ -78,6 +78,13 @@ export default function Dashboard() {
             setShowOnboarding(true);
           }
 
+          // Reopen wizard if triggered from Settings
+          const shouldReopen = localStorage.getItem('splitsync_reopen_wizard');
+          if (shouldReopen) {
+            localStorage.removeItem('splitsync_reopen_wizard');
+            setShowOnboarding(true);
+          }
+
           
           // Mark first login as complete
           if (data.isFirstLogin) {
