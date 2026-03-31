@@ -92,18 +92,26 @@ export default function Activity() {
     return true;
   });
 
-  // Calculate stats
-  const totalPaid = expenses
+  // Helper — must be defined before stats so it can be used in calculations
+  const getGroupForExpense = (groupId) => groups.find(g => g.id === groupId);
+
+  // Calculate stats grouped by currency — never sum across different currencies
+  const paidByCurrency = {};
+  expenses
     .filter(e => e.paidBy === user.uid)
-    .reduce((sum, e) => sum + e.amount, 0);
+    .forEach(e => {
+      const currency = getGroupForExpense(e.groupId)?.currency || 'EUR';
+      paidByCurrency[currency] = (paidByCurrency[currency] || 0) + e.amount;
+    });
 
-  const totalOwed = expenses
+  const owedByCurrency = {};
+  expenses
     .filter(e => e.participants?.includes(user.uid) && e.paidBy !== user.uid)
-    .reduce((sum, e) => sum + (e.splits?.[user.uid] || 0), 0);
-
-  const getGroupForExpense = (groupId) => {
-    return groups.find(g => g.id === groupId);
-  };
+    .forEach(e => {
+      const currency = getGroupForExpense(e.groupId)?.currency || 'EUR';
+      const share = e.splits?.[user.uid] || 0;
+      owedByCurrency[currency] = (owedByCurrency[currency] || 0) + share;
+    });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
@@ -130,9 +138,17 @@ export default function Activity() {
               <TrendingUp size={20} className="text-green-600 dark:text-green-400" />
               <p className="text-sm text-green-700 dark:text-green-300 font-medium">You Paid</p>
             </div>
-            <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-              €{totalPaid.toFixed(2)}
-            </p>
+            <div className="space-y-0.5">
+              {Object.entries(paidByCurrency).length === 0 ? (
+                <p className="text-2xl font-bold text-green-900 dark:text-green-100">—</p>
+              ) : (
+                Object.entries(paidByCurrency).map(([currency, amount]) => (
+                  <p key={currency} className="text-2xl font-bold text-green-900 dark:text-green-100">
+                    {currency} {amount.toFixed(2)}
+                  </p>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 rounded-xl shadow-card dark:shadow-gray-900/50 p-4 border border-orange-200 dark:border-orange-800">
@@ -140,9 +156,17 @@ export default function Activity() {
               <TrendingDown size={20} className="text-orange-600 dark:text-orange-400" />
               <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
             </div>
-            <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-              €{totalOwed.toFixed(2)}
-            </p>
+            <div className="space-y-0.5">
+              {Object.entries(owedByCurrency).length === 0 ? (
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">—</p>
+              ) : (
+                Object.entries(owedByCurrency).map(([currency, amount]) => (
+                  <p key={currency} className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                    {currency} {amount.toFixed(2)}
+                  </p>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
@@ -230,7 +254,7 @@ export default function Activity() {
                         <span className="text-xs text-green-600 dark:text-green-400 font-medium">You paid</span>
                       ) : (
                         <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">
-                          You owe €{yourShare.toFixed(2)}
+                          You owe {group?.currency || ''} {yourShare.toFixed(2)}
                         </span>
                       )}
                     </div>
