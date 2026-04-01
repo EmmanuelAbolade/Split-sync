@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import app from '../services/firebase';
-import { Camera, X, Loader, Image as ImageIcon, Lightbulb, Sun, Droplets, FileCheck, Edit3, CheckCircle2, Sparkles, Upload } from 'lucide-react';
+import { Camera, X, Loader, Image as ImageIcon, Lightbulb, Sun, Droplets, FileCheck, Edit3, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function ReceiptScanner({ onDataExtracted, isOpen, onClose }) {
   const [image, setImage] = useState(null);

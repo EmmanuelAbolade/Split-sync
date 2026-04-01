@@ -6,7 +6,6 @@ import { db } from '../services/firebase';
 import { 
   processSepaPayment, 
   generatePaymentReference,
-  formatIBAN,
   maskIBAN,
   validatePaymentAmount,
   createPaymentDescription,

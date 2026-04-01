@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Compass,
-  UserCircle,
   CreditCard,
   Fingerprint,
   Users,

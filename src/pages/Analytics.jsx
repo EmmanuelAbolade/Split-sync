@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { calculateBalances, calculateSettlements } from '../utils/balanceCalculator';
@@ -20,8 +20,6 @@ import {
 } from 'lucide-react';
 
 // ─── Colour palette ───────────────────────────────────────────────────────────
-
-const COLORS = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#f43f5e', '#a78bfa', '#fb923c'];
 
 const CATEGORY_COLORS = {
   food:          '#f59e0b',

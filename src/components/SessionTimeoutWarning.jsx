@@ -1,5 +1,5 @@
 // src/components/SessionTimeoutWarning.jsx
-import { AlertTriangle, X, Clock } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 
 export default function SessionTimeoutWarning({ 
   isOpen, 
