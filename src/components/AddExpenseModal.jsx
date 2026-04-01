@@ -295,7 +295,7 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
 
     // New validation for maximum amount
     if (amountNum > 1000000) {
-      setError('Amount cannot exceed €1,000,000');
+      setError(`Amount cannot exceed ${group?.currency || ''} 1,000,000`);
       return;
     }
 

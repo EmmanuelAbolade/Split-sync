@@ -78,6 +78,10 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
       setError('Group name is required');
       return;
     }
+    if (groupName.trim().length > 50) {
+      setError('Group name cannot exceed 50 characters');
+      return;
+    }
 
     setError('');
     setLoading(true);
@@ -193,7 +197,8 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder="e.g., Flat Mates, Paris Trip"
+                placeholder="e.g., Flat Mates, Paris Trip, Shared subscription"
+                maxLength={50}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
                 required
               />

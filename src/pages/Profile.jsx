@@ -307,9 +307,27 @@ export default function Profile() {
         }
       }
       if (paymentMethods.paypalUsername && paymentMethods.paypalUsername.trim()) {
-        const paypalRegex = /^[a-zA-Z0-9_]+$/;
-        if (!paypalRegex.test(paymentMethods.paypalUsername)) {
-          setPaymentError('PayPal username can only contain letters, numbers, and underscores');
+        const paypalRegex = /^[a-zA-Z0-9_.]{1,20}$/;
+        if (!paypalRegex.test(paymentMethods.paypalUsername.trim())) {
+          setPaymentError('PayPal username must be 1–20 characters: letters, numbers, underscores, or dots only');
+          setSavingPayment(false);
+          return;
+        }
+      }
+
+      if (paymentMethods.revolutUsername && paymentMethods.revolutUsername.trim()) {
+        const revolutRegex = /^[a-zA-Z0-9._]{1,30}$/;
+        if (!revolutRegex.test(paymentMethods.revolutUsername.trim())) {
+          setPaymentError('Revolut username must be 1–30 characters: letters, numbers, dots, or underscores only');
+          setSavingPayment(false);
+          return;
+        }
+      }
+
+      if (paymentMethods.bic && paymentMethods.bic.trim()) {
+        const bicRegex = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+        if (!bicRegex.test(paymentMethods.bic.trim().toUpperCase())) {
+          setPaymentError('Invalid BIC/SWIFT code. Must be 8 or 11 characters (e.g. AIBKIE2D)');
           setSavingPayment(false);
           return;
         }
@@ -781,6 +799,7 @@ export default function Profile() {
                       onChange={(e) => setPaymentMethods(prev => ({ ...prev, paypalUsername: e.target.value }))}
                       disabled={!editingPayment}
                       placeholder="username"
+                      maxLength={20}
                       className="w-full pl-24 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
                     />
                   </div>
@@ -798,6 +817,7 @@ export default function Profile() {
                       onChange={(e) => setPaymentMethods(prev => ({ ...prev, revolutUsername: e.target.value }))}
                       disabled={!editingPayment}
                       placeholder="username"
+                      maxLength={30}
                       className="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
                     />
                   </div>
@@ -816,6 +836,7 @@ export default function Profile() {
                     onChange={(e) => setPaymentMethods(prev => ({ ...prev, iban: e.target.value.toUpperCase() }))}
                     disabled={!editingPayment}
                     placeholder="IE29AIBK12345678901234"
+                    maxLength={34}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your bank account IBAN for SEPA transfers</p>
@@ -830,6 +851,7 @@ export default function Profile() {
                     onChange={(e) => setPaymentMethods(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))}
                     disabled={!editingPayment}
                     placeholder="AIBKIE2D"
+                    maxLength={11}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your bank's BIC/SWIFT code (usually not required for SEPA)</p>
