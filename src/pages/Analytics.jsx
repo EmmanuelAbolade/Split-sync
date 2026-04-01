@@ -294,12 +294,24 @@ export default function Analytics() {
       .reduce((s, e) => s + (e.amount || 0), 0);
   })();
 
-  // Count of expenses this month (used when no single currency is active)
-  const thisMonthCount = filteredExpenses.filter(e => {
-    const d = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt || e.date);
-    const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).length;
+  // Per-currency totals for the summary cards — used when All Groups is selected
+  const totalSpendByCurrency = filteredExpenses.reduce((acc, e) => {
+    const currency = groups.find(g => g.id === e.groupId)?.currency || 'EUR';
+    acc[currency] = (acc[currency] || 0) + (e.amount || 0);
+    return acc;
+  }, {});
+
+  const thisMonthByCurrency = filteredExpenses
+    .filter(e => {
+      const d = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt || e.date);
+      const now = new Date();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    })
+    .reduce((acc, e) => {
+      const currency = groups.find(g => g.id === e.groupId)?.currency || 'EUR';
+      acc[currency] = (acc[currency] || 0) + (e.amount || 0);
+      return acc;
+    }, {});
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -336,7 +348,7 @@ export default function Analytics() {
         </select>
         {!activeCurrency && (
           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 px-1">
-            Amounts across groups use different currencies. Select a group for accurate totals.
+            Amounts across groups may be of different currencies. Select a group for accurate totals.
           </p>
         )}
       </div>
@@ -345,21 +357,63 @@ export default function Analytics() {
 
         {/* ── Summary cards ── */}
         <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: 'Total Spent',    value: activeCurrency ? fmt(totalSpend, activeCurrency) : `${filteredExpenses.length} expenses`, color: 'from-indigo-500 to-purple-600' },
-            { label: 'This Month',     value: activeCurrency ? fmt(thisMonth, activeCurrency)  : `${thisMonthCount} expenses`,          color: 'from-cyan-500 to-blue-600' },
-            { label: 'Total Expenses', value: `${filteredExpenses.length}`,                                                             color: 'from-amber-500 to-orange-500' },
-            { label: 'Groups',         value: `${filteredGroups.length}`,                                                               color: 'from-emerald-500 to-teal-600' },
-          ].map((c, i) => (
-            <div
-              key={c.label}
-              className={`bg-gradient-to-br ${c.color} rounded-2xl p-4 text-white animate-fade-in`}
-              style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
-            >
-              <p className="text-xs font-medium text-white/80 mb-1">{c.label}</p>
-              <p className="text-2xl font-bold">{c.value}</p>
-            </div>
-          ))}
+
+          {/* Total Spent — stacked per currency when all groups selected */}
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-4 text-white animate-fade-in"
+              style={{ animationDelay: '0ms', animationFillMode: 'both' }}>
+            <p className="text-xs font-medium text-white/80 mb-1">Total Spent</p>
+            {activeCurrency ? (
+              <p className="text-2xl font-bold">{fmt(totalSpend, activeCurrency)}</p>
+            ) : (
+              <div className="space-y-0.5">
+                {Object.entries(totalSpendByCurrency).length === 0 ? (
+                  <p className="text-2xl font-bold">—</p>
+                ) : (
+                  Object.entries(totalSpendByCurrency).map(([currency, amount]) => (
+                    <p key={currency} className="text-lg font-bold leading-tight">
+                      {currency} {amount.toFixed(2)}
+                    </p>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* This Month — stacked per currency when all groups selected */}
+          <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-4 text-white animate-fade-in"
+              style={{ animationDelay: '80ms', animationFillMode: 'both' }}>
+            <p className="text-xs font-medium text-white/80 mb-1">This Month</p>
+            {activeCurrency ? (
+              <p className="text-2xl font-bold">{fmt(thisMonth, activeCurrency)}</p>
+            ) : (
+              <div className="space-y-0.5">
+                {Object.entries(thisMonthByCurrency).length === 0 ? (
+                  <p className="text-2xl font-bold">—</p>
+                ) : (
+                  Object.entries(thisMonthByCurrency).map(([currency, amount]) => (
+                    <p key={currency} className="text-lg font-bold leading-tight">
+                      {currency} {amount.toFixed(2)}
+                    </p>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Total Expenses — count */}
+          <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-4 text-white animate-fade-in"
+              style={{ animationDelay: '160ms', animationFillMode: 'both' }}>
+            <p className="text-xs font-medium text-white/80 mb-1">Total Expenses</p>
+            <p className="text-2xl font-bold">{filteredExpenses.length}</p>
+          </div>
+
+          {/* Groups */}
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 text-white animate-fade-in"
+              style={{ animationDelay: '240ms', animationFillMode: 'both' }}>
+            <p className="text-xs font-medium text-white/80 mb-1">Groups</p>
+            <p className="text-2xl font-bold">{filteredGroups.length}</p>
+          </div>
+
         </div>
 
         {/* ── 1. Spending Over Time ── */}
