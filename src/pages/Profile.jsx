@@ -570,21 +570,26 @@ export default function Profile() {
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{groups.length}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Wallet size={20} className="text-green-600 dark:text-green-400" />
+            <div className="flex items-center gap-2 mb-3">
+              <Wallet size={16} className="text-green-600 dark:text-green-400" />
               <p className="text-sm text-gray-600 dark:text-gray-300">Total Paid</p>
             </div>
-            <div className="space-y-0.5">
-              {Object.entries(paidByCurrency).length === 0 ? (
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">—</p>
-              ) : (
-                Object.entries(paidByCurrency).map(([currency, amount]) => (
-                  <p key={currency} className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {currency} {amount.toFixed(2)}
-                  </p>
-                ))
-              )}
-            </div>
+            {Object.entries(paidByCurrency).length === 0 ? (
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">—</p>
+            ) : (
+              <div className="space-y-1">
+                {Object.entries(paidByCurrency).map(([currency, amount]) => (
+                  <div key={currency} className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">
+                      {currency}
+                    </span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      {amount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
