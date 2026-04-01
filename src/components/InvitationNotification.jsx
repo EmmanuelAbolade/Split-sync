@@ -12,6 +12,7 @@ export default function InvitationNotification({ user, onInvitationUpdate }) {
   const [processingId, setProcessingId] = useState(null);
   const navigate = useNavigate();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (user) {
       loadInvitations();

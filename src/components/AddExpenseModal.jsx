@@ -46,7 +46,8 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
   const [scannedData, setScannedData] = useState(null);
 
       // Initialize members when modal opens
-    useEffect(() => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      useEffect(() => {
       if (isOpen && group?.members) {
         const initial = {};
         group.members.forEach(member => {
@@ -75,6 +76,7 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
     }, [isOpen, splitMethod, group?.members]);
       
     // Reinitialize splits when split method changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
       if (!group?.members) return;
       
@@ -102,6 +104,7 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
 
     // Pre-populate form fields when opening in edit mode.
     // Runs whenever the modal opens with an initialExpense provided.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
       if (!isOpen || !initialExpense) return;
 

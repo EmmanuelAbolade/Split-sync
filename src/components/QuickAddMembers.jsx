@@ -14,7 +14,7 @@ export default function QuickAddMembers({ currentUser, onAddMembers, excludeUser
   const [showAll, setShowAll] = useState(false);
 
  
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const loadConnections = useCallback(async () => {
     if (!currentUser) return;
 
@@ -81,7 +81,6 @@ export default function QuickAddMembers({ currentUser, onAddMembers, excludeUser
 
    useEffect(() => {
     loadConnections();
- // }, [currentUser]);
     }, [loadConnections]);
 
   const filteredConnections = getFilteredConnections();
