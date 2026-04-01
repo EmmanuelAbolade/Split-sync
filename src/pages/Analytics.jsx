@@ -35,7 +35,8 @@ const CATEGORY_COLORS = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const fmt = (n) => `€${Number(n).toFixed(2)}`;
+// fmt takes a currency code — falls back to plain number if none provided
+const fmt = (n, currency = '') => currency ? `${currency} ${Number(n).toFixed(2)}` : Number(n).toFixed(2);
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -99,6 +100,7 @@ export default function Analytics() {
   const [expenses, setExpenses] = useState([]);   // all expenses across all groups
   const [groups,   setGroups]   = useState([]);   // all user groups
   const [members,  setMembers]  = useState({});   // userId → displayName
+  const [selectedGroupId, setSelectedGroupId] = useState('all'); // group filter
 
   // ── Fetch all data ──────────────────────────────────────────────────────────
 
@@ -147,12 +149,25 @@ export default function Analytics() {
     fetchAll();
   }, [user]);
 
+  // Active group and currency — null when "All Groups" is selected
+  const activeGroup    = selectedGroupId === 'all' ? null : groups.find(g => g.id === selectedGroupId);
+  const activeCurrency = activeGroup?.currency || null;
+
+  // Filter expenses to selected group, or use all
+  const filteredExpenses = selectedGroupId === 'all'
+    ? expenses
+    : expenses.filter(e => e.groupId === selectedGroupId);
+
+  const filteredGroups = selectedGroupId === 'all'
+    ? groups
+    : groups.filter(g => g.id === selectedGroupId);
+
   // ── Derived chart data ──────────────────────────────────────────────────────
 
   // 1. Spending over time (last 6 months, area chart)
   const spendingOverTime = useMemo(() => {
     const map = {};
-    expenses.forEach(e => {
+    filteredExpenses.forEach(e => {
       const k = monthKey(e.createdAt || e.date);
       map[k] = (map[k] || 0) + (e.amount || 0);
     });
@@ -164,12 +179,12 @@ export default function Analytics() {
       })
       .slice(-6)
       .map(([month, total]) => ({ month, total: parseFloat(total.toFixed(2)) }));
-  }, [expenses]);
+  }, [filteredExpenses]);
 
   // 2. Category breakdown (pie chart)
   const categoryData = useMemo(() => {
     const map = {};
-    expenses.forEach(e => {
+    filteredExpenses.forEach(e => {
       const cat = e.category || 'other';
       map[cat] = (map[cat] || 0) + (e.amount || 0);
     });
@@ -178,14 +193,14 @@ export default function Analytics() {
       value: parseFloat(value.toFixed(2)),
       color: CATEGORY_COLORS[name] || '#94a3b8',
     }));
-  }, [expenses]);
+  }, [filteredExpenses]);
 
   // 3. Monthly summary (bar chart — this year)
   const monthlySummary = useMemo(() => {
     const year = new Date().getFullYear();
     const map  = {};
     MONTHS.forEach(m => { map[m] = 0; });
-    expenses.forEach(e => {
+    filteredExpenses.forEach(e => {
       const d = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt || e.date);
       if (d.getFullYear() === year) {
         const m = MONTHS[d.getMonth()];
@@ -193,13 +208,13 @@ export default function Analytics() {
       }
     });
     return MONTHS.map(m => ({ month: m, amount: parseFloat((map[m] || 0).toFixed(2)) }));
-  }, [expenses]);
+  }, [filteredExpenses]);
 
   // 4. Per-person balance across all groups (bar chart)
   const perPersonData = useMemo(() => {
     const netBalances = {};
-    groups.forEach(g => {
-      const gExpenses = expenses.filter(e => e.groupId === g.id);
+    filteredGroups.forEach(g => {
+      const gExpenses = filteredExpenses.filter(e => e.groupId === g.id);
       const balances  = calculateBalances(gExpenses, g.members || []);
       Object.entries(balances).forEach(([uid, bal]) => {
         netBalances[uid] = (netBalances[uid] || 0) + bal;
@@ -212,16 +227,16 @@ export default function Analytics() {
         isYou:   uid === user?.uid,
       }))
       .sort((a, b) => b.balance - a.balance);
-  }, [groups, expenses, members, user]);
+  }, [filteredGroups, filteredExpenses, members, user]);
 
   // 5. Who owes who — aggregate across all groups
   const settlements = useMemo(() => {
     const allSettlements = [];
-    groups.forEach(g => {
-      const gExpenses = expenses.filter(e => e.groupId === g.id);
+    filteredGroups.forEach(g => {
+      const gExpenses = filteredExpenses.filter(e => e.groupId === g.id);
       const balances  = calculateBalances(gExpenses, g.members || []);
       const s         = calculateSettlements(balances);
-      s.forEach(item => allSettlements.push({ ...item, groupName: g.name }));
+      s.forEach(item => allSettlements.push({ ...item, groupName: g.name, currency: g.currency }));
     });
     // Consolidate: merge same from→to pairs
     const consolidated = {};
@@ -232,7 +247,7 @@ export default function Analytics() {
     return Object.values(consolidated)
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 8);
-  }, [groups, expenses]);
+  }, [filteredGroups, filteredExpenses]);
 
   // ── Loading ─────────────────────────────────────────────────────────────────
 
@@ -269,18 +284,24 @@ export default function Analytics() {
     );
   }
 
-  // ── Totals for summary cards ────────────────────────────────────────────────
-
-  const totalSpend = expenses.reduce((s, e) => s + (e.amount || 0), 0);
+  // ── Totals for summary cards — use filteredExpenses────────────────────────────────────────────────
+  const totalSpend = filteredExpenses.reduce((s, e) => s + (e.amount || 0), 0);
   const thisMonth  = (() => {
     const now = new Date();
-    return expenses
+    return filteredExpenses
       .filter(e => {
         const d = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt || e.date);
         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
       })
       .reduce((s, e) => s + (e.amount || 0), 0);
   })();
+
+  // Count of expenses this month (used when no single currency is active)
+  const thisMonthCount = filteredExpenses.filter(e => {
+    const d = e.createdAt?.toDate ? e.createdAt.toDate() : new Date(e.createdAt || e.date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -303,15 +324,34 @@ export default function Analytics() {
         </div>
       </div>
 
+      {/* Group selector — filters all charts to a single currency */}
+      <div className="max-w-2xl mx-auto px-4 pt-3 pb-1">
+        <select
+          value={selectedGroupId}
+          onChange={e => setSelectedGroupId(e.target.value)}
+          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="all">All Groups (mixed currencies)</option>
+          {groups.map(g => (
+            <option key={g.id} value={g.id}>{g.name} — {g.currency}</option>
+          ))}
+        </select>
+        {!activeCurrency && (
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 px-1">
+            Amounts across groups use different currencies. Select a group for accurate totals.
+          </p>
+        )}
+      </div>
+
       <div className="max-w-2xl mx-auto px-4 pt-5 space-y-5">
 
         {/* ── Summary cards ── */}
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Total Spent',    value: fmt(totalSpend),        color: 'from-indigo-500 to-purple-600' },
-            { label: 'This Month',     value: fmt(thisMonth),          color: 'from-cyan-500 to-blue-600' },
-            { label: 'Total Expenses', value: `${expenses.length}`,   color: 'from-amber-500 to-orange-500' },
-            { label: 'Groups',         value: `${groups.length}`,     color: 'from-emerald-500 to-teal-600' },
+            { label: 'Total Spent',    value: activeCurrency ? fmt(totalSpend, activeCurrency) : `${filteredExpenses.length} expenses`, color: 'from-indigo-500 to-purple-600' },
+            { label: 'This Month',     value: activeCurrency ? fmt(thisMonth, activeCurrency)  : `${thisMonthCount} expenses`,          color: 'from-cyan-500 to-blue-600' },
+            { label: 'Total Expenses', value: `${filteredExpenses.length}`,                                                             color: 'from-amber-500 to-orange-500' },
+            { label: 'Groups',         value: `${filteredGroups.length}`,                                                               color: 'from-emerald-500 to-teal-600' },
           ].map((c, i) => (
             <div
               key={c.label}
@@ -336,7 +376,7 @@ export default function Analytics() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `€${v}`} />
+              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => activeCurrency ? `${activeCurrency} ${v}` : `${v}`} />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
@@ -360,7 +400,7 @@ export default function Analytics() {
             <BarChart data={monthlySummary} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:opacity-20" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `€${v}`} />
+              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => activeCurrency ? `${activeCurrency} ${v}` : `${v}`} />
               <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="amount"
@@ -435,7 +475,7 @@ export default function Analytics() {
                   margin={{ top: 0, right: 10, left: 10, bottom: 0 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} className="dark:opacity-20" />
-                  <XAxis type="number" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `€${v}`} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => activeCurrency ? `${activeCurrency} ${v}` : `${v}`} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} width={55} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar
@@ -497,7 +537,9 @@ export default function Analytics() {
                           {toName[0]?.toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-bold text-gray-800 dark:text-white text-sm">{fmt(s.amount)}</span>
+                      <span className="font-bold text-gray-800 dark:text-white text-sm">
+                        {fmt(s.amount, s.currency || activeCurrency || '')}
+                      </span>
                     </div>
                     {/* Progress bar */}
                     <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
