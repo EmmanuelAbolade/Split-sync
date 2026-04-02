@@ -134,18 +134,23 @@ export default function Activity() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl shadow-card dark:shadow-gray-900/50 p-4 border border-green-200 dark:border-green-800">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               <TrendingUp size={20} className="text-green-600 dark:text-green-400" />
               <p className="text-sm text-green-700 dark:text-green-300 font-medium">You Paid</p>
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {Object.entries(paidByCurrency).length === 0 ? (
                 <p className="text-2xl font-bold text-green-900 dark:text-green-100">—</p>
               ) : (
                 Object.entries(paidByCurrency).map(([currency, amount]) => (
-                  <p key={currency} className="text-2xl font-bold text-green-900 dark:text-green-100">
-                    {currency} {amount.toFixed(2)}
-                  </p>
+                  <div key={currency} className="flex items-center justify-between">
+                    <span className="text-2xl font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-1.5 py-0.5 rounded">
+                      {currency}
+                    </span>
+                    <span className="text-2xl font-bold text-green-900 dark:text-green-100">
+                      {amount.toFixed(2)}
+                    </span>
+                  </div>
                 ))
               )}
             </div>
@@ -161,9 +166,14 @@ export default function Activity() {
                 <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">—</p>
               ) : (
                 Object.entries(owedByCurrency).map(([currency, amount]) => (
-                  <p key={currency} className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                    {currency} {amount.toFixed(2)}
-                  </p>
+                  <div key={currency} className="flex items-center justify-between">
+                    <span className="text-2xl font-medium text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/40 px-1.5 py-0.5 rounded">
+                      {currency}
+                    </span>
+                    <span className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                      {amount.toFixed(2)}
+                    </span>
+                  </div>
                 ))
               )}
             </div>
