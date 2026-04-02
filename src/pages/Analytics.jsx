@@ -328,7 +328,7 @@ export default function Analytics() {
             <ArrowLeft size={20} className="text-gray-600 dark:text-gray-300" />
           </button>
           <div>
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white">Analytics</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">Spending insights across all groups</p>
           </div>
         </div>

@@ -114,7 +114,10 @@ export default function QuickAdd() {
             >
               <ArrowLeft size={24} />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Quick Add Expense</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Quick Add Expense</h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Quick expense addition</p>
+            </div>
           </div>
         </div>
       </div>

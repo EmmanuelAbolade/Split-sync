@@ -465,26 +465,34 @@ export default function Profile() {
         </div>
       )}
       {/* ── Header ── */}
-      <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-white hover:text-gray-200 mb-4 md:hidden"
-          >
-            <ArrowLeft size={24} />
-          </button>
+      <div className="bg-white dark:bg-gray-800 shadow-card top-0 z-30">
+        <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="text-white hover:text-gray-200 mb-4 md:hidden"
+                >
+                  <ArrowLeft size={24} />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
+                <p className="text-white text-xs text-gray-500 dark:text-gray-400">Your personal information and settings</p>
+              </div>
+            </div>
+          </div>  
           <div className="flex flex-col items-center">
-            <CloudinaryUpload
-              user={user}
-              currentPhotoURL={userData?.photoURL}
-              onPhotoUpdated={handlePhotoUpdated}
-            />
-            <h1 className="text-2xl font-bold mb-1">{user?.displayName || 'User'}</h1>
-            <p className="text-white text-opacity-90 text-sm">{user?.email}</p>
+              <CloudinaryUpload
+                user={user}
+                currentPhotoURL={userData?.photoURL}
+                onPhotoUpdated={handlePhotoUpdated}
+              />
+              <h1 className="text-2xl font-bold mb-1">{user?.displayName || 'User'}</h1>
+              <p className="text-white text-opacity-90 text-sm">{user?.email}</p><br />
           </div>
         </div>
+        
       </div>
-
       <div className="max-w-7xl mx-auto px-4 py-6">
 
         {/* ── Balance Overview ── */}
@@ -741,7 +749,7 @@ export default function Profile() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Settings</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Payment Settings</h2>
                   {biometricEnabled && <Lock size={16} className="text-indigo-600 dark:text-indigo-400" />}
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">

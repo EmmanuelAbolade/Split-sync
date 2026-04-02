@@ -17,46 +17,52 @@ export default function InfoHubModal({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 overflow-y-auto">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-gray-900/50 max-w-2xl w-full my-4 flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between rounded-t-2xl z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-              <HelpCircle size={20} className="text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Help & Information</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Everything you need to know about Split-Sync</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition"
-          >
-            <X size={24} />
-          </button>
-        </div>
+       
+        {/* Sticky header + tabs — scroll together, never scroll away */}
+        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 rounded-t-2xl">
 
-        {/* Tabs */}
-        <div className="border-b border-gray-200 dark:border-gray-700 px-6 overflow-x-auto">
-          <div className="flex gap-1 min-w-max">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-3 border-b-2 transition whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-medium'
-                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span className="text-sm">{tab.label}</span>
-                </button>
-              );
-            })}
+          {/* Header */}
+          <div className="border-b border-gray-200 dark:border-gray-700 p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center shrink-0">
+                <HelpCircle size={18} className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-white">Help & Information</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Everything you need to know about Split-Sync</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition p-1"
+            >
+              <X size={22} />
+            </button>
           </div>
+
+          {/* Tabs — sticky alongside header */}
+          <div className="border-b border-gray-200 dark:border-gray-700 px-4 overflow-x-auto">
+            <div className="flex gap-1 min-w-max">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-1.5 px-3 py-2.5 border-b-2 transition whitespace-nowrap text-sm ${
+                      activeTab === tab.id
+                        ? 'border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-medium'
+                        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    }`}
+                  >
+                    <Icon size={15} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
 
         {/* Content */}
