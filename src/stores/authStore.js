@@ -32,6 +32,19 @@ export const useAuthStore = create(
         }
       },
 
+      // Update user's displayName in store
+      updateUserDisplayName: (displayName) => {
+        const currentUser = get().user;
+        if (currentUser) {
+          set({
+            user: {
+              ...currentUser,
+              displayName: displayName
+            }
+          });
+        }
+      },
+
       logout: async () => {
         try {
           // Clear state first

@@ -118,7 +118,7 @@ function ActionRow({ icon: Icon, iconBg, iconColor, label, description, onClick,
 
 export default function Settings() {
   const navigate       = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateUserDisplayName } = useAuthStore();
 
   const [notifications,    setNotifications]    = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -239,6 +239,8 @@ export default function Settings() {
       });
       await batch.commit();
 
+      // Update the in-memory store so all components reflect the new name immediately
+      updateUserDisplayName(trimmedName);
       setSuccess('Name updated successfully!');
       setEditingName(false);
       setTimeout(() => setSuccess(''), 3000);
