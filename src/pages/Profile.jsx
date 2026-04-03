@@ -476,7 +476,7 @@ export default function Profile() {
                   <ArrowLeft size={24} />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
+                <h1 className="text-white text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
                 <p className="text-white text-xs text-gray-500 dark:text-gray-400">Your personal information and settings</p>
               </div>
             </div>
