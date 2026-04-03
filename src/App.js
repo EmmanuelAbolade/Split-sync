@@ -1,4 +1,5 @@
 // src/App.js
+import { useNotificationsStore } from './stores/notificationsStore';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -23,7 +24,18 @@ import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 // Layout wrapper for protected routes — renders bottom nav, session timeout, and AI chatbot
 function ProtectedLayout({ children }) {
   const location = useLocation();
+  const { user } = useAuthStore();
+  const { subscribeToNotifications } = useNotificationsStore();
 
+  // Subscribe to notifications at the app level — not just on Dashboard.
+  // Ensures payment_log and other notifications update in real time
+  // on any page, without needing a refresh.
+  useEffect(() => {
+    if (!user?.uid) return;
+    const unsubscribe = subscribeToNotifications(user.uid);
+    return () => unsubscribe();
+  }, [user?.uid, subscribeToNotifications]);
+  
   // Session timeout hook — drives the auto-logout warning modal
   const {
     showWarning,

@@ -52,7 +52,7 @@ export default function Dashboard() {
 
   // Notifications state
   const [showNotifications, setShowNotifications] = useState(false);
-  const { unreadCount, subscribeToNotifications } = useNotificationsStore();
+  const { unreadCount } = useNotificationsStore();
 
   // Fetch user data
   useEffect(() => {
@@ -176,15 +176,6 @@ export default function Dashboard() {
     
     return () => unsubscribe();
   }, [user]);
-
-
-  // Subscribe to notifications
-  useEffect(() => {
-    if (!user) return;
-    
-    const unsubscribe = subscribeToNotifications(user.uid);
-    return () => unsubscribe();
-  }, [user, subscribeToNotifications]);
 
 
   // Handle invitation count updates
