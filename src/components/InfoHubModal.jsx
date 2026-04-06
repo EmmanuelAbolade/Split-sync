@@ -186,15 +186,31 @@ export default function InfoHubModal({ isOpen, onClose }) {
                 </a>
               </div>
 
-              {/* Video 2 - Coming Soon */}
+              {/* Video 2 - How to Add and Split Expenses (Live)*/}
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">How to Split Expenses</h4>
-                <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center py-10">
-                  <div className="text-center">
-                    <PlayCircle size={28} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Coming soon</p>
+                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  How to Add and Split Expenses
+                </h4>
+                <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-black">
+                  <div className="relative w-full" style={{ paddingBottom: '177.78%' }}>
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src="https://www.youtube.com/embed/f-t15aN6NMg"
+                      title="How to Add and Split Expenses in Split-sync"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
                   </div>
                 </div>
+                <a
+                  href="https://youtube.com/shorts/f-t15aN6NMg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 hover:underline"
+                >
+                  <PlayCircle size={13} />
+                  Open in YouTube
+                </a>
               </div>
 
               {/* Video 3 - Coming Soon */}
