@@ -147,7 +147,7 @@
 ### Quick Start
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/split-sync-app.git
+git clone https://github.com/EmmanuelAbolade/split-sync-app.git
 cd split-sync-app
 
 # Install dependencies
@@ -540,9 +540,9 @@ This is an academic project (Final Year Project) and is not currently accepting 
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Apache License** - see the [LICENSE](LICENSE) file for details.
 ```
-MIT License
+Apache License
 
 Copyright (c) 2026 Split-Sync Contributors
 
@@ -576,7 +576,7 @@ SOFTWARE.
 
 ### Links
 - **Live Demo**: [https://splitsync-dev.web.app](https://splitsync-dev.web.app)
-- **GitHub**: [https://github.com/yourusername/split-sync-app](https://github.com/yourusername/split-sync-app)
+- **GitHub**: [https://github.com/EmmanuelAbolade/Split-sync](https://github.com/EmmanuelAbolade/Split-sync)
 - **Documentation**: [View Docs](./docs)
 
 
