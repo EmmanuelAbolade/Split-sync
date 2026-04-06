@@ -160,32 +160,33 @@ export default function InfoHubModal({ isOpen, onClose }) {
               </div>
 
               {/* Video 1 - Getting Started (live) */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                  Getting Started with Split-Sync
-                </h4>
-                <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-black">
-                  <div className="relative w-full" style={{ paddingBottom: '177.78%' }}>
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src="https://www.youtube.com/embed/Ke0iaIlBhtU"
-                      title="Getting Started with Split-Sync"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                    Getting Started with Split-Sync
+                  </h4>
+                  <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-black">
+                    <div className="relative w-full" style={{ paddingBottom: '177.78%' }}>
+                      <iframe
+                        className="absolute inset-0 w-full h-full"
+                        src="https://www.youtube.com/embed/Ke0iaIlBhtU"
+                        title="Getting Started with Split-Sync"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
                   </div>
+                  <a
+                    href="https://youtube.com/shorts/Ke0iaIlBhtU"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 hover:underline"
+                  >
+                    <PlayCircle size={13} />
+                    Open in YouTube
+                  </a>
                 </div>
-                <a
-                  href="https://youtube.com/shorts/Ke0iaIlBhtU"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 hover:underline"
-                >
-                  <PlayCircle size={13} />
-                  Open in YouTube
-                </a>
-              </div>
-
+              
               {/* Video 2 - How to Add and Split Expenses (Live)*/}
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
@@ -240,15 +241,31 @@ export default function InfoHubModal({ isOpen, onClose }) {
                 </a>
               </div>
 
-              {/* Video 4 - Coming Soon */}
+              {/* Video 4 - Analytics and Features (Live)*/}
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">Receipt Scanning and Analytics</h4>
-                <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center py-10">
-                  <div className="text-center">
-                    <PlayCircle size={28} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Coming soon</p>
+                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  Analytics and Key Features
+                </h4>
+                <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-black">
+                  <div className="relative w-full" style={{ paddingBottom: '177.78%' }}>
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src="https://www.youtube.com/embed/NqdfAvKdPm0"
+                      title="Analytics and Key Features in Split-Sync"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
                   </div>
                 </div>
+                <a
+                  href="https://youtube.com/shorts/NqdfAvKdPm0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 hover:underline"
+                >
+                  <PlayCircle size={13} />
+                  Open in YouTube
+                </a>
               </div>
 
             </div>
@@ -275,7 +292,7 @@ export default function InfoHubModal({ isOpen, onClose }) {
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white mb-0.5">Email Support</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">support@split-sync.com</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">We typically respond within 24 hours</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">This support email is coming soon</p>
                   </div>
                 </a>
 
