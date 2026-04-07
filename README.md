@@ -1,6 +1,8 @@
 # Split-Sync 💰
 
-> A modern Progressive Web Application for seamless smart expense management, bill splitting, and group payment tracking with integrated payment solutions.
+> A modern Progressive Web Application for seamless smart group expense management, bill splitting, and group payment tracking with integrated payment solutions built as a Final Year Project at SETU Carlow.
+
+**Live Demo**: [https://splitsync-dev.web.app](https://splitsync-dev.web.app)
 
 
 
@@ -14,24 +16,27 @@
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Security & Privacy](#security--privacy)
+- [Running Tests](#running-tests)
 - [Project Structure](#project-structure)
+- [Security](#security)
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
 - [Academic Context](#academic-context)
 - [License](#license)
+- [Acknowledgments](#Acknowledgement)
 - [Contact](#contact)
 
 
 
 ## Overview
 
-**Split-Sync** is a comprehensive expense management and bill-splitting Progressive Web Application (PWA) designed to simplify financial tracking for groups, roommates, travelers, and friends. Built with modern web technologies and integrated payment solutions, Split-Sync ensures accurate expense tracking, automated balance calculations, and seamless settlements.
+**Split-Sync** is a full-featured expense management and bill-splitting Progressive Web Application (PWA) designed to simplify financial tracking for groups to track costs, calculate who owes who, and settle debts directly through integrated payment methods, maybe its family, roommates, travelers, event planners and friends, Split-Sync ensures accurate expense tracking, automated balance calculations, and seamless settlements.
 
 ### Why Split-Sync?
 
 - **Privacy-First Design**: End-to-end encryption, secure authentication, and privacy-preserving contact sync
 - **Multiple Payment Methods**: Integrated PayPal, Revolut, and SEPA bank transfers
-- **Progressive Web App**: Install on any device, works offline, native app experience
+- **Progressive Web App**: Install on any device, and have native app experience
 - **Multi-Currency Support**: EUR, USD, GBP with automatic currency handling
 - **Smart Contact Sync**: Find friends using Split-Sync through privacy-preserving phone number matching
 - **Real-Time Notifications**: Instant updates for expenses, settlements, and group activities
@@ -59,7 +64,8 @@
   - QR code scanning
   - Shareable invite links via whatsApp, SMS, Email etc.
 - **Real-Time Updates**: Live expense and member updates via Firestore subscriptions
-- **Member Management**: Add/remove members, role-based permissions
+- **Group Management**: Leave or delete a group with unsettled balance protection.
+- **Group Currency**: Each group maintains its own currency — no cross-currency conversion is applied to prevent confusion
 
 #### **Expense Entry and Tracking**
 - **OCR receipt scanning**: Extract merchant name, total amount, transaction date and returns structured expense metadata
@@ -69,17 +75,21 @@
   3. **Exact Amounts**: Specify exact amount per person
   4. **Shares**: Split by share ratios (e.g., 2:1:3)
 - **Rich Expense Details**: Categories, descriptions, dates, receipts
-- **Expense Categories**: 15+ categories with custom icons
+- **Expense Categories**: Expense categories with distinct icons
 - **Expense History**: Complete activity timeline with filters
 - **Settlement Suggestions**: Smart balance calculation and optimal settlement paths
+- **CSV and PDF Report Export**: Report generated for use in spreadsheet and printable browser print dialogue
+- **Expense Management**: Edit and delete expenses (owner only) if no member or all settled up
 
 #### **Payment Integration**
 - **PayPal Integration**: Direct payment links with PayPal
 - **Revolut Support**: Payment links for Revolut users
 - **SEPA Bank Transfers**: IBAN validation and transfer details
 - **Manual Settlements**: Mark payments as sent/received offline outside the app
+- **Payment confirmation**: Payee confirms or declines receipt
 - **Biometric Confirmation**: Secure payment authorization
 - **Amount Validation**: Method-specific limits (PayPal: €0.01-€60,000, SEPA: €0.01-€999,999.99)
+- **Personal Payment Activity**: My Payment Activity section tracks all payment statuses in real time
 
 #### **Notifications System**
 - **Real-Time Notifications**: Bell icon with unread badge
@@ -91,33 +101,72 @@
 - **In-App Notifications**: Dropdown with action buttons
 - **Invitation Banners**: Prominent accept/decline UI
 
+### **Profile and Payments**
+- Payment settings protected by biometric or password authentication
+- IBAN stored encrypted (AES-256)
+- PayPal, Revolut, and SEPA payment methods supported
+- Input validation enforced on all payment fields with strict length limits
+- Display name changed, sync across Firebase Auth, Firestore, and all group member arrays in real time
+
+### **Analytics**
+- Spending Over Time chart (last 6 months)
+- Monthly Summary bar chart
+- Category Breakdown pie chart
+- Per-Person Balance chart
+- Who Owes Who summary
+- Group selector to filter all charts to a single currency
+
+### **Security**
+- Email/password and Google OAuth authentication
+- WebAuthn biometric login (fingerprint and Face ID) per device
+- Configurable session timeout with auto-logout warning
+- All routes protected — unauthenticated users are redirected to login
+- Firestore security rules restrict all reads and writes to authorised users only
+- API keys secured server-side in Firebase Cloud Functions — never exposed to the client
+- Input validation and maxLength constraints on all user-facing fields
+
+
 #### **User Experience**
 - **Dark Mode**: Full dark mode support with system preference detection
 - **Responsive Design**: Mobile-first design that works on all screen sizes
 - **Offline Support**: PWA capabilities with service worker
 - **Smooth Animations**: Tailwind CSS transitions and custom animations
 - **Professional UI**: Lucide React icons, modern color schemes
-- **Keyboard Navigation**: Full keyboard accessibility support
+- **Help and Information modal**: Getting started guide, features list, embedded video tutorials, and contact section
+- **In-App AI Assistant**: Split-Sync Assistant powered by Claude via Firebase Cloud Function
+- **Onboarding wizard**: first login, action-first with Required, Recommended, and Optional step labels
 
-
+---
 
 ## Tech Stack
 
 ### Frontend
-- **React 18.3.1**: Component-based UI library
-- **React Router 7.1.1**: Client-side routing
-- **Tailwind CSS 3.4.17**: Utility-first CSS framework
-- **Lucide React 0.469.0**: Modern icon library
-- **Zustand 5.0.2**: Lightweight state management
+| Technology | Version | Purpose |
+|---|---|---|
+| React | 18.3.1 | Component-based UI |
+| React Router | 7.1.1 | Client-side routing |
+| Tailwind CSS | 3.4.17 | Utility-first styling |
+| Zustand | 5.0.2 | Global state management |
+| Lucide React | 0.469.0 | Icon library |
+| Recharts | latest | Analytics charts |
 
 ### Backend & Services
-- **Firebase 11.0.2**:
-  - Authentication (Email/Password, Google OAuth)
-  - Firestore (NoSQL real-time database)
-  - Cloud Storage (Image hosting)
-  - Hosting (Static site deployment)
-- **Google Cloud Vision API**: OCR receipt scanning
-- **Cloudinary**: Image upload and optimization
+| Service | Purpose |
+|---|---|
+| Firebase Authentication | Email/password and Google OAuth |
+| Firestore | Real-time NoSQL database |
+| Firebase Cloud Functions | Secure API proxy (Anthropic, Vision) |
+| Firebase Hosting | Static site deployment |
+| Google Cloud Vision API | OCR receipt scanning |
+| Cloudinary | Profile photo upload and optimisation |
+| Anthropic Claude | In-app AI assistant |
+
+### Testing
+| Tool | Purpose |
+|---|---|
+| Jest | Test runner |
+| React Testing Library | Component testing |
+| Coverage | ~81% line coverage, 1,382+ passing tests across 48+ suites |
 
 ### Security & Privacy
 - **WebAuthn**: Biometric authentication
@@ -144,25 +193,6 @@
 - **Google Cloud Account**: For Vision API (optional)
 - **Cloudinary Account**: For image uploads (optional)
 
-### Quick Start
-```bash
-# Clone the repository
-git clone https://github.com/EmmanuelAbolade/split-sync.git
-cd split-sync-app
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-
-# Start development server
-npm start
-```
-
-The app will open at `http://localhost:3000`
-
-
 
 ## Installation
 
@@ -181,9 +211,10 @@ npm install
 
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable Authentication (Email/Password and Google)
-3. Create a Firestore database
-4. Enable Storage
-5. Copy your Firebase config
+3. Create a Firestore database in production mode
+4. Enable Firebase Storage
+5. Enable Firebase Hosting
+6. Deploy Firestore security rules
 
 ### 4. Environment Variables
 
@@ -203,7 +234,11 @@ REACT_APP_CLOUDINARY_UPLOAD_PRESET=your_preset
 
 # Google Cloud Vision API (Optional)
 REACT_APP_GOOGLE_CLOUD_VISION_KEY=your_api_key
+
+# App base URL (used for invite links)
+REACT_APP_BASE_URL=https://splitsync-dev.web.app
 ```
+The Anthropic API key and Google Cloud Vision API key are stored as Firebase Secret Manager secrets and accessed only via Cloud Functions. They are never placed in the frontend environment.
 
 ### 5. Firestore Security Rules
 
@@ -211,13 +246,28 @@ Deploy the security rules from `firestore.rules`:
 ```bash
 firebase deploy --only firestore:rules
 ```
+Deploy Cloud Functions from `firebasestore,functions`:
+
+```bash
+cd functions
+npm install
+firebase deploy --only functions
+```
+Set Cloud Function secrets:
+
+```bash
+firebase functions:secrets:set ANTHROPIC_API_KEY
+firebase functions:secrets:set GOOGLE_VISION_API_KEY
+```
 
 ### 6. Run Development Server
 ```bash
 npm start
 ```
 
+The app opens at `http://localhost:3000`.
 
+---
 
 ## Configuration
 
@@ -374,14 +424,14 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 ## Security & Privacy
 
 ### Authentication & Authorization
-- Firebase Authentication with secure session management
-- WebAuthn biometric authentication for sensitive operations
+- Firebase Authentication with secure session management handles all credential management
+- WebAuthn biometric authentication for sensitive operations uses the WebAuthn API — credentials are stored on the device only
 - Configurable auto-logout (5-30 minutes of inactivity)
 - Google OAuth 2.0 integration
 
 ### Data Protection
-- Firestore security rules with role-based access control
-- AES-256 encryption at rest
+- Firestore security rules with role-based access control: All Firestore reads and writes require authenticated and authorised requests via security rules
+- AES-256 encryption at rest: IBAN is encrypted with AES-256 before being stored in Firestore
 - TLS 1.3 for data in transit
 - Input validation and sanitization
 - XSS and CSRF protection
@@ -393,12 +443,63 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 - **GDPR Compliant**: User data deletion, explicit consent
 - **Minimal Data Collection**: Only essential information stored
 
+### API Security
+- Anthropic API key and Google Vision API key are stored in Firebase Secret Manager
+- All external API calls are proxied through Firebase Cloud Functions
+- No sensitive keys are present in the frontend bundle
+
+### Input Validation
+- IBAN: max 34 characters, regex format validation
+- BIC: max 11 characters, regex format validation
+- PayPal username: max 20 characters, alphanumeric validation
+- Revolut username: max 30 characters, alphanumeric validation
+- Group name: max 50 characters
+- Display name: max 50 characters
+- Expense amount: max 1,000,000 in group currency
+
 ### Best Practices
 - Environment variables for sensitive config
 - Firestore security rules restrict data access
 - Regular security audits
 - No sensitive data in client-side code
 - Secure payment link generation
+
+---
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run all tests with coverage report
+npm test -- --coverage --watchAll=false
+
+# Run a specific test file
+npm test -- AddExpenseModal --watchAll=false
+```
+
+Coverage target: 80%+ line coverage. Current coverage: approximately 81% across 48+ test suites.
+
+---
+
+## Deployment
+
+```bash
+# Build production bundle
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
+
+# Deploy Cloud Functions only
+firebase deploy --only functions
+
+# Deploy everything
+firebase deploy
+```
+
+---
+
 
 
 ## Project Structure
@@ -407,6 +508,8 @@ split-sync-app/
 ├── public/
 │   ├── index.html
 │   ├── manifest.json
+│   ├── service-worker.js
+│   |── offline.html
 │   ├── robots.txt
 │   └── icons/
 ├── src/
@@ -424,10 +527,13 @@ split-sync-app/
 │   │   └── ... (15+ other components)
 │   ├── pages/
 │   │   ├── Activity.jsx
+│   │   ├── Analytics.jsx
 │   │   ├── Dashboard.jsx
 │   │   ├── GroupDetails.jsx
+│   │   ├── JoinGroup.jsx
 │   │   ├── Login.jsx
 │   │   ├── Profile.jsx
+│   │   ├── QuickAdd.jsx
 │   │   ├── Register.jsx
 │   │   └── Settings.jsx
 │   ├── services/
@@ -453,6 +559,8 @@ split-sync-app/
 │   ├── App.css
 │   ├── index.js
 │   └── index.css
+├── functions/
+│   └── index.js   — Cloud Functions (chat proxy, OCR)
 ├── .env
 ├── .gitignore
 ├── firestore.rules
@@ -494,30 +602,35 @@ This is an academic project (Final Year Project) and is not currently accepting 
 - [x] Receipt scanning with OCR
 - [x] Expense categories analytics
 - [x] Export reports (PDF, CSV)
+- [x] In-app AI assistant
+- [x] Onboarding wizard with Settings revisit
+- [x] Embedded video tutorial guides
+- [x] Input validation and maxLength on all payment fields
+- [x] ~81% automated test coverage
 
 ### Planned Features
 - [ ] Multi-language support (i18n)
-- [ ] Budget tracking and alerts
-- [ ] Recurring expenses
+- [ ] Budget tracking and alerts per group
+- [ ] Recurring and scheduled expenses
+- [ ] Automated payment reminders
 - [ ] Split by percentage of income
 - [ ] Group chat functionality
-- [ ] Expense approval workflow
 - [ ] Integration with banking APIs
+- [ ] Google Pay and Apple Pay integration
 - [ ] Mobile app (React Native)
 
 
 
 ## Academic Context
 
-**Split-Sync** is developed as a **Final Year Project (FYP)** for the BSc Software Development program at South East Technological University (SETU) Carlow.
-
-### Project Details
-- **Program**: BSc Software Development
-- **Institution**: SETU Carlow
-- **Academic Year**: 2025/2026
-- **Project Type**: Capstone Final Year Project
-- **Student Developer**: Emmanuel Abolade
-- **Project Supervisor**: Joseph Kehoe
+| Field | Detail |
+|---|---|
+| Programme | BSc Software Development |
+| Institution | South East Technological University (SETU) Carlow |
+| Academic Year | 2025/2026 |
+| Student | Emmanuel Abolade (C00288657) |
+| Supervisor | Joseph Kehoe |
+| Project Type | Final Year Project (FYP) |
 
 ### Objectives
 1. Design and implement a full-stack Progressive Web Application
@@ -527,13 +640,14 @@ This is an academic project (Final Year Project) and is not currently accepting 
 5. Create comprehensive technical documentation
 
 ### Deliverables
-- Research document
-- Functional Specification document - PWA with core features
-- Design document
-- Source code with version control (Git)
-- Technical documentation/Manual
-- User testing and evaluation
-- Final presentation and screen cast
+- Research Document
+- Functional Specification
+- Final Design Document
+- Source Code (GitHub)
+- Project Report
+- User Evaluation
+- Project Diary
+- Presentation and Screencast
 
 
 
@@ -604,21 +718,33 @@ SOFTWARE.
 
 ## Screenshots
 
-*Coming soon - Add screenshots of your app here*
-```
-#Default Mode
-[Login/Register]			[Dashboard]     	[Group Details]     [Add Expense]
-[OCR Receipt scanning]     	[Notifications]     [Contact Sync]		[Contact Sync]
-[Settle Modal]				[Payment Settings]	[Invite Methods]	[Profile]
-[Activity]					[QuickAdd]			[Create Group]		[Settings]
+### Light Mode
 
+| Login | Dashboard | Group Details |
+|---|---|---|
+| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) | ![Group Details](docs/screenshots/group-details.png) |
 
+| Add Expense | Settle Up | Profile |
+|---|---|---|
+| ![Add Expense](docs/screenshots/add-expense.png) | ![Settle Up](docs/screenshots/settle-up.png) | ![Profile](docs/screenshots/profile.png) |
 
-#Dark Mode
-[Login/Register]			[Dashboard]     	[Group Details]     [Add Expense]
-[OCR Receipt scanning]     	[Notifications]     [Contact Sync]		[Contact Sync]
-[Settle Modal]				[Payment Settings]	[Invite Methods]	[Profile]
-[Activity]					[QuickAdd]			[Create Group]		[Settings]
+| Settings | Analytics | Help and Info |
+|---|---|---|
+| ![Settings](docs/screenshots/settings.png) | ![Analytics](docs/screenshots/analytics.png) | ![Help](docs/screenshots/help-guide-video-link.png) |
+
+### Dark Mode
+
+| Dashboard | Analytics | Settings |
+|---|---|---|
+| ![Onboarding](docs/screenshots/onboarding-darkmode.png) | ![Analytics](docs/screenshots/analytics-darkmode.png) | ![Activity](docs/screenshots/activity-darkmode.png) |
+
+| Dashboard | Analytics | Settings |
+|---|---|---|
+| ![Notification In-App](docs/screenshots/notifications-darkmode.png) | ![Onboarding Guide](docs/screenshots/onboarding-darkmode.png) | ![Quick Add Expense](docs/screenshots/quickadd-darkmode.png) |
+
+| Dashboard | Analytics | Settings |
+|---|---|---|
+| ![Settle Up Modal](docs/screenshots/settlement-up-modal-darkmode.png) | ![Create Group Modal](docs/screenshots/create-group-dark.png) | ![Add Member Sync](docs/screenshots/member-adding-dark.png) |
 
 ```
 
