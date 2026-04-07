@@ -12,7 +12,7 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, XCircle, LogOut, Trash2, MoreVertical
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, XCircle, LogOut, Trash2, MoreVertical, Download
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -495,6 +495,219 @@ export default function GroupDetails() {
   const isOwner = group.createdBy === user.uid;
   const isSoloGroup = (group?.members?.length || 0) <= 1; // true when no other members have joined
   
+  // Export group expenses to a CSV file
+  const handleExportCSV = () => {
+    if (expenses.length === 0) return;
+
+    const headers = [
+      'Date',
+      'Title',
+      'Category',
+      'Amount',
+      'Currency',
+      'Paid By',
+      'Your Share',
+      'Split Method',
+      'Notes',
+    ];
+
+    const rows = expenses.map(expense => {
+      const payer = group.members?.find(m => m.userId === expense.paidBy);
+      const payerName = payer?.name || expense.paidBy;
+      const yourShare = expense.splits?.[user.uid] ?? '';
+      const date = expense.date?.toDate
+        ? expense.date.toDate().toLocaleDateString('en-IE')
+        : new Date(expense.date).toLocaleDateString('en-IE');
+
+      return [
+        date,
+        `"${(expense.title || '').replace(/"/g, '""')}"`,
+        expense.category || 'other',
+        expense.amount?.toFixed(2) ?? '',
+        group.currency,
+        `"${payerName.replace(/"/g, '""')}"`,
+        yourShare !== '' ? Number(yourShare).toFixed(2) : '',
+        expense.splitMethod || 'equal',
+        `"${(expense.description || '').replace(/"/g, '""')}"`,
+      ];
+    });
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${group.name.replace(/\s+/g, '_')}_expenses.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setShowGroupOptions(false);
+  };
+
+
+  // Generate a print-ready PDF report for the group
+  const handleExportPDF = () => {
+    if (expenses.length === 0) return;
+    setShowGroupOptions(false);
+
+    // Build member totals
+    const memberTotals = {};
+    (group.members || []).forEach(m => {
+      memberTotals[m.userId] = { name: m.name || m.email, paid: 0, share: 0 };
+    });
+    expenses.forEach(e => {
+      if (memberTotals[e.paidBy]) memberTotals[e.paidBy].paid += e.amount || 0;
+      Object.entries(e.splits || {}).forEach(([uid, share]) => {
+        if (memberTotals[uid]) memberTotals[uid].share += share || 0;
+      });
+    });
+
+    // Build settlements
+    const balances = calculateBalances(expenses, group.members || []);
+    const settlementsData = calculateSettlements(balances);
+
+    const currency = group.currency;
+    const exportDate = new Date().toLocaleDateString('en-IE', {
+      day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    const expenseRows = expenses.map(e => {
+      const payer = group.members?.find(m => m.userId === e.paidBy);
+      const payerName = payer?.name || 'Unknown';
+      const date = e.date?.toDate
+        ? e.date.toDate().toLocaleDateString('en-IE')
+        : new Date(e.date).toLocaleDateString('en-IE');
+      return `
+        <tr>
+          <td>${date}</td>
+          <td>${e.title || ''}</td>
+          <td style="text-transform:capitalize">${e.category || 'other'}</td>
+          <td class="amount">${currency} ${(e.amount || 0).toFixed(2)}</td>
+          <td>${payerName}</td>
+          <td style="text-transform:capitalize">${e.splitMethod || 'equal'}</td>
+        </tr>`;
+    }).join('');
+
+    const memberRows = Object.values(memberTotals).map(m => `
+      <tr>
+        <td>${m.name}</td>
+        <td class="amount">${currency} ${m.paid.toFixed(2)}</td>
+        <td class="amount">${currency} ${m.share.toFixed(2)}</td>
+        <td class="amount ${m.paid - m.share >= 0 ? 'positive' : 'negative'}">
+          ${currency} ${Math.abs(m.paid - m.share).toFixed(2)}
+          ${m.paid - m.share >= 0 ? ' (owed back)' : ' (owes)'}
+        </td>
+      </tr>`).join('');
+
+    const settlementRows = settlementsData.length === 0
+      ? `<tr><td colspan="3" style="text-align:center;color:#16a34a">All settled up</td></tr>`
+      : settlementsData.map(s => {
+          const from = group.members?.find(m => m.userId === s.from)?.name || s.from;
+          const to   = group.members?.find(m => m.userId === s.to)?.name   || s.to;
+          return `<tr><td>${from}</td><td>${to}</td><td class="amount">${currency} ${s.amount.toFixed(2)}</td></tr>`;
+        }).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <title>${group.name} — Expense Report</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1e293b; background: #fff; padding: 32px; font-size: 13px; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #6366f1; }
+          .header-left h1 { font-size: 22px; font-weight: 700; color: #6366f1; margin-bottom: 4px; }
+          .header-left p { color: #64748b; font-size: 12px; }
+          .badge { display: inline-block; background: #eef2ff; color: #6366f1; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 6px; }
+          .header-right { text-align: right; color: #64748b; font-size: 12px; line-height: 1.8; }
+          .section { margin-bottom: 28px; }
+          .section-title { font-size: 13px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
+          table { width: 100%; border-collapse: collapse; }
+          th { background: #f8fafc; text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e2e8f0; }
+          td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; color: #334155; }
+          tr:last-child td { border-bottom: none; }
+          tr:hover td { background: #fafafa; }
+          .amount { font-variant-numeric: tabular-nums; font-weight: 600; }
+          .positive { color: #16a34a; }
+          .negative { color: #dc2626; }
+          .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 11px; }
+          @media print {
+            body { padding: 0; }
+            @page { margin: 20mm; }
+          }
+        </style>
+      </head>
+      <body>
+
+        <div class="header">
+          <div class="header-left">
+            <h1>${group.name}</h1>
+            <p>Expense Report</p>
+            <span class="badge">${currency}</span>
+          </div>
+          <div class="header-right">
+            <p><strong>Exported:</strong> ${exportDate}</p>
+            <p><strong>Members:</strong> ${group.members?.length || 0}</p>
+            <p><strong>Expenses:</strong> ${expenses.length}</p>
+            <p><strong>Total:</strong> ${currency} ${expenses.reduce((s, e) => s + (e.amount || 0), 0).toFixed(2)}</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Member Summary</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Total Paid</th>
+                <th>Total Share</th>
+                <th>Net Balance</th>
+              </tr>
+            </thead>
+            <tbody>${memberRows}</tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Settlement Summary</div>
+          <table>
+            <thead>
+              <tr><th>From</th><th>To</th><th>Amount</th></tr>
+            </thead>
+            <tbody>${settlementRows}</tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">All Expenses</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Paid By</th>
+                <th>Split</th>
+              </tr>
+            </thead>
+            <tbody>${expenseRows}</tbody>
+          </table>
+        </div>
+
+        <div class="footer">
+          Generated by Split-Sync &nbsp;|&nbsp; splitsync-dev.web.app &nbsp;|&nbsp; ${exportDate}
+        </div>
+
+        <script>window.onload = () => window.print();</script>
+      </body>
+      </html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+  };
+
   // THEN RETURN JSX
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
@@ -569,6 +782,27 @@ export default function GroupDetails() {
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowGroupOptions(false)} />
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
+                    
+                    {/* Export CSV — available to all members */}
+                    {expenses.length > 0 && (
+                      <>
+                        <button
+                          onClick={handleExportCSV}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition"
+                        >
+                          <Download size={16} />
+                          Export CSV
+                        </button>
+                        <button
+                          onClick={handleExportPDF}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition"
+                        >
+                          <Download size={16} />
+                          Export PDF
+                        </button>
+                      </>
+                    )}
+
                     {!isOwner && (
                       <button
                         onClick={handleOpenLeave}
