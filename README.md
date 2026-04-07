@@ -734,15 +734,15 @@ SOFTWARE.
 
 ### Dark Mode
 
-| Dashboard | Analytics | Settings |
+| Onboarding | Analytics | Activity |
 |---|---|---|
 | ![Onboarding](docs/screenshots/onboarding-darkmode.png) | ![Analytics](docs/screenshots/analytics-darkmode.png) | ![Activity](docs/screenshots/activity-darkmode.png) |
 
-| Dashboard | Analytics | Settings |
+| Notification | Personal Dashboard - YOU OWE | Quick Add Expense |
 |---|---|---|
-| ![Notification In-App](docs/screenshots/notifications-darkmode.png) | ![Onboarding Guide](docs/screenshots/onboarding-darkmode.png) | ![Quick Add Expense](docs/screenshots/quickadd-darkmode.png) |
+| ![Notification In-App](docs/screenshots/notifications-darkmode.png) | ![Personal dashboard](docs/screenshots/profile-dark.png) | ![Quick Add Expense](docs/screenshots/quickadd-darkmode.png) |
 
-| Dashboard | Analytics | Settings |
+| Settle Up Modal | Create Group Modal | Add Member Sync |
 |---|---|---|
 | ![Settle Up Modal](docs/screenshots/settlement-up-modal-darkmode.png) | ![Create Group Modal](docs/screenshots/create-group-dark.png) | ![Add Member Sync](docs/screenshots/member-adding-dark.png) |
 
