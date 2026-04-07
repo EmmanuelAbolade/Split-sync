@@ -682,10 +682,10 @@ SOFTWARE.
 
 ## Contact
 
-**Developer**: Emmanuel Abolade  
+**Student Name**: Emmanuel Abolade
+**Student ID**: C00288657  
 **Email**: emab.dev@gmail.com  
-**Institution**: SETU Carlow  
-**Project**: Split-Sync - Smart Expense Management PWA
+**Institution**: SETU Carlow 
 
 ### Links
 - **Live Demo**: [https://splitsync-dev.web.app](https://splitsync-dev.web.app)
@@ -746,10 +746,7 @@ SOFTWARE.
 |---|---|---|
 | ![Settle Up Modal](docs/screenshots/settlement-up-modal-darkmode.png) | ![Create Group Modal](docs/screenshots/create-group-dark.png) | ![Add Member Sync](docs/screenshots/member-adding-dark.png) |
 
-```
-
-
-
+---
 <div align="center">
 
 **Built with ❤️ by Emmanuel Abolade**
@@ -759,12 +756,3 @@ SOFTWARE.
 [⬆ Back to Top](#split-sync-)
 
 </div>
-
-
-
-
-## **ALSO CREATE:** `LICENSE` file
-```
-## License
-
-This project is licensed under the Apache License 2.0 – see the [LICENSE](LICENSE) file for details.
