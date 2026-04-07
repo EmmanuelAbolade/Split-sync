@@ -29,14 +29,14 @@
 
 ### Why Split-Sync?
 
-- ** Privacy-First Design**: End-to-end encryption, secure authentication, and privacy-preserving contact sync
-- ** Multiple Payment Methods**: Integrated PayPal, Revolut, and SEPA bank transfers
-- ** Progressive Web App**: Install on any device, works offline, native app experience
-- ** Multi-Currency Support**: EUR, USD, GBP with automatic currency handling
-- ** Smart Contact Sync**: Find friends using Split-Sync through privacy-preserving phone number matching
-- ** Real-Time Notifications**: Instant updates for expenses, settlements, and group activities
-- ** Advanced Split Methods**: Equal splits, percentage-based, exact amounts, and shares
-- ** Receipt Scanning**: OCR-powered receipt scanning with Google Cloud Vision API (planned)
+- **Privacy-First Design**: End-to-end encryption, secure authentication, and privacy-preserving contact sync
+- **Multiple Payment Methods**: Integrated PayPal, Revolut, and SEPA bank transfers
+- **Progressive Web App**: Install on any device, works offline, native app experience
+- **Multi-Currency Support**: EUR, USD, GBP with automatic currency handling
+- **Smart Contact Sync**: Find friends using Split-Sync through privacy-preserving phone number matching
+- **Real-Time Notifications**: Instant updates for expenses, settlements, and group activities
+- **Advanced Split Methods**: Equal splits, percentage-based, exact amounts, and shares
+- **Receipt Scanning**: OCR-powered receipt scanning with Google Cloud Vision API (planned)
 
 
 
@@ -147,7 +147,7 @@
 ### Quick Start
 ```bash
 # Clone the repository
-git clone https://github.com/EmmanuelAbolade/split-sync-app.git
+git clone https://github.com/EmmanuelAbolade/split-sync.git
 cd split-sync-app
 
 # Install dependencies
@@ -168,7 +168,7 @@ The app will open at `http://localhost:3000`
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/split-sync-app.git
+git clone https://github.com/EmmanuelAbolade/split-sync.git
 cd split-sync-app
 ```
 
@@ -315,7 +315,7 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 ### Login and Account Set up
 
 1. **Register/Login**: Create an account or sign in with Google
-2. **Add Payment Methods ** (Needed for settlement): Go to Profile (You) → Add a payment method
+2. **Add Payment Methods** (Needed for settlement): Go to Profile (You) → Add a payment method
 3. **Enable biometric authentication**: (Needed for security): Go to Settings → toggle on and set up biometric 
 4. **Add Phone Number** (Optional): Go to Profile → Add phone for contact sync
 
@@ -491,11 +491,9 @@ This is an academic project (Final Year Project) and is not currently accepting 
 - [x] Contact sync (privacy-preserving)
 - [x] Balance calculation and settlement suggestions
 - [x] Progressive Web App (PWA)
-
-### In Progress
-- [ ] Receipt scanning with OCR
-- [ ] Expense categories analytics
-- [ ] Export reports (PDF, CSV)
+- [x] Receipt scanning with OCR
+- [x] Expense categories analytics
+- [x] Export reports (PDF, CSV)
 
 ### Planned Features
 - [ ] Multi-language support (i18n)
@@ -518,7 +516,7 @@ This is an academic project (Final Year Project) and is not currently accepting 
 - **Institution**: SETU Carlow
 - **Academic Year**: 2025/2026
 - **Project Type**: Capstone Final Year Project
-- **Student Developer **: Emmanuel Abolade
+- **Student Developer**: Emmanuel Abolade
 - **Project Supervisor**: Joseph Kehoe
 
 ### Objectives
@@ -529,10 +527,11 @@ This is an academic project (Final Year Project) and is not currently accepting 
 5. Create comprehensive technical documentation
 
 ### Deliverables
-- Functional PWA with core features
+- Research document
+- Functional Specification document - PWA with core features
+- Design document
 - Source code with version control (Git)
-- Technical documentation
-- Research document (in progress)
+- Technical documentation/Manual
 - User testing and evaluation
 - Final presentation and screen cast
 
@@ -596,6 +595,10 @@ SOFTWARE.
 - **React Community**: Libraries and open-source tools
 - **Lucide Icons**: Beautiful icon library
 - **Tailwind CSS**: Utility-first CSS framework
+- **Claude Anthropic**: Assistance with reasoning and solving problems
+- **Netlify**: Feedback web application form
+- **Formspree**: Feedback form submission and csv export
+- **YouTube**: Video Guide live upload
 
 
 
@@ -630,7 +633,7 @@ SOFTWARE.
 [⬆ Back to Top](#split-sync-)
 
 </div>
-```
+
 
 
 
