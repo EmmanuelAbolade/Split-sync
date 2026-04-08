@@ -254,7 +254,7 @@ export const acceptInvitation = async (invitationId, userId) => {
       memberIds: arrayUnion(userId),
       members: arrayUnion({
         userId,
-        name: userData.fullName || userData.displayName || 'User',
+        name: userData.displayName || userData.fullName || 'User',
         email: userData.email,
         photoURL: userData.photoURL || null,
         joinedAt: new Date()

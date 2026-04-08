@@ -222,8 +222,8 @@ export default function Settings() {
       // 1. Update Firebase Auth display name
       await updateProfile(auth.currentUser, { displayName: trimmedName });
 
-      // 2. Update Firestore user document
-      await updateDoc(doc(db, 'users', user.uid), { displayName: trimmedName });
+      // 2. Update Firestore user document — keep both displayName and fullName in sync
+      await updateDoc(doc(db, 'users', user.uid), { displayName: trimmedName, fullName: trimmedName });
 
       // 3. Update this user's name inside every group's members array
       const groupsSnap = await getDocs(
