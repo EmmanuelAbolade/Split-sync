@@ -197,7 +197,7 @@ export default function Login() {
               className="h-32 w-auto mb-4"
             />
           </div>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">Share expenses simply</p>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">Split and settle expenses easily, smartly and instantly</p>
         </div>
 
         {/* Error Message */}
