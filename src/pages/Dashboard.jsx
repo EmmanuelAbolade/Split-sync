@@ -372,7 +372,7 @@ export default function Dashboard() {
                   ? `Welcome back, ${user?.displayName?.split(' ')[0] || 'there'}!`
                   : `Welcome, ${user?.displayName?.split(' ')[0] || 'there'}!`}
               </h2>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3">Do You have any shared expense to manage - easily and smartly? Settle up now with family and friends effortlessly. Keep finances clear and relationships smooth. </p>
+              <p className="text-xs font-semibold tracking-wide text-gray-400 dark:text-gray-500 mb-3">Do You have any shared expense to manage - easily and smartly? Settle up now with family and friends effortlessly. Keep finances clear and relationships smooth. </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
