@@ -6,7 +6,7 @@ import { auth, db } from '../services/firebase';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import CreateGroupModal from '../components/CreateGroupModal';
-import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift, Settings, Bell, TrendingDown, TrendingUp, Layers, AlertCircle } from 'lucide-react';
+import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift, Settings, Bell, TrendingDown, TrendingUp, Layers, AlertCircle,  ArrowRightCircle } from 'lucide-react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import InvitationNotification from '../components/InvitationNotification';
 import OnboardingWizard from "../components/OnboardingWizard";
@@ -70,17 +70,30 @@ export default function Dashboard() {
     let totalOwed = {};
     let oweCount = 0;
     let owedCount = 0;
-    Object.entries(groupBalances).forEach(([, bal]) => {
+    let highestDebt = null; // { amount, currency, groupId, groupName }
+
+    Object.entries(groupBalances).forEach(([groupId, bal]) => {
       if (bal.status === 'owes') {
         totalOwe[bal.currency] = (totalOwe[bal.currency] || 0) + bal.amount;
         oweCount++;
+        // Track the single highest debt for the settlement suggestion
+        if (!highestDebt || bal.amount > highestDebt.amount) {
+          const group = groups.find(g => g.id === groupId);
+          highestDebt = {
+            amount: bal.amount,
+            currency: bal.currency,
+            groupId,
+            groupName: group?.name || '',
+          };
+        }
       } else if (bal.status === 'owed') {
         totalOwed[bal.currency] = (totalOwed[bal.currency] || 0) + bal.amount;
         owedCount++;
       }
     });
-    return { totalOwe, totalOwed, oweCount, owedCount };
-  }, [groupBalances]);
+
+    return { totalOwe, totalOwed, oweCount, owedCount, highestDebt };
+  }, [groupBalances, groups]);
 
   // Fetch user data
   useEffect(() => {
@@ -371,9 +384,14 @@ export default function Dashboard() {
         {/* Overview stat cards */}
         <div className="mb-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3">Overview</p>
-          <div className="grid grid-cols-3 gap-3">
+
+          {/* Row 1 — financial summary */}
+          <div className="grid grid-cols-3 gap-3 mb-3">
             {/* You owe */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3">
+            <div
+              onClick={() => navigate('/activity', { state: { filter: 'owe' } })}
+              className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition"
+            >
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingDown size={13} className="text-orange-500" />
                 <p className="text-xs text-gray-500 dark:text-gray-400">You owe</p>
@@ -393,7 +411,10 @@ export default function Dashboard() {
             </div>
 
             {/* Owed to you */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3">
+            <div
+              onClick={() => navigate('/activity', { state: { filter: 'paid' } })}
+              className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 cursor-pointer hover:border-green-300 dark:hover:border-green-700 hover:bg-green-50 dark:hover:bg-green-900/10 transition"
+            >
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingUp size={13} className="text-green-500" />
                 <p className="text-xs text-gray-500 dark:text-gray-400">Owed to you</p>
@@ -413,7 +434,10 @@ export default function Dashboard() {
             </div>
 
             {/* Groups count */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3">
+            <div
+              onClick={() => document.getElementById('groups-section')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition"
+            >
               <div className="flex items-center gap-1.5 mb-2">
                 <Layers size={13} className="text-indigo-500" />
                 <p className="text-xs text-gray-500 dark:text-gray-400">Groups</p>
@@ -424,7 +448,40 @@ export default function Dashboard() {
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">active</p>
             </div>
           </div>
+
+          
         </div>
+
+        {/* Suggested settlement — only shown when user has a debt */}
+        {overviewStats.highestDebt && (
+          <div className="mb-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3 flex items-center gap-1.5">
+              <ArrowRightCircle size={12} />
+              Suggested settlement
+            </p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                  {overviewStats.highestDebt.groupName}
+                </p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                  Highest outstanding debt
+                </p>
+              </div>
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <p className="text-base font-semibold text-orange-600 dark:text-orange-400">
+                  {overviewStats.highestDebt.currency} {overviewStats.highestDebt.amount.toFixed(2)}
+                </p>
+                <button
+                  onClick={() => navigate(`/group/${overviewStats.highestDebt.groupId}`)}
+                  className="text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 px-3 py-1.5 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/60 transition whitespace-nowrap"
+                >
+                  Settle
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pending payment confirmation banner */}
         {pendingConfirmation && (
@@ -451,7 +508,7 @@ export default function Dashboard() {
         )}
 
         {/* Groups section */}
-        <div className="mb-6">
+        <div id="groups-section" className="mb-6">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">Your groups</h3>
             <button

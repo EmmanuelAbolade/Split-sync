@@ -1,6 +1,6 @@
 // src/pages/Activity.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
@@ -10,12 +10,13 @@ import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 export default function Activity() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const location = useLocation();
   
   const [expenses, setExpenses] = useState([]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedExpense, setSelectedExpense] = useState(null);
-  const [filter, setFilter] = useState('all'); // 'all', 'paid', 'owe'
+  const [filter, setFilter] = useState(location.state?.filter || 'all'); // 'all', 'paid', 'owe'
 
   // Get display title with current names for settlements
   const getDisplayTitle = (expense, group) => {
