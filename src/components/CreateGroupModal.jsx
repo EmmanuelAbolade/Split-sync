@@ -1,6 +1,6 @@
 // src/components/CreateGroupModal.jsx
-import { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useState, useRef } from 'react';
+import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import IconSelector from './IconSelector';
@@ -18,7 +18,9 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   const [currency, setCurrency] = useState('EUR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const [suggestions, setSuggestions] = useState([]);
+  const modalBodyRef = useRef(null);
+
   // STATE - ADDED FOR QUICK ADD & CONTACT SYNC
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [pendingInvitations, setPendingInvitations] = useState([]);
@@ -70,6 +72,20 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
     setPendingInvitations(prev => prev.filter(inv => inv.userId !== userId));
   };
 
+  // Generate name suggestions when a duplicate is detected
+  const generateSuggestions = (name, existingNames) => {
+    const base = name.trim();
+    const candidates = [
+      `${base} 2`,
+      `${base} (New)`,
+      `${base} Group`,
+      `My ${base}`,
+      `${base} ${new Date().getFullYear()}`,
+    ];
+    return candidates.filter(c => !existingNames.includes(c.toLowerCase()));
+  };
+
+
   // Modified handleSubmit with connection tracking & invitations
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,6 +97,27 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
     if (groupName.trim().length > 50) {
       setError('Group name cannot exceed 50 characters');
       return;
+    }
+
+
+    // Check for duplicate name among user's existing groups
+    setLoading(true);
+    try {
+      const existingSnap = await getDocs(
+        query(collection(db, 'groups'), where('memberIds', 'array-contains', user.uid))
+      );
+      const existingNames = existingSnap.docs.map(d => d.data().name?.toLowerCase());
+      if (existingNames.includes(groupName.trim().toLowerCase())) {
+        setSuggestions(generateSuggestions(groupName.trim(), existingNames));
+        setError(`You already have a group called "${groupName.trim()}".`);
+        setLoading(false);
+        setTimeout(() => {
+          modalBodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 50);
+        return;
+      }
+    } catch (e) {
+      console.error('[CreateGroupModal] duplicate check error', e);
     }
 
     setError('');
@@ -171,7 +208,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in max-h-[90vh] overflow-y-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in max-h-[90vh] overflow-y-auto" ref={modalBodyRef}>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Group</h2>
             <button
@@ -183,8 +220,31 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">
-              {error}
+            <div className="bg-red-50 dark:bg-red-900/30 p-3 rounded-lg mb-4 border border-red-200 dark:border-red-800">
+              <p className="text-sm text-red-600 dark:text-red-300 mb-2">{error}</p>
+              {suggestions.length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    Try one of these instead:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => {
+                          setGroupName(s);
+                          setSuggestions([]);
+                          setError('');
+                        }}
+                        className="px-3 py-1.5 text-xs rounded-lg border border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -196,7 +256,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
               <input
                 type="text"
                 value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
+                onChange={(e) => { setGroupName(e.target.value); setSuggestions([]); setError(''); }}
                 placeholder="e.g., Flat Mates, Paris Trip, Shared subscription"
                 maxLength={50}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
