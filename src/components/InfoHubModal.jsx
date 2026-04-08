@@ -19,15 +19,25 @@ export default function InfoHubModal({ isOpen, onClose }) {
 
   const features = [
     { title: 'Expense Splitting',        desc: 'Split by equal share, percentage, exact amount, or weighted shares.' },
+    { title: 'Smart Settlements Suggestions',           desc: 'Get intelligent suggestions for settling debts within your group.' },
     { title: 'Multi-Currency Support',   desc: 'Each group has its own currency. Balances are shown per currency with no conversion applied.' },
-    { title: 'Payment Integrations',     desc: 'Settle via PayPal, Revolut, or SEPA bank transfer directly from the app.' },
+    { title: 'Payment Integrations',     desc: 'Settle via PayPal, Revolut, or SEPA bank transfer directly from the app. IBAN stored encrypted (AES-256).' },
     { title: 'Receipt Scanner',          desc: 'Scan a receipt with your camera to auto-fill expense title, amount, and date.' },
     { title: 'Real-Time Balances',       desc: 'Balances update instantly when expenses or payments are recorded.' },
     { title: 'Biometric Authentication', desc: 'Secure your account and payments with fingerprint or Face ID.' },
     { title: 'Spending Analytics',       desc: 'View charts and breakdowns of your spending per group in the Stats tab.' },
     { title: 'QR Code Invites',          desc: 'Share a scannable QR code to invite members to your group.' },
     { title: 'Dark Mode',                desc: 'Toggle dark mode in Settings under Appearance.' },
+    { title: 'CSV & PDF Group Reports',  desc: 'Export group reports as CSV or PDF for offline analysis.' },
     { title: 'PWA Install',              desc: 'Install Split-Sync to your home screen for a native app experience.' },
+    { title: 'In-App Notifications',     desc: 'Get notified about new expenses, payments, and group activities.' },
+    { title: 'Session Management and auto-logout',       desc: 'Manage your active sessions and log out from other devices.' },
+    { title: 'Profile Management',       desc: 'Update your profile information and preferences at any time.' },
+    { title: 'Privacy-Preserving Contact System', desc: 'Your contacts are encrypted and never shared with third parties.' },
+    { title: 'AI Assistant',             desc: 'Get help with common tasks and questions using our AI assistant.' },
+    { title: 'GDPR Compliant',           desc: 'User data deletion, Account closure, and explicit consent management.' },
+    { title: 'Onboarding Process Guide',           desc: 'Use our comprehensive onboarding guide to get started quickly.' },
+    
   ];
 
   return (

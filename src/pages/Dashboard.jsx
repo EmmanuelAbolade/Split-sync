@@ -1,18 +1,18 @@
 // src/pages/Dashboard.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import CreateGroupModal from '../components/CreateGroupModal';
-import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift } from 'lucide-react';
+import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift, Settings, Bell, TrendingDown, TrendingUp, Layers, AlertCircle } from 'lucide-react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { Settings, Bell } from 'lucide-react';
 import InvitationNotification from '../components/InvitationNotification';
 import OnboardingWizard from "../components/OnboardingWizard";
 import NotificationsDropdown from '../components/NotificationsDropdown'; 
 import { useNotificationsStore } from '../stores/notificationsStore';
+import { calculateBalances, getUserBalanceSummary } from '../utils/balanceCalculator';
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -49,10 +49,38 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [groupBalances, setGroupBalances] = useState({}); // groupId -> { status, amount, currency }
+  const [pendingConfirmation, setPendingConfirmation] = useState(null); // first pending payment notification
 
   // Notifications state
   const [showNotifications, setShowNotifications] = useState(false);
-  const { unreadCount } = useNotificationsStore();
+  const { unreadCount, notifications } = useNotificationsStore();
+
+  // First pending payment confirmation for the banner
+  useEffect(() => {
+    const pending = notifications.find(
+      n => n.type === 'payment_confirmation_needed' && n.requiresAction && !n.read
+    );
+    setPendingConfirmation(pending || null);
+  }, [notifications]);
+
+  // Aggregate totals across all groups
+  const overviewStats = useMemo(() => {
+    let totalOwe = {};
+    let totalOwed = {};
+    let oweCount = 0;
+    let owedCount = 0;
+    Object.entries(groupBalances).forEach(([, bal]) => {
+      if (bal.status === 'owes') {
+        totalOwe[bal.currency] = (totalOwe[bal.currency] || 0) + bal.amount;
+        oweCount++;
+      } else if (bal.status === 'owed') {
+        totalOwed[bal.currency] = (totalOwed[bal.currency] || 0) + bal.amount;
+        owedCount++;
+      }
+    });
+    return { totalOwe, totalOwed, oweCount, owedCount };
+  }, [groupBalances]);
 
   // Fetch user data
   useEffect(() => {
@@ -103,7 +131,7 @@ export default function Dashboard() {
   }, [user]);
   
   
-  // Fetch user's groups in real-time
+  // Fetch user's groups in real-time and calculate balances
   useEffect(() => {
     if (!user) return;
 
@@ -112,14 +140,35 @@ export default function Dashboard() {
       where('memberIds', 'array-contains', user.uid)
     );
 
-    // Listen for real-time updates
-    const unsubscribe = onSnapshot(groupsQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(groupsQuery, async (snapshot) => {
       const groupsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
-      
       setGroups(groupsData);
+
+      // Fetch expenses for each group and calculate user balance
+      const balanceMap = {};
+      await Promise.all(
+        groupsData.map(async (group) => {
+          try {
+            const expSnap = await getDocs(
+              query(collection(db, 'expenses'), where('groupId', '==', group.id))
+            );
+            const expenses = expSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const balances = calculateBalances(expenses, group.members || []);
+            const summary = getUserBalanceSummary(balances, user.uid, group.members || []);
+            balanceMap[group.id] = {
+              status: summary.status,
+              amount: summary.amount,
+              currency: group.currency,
+            };
+          } catch (e) {
+            console.error('[Dashboard] balance fetch error', group.id, e);
+          }
+        })
+      );
+      setGroupBalances(balanceMap);
       setLoading(false);
     }, (error) => {
       console.error('Error fetching groups:', error);
@@ -291,109 +340,195 @@ export default function Dashboard() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Welcome */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            {/* Profile Photo */}
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover">
+        <div className="mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover flex-shrink-0">
               {userData?.photoURL ? (
-                <img
-                  src={userData.photoURL}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
+                <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">
+                  <span className="text-xl font-bold text-white">
                     {user?.displayName?.charAt(0).toUpperCase() || 'U'}
                   </span>
                 </div>
               )}
             </div>
-            
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                {userData?.isFirstLogin === false 
-                  ? `Welcome back, ${user?.displayName || 'there'}!`
-                  : `Welcome, ${user?.displayName || 'there'}!`
-                }
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {userData?.isFirstLogin === false
+                  ? `Welcome back, ${user?.displayName?.split(' ')[0] || 'there'}!`
+                  : `Welcome, ${user?.displayName?.split(' ')[0] || 'there'}!`}
               </h2>
-              <p className="text-gray-600 dark:text-gray-300">
-                Do you have any shared expenses to manage? Settle up with friends and family.
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3">Do You have any shared expense to manage - easily and smartly? Settle up now with family and friends effortlessly. Keep finances clear and relationships smooth. </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
+              
             </div>
           </div>
         </div>
 
-        {/* Your Groups Section */}
+        {/* Overview stat cards */}
+        <div className="mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3">Overview</p>
+          <div className="grid grid-cols-3 gap-3">
+            {/* You owe */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <TrendingDown size={13} className="text-orange-500" />
+                <p className="text-xs text-gray-500 dark:text-gray-400">You owe</p>
+              </div>
+              {Object.keys(overviewStats.totalOwe).length === 0 ? (
+                <p className="text-base font-semibold text-gray-400 dark:text-gray-500">—</p>
+              ) : (
+                Object.entries(overviewStats.totalOwe).map(([cur, amt]) => (
+                  <p key={cur} className="text-base font-semibold text-orange-600 dark:text-orange-400">
+                    {cur} {amt.toFixed(2)}
+                  </p>
+                ))
+              )}
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                {overviewStats.oweCount > 0 ? `${overviewStats.oweCount} group${overviewStats.oweCount !== 1 ? 's' : ''}` : 'all settled'}
+              </p>
+            </div>
+
+            {/* Owed to you */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <TrendingUp size={13} className="text-green-500" />
+                <p className="text-xs text-gray-500 dark:text-gray-400">Owed to you</p>
+              </div>
+              {Object.keys(overviewStats.totalOwed).length === 0 ? (
+                <p className="text-base font-semibold text-gray-400 dark:text-gray-500">—</p>
+              ) : (
+                Object.entries(overviewStats.totalOwed).map(([cur, amt]) => (
+                  <p key={cur} className="text-base font-semibold text-green-600 dark:text-green-400">
+                    {cur} {amt.toFixed(2)}
+                  </p>
+                ))
+              )}
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                {overviewStats.owedCount > 0 ? `${overviewStats.owedCount} group${overviewStats.owedCount !== 1 ? 's' : ''}` : 'nothing yet'}
+              </p>
+            </div>
+
+            {/* Groups count */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Layers size={13} className="text-indigo-500" />
+                <p className="text-xs text-gray-500 dark:text-gray-400">Groups</p>
+              </div>
+              <p className="text-base font-semibold text-indigo-600 dark:text-indigo-400">
+                {groups.length}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">active</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending payment confirmation banner */}
+        {pendingConfirmation && (
+          <div className="mb-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 flex items-start gap-3">
+            <AlertCircle size={16} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                Payment awaiting confirmation
+              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5 truncate">
+                {pendingConfirmation.message || 'Someone has sent you a payment — confirm receipt.'}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const groupId = pendingConfirmation.data?.groupId;
+                if (groupId) navigate(`/group/${groupId}`);
+              }}
+              className="text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 px-3 py-1.5 rounded-lg whitespace-nowrap hover:bg-amber-200 dark:hover:bg-amber-900/60 transition"
+            >
+              Review
+            </button>
+          </div>
+        )}
+
+        {/* Groups section */}
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Your Groups</h3>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Your groups</h3>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-gradient-to-r from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 text-white px-4 py-2 rounded-lg hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+              className="bg-gradient-to-r from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:shadow-card-hover transition-all duration-300 flex items-center gap-2"
             >
-              <span className="text-xl">+</span>
-              Create Group
+              + Create group
             </button>
           </div>
 
-          {/* Loading State */}
           {loading && (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-300">Loading groups...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading groups...</p>
             </div>
           )}
 
-          {/* Empty State */}
           {!loading && groups.length === 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-card dark:shadow-gray-900/50 p-12 text-center">
-              <div className="text-6xl mb-4">👥</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                No groups yet
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-10 text-center">
+              <Users size={40} className="mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">No groups yet</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
                 Create your first group to start tracking shared expenses
               </p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-gradient-to-r from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 text-white px-4 py-2 rounded-lg hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
+                className="bg-gradient-to-r from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:shadow-card-hover transition-all duration-300"
               >
-                Create Your First Group
+                Create your first group
               </button>
             </div>
           )}
 
-          {/* Groups Grid */}
           {!loading && groups.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {groups.map((group, index) => {
                 const IconComponent = getIconComponent(group.icon);
+                const bal = groupBalances[group.id];
                 return (
                   <div
                     key={group.id}
                     onClick={() => navigate(`/group/${group.id}`)}
-                    className="group bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 transform hover:-translate-y-2 active:translate-y-0 p-6 cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-primary dark:hover:border-indigo-500 animate-slide-up"
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    className="group bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 p-8 cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-primary dark:hover:border-indigo-500 flex items-center gap-4 animate-slide-up"
+                    style={{ animationDelay: `${index * 40}ms` }}
                   >
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-card transform transition-transform group-hover:scale-110 group-hover:rotate-6">
-                        <IconComponent className="text-white" size={28} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-1 truncate">
-                          {group.name}
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                          <Users size={14} />
-                          {group.members?.length || 0} member{group.members?.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
+                    <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-card transform transition-transform group-hover:scale-110 group-hover:rotate-6">
+                      <IconComponent className="text-white" size={34} />
                     </div>
-          
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-300">Currency</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{group.currency}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 dark:text-white truncate">{group.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
+                        <Users size={18} />
+                        {group.members?.length || 0} member{group.members?.length !== 1 ? 's' : ''}
+                        <span className="mx-1">·</span>
+                        {group.currency}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      {!bal ? (
+                        <p className="text-xs text-gray-400 dark:text-gray-500">—</p>
+                      ) : bal.status === 'settled' ? (
+                        <p className="text-sm font-medium text-green-600 dark:text-green-400">Settled</p>
+                      ) : bal.status === 'owed' ? (
+                        <>
+                          <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                            +{group.currency} {bal.amount.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">owed to you</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                            -{group.currency} {bal.amount.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">you owe</p>
+                        </>
+                      )}
                     </div>
                   </div>
                 );
