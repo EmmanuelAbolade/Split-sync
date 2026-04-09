@@ -363,11 +363,13 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         currency: group.currency,
         username: method.username,
         onProceed: () => {
-          const link = generatePayPalLink(method.username, amountNum, group.currency);
-          window.open(link, '_blank');
-          setShowPaymentInfo(false);
-          onClose();
-        }
+        // Copy amount to clipboard so user can paste it in the payment app
+        navigator.clipboard?.writeText(amountNum.toFixed(2)).catch(() => {});
+        const link = generatePayPalLink(method.username, amountNum, group.currency);
+        window.open(link, '_blank');
+        setShowPaymentInfo(false);
+        onClose();
+      }
       });
       setShowPaymentInfo(true);
       
@@ -378,11 +380,13 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         currency: group.currency,
         username: method.username,
         onProceed: () => {
-          const link = generateRevolutLink(method.username, amountNum, group.currency);
-          window.open(link, '_blank');
-          setShowPaymentInfo(false);
-          onClose();
-        }
+        // Copy amount to clipboard so user can paste it in the payment app
+        navigator.clipboard?.writeText(amountNum.toFixed(2)).catch(() => {});
+        const link = generateRevolutLink(method.username, amountNum, group.currency);
+        window.open(link, '_blank');
+        setShowPaymentInfo(false);
+        onClose();
+      }
       });
       setShowPaymentInfo(true);
       
@@ -650,6 +654,15 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             {group?.currency} {settlement?.amount?.toFixed(2)}
           </p>
         </div>
+        {/* Pending payment lock warning */}
+        {pendingPayment && !showPendingConfirmation && (
+          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg flex items-start gap-2">
+            <AlertCircle size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              A payment of {pendingPayment.currency} {pendingPayment.amount?.toFixed(2)} to {pendingPayment.toName} is awaiting confirmation. You cannot initiate another payment until this is resolved.
+            </p>
+          </div>
+        )}
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -661,7 +674,10 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             min="0.01"
             max="1000000"
             value={amount}
+            readOnly={!!pendingPayment}
             onChange={(e) => {
+              // Prevent changes when a payment is pending confirmation
+              if (pendingPayment) return;
               const value = e.target.value;
               
               // Check if amount exceeds limit
@@ -719,7 +735,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                       key={method.id}
                       type="button"
                       onClick={() => handlePaymentLinkClick(method)}
-                      disabled={!amount || parseFloat(amount) <= 0}
+                      disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
                       className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-700 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
                       <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
@@ -745,7 +761,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Or pay directly with SEPA</h3>
                 <button
                   onClick={handleSepaPayment}
-                  disabled={!amount || parseFloat(amount) <= 0}
+                  disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
                   className="w-full flex items-center gap-3 p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900/50 transition">
