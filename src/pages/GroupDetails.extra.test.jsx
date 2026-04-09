@@ -189,8 +189,14 @@ const setupWithGroup = (group = mockGroupOwner, expenses = mockExpenses) => {
   mockGetUserBalanceSummary.mockReturnValue({ status: 'owed', amount: 30, message: 'You are owed' });
   mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: group.id, data: () => group })
             .mockResolvedValue(mockUserDoc);
+  let callCount = 0;
   mockOnSnapshot.mockImplementation((q, cb) => {
-    cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    callCount++;
+    if (callCount === 1) {
+      cb({ exists: () => true, id: group.id, data: () => group });
+    } else {
+      cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    }
     return jest.fn();
   });
   mockGetMySentInvitations.mockResolvedValue([]);
@@ -301,8 +307,10 @@ describe('GroupDetails Extra - fetchGroup error path', () => {
 
   test('Navigates to /dashboard when getDoc throws', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    mockGetDoc.mockRejectedValueOnce(new Error('Network error'));
-    mockOnSnapshot.mockReturnValue(jest.fn());
+    mockOnSnapshot.mockImplementation((q, successCb, errorCb) => {
+      errorCb(new Error('Network error'));
+      return jest.fn();
+    });
     mockGetMySentInvitations.mockResolvedValue([]);
     render(<GroupDetails />);
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
@@ -310,8 +318,16 @@ describe('GroupDetails Extra - fetchGroup error path', () => {
   });
 
   test('Navigates to /dashboard when group doc does not exist', async () => {
-    mockGetDoc.mockResolvedValueOnce({ exists: () => false, data: () => ({}) });
-    mockOnSnapshot.mockReturnValue(jest.fn());
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) {
+        cb({ exists: () => false, data: () => ({}) });
+      } else {
+        cb({ docs: [] });
+      }
+      return jest.fn();
+    });
     mockGetMySentInvitations.mockResolvedValue([]);
     render(<GroupDetails />);
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
@@ -338,8 +354,14 @@ describe('GroupDetails Extra - fetchPaymentMethods doc exists', () => {
     };
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
               .mockResolvedValue(userDocWithMethods);
+    let callCount = 0;
     mockOnSnapshot.mockImplementation((q, cb) => {
-      cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      callCount++;
+      if (callCount === 1) {
+        cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      } else {
+        cb({ docs: [] });
+      }
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);
@@ -368,8 +390,14 @@ describe('GroupDetails Extra - onSnapshot error callback', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
               .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
     mockOnSnapshot.mockImplementation((q, successCb, errorCb) => {
-      errorCb(new Error('Firestore permission denied'));
+      callCount++;
+      if (callCount === 1) {
+        successCb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      } else {
+        errorCb(new Error('Firestore permission denied'));
+      }
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);
@@ -728,8 +756,14 @@ describe('GroupDetails Extra - Leave Group flow', () => {
     // Alice is NOT owner in mockGroupMember
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupMember })
               .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
     mockOnSnapshot.mockImplementation((q, cb) => {
-      cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      callCount++;
+      if (callCount === 1) {
+        cb({ exists: () => true, id: 'group-123', data: () => mockGroupMember });
+      } else {
+        cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      }
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);
@@ -820,8 +854,14 @@ describe('GroupDetails Extra - Delete Group flow', () => {
     // Alice IS owner
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
               .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
     mockOnSnapshot.mockImplementation((q, cb) => {
-      cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      callCount++;
+      if (callCount === 1) {
+        cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      } else {
+        cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      }
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);

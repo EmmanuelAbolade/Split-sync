@@ -545,7 +545,7 @@ describe('Profile - Payment Validation', () => {
       fireEvent.click(screen.getByText('Save Payment Settings'));
     });
     await waitFor(() =>
-      expect(screen.getByText(/letters, numbers, and underscores/)).toBeInTheDocument()
+      expect(screen.getByText(/letters, numbers, underscores, or dots only/)).toBeInTheDocument()
     );
   });
 });

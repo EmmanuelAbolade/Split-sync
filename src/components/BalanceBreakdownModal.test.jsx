@@ -42,8 +42,8 @@ describe('BalanceBreakdownModal', () => {
   });
 
   test('Displays formatted total amount', () => {
-    render(<BalanceBreakdownModal {...defaultProps} totalAmount={75.5} />);
-    expect(screen.getByText('75.50')).toBeInTheDocument();
+    render(<BalanceBreakdownModal {...defaultProps} amountsByCurrency={{ EUR: 75.5 }} />);
+    expect(screen.getByText('EUR 75.50')).toBeInTheDocument();
   });
 
   test('Shows empty state for owed type when no breakdowns', () => {

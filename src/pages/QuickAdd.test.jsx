@@ -138,7 +138,7 @@ describe('QuickAdd - Groups list', () => {
     await waitFor(() =>
       expect(screen.getByText(/2 members/)).toBeInTheDocument()
     );
-    expect(screen.getByText(/1 members/)).toBeInTheDocument();
+    expect(screen.getByText(/1 member/)).toBeInTheDocument();
   });
 
   test('Renders group currencies', async () => {

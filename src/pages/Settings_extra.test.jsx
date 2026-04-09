@@ -57,9 +57,10 @@ jest.mock('../services/firebase', () => ({
 }));
 
 const mockLogout = jest.fn();
+const mockUpdateUserDisplayName = jest.fn();
 const mockUser   = { uid: 'user-123', email: 'test@example.com', displayName: 'Alice' };
 jest.mock('../stores/authStore', () => ({
-  useAuthStore: () => ({ user: mockUser, logout: mockLogout }),
+  useAuthStore: () => ({ user: mockUser, logout: mockLogout, updateUserDisplayName: mockUpdateUserDisplayName }),
 }));
 
 const mockRegisterBiometric          = jest.fn();

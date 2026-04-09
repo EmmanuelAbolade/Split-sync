@@ -10,6 +10,7 @@ import '@testing-library/jest-dom';
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/activity' }),
 }));
 
 const mockOnSnapshot = jest.fn();

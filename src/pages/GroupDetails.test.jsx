@@ -173,8 +173,14 @@ const setupWithGroup = (expenses = mockExpenses) => {
   mockGetDoc.mockResolvedValueOnce(mockGroupDoc)   // group fetch
              .mockResolvedValue(mockUserDoc);       // member photo/payment fetches
 
+  let callCount = 0;
   mockOnSnapshot.mockImplementation((query, callback) => {
-    callback({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    callCount++;
+    if (callCount === 1) {
+      callback(mockGroupDoc);
+    } else {
+      callback({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    }
     return jest.fn();
   });
 };
@@ -184,15 +190,32 @@ const setupWithNoExpenses = () => {
   mockGetDoc.mockResolvedValueOnce(mockGroupDoc)
              .mockResolvedValue(mockUserDoc);
 
+  let callCount = 0;
   mockOnSnapshot.mockImplementation((query, callback) => {
-    callback({ docs: [] });
+    callCount++;
+    if (callCount === 1) {
+      callback(mockGroupDoc);
+    } else {
+      callback({ docs: [] });
+    }
     return jest.fn();
   });
 };
 
 const setupGroupNotFound = () => {
   mockGetDoc.mockResolvedValue({ exists: () => false });
-  mockOnSnapshot.mockImplementation(() => jest.fn());
+  let callCount = 0;
+  mockOnSnapshot.mockImplementation((q, cb) => {
+    callCount++;
+    if (typeof cb === 'function') {
+      if (callCount === 1) {
+        cb({ exists: () => false, data: () => ({}) });
+      } else {
+        cb({ docs: [] });
+      }
+    }
+    return jest.fn();
+  });
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

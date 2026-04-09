@@ -295,7 +295,7 @@ describe('Analytics - Summary Cards', () => {
     setupWithData([makeExpense({ amount: 100 })]);
     await renderAndWait(<Analytics />);
     await waitFor(() =>
-      expect(screen.getByText('€100.00')).toBeInTheDocument()
+      expect(screen.getByText('EUR 100.00')).toBeInTheDocument()
     );
   });
 
@@ -408,7 +408,7 @@ describe('Analytics - Multiple Expenses', () => {
     ]);
     await renderAndWait(<Analytics />);
     await waitFor(() =>
-      expect(screen.getByText('€100.00')).toBeInTheDocument()
+      expect(screen.getByText('EUR 100.00')).toBeInTheDocument()
     );
   });
 

@@ -136,10 +136,16 @@ const resetBalanceMocks = (overrides = {}) => {
 const setupWithGroup = (expenses = mockExpenses) => {
   resetBalanceMocks();
   mockGetDoc.mockResolvedValueOnce(mockGroupDoc).mockResolvedValue(mockUserDoc);
-  mockOnSnapshot.mockImplementation((q, cb) => {
-    cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
-    return jest.fn();
-  });
+  let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) {
+        cb(mockGroupDoc);
+      } else {
+        cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+      }
+      return jest.fn();
+    });
   mockGetMySentInvitations.mockResolvedValue([]);
   mockNotificationsStore.notifications = [];
 };
@@ -158,8 +164,14 @@ describe('GroupDetails Extended - Settled balance state', () => {
       summary: { status: 'settled', amount: 0, message: 'All settled up!' },
     });
     mockGetDoc.mockResolvedValueOnce(mockGroupDoc).mockResolvedValue(mockUserDoc);
+    let callCount = 0;
     mockOnSnapshot.mockImplementation((q, cb) => {
-      cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      callCount++;
+      if (callCount === 1) {
+        cb(mockGroupDoc);
+      } else {
+        cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      }
       return jest.fn();
     });
   });

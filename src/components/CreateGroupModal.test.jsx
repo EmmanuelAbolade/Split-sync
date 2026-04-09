@@ -115,7 +115,7 @@ describe('CreateGroupModal - Rendering', () => {
   test('renders the group name input', () => {
     renderModal();
     expect(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip')
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription')
     ).toBeInTheDocument();
   });
 
@@ -199,7 +199,7 @@ describe('CreateGroupModal - Form Validation', () => {
   test('shows error when submitting with whitespace-only group name', async () => {
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: '   ' } }
     );
     fireEvent.click(screen.getByRole('button', { name: /Create Group/i }));
@@ -232,7 +232,7 @@ describe('CreateGroupModal - Successful Creation', () => {
   test('calls addDoc with correct group data on submit', async () => {
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Flat Mates' } }
     );
     await act(async () => {
@@ -248,7 +248,7 @@ describe('CreateGroupModal - Successful Creation', () => {
   test('trims whitespace from group name before saving', async () => {
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: '  Paris Trip  ' } }
     );
     await act(async () => {
@@ -261,7 +261,7 @@ describe('CreateGroupModal - Successful Creation', () => {
   test('calls onGroupCreated with the new group id after creation', async () => {
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Test Group' } }
     );
     await act(async () => {
@@ -275,7 +275,7 @@ describe('CreateGroupModal - Successful Creation', () => {
   test('calls onClose after successful group creation', async () => {
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Test Group' } }
     );
     await act(async () => {
@@ -291,7 +291,7 @@ describe('CreateGroupModal - Successful Creation', () => {
     mockAddDoc.mockImplementation(() => new Promise(() => {}));
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Test Group' } }
     );
     fireEvent.click(screen.getByRole('button', { name: /Create Group/i }));
@@ -322,7 +322,7 @@ describe('CreateGroupModal - Currency Selection', () => {
     renderModal();
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'GBP' } });
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'London Trip' } }
     );
     await act(async () => {
@@ -407,7 +407,7 @@ describe('CreateGroupModal - Quick Add and Pending Invitations', () => {
     fireEvent.click(screen.getByText('Add Bob'));
     // Submit the form
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Group With Members' } }
     );
     await act(async () => {
@@ -436,7 +436,7 @@ describe('CreateGroupModal - Error Handling', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Test Group' } }
     );
     await act(async () => {
@@ -455,7 +455,7 @@ describe('CreateGroupModal - Error Handling', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
     fireEvent.change(
-      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip'),
+      screen.getByPlaceholderText('e.g., Flat Mates, Paris Trip, Shared subscription'),
       { target: { value: 'Test Group' } }
     );
     await act(async () => {

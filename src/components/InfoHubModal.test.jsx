@@ -14,12 +14,12 @@ describe('InfoHubModal', () => {
 
   test('Renders nothing when isOpen is false', () => {
     render(<InfoHubModal isOpen={false} onClose={mockOnClose} />);
-    expect(screen.queryByText('Help & Information')).not.toBeInTheDocument();
+    expect(screen.queryByText('Help and Information')).not.toBeInTheDocument();
   });
 
   test('Renders modal when isOpen is true', () => {
     render(<InfoHubModal isOpen={true} onClose={mockOnClose} />);
-    expect(screen.getByText('Help & Information')).toBeInTheDocument();
+    expect(screen.getByText('Help and Information')).toBeInTheDocument();
   });
 
   test('Renders all four tabs', () => {
@@ -38,7 +38,7 @@ describe('InfoHubModal', () => {
   test('Shows Features content when Features tab is clicked', () => {
     render(<InfoHubModal isOpen={true} onClose={mockOnClose} />);
     fireEvent.click(screen.getByRole('button', { name: /Features/i }));
-    expect(screen.getByText(/Key Features/i)).toBeInTheDocument();
+    expect(screen.getByText(/Core Features/i)).toBeInTheDocument();
   });
 
   test('Shows Tutorials content when Tutorials tab is clicked', () => {

@@ -35,12 +35,12 @@ describe('OnboardingWizard - Visibility', () => {
 
   test('Renders when open is true', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    expect(screen.getByText('Welcome to SplitSync')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to Split-Sync')).toBeInTheDocument();
   });
 
   test('Does not render when open is false', () => {
     render(<OnboardingWizard {...defaultProps} open={false} />);
-    expect(screen.queryByText('Welcome to SplitSync')).not.toBeInTheDocument();
+    expect(screen.queryByText('Welcome to Split-Sync')).not.toBeInTheDocument();
   });
 });
 
@@ -52,13 +52,14 @@ describe('OnboardingWizard - Step 1 (Welcome)', () => {
 
   test('Shows Welcome to SplitSync title', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    expect(screen.getByText('Welcome to SplitSync')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to Split-Sync')).toBeInTheDocument();
   });
 
-  test('Shows step counter 1 / 7', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    expect(screen.getByText('1 / 7')).toBeInTheDocument();
-  });
+  test('Renders step indicator dots', () => {
+  render(<OnboardingWizard {...defaultProps} />);
+  const dots = screen.getAllByRole('button', { name: /Go to step/i });
+  expect(dots).toHaveLength(9);
+});
 
   test('Back button is disabled on first step', () => {
     render(<OnboardingWizard {...defaultProps} />);
@@ -72,7 +73,7 @@ describe('OnboardingWizard - Step 1 (Welcome)', () => {
 
   test('Does not show Finish button on first step', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    expect(screen.queryByText('Finish')).not.toBeInTheDocument();
+    expect(screen.queryByText('Get Started')).not.toBeInTheDocument();
   });
 });
 
@@ -85,14 +86,9 @@ describe('OnboardingWizard - Navigation', () => {
   test('Advances to step 2 when Next is clicked', () => {
     render(<OnboardingWizard {...defaultProps} />);
     fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Step 1: Create or Join a Group')).toBeInTheDocument();
+    expect(screen.getByText('Set up a payment method')).toBeInTheDocument();
   });
 
-  test('Shows step counter 2 / 7 after one Next click', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('2 / 7')).toBeInTheDocument();
-  });
 
   test('Back button is enabled after first Next click', () => {
     render(<OnboardingWizard {...defaultProps} />);
@@ -104,34 +100,36 @@ describe('OnboardingWizard - Navigation', () => {
     render(<OnboardingWizard {...defaultProps} />);
     fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Back'));
-    expect(screen.getByText('Welcome to SplitSync')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to Split-Sync')).toBeInTheDocument();
   });
 
   test('Shows Finish button on last step', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    // Click Next 6 times to reach last step (7 steps total)
-    for (let i = 0; i < 6; i++) {
+    // Click Next 7 times to reach last step (8 steps total)
+    for (let i = 0; i < 8; i++) {
       fireEvent.click(screen.getByText('Next'));
     }
-    expect(screen.getByText('Finish')).toBeInTheDocument();
+    expect(screen.getByText('Get Started')).toBeInTheDocument();
   });
 
   test('Does not show Next button on last step', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       fireEvent.click(screen.getByText('Next'));
     }
     expect(screen.queryByText('Next')).not.toBeInTheDocument();
   });
 
-  test('Shows step counter 7 / 7 on last step', () => {
+  test('Renders 9 step indicator dots', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 6; i++) {
-      fireEvent.click(screen.getByText('Next'));
-    }
-    expect(screen.getByText('7 / 7')).toBeInTheDocument();
+    const dots = screen.getAllByRole('button', { name: /Go to step/i });
+    expect(dots).toHaveLength(9);
   });
+
 });
+
+// ---------------------------------------------------------------------------
+// 4. Step content per step
 
 // ---------------------------------------------------------------------------
 // 4. Step content per step
@@ -139,98 +137,89 @@ describe('OnboardingWizard - Navigation', () => {
 
 describe('OnboardingWizard - Step content', () => {
 
-  test('Step 2 shows Go to Dashboard button', () => {
+  test('Step 2 shows Open Payment Settings button', () => {
     render(<OnboardingWizard {...defaultProps} />);
     fireEvent.click(screen.getByText('Next'));
+    expect(screen.getByText('Open Payment Settings')).toBeInTheDocument();
+  });
+
+  test('Step 3 shows Go to Settings to Enable button', () => {
+    render(<OnboardingWizard {...defaultProps} />);
+    for (let i = 0; i < 2; i++) fireEvent.click(screen.getByText('Next'));
+    expect(screen.getByText('Go to Settings to Enable')).toBeInTheDocument();
+  });
+
+  test('Step 4 shows Add Phone Number button', () => {
+    render(<OnboardingWizard {...defaultProps} />);
+    for (let i = 0; i < 3; i++) fireEvent.click(screen.getByText('Next'));
+    expect(screen.getByText('Add Phone Number')).toBeInTheDocument();
+  });
+
+  test('Step 5 shows Go to Dashboard button', () => {
+    render(<OnboardingWizard {...defaultProps} />);
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText('Next'));
     expect(screen.getByText('Go to Dashboard')).toBeInTheDocument();
   });
 
-  test('Step 2 shows Join a Group button', () => {
+  test('Step 5 shows Join a Group button', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    fireEvent.click(screen.getByText('Next'));
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText('Next'));
     expect(screen.getByText('Join a Group')).toBeInTheDocument();
   });
 
-  test('Step 3 shows Quick Add / Receipt Scan button', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 2; i++) fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Quick Add / Receipt Scan')).toBeInTheDocument();
-  });
-
-  test('Step 4 shows Go to Activity button', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 3; i++) fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Go to Activity')).toBeInTheDocument();
-  });
-
-  test('Step 5 shows Open Profile Payment Settings button', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Open Profile Payment Settings')).toBeInTheDocument();
-  });
-
-  test('Step 6 shows Open Settings button', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 5; i++) fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Open Settings')).toBeInTheDocument();
-  });
-
-  test('Step 7 (Notifications) shows correct title', () => {
+  test('Step 7 shows Quick Add button', () => {
     render(<OnboardingWizard {...defaultProps} />);
     for (let i = 0; i < 6; i++) fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Quick Add')).toBeInTheDocument();
+  });
+
+  test('Step 8 shows View Activity button', () => {
+    render(<OnboardingWizard {...defaultProps} />);
+    for (let i = 0; i < 7; i++) fireEvent.click(screen.getByText('Next'));
+    expect(screen.getByText('View Activity')).toBeInTheDocument();
   });
 });
-
 // ---------------------------------------------------------------------------
 // 5. Navigation callbacks
 // ---------------------------------------------------------------------------
 
 describe('OnboardingWizard - Navigate callbacks', () => {
 
-  test('Clicking Go to Dashboard calls navigate with /dashboard', () => {
+  test('Clicking Open Payment Settings calls navigate with /profile', () => {
     render(<OnboardingWizard {...defaultProps} />);
     fireEvent.click(screen.getByText('Next'));
+    fireEvent.click(screen.getByText('Open Payment Settings'));
+    expect(mockNavigate).toHaveBeenCalledWith('/profile');
+  });
+
+  test('Clicking Go to Dashboard calls navigate with /dashboard', () => {
+    render(<OnboardingWizard {...defaultProps} />);
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Go to Dashboard'));
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
   test('Clicking Join a Group calls navigate with /join-group', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    fireEvent.click(screen.getByText('Next'));
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Join a Group'));
     expect(mockNavigate).toHaveBeenCalledWith('/join-group');
   });
 
-  test('Clicking Quick Add / Receipt Scan calls navigate with /quick-add', () => {
+  test('Clicking Quick Add calls navigate with /add', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 2; i++) fireEvent.click(screen.getByText('Next'));
-    fireEvent.click(screen.getByText('Quick Add / Receipt Scan'));
+    for (let i = 0; i < 6; i++) fireEvent.click(screen.getByText('Next'));
+    fireEvent.click(screen.getByText('Quick Add'));
     expect(mockNavigate).toHaveBeenCalledWith('/quick-add');
   });
 
-  test('Clicking Go to Activity calls navigate with /activity', () => {
+  test('Clicking View Activity calls navigate with /activity', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 3; i++) fireEvent.click(screen.getByText('Next'));
-    fireEvent.click(screen.getByText('Go to Activity'));
+    for (let i = 0; i < 7; i++) fireEvent.click(screen.getByText('Next'));
+    fireEvent.click(screen.getByText('View Activity'));
     expect(mockNavigate).toHaveBeenCalledWith('/activity');
   });
-
-  test('Clicking Open Profile Payment Settings calls navigate with /profile', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText('Next'));
-    fireEvent.click(screen.getByText('Open Profile Payment Settings'));
-    expect(mockNavigate).toHaveBeenCalledWith('/profile');
-  });
-
-  test('Clicking Open Settings calls navigate with /settings', () => {
-    render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 5; i++) fireEvent.click(screen.getByText('Next'));
-    fireEvent.click(screen.getByText('Open Settings'));
-    expect(mockNavigate).toHaveBeenCalledWith('/settings');
-  });
 });
-
 // ---------------------------------------------------------------------------
 // 6. Close and Finish callbacks
 // ---------------------------------------------------------------------------
@@ -239,7 +228,7 @@ describe('OnboardingWizard - Close and Finish', () => {
 
   test('Calls onClose when X button is clicked', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    fireEvent.click(screen.getByLabelText('Close onboarding'));
+    fireEvent.click(screen.getByLabelText('Close onboarding wizard'));
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
@@ -252,8 +241,8 @@ describe('OnboardingWizard - Close and Finish', () => {
 
   test('Calls onFinish when Finish is clicked on last step', () => {
     render(<OnboardingWizard {...defaultProps} />);
-    for (let i = 0; i < 6; i++) fireEvent.click(screen.getByText('Next'));
-    fireEvent.click(screen.getByText('Finish'));
+    for (let i = 0; i < 8; i++) fireEvent.click(screen.getByText('Next'));
+    fireEvent.click(screen.getByText('Get Started'));
     expect(mockOnFinish).toHaveBeenCalledTimes(1);
   });
 });
