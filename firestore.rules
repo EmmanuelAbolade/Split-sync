@@ -2,6 +2,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // ===== ADMIN HELPER =====
+    // Grants read access to users with { admin: true } Firebase custom claim
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
     // ===== USERS COLLECTION =====
     match /users/{userId} {
       allow read: if request.auth != null;
@@ -41,9 +47,11 @@ service cloud.firestore {
     
     // ===== INVITATIONS =====
     match /invitations/{invitationId} {
-      allow read: if request.auth != null && 
-        (resource.data.toUserId == request.auth.uid || 
-         resource.data.fromUserId == request.auth.uid);
+      // Admin can read all invitations (e.g. to count pending invitations in Taskmaster)
+      allow read: if isAdmin() ||
+        (request.auth != null && 
+         (resource.data.toUserId == request.auth.uid || 
+          resource.data.fromUserId == request.auth.uid));
       
       allow create: if request.auth != null && 
         request.auth.uid == request.resource.data.fromUserId;

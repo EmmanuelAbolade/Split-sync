@@ -20,6 +20,7 @@ import Settings           from './pages/Settings';
 import SplitSyncChat      from './components/SplitSyncChat';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
+import Taskmaster from './pages/Taskmaster';
 
 // Layout wrapper for protected routes — renders bottom nav, session timeout, and AI chatbot
 function ProtectedLayout({ children }) {
@@ -206,8 +207,13 @@ function App() {
           path="*"
           element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
         />
+        <Route
+        path="/taskmaster"
+        element={isAuthenticated ? <Taskmaster /> : <Navigate to="/login" />}
+      />
 
       </Routes>
+      
     </BrowserRouter>
   );
 }
