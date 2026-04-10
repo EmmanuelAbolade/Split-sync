@@ -28,8 +28,6 @@ async function checkAdminClaim() {
   const currentUser = auth.currentUser;
   if (!currentUser) return false;
   const token = await currentUser.getIdTokenResult(true);
-  console.log('UID:', currentUser.uid);
-  console.log('Claims:', JSON.stringify(token.claims));
   return token.claims.admin === true;
 }
 
