@@ -257,42 +257,40 @@ export default function GroupDetails() {
     if (!Array.isArray(expenses)) return;
     if (!group.members || !Array.isArray(group.members)) return;
     
-    const checkPendingOnFocus = () => {
-        
-      try {
-        const pending = sessionStorage.getItem('pendingPayment');
-        
-        if (!pending) {
-          return;
-        }
-        
-        const paymentData = JSON.parse(pending);
-        
-        // Check if this payment belongs to THIS group
-        if (paymentData.groupId !== groupId) {
-          return;
-        }
-        setPendingPaymentBanner(paymentData);
-        
-        // Calculate settlements to find matching one
-        const balances = calculateBalances(expenses, group.members);
-        const settlements = calculateSettlements(balances);
-        
-        const matchingSettlement = settlements.find(
-          s => s.from === paymentData.fromUserId && s.to === paymentData.toUserId
-        );
+    // Listen to Firestore for any pending payment where this user is the payer
+    // in this group. Works across sessions and devices.
+    const pendingQuery = query(
+      collection(db, 'pendingPayments'),
+      where('groupId', '==', groupId),
+      where('fromUserId', '==', user.uid)
+    );
 
-        // If we find a matching settlement, open the SettleUpModal for it
-        if (matchingSettlement) {
-          //setSelectedSettlement(matchingSettlement);
-        }
-        // Clear pending payment from sessionStorage after processing
-      } catch (err) {
+    const unsubPending = onSnapshot(pendingQuery, (snapshot) => {
+      if (!snapshot.empty) {
+        const paymentData = snapshot.docs[0].data();
+        setPendingPaymentBanner(paymentData);
+        sessionStorage.setItem('pendingPayment', JSON.stringify(paymentData));
+      } else {
+        setPendingPaymentBanner(null);
+        sessionStorage.removeItem('pendingPayment');
+      }
+    });
+
+    // sessionStorage fallback for same-session detection on window focus
+    const checkPendingOnFocus = () => {
+      const pending = sessionStorage.getItem('pendingPayment');
+      if (pending) {
+        try {
+          const paymentData = JSON.parse(pending);
+          if (paymentData.groupId === groupId) {
+            setPendingPaymentBanner(paymentData);
+          }
+        } catch {}
       }
     };
 
-    // Check on mount in case user is already back and focused
-    checkPendingOnFocus();
+    // Check on window focus (user returns from PayPal)
+    window.addEventListener('focus', checkPendingOnFocus);
     
     // Check on window focus (user returns from PayPal)
     const handleFocus = () => {
@@ -310,6 +308,7 @@ export default function GroupDetails() {
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
+      unsubPending();
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
@@ -925,7 +924,9 @@ export default function GroupDetails() {
                         Yes, Mark as Paid
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={async () => {
+                          const pendingDocId = `${groupId}_${pendingPaymentBanner.fromUserId}_${pendingPaymentBanner.toUserId}`;
+                          await deleteDoc(doc(db, 'pendingPayments', pendingDocId)).catch(() => {});
                           sessionStorage.removeItem('pendingPayment');
                           setPendingPaymentBanner(null);
                         }}

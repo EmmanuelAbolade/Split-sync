@@ -2,7 +2,7 @@
 import ReceiptScanner from './ReceiptScanner';
 import { Camera } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, serverTimestamp, getDocs, query, where, deleteDoc  } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import Tooltip from './Tooltip';
@@ -313,6 +313,27 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
       return;
     }
 
+    // Rule 1 — Block payee from adding expense while they have an unconfirmed
+    // incoming payment. Forces them to resolve it first to keep balances accurate.
+    try {
+      const incomingQuery = query(
+        collection(db, 'pendingPayments'),
+        where('groupId', '==', group.id),
+        where('toUserId', '==', user.uid)
+      );
+      const incomingSnap = await getDocs(incomingQuery);
+      if (!incomingSnap.empty) {
+        const pd = incomingSnap.docs[0].data();
+        setError(
+          `You have a payment from ${pd.fromName || 'a group member'} awaiting your confirmation. ` +
+          `Please confirm or decline it in the group before adding a new expense.`
+        );
+        return;
+      }
+    } catch {
+      // Non-blocking — if the check fails, allow the expense to proceed
+    }
+
     // Show confirmation instead of submitting immediately
     setShowConfirmation(true);
   };
@@ -394,6 +415,22 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
       setDate(new Date().toISOString().split('T')[0]);
       setSplitMethod('equal');
       setScannedData(null);
+
+      // Rule 2 — Auto-cancel any pending payments in this group because
+      // the new expense changes the balances, making pending amounts stale.
+      // Both payer and payee are notified via the existing Firestore listener.
+      try {
+        const pendingQuery = query(
+          collection(db, 'pendingPayments'),
+          where('groupId', '==', group.id)
+        );
+        const pendingSnap = await getDocs(pendingQuery);
+        await Promise.all(
+          pendingSnap.docs.map(d => deleteDoc(d.ref))
+        );
+      } catch {
+        // Non-blocking — balance accuracy takes priority but do not fail the expense save
+      }
 
       onClose();
     } catch (err) {

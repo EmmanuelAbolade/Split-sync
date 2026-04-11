@@ -1,6 +1,6 @@
 // src/components/SettleUpModal.jsx - WITH PAYMENT CONFIRMATION FLOW
 import { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark, QrCode, Smartphone, ChevronDown } from 'lucide-react';
@@ -54,31 +54,27 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setCopiedIban(false);
     setAmount(settlement?.amount?.toFixed(2) || '');
 
-    // Step 2: Check sessionStorage for a pending payment AFTER the reset,
-    // so the check result is the final value of showPendingConfirmation.
-    try {
-      const pending = sessionStorage.getItem('pendingPayment');
-      if (pending) {
-        const paymentData = JSON.parse(pending);
-        if (
-          paymentData.groupId === group?.id &&
-          paymentData.fromUserId === settlement?.from &&
-          paymentData.toUserId === settlement?.to
-        ) {
-          setPendingPayment(paymentData);
-          setShowPendingConfirmation(true);
-        } else {
-          sessionStorage.removeItem('pendingPayment');
-          setShowPendingConfirmation(false);
-        }
+    // Step 2: Listen to Firestore for a pending payment for this exact settlement pair.
+    // Firestore persists across sessions and devices unlike sessionStorage.
+    if (!group?.id || !settlement?.from || !settlement?.to) return;
+
+    const pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;
+    const pendingDocRef = doc(db, 'pendingPayments', pendingDocId);
+
+    const unsubscribe = onSnapshot(pendingDocRef, (snap) => {
+      if (snap.exists()) {
+        const paymentData = snap.data();
+        setPendingPayment(paymentData);
+        setShowPendingConfirmation(true);
+        sessionStorage.setItem('pendingPayment', JSON.stringify(paymentData));
       } else {
+        setPendingPayment(null);
         setShowPendingConfirmation(false);
+        sessionStorage.removeItem('pendingPayment');
       }
-    } catch (err) {
-      console.error('Error checking pending payment:', err);
-      sessionStorage.removeItem('pendingPayment');
-      setShowPendingConfirmation(false);
-    }
+    });
+
+    return () => unsubscribe();
   }, [isOpen, group?.id, settlement?.from, settlement?.to, settlement?.amount]);
 
   // Fetch recipient's payment methods
@@ -197,6 +193,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         method: pendingPayment.method,
       });
 
+      // Delete from Firestore so all devices and sessions are unblocked
+      const pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;
+      await deleteDoc(doc(db, 'pendingPayments', pendingDocId)).catch(() => {});
       sessionStorage.removeItem('pendingPayment');
       setPendingPayment(null);
       setShowPendingConfirmation(false);
@@ -354,6 +353,14 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       timestamp: Date.now(),
     };
 
+    // Save to Firestore for cross-device persistence
+    const pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;
+    setDoc(doc(db, 'pendingPayments', pendingDocId), {
+      ...pendingPaymentData,
+      createdAt: new Date(),
+    }).catch(err => console.error('Failed to save pending payment:', err));
+
+    // Keep sessionStorage in sync for same-session GroupDetails banner
     sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
     
     if (method.id === 'paypal' || method.id === 'paypal-link') {

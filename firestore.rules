@@ -83,6 +83,22 @@ service cloud.firestore {
                      resource.data.userId == request.auth.uid;
     }
 
+    // ===== PENDING PAYMENTS =====
+    // Stores in-progress payment records to prevent duplicate payments
+    // across sessions and devices. Document ID: {groupId}_{fromUserId}_{toUserId}
+    match /pendingPayments/{docId} {
+      allow read: if request.auth != null && (
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toUserId == request.auth.uid
+      );
+      allow create, update: if request.auth != null &&
+        request.resource.data.fromUserId == request.auth.uid;
+      allow delete: if request.auth != null && (
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toUserId == request.auth.uid
+      );
+    }
+
     
     // ===== FALLBACK RULE (MUST BE LAST!) =====
     match /{document=**} {
