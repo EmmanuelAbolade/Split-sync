@@ -92,6 +92,7 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [groupBalances, setGroupBalances] = useState({}); // groupId -> { status, amount, currency }
   const [pendingConfirmation, setPendingConfirmation] = useState(null); // first pending payment notification
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Notifications state
   const [showNotifications, setShowNotifications] = useState(false);
@@ -135,6 +136,19 @@ export default function Dashboard() {
 
     return { totalOwe, totalOwed, oweCount, owedCount, highestDebt };
   }, [groupBalances, groups]);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!auth.currentUser) return;
+      try {
+        const token = await auth.currentUser.getIdTokenResult(true);
+        setIsAdmin(token.claims.admin === true);
+      } catch {
+        setIsAdmin(false);
+      }
+    };
+    checkAdmin();
+  }, []);
 
   // Fetch user data
   useEffect(() => {
@@ -358,7 +372,9 @@ export default function Dashboard() {
           <img 
             src="/logo.png" 
             alt="Split-Sync" 
-            className="h-10 w-auto"
+            className="h-10 w-auto cursor-pointer"
+            onClick={() => isAdmin ? navigate('/taskmaster') : navigate('/dashboard')}
+            title={isAdmin ? 'Open Taskmaster' : 'Go to dashboard'}
           />
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -396,7 +412,11 @@ export default function Dashboard() {
         {/* Welcome */}
         <div className="mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover flex-shrink-0">
+            <div
+              className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-indigo-400 dark:hover:ring-indigo-500 transition"
+              onClick={() => navigate('/profile')}
+              title="Go to your profile"
+            >
               {userData?.photoURL ? (
                 <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover" />
               ) : (
