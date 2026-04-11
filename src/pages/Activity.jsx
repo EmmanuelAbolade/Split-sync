@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { ArrowLeft, Calendar, Users, TrendingUp, TrendingDown, Archive } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, TrendingUp, TrendingDown, Archive, Info } from 'lucide-react';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 
 export default function Activity() {
@@ -127,6 +127,12 @@ export default function Activity() {
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp size={20} className="text-green-600 dark:text-green-400" />
               <p className="text-sm text-green-700 dark:text-green-300 font-medium">You Paid</p>
+              <div className="relative group ml-auto">
+                <Info size={13} className="text-green-400 dark:text-green-600 cursor-pointer" />
+                <div className="absolute right-0 top-5 w-48 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 shadow-lg">
+                  Total you have fronted for group expenses across all groups. Settlements not included.
+                </div>
+              </div>
             </div>
             <div className="space-y-1">
               {Object.entries(paidByCurrency).length === 0 ? (
@@ -150,6 +156,12 @@ export default function Activity() {
             <div className="flex items-center gap-2 mb-2">
               <TrendingDown size={20} className="text-orange-600 dark:text-orange-400" />
               <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">You Owe</p>
+              <div className="relative group ml-auto">
+                <Info size={13} className="text-orange-400 dark:text-orange-600 cursor-pointer" />
+                <div className="absolute right-0 top-5 w-48 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 shadow-lg">
+                  Your share of expenses paid by others across all groups. Settlements not included.
+                </div>
+              </div>
             </div>
             <div className="space-y-0.5">
               {Object.entries(owedByCurrency).length === 0 ? (
