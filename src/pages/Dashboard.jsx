@@ -39,6 +39,47 @@ function getIconComponent(iconName) {
   return ICON_MAP[iconName] || Home;
 }
 
+// Cycling tagline — rotates through phrases with a smooth fade transition
+// Sits under the welcome greeting to give the dashboard a living feel
+const TAGLINES = [
+  'Any shared expense to split?',
+  'Split smart. Settle fast. Stay balanced.',
+  'Sort out who owes what, the easy way.',
+  'Keep it fair, keep it simple — settle up.',
+  'Keep relationships sync and smooth.',
+];
+
+function CyclingTagline() {
+  const [index,   setIndex]   = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Fade out
+      setVisible(false);
+      setTimeout(() => {
+        // Swap text then fade back in
+        setIndex(prev => (prev + 1) % TAGLINES.length);
+        setVisible(true);
+      }, 400);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <p
+      className="text-xs font-medium tracking-wide text-indigo-400 dark:text-indigo-500 mb-1 mt-0.5"
+      style={{
+        opacity:    visible ? 1 : 0,
+        transition: 'opacity 400ms ease-in-out',
+        minHeight:  '1.2rem',
+      }}
+    >
+      {TAGLINES[index]}
+    </p>
+  );
+}
+
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const [userData, setUserData] = useState(null);
@@ -372,7 +413,7 @@ export default function Dashboard() {
                   ? `Welcome back, ${user?.displayName?.split(' ')[0] || 'there'}!`
                   : `Welcome, ${user?.displayName?.split(' ')[0] || 'there'}!`}
               </h2>
-              <p className="text-xs font-semibold tracking-wide text-gray-400 dark:text-gray-500 mb-3">Do You have any shared expense to manage - easily and smartly? Settle up now with family and friends effortlessly. Keep finances clear and relationships smooth. </p>
+              <CyclingTagline />
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>

@@ -1,5 +1,5 @@
 // src/pages/GroupDetails.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove } from 'firebase/firestore';
 import { authenticateWithBiometric, isBiometricEnabledOnDevice } from '../utils/biometric';
@@ -75,6 +75,13 @@ export default function GroupDetails() {
   const [leaveBlockReason, setLeaveBlockReason] = useState(null); // null | { amount, currency, direction }
   const [groupActionLoading, setGroupActionLoading] = useState(false);
   const [groupActionError, setGroupActionError] = useState('');
+
+  // Section refs for scroll navigation strip
+  const refMembers     = useRef(null);
+  const refBalances    = useRef(null);
+  const refSettlements = useRef(null);
+  const refHistory     = useRef(null);
+  const refExpenses    = useRef(null);
 
   // Delete group
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -1086,6 +1093,28 @@ export default function GroupDetails() {
           </div>
         )}
         
+        {/* Section Navigation Strip */}
+        <div className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 mb-4">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
+            {[
+              { label: 'Members',     ref: refMembers,     tip: 'Group members and their status' },
+              { label: 'Balances',    ref: refBalances,    tip: 'What each member owes or is owed' },
+              { label: 'Settlements', ref: refSettlements, tip: 'Suggested payments to clear all debts' },
+              { label: 'History',     ref: refHistory,     tip: 'Your payment records for this group' },
+              { label: 'Expenses',    ref: refExpenses,    tip: 'All expenses recorded in this group' },
+            ].map(({ label, ref, tip }) => (
+              <button
+                key={label}
+                title={tip}
+                onClick={() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-200 whitespace-nowrap"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Members Section */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -1144,7 +1173,7 @@ export default function GroupDetails() {
 
         {/* Settlements Section */}
         {expenses.length > 0 && settlements.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6 overflow-hidden">
+          <div ref={refSettlements} className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6 overflow-hidden">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Settlement Summary
             </h3>
@@ -1306,7 +1335,7 @@ export default function GroupDetails() {
 
         {/* Balances Breakdown */}
         {expenses.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
+          <div ref={refBalances} className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Individual Balances
             </h3>
@@ -1379,7 +1408,7 @@ export default function GroupDetails() {
         {/* My Payment Activity - payer's personal record of all payments sent in this group.
             Sourced from payment_log notifications in the existing notifications collection. */}
         {groupPaymentLog.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
+          <div ref={refHistory} className="bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 p-6 mb-6">
             {/* Collapsible header */}
             <button
               type="button"
@@ -1500,7 +1529,7 @@ export default function GroupDetails() {
         )}
 
         {/* Expenses Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/50 p-6">
+        <div ref={refExpenses} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/50 p-6">
           {/* Modified Header - Collapsible */}
           <div className="flex items-center justify-between mb-4">
             <div 
@@ -1560,7 +1589,7 @@ export default function GroupDetails() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {expenses.map((expense) => {
+                  {expenses.filter(e => !e.status || e.status === 'active').map((expense) => {
                     const payer = group.members?.find(m => m.userId === expense.paidBy);
                     const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
 
