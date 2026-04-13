@@ -21,14 +21,6 @@ import {
 } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 
-// ── Admin claim check ─────────────────────────────────────────────────────────
-// Returns true only when the Firebase ID token contains { admin: true }
-async function checkAdminClaim() {
-  const currentUser = auth.currentUser;
-  if (!currentUser) return false;
-  const token = await currentUser.getIdTokenResult(true);
-  return token.claims.admin === true;
-}
 
 // ── Sidebar navigation items ──────────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -451,7 +443,6 @@ function FinancialOversight() {
       setLoading(true);
       try {
         const expSnap = await getDocs(collection(db, 'expenses'));
-        let totalAmount = 0;
         let settledCount = 0;
         const currencyMap = {};
 
@@ -459,7 +450,6 @@ function FinancialOversight() {
           const data = d.data();
           const amt = data.amount || 0;
           const cur = data.currency || 'EUR';
-          totalAmount += amt;
           if (data.isSettled) settledCount++;
           currencyMap[cur] = (currencyMap[cur] || 0) + amt;
         });
