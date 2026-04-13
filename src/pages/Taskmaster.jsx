@@ -17,8 +17,7 @@ import {
 import { auth, db } from '../services/firebase';
 import {
   collection, getDocs, query, where, orderBy,
-  limit, doc, updateDoc, deleteDoc, getDoc,
-  Timestamp,
+  limit, doc, updateDoc,
 } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 
