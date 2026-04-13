@@ -39,3 +39,14 @@ export const serverTimestamp = jest.fn(() => new Date());
 export const arrayUnion = jest.fn((val) => val);
 
 export const arrayRemove = jest.fn((val) => val);
+
+export const onSnapshot = jest.fn((ref, callback) => {
+  callback({ exists: () => false, data: () => ({}) });
+  return jest.fn();
+});
+
+export const writeBatch = jest.fn(() => ({
+  update: jest.fn(),
+  delete: jest.fn(),
+  commit: jest.fn(() => Promise.resolve()),
+}));

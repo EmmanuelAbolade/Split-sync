@@ -194,8 +194,10 @@ const setupWithGroup = (group = mockGroupOwner, expenses = mockExpenses) => {
     callCount++;
     if (callCount === 1) {
       cb({ exists: () => true, id: group.id, data: () => group });
-    } else {
+    } else if (callCount === 2) {
       cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    } else {
+      if (typeof cb === 'function') cb({ empty: true, docs: [] });
     }
     return jest.fn();
   });
@@ -359,8 +361,10 @@ describe('GroupDetails Extra - fetchPaymentMethods doc exists', () => {
       callCount++;
       if (callCount === 1) {
         cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
-      } else {
+      } else if (callCount === 2) {
         cb({ docs: [] });
+      } else {
+        if (typeof cb === 'function') cb({ empty: true, docs: [] });
       }
       return jest.fn();
     });
@@ -395,8 +399,10 @@ describe('GroupDetails Extra - onSnapshot error callback', () => {
       callCount++;
       if (callCount === 1) {
         successCb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
-      } else {
+      } else if (callCount === 2) {
         errorCb(new Error('Firestore permission denied'));
+      } else {
+        if (typeof successCb === 'function') successCb({ empty: true, docs: [] });
       }
       return jest.fn();
     });
@@ -448,13 +454,23 @@ describe('GroupDetails Extra - Pending payment banner Yes action', () => {
   afterEach(() => sessionStorage.clear());
 
   test('Clicking Yes opens SettleUpModal for matching settlement', async () => {
-    setupWithGroup();
-    // Override settlements so direction matches the pending payment (user-123 → user-456)
-    mockCalculateSettlements.mockReturnValue([{ from: 'user-123', to: 'user-456', amount: 30 }]);
-    sessionStorage.setItem('pendingPayment', JSON.stringify({
+    const pendingData = {
       groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
       toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR',
-    }));
+    };
+    mockCalculateSettlements.mockReturnValue([{ from: 'user-123', to: 'user-456', amount: 30 }]);
+    mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
+              .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      else if (callCount === 2) cb({ docs: [] });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      return jest.fn();
+    });
+    mockGetMySentInvitations.mockResolvedValue([]);
+    mockNotificationsStore.notifications = [];
     render(<GroupDetails />);
     await waitFor(() => screen.getByText('Yes, Mark as Paid'));
     fireEvent.click(screen.getByText('Yes, Mark as Paid'));
@@ -464,12 +480,23 @@ describe('GroupDetails Extra - Pending payment banner Yes action', () => {
   });
 
   test('Clicking Yes with no matching settlement does not crash', async () => {
-    setupWithGroup();
-    mockCalculateSettlements.mockReturnValue([]);
-    sessionStorage.setItem('pendingPayment', JSON.stringify({
+    const pendingData = {
       groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
       toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR',
-    }));
+    };
+    mockCalculateSettlements.mockReturnValue([]);
+    mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
+              .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      else if (callCount === 2) cb({ docs: [] });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      return jest.fn();
+    });
+    mockGetMySentInvitations.mockResolvedValue([]);
+    mockNotificationsStore.notifications = [];
     render(<GroupDetails />);
     await waitFor(() => screen.getByText('Yes, Mark as Paid'));
     fireEvent.click(screen.getByText('Yes, Mark as Paid'));
@@ -699,12 +726,23 @@ describe('GroupDetails Extra - SettleUpModal onClose clears banner', () => {
   afterEach(() => sessionStorage.clear());
 
   test('Closing SettleUpModal clears pending banner when sessionStorage is empty', async () => {
-    sessionStorage.setItem('pendingPayment', JSON.stringify({
+    const pendingData = {
       groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
       toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR',
-    }));
+    };
+    mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
+              .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      else if (callCount === 2) cb({ docs: [] });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      return jest.fn();
+    });
+    mockGetMySentInvitations.mockResolvedValue([]);
+    mockNotificationsStore.notifications = [];
     render(<GroupDetails />);
-    // Open modal via "Yes, Mark as Paid"
     await waitFor(() => screen.getByText('Yes, Mark as Paid'));
     fireEvent.click(screen.getByText('Yes, Mark as Paid'));
     await waitFor(() => screen.getByTestId('settle-up-modal'));

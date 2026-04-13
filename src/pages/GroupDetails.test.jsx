@@ -178,8 +178,11 @@ const setupWithGroup = (expenses = mockExpenses) => {
     callCount++;
     if (callCount === 1) {
       callback(mockGroupDoc);
-    } else {
+    } else if (callCount === 2) {
       callback({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    } else {
+      // pendingPayments listener — always empty
+      if (typeof callback === 'function') callback({ empty: true, docs: [] });
     }
     return jest.fn();
   });
@@ -195,8 +198,10 @@ const setupWithNoExpenses = () => {
     callCount++;
     if (callCount === 1) {
       callback(mockGroupDoc);
-    } else {
+    } else if (callCount === 2) {
       callback({ docs: [] });
+    } else {
+      if (typeof callback === 'function') callback({ empty: true, docs: [] });
     }
     return jest.fn();
   });
@@ -315,7 +320,7 @@ describe('GroupDetails - Rendering', () => {
   test('Renders Members section heading', async () => {
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Members')).toBeInTheDocument()
+      expect(screen.getAllByText('Members').length).toBeGreaterThan(0)
     );
   });
 });

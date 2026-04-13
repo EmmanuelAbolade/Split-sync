@@ -14,10 +14,19 @@ import SettleUpModal from './SettleUpModal';
 jest.mock('../services/firebase', () => ({ db: {} }));
 
 jest.mock('firebase/firestore', () => ({
-  collection: jest.fn(() => ({})),
-  addDoc: jest.fn(() => Promise.resolve({ id: 'settlement-id' })),
+  collection:      jest.fn(() => ({})),
+  addDoc:          jest.fn(() => Promise.resolve({ id: 'settlement-id' })),
   serverTimestamp: jest.fn(() => new Date()),
-  doc: jest.fn(() => ({})),
+  doc:             jest.fn(() => ({})),
+  setDoc:    jest.fn().mockResolvedValue(undefined),
+  deleteDoc: jest.fn().mockResolvedValue(undefined),
+  onSnapshot: jest.fn((_ref, callback) => {
+    if (typeof callback === 'function') {
+      callback({ exists: () => false, data: () => ({}) });
+    }
+    const unsubscribe = jest.fn();
+    return unsubscribe;
+  }),
   getDoc: jest.fn(() =>
     Promise.resolve({
       exists: () => true,
@@ -158,6 +167,9 @@ const renderModal = (props = {}) =>
 describe('SettleUpModal - Closed State', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     sessionStorage.clear();
   });
 
@@ -174,6 +186,9 @@ describe('SettleUpModal - Closed State', () => {
 describe('SettleUpModal - Payer View', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     sessionStorage.clear();
   });
 
@@ -226,6 +241,9 @@ describe('SettleUpModal - Payer View', () => {
 describe('SettleUpModal - Receiver View', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     sessionStorage.clear();
   });
 
@@ -295,6 +313,9 @@ describe('SettleUpModal - Receiver View', () => {
 describe('SettleUpModal - Amount Editing', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     sessionStorage.clear();
   });
 
@@ -314,6 +335,9 @@ describe('SettleUpModal - Amount Editing', () => {
 describe('SettleUpModal - Manual Settlement (Payer)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     sessionStorage.clear();
   });
 
@@ -346,6 +370,9 @@ describe('SettleUpModal - Manual Settlement (Payer)', () => {
 
 describe('SettleUpModal - Manual Settlement (Receiver)', () => {
   beforeEach(() => {
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     jest.clearAllMocks();
     sessionStorage.clear();
     // Ensure biometric mock always resolves true for this suite
@@ -407,8 +434,31 @@ describe('SettleUpModal - Manual Settlement (Receiver)', () => {
 // ---------------------------------------------------------------------------
 
 describe('SettleUpModal - Pending Payment Flow', () => {
+  const pendingPaymentData = {
+    groupId: 'group-1',
+    fromUserId: 'user-1',
+    toUserId: 'user-2',
+    fromName: 'Alice',
+    toName: 'Bob',
+    amount: 45.5,
+    currency: 'EUR',
+    method: 'paypal',
+    timestamp: Date.now(),
+  };
+
   beforeEach(() => {
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     jest.clearAllMocks();
+    // Simulate a pending payment existing in Firestore
+    const { onSnapshot } = require('firebase/firestore');
+    onSnapshot.mockImplementation((_ref, callback) => {
+      if (typeof callback === 'function') {
+        callback({ exists: () => true, data: () => pendingPaymentData });
+      }
+      return jest.fn();
+    });
   });
 
   afterEach(() => {
@@ -416,20 +466,8 @@ describe('SettleUpModal - Pending Payment Flow', () => {
   });
 
   const setPendingPayment = () => {
-    sessionStorage.setItem(
-      'pendingPayment',
-      JSON.stringify({
-        groupId: 'group-1',
-        fromUserId: 'user-1',
-        toUserId: 'user-2',
-        fromName: 'Alice',
-        toName: 'Bob',
-        amount: 45.5,
-        currency: 'EUR',
-        method: 'paypal',
-        timestamp: Date.now(),
-      })
-    );
+    // kept for backward compatibility — Firestore mock now drives the flow
+    sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
   };
 
   test('shows pending confirmation dialog when a matching pending payment exists', async () => {
@@ -492,6 +530,9 @@ describe('SettleUpModal - Pending Payment Flow', () => {
 
 describe('SettleUpModal - Error Handling', () => {
   beforeEach(() => {
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     jest.clearAllMocks();
     sessionStorage.clear();
   });
@@ -528,8 +569,18 @@ describe('SettleUpModal - Error Handling', () => {
 
 describe('SettleUpModal - Stale pending payment', () => {
   beforeEach(() => {
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     jest.clearAllMocks();
-    sessionStorage.clear();
+    // No pending payment in Firestore for these tests
+    const { onSnapshot } = require('firebase/firestore');
+    onSnapshot.mockImplementation((_ref, callback) => {
+      if (typeof callback === 'function') {
+        callback({ exists: () => false, data: () => ({}) });
+      }
+      return jest.fn();
+    });
   });
 
   test('clears sessionStorage and shows main modal when groupId does not match', () => {
@@ -566,6 +617,9 @@ describe('SettleUpModal - Stale pending payment', () => {
 
 describe('SettleUpModal - Recipient doc exists', () => {
   beforeEach(() => {
+    const { setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     jest.clearAllMocks();
     sessionStorage.clear();
     const { getDoc } = require('firebase/firestore');
@@ -638,26 +692,29 @@ describe('SettleUpModal - Amount validation', () => {
 // ---------------------------------------------------------------------------
 
 describe('SettleUpModal - handleMarkAsPaid errors', () => {
-  const setPendingPayment = () => {
-    sessionStorage.setItem(
-      'pendingPayment',
-      JSON.stringify({
-        groupId: 'group-1',
-        fromUserId: 'user-1',
-        toUserId: 'user-2',
-        fromName: 'Alice',
-        toName: 'Bob',
-        amount: 45.5,
-        currency: 'EUR',
-        method: 'paypal',
-        timestamp: Date.now(),
-      })
-    );
+  const pendingPaymentData = {
+    groupId: 'group-1',
+    fromUserId: 'user-1',
+    toUserId: 'user-2',
+    fromName: 'Alice',
+    toName: 'Bob',
+    amount: 45.5,
+    currency: 'EUR',
+    method: 'paypal',
+    timestamp: Date.now(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    setPendingPayment();
+    const { setDoc, deleteDoc, onSnapshot } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
+    onSnapshot.mockImplementation((_ref, callback) => {
+      if (typeof callback === 'function') {
+        callback({ exists: () => true, data: () => pendingPaymentData });
+      }
+      return jest.fn();
+    });
   });
 
   afterEach(() => sessionStorage.clear());
@@ -905,7 +962,9 @@ describe('SettleUpModal - Payment link click and options section', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    const { getDoc } = require('firebase/firestore');
+    const { getDoc, setDoc, deleteDoc } = require('firebase/firestore');
+    setDoc.mockResolvedValue(undefined);
+    deleteDoc.mockResolvedValue(undefined);
     getDoc.mockResolvedValue({
       exists: () => true,
       data: () => ({

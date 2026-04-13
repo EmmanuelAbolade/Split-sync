@@ -74,7 +74,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       }
     });
 
-    return () => unsubscribe();
+    return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
   }, [isOpen, group?.id, settlement?.from, settlement?.to, settlement?.amount]);
 
   // Fetch recipient's payment methods

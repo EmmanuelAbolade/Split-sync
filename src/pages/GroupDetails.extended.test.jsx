@@ -23,6 +23,8 @@ const mockDoc        = jest.fn();
 const mockCollection = jest.fn();
 const mockQuery      = jest.fn();
 const mockWhere      = jest.fn();
+const mockDeleteDoc = jest.fn(() => Promise.resolve());
+
 jest.mock('firebase/firestore', () => ({
   doc:        (...a) => mockDoc(...a),
   getDoc:     (...a) => mockGetDoc(...a),
@@ -30,6 +32,7 @@ jest.mock('firebase/firestore', () => ({
   query:      (...a) => mockQuery(...a),
   where:      (...a) => mockWhere(...a),
   onSnapshot: (...a) => mockOnSnapshot(...a),
+  deleteDoc:  (...a) => mockDeleteDoc(...a),
 }));
 
 jest.mock('../services/firebase', () => ({ db: {} }));
@@ -137,15 +140,17 @@ const setupWithGroup = (expenses = mockExpenses) => {
   resetBalanceMocks();
   mockGetDoc.mockResolvedValueOnce(mockGroupDoc).mockResolvedValue(mockUserDoc);
   let callCount = 0;
-    mockOnSnapshot.mockImplementation((q, cb) => {
-      callCount++;
-      if (callCount === 1) {
-        cb(mockGroupDoc);
-      } else {
-        cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
-      }
-      return jest.fn();
-    });
+  mockOnSnapshot.mockImplementation((q, cb) => {
+    callCount++;
+    if (callCount === 1) {
+      cb(mockGroupDoc);
+    } else if (callCount === 2) {
+      cb({ docs: expenses.map(e => ({ id: e.id, data: () => e })) });
+    } else {
+      if (typeof cb === 'function') cb({ empty: true, docs: [] });
+    }
+    return jest.fn();
+  });
   mockGetMySentInvitations.mockResolvedValue([]);
   mockNotificationsStore.notifications = [];
 };
@@ -169,8 +174,10 @@ describe('GroupDetails Extended - Settled balance state', () => {
       callCount++;
       if (callCount === 1) {
         cb(mockGroupDoc);
-      } else {
+      } else if (callCount === 2) {
         cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      } else {
+        if (typeof cb === 'function') cb({ empty: true, docs: [] });
       }
       return jest.fn();
     });
@@ -479,10 +486,29 @@ describe('GroupDetails Extended - Pending invitations', () => {
 
 describe('GroupDetails Extended - Pending payment banner (sessionStorage)', () => {
 
+  const pendingData = {
+    groupId: 'group-123', fromUserId: 'user-123',
+    toUserId: 'user-456', toName: 'Bob',
+    method: 'paypal', amount: 30, currency: 'EUR',
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    setupWithGroup();
     sessionStorage.clear();
+    mockDeleteDoc.mockResolvedValue(undefined);
+    mockGetDoc.mockResolvedValueOnce(mockGroupDoc).mockResolvedValue(mockUserDoc);
+    mockGetMySentInvitations.mockResolvedValue([]);
+    mockNotificationsStore.notifications = [];
+    resetBalanceMocks();
+    // Call 3 returns the pending payment from Firestore
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) cb(mockGroupDoc);
+      else if (callCount === 2) cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      return jest.fn();
+    });
   });
 
   afterEach(() => {
@@ -490,33 +516,13 @@ describe('GroupDetails Extended - Pending payment banner (sessionStorage)', () =
   });
 
   test('Shows pending payment banner when sessionStorage has matching payment', async () => {
-    sessionStorage.setItem('pendingPayment', JSON.stringify({
-      groupId:     'group-123',
-      fromUserId:  'user-123',
-      toUserId:    'user-456',
-      toName:      'Bob',
-      method:      'paypal',
-      amount:      30,
-      currency:    'EUR',
-    }));
-
     render(<GroupDetails />);
     await waitFor(() =>
       expect(screen.getByText('Payment Confirmation Needed')).toBeInTheDocument()
     );
   });
 
-  test('Shows payment amount in pending banner', async () => {
-    sessionStorage.setItem('pendingPayment', JSON.stringify({
-      groupId:    'group-123',
-      fromUserId: 'user-123',
-      toUserId:   'user-456',
-      toName:     'Bob',
-      method:     'paypal',
-      amount:     30,
-      currency:   'EUR',
-    }));
-
+ test('Shows payment amount in pending banner', async () => {
     render(<GroupDetails />);
     await waitFor(() =>
       expect(screen.getByText('Payment Confirmation Needed')).toBeInTheDocument()
@@ -525,6 +531,15 @@ describe('GroupDetails Extended - Pending payment banner (sessionStorage)', () =
   });
 
   test('Does not show banner for payment in different group', async () => {
+    // Override: pendingPayments returns empty for this group
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) cb(mockGroupDoc);
+      else if (callCount === 2) cb({ docs: mockExpenses.map(e => ({ id: e.id, data: () => e })) });
+      else cb({ empty: true, docs: [] });
+      return jest.fn();
+    });
     sessionStorage.setItem('pendingPayment', JSON.stringify({
       groupId:    'other-group',
       fromUserId: 'user-123',
