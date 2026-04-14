@@ -2,8 +2,13 @@
 
 > A modern Progressive Web Application for seamless smart group expense management, bill splitting, and group payment tracking with integrated payment solutions built as a Final Year Project at SETU Carlow.
 
-**Live Demo**: [https://splitsync-dev.web.app](https://splitsync-dev.web.app)
-
+### Links
+- **Live Demo**: [https://splitsync-dev.web.app](https://splitsync-dev.web.app)
+- **GitHub**: [https://github.com/EmmanuelAbolade/Split-sync](https://github.com/EmmanuelAbolade/Split-sync)
+- **Screencast**: [Watch on YouTube](https://youtu.be/7uat5PeTsrI?si=0_pGz91OvCN4-UQ6)
+- **Doxygen Documentation**: [https://splitsync-docs.netlify.app](https://splitsync-docs.netlify.app)
+- **Test Coverage Report**: [https://splitsync-coverage-test.netlify.app](https://splitsync-coverage-test.netlify.app)
+- **Documentation**: [View Docs](./docs)
 
 
 ## Table of Contents
@@ -469,9 +474,6 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 
 Doxygen-generated HTML documentation is available for all source modules.
 
-### Viewing Locally
-Open the following file in your browser:
-
 ### Coverage
 Doxygen processes all `.js` and `.jsx` files across the entire `src/` directory including:
 - `src/utils/` — fully documented with JSDoc comments (balanceCalculator, encryption, paymentLinks, sepaPayment and more)
@@ -489,7 +491,8 @@ Open the following file in your browser:
 ```
 docs/doxygen/html/index.html
 ```
-
+### Screencast
+Watch the full project demonstration: [https://youtu.be/7uat5PeTsrI?si=0_pGz91OvCN4-UQ6](https://youtu.be/7uat5PeTsrI?si=0_pGz91OvCN4-UQ6)
 
 ## Running Tests
 
@@ -503,6 +506,9 @@ npm test -- --coverage --watchAll=false
 # Run a specific test file
 npm test -- AddExpenseModal --watchAll=false
 ```
+
+
+View the live coverage report: [https://splitsync-coverage-test.netlify.app](https://splitsync-coverage-test.netlify.app)
 
 Coverage target: 80%+ line coverage. Current coverage: approximately 84.37% across 52 test suites.
 
@@ -713,11 +719,6 @@ SOFTWARE.
 **Email**: emab.dev@gmail.com  
 **Institution**: SETU Carlow 
 
-### Links
-- **Live Demo**: [https://splitsync-dev.web.app](https://splitsync-dev.web.app)
-- **GitHub**: [https://github.com/EmmanuelAbolade/Split-sync](https://github.com/EmmanuelAbolade/Split-sync)
-- **Documentation**: [View Docs](./docs)
-
 
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-11.0.2-orange.svg)](https://firebase.google.com/)
@@ -773,9 +774,6 @@ SOFTWARE.
 | ![Settle Up Modal](docs/screenshots/settlement-up-modal-darkmode.png) | ![Create Group Modal](docs/screenshots/create-group-dark.png) | ![Add Member Sync](docs/screenshots/member-adding-dark.png) |
 
 ## Demo
-
-### Expense and Settlement Flow
-![Split-Sync expense and settlement flow](https://res.cloudinary.com/dpnpqw37p/image/upload/q_auto/v1776125507/splitsync_trailer_02_ytduuk.gif)
 
 ### Light Mode and Dark Mode
 ![Split-Sync light and dark mode](https://res.cloudinary.com/dpnpqw37p/image/upload/v1776125910/splitsync_trailer_03_dugygu.gif)
