@@ -166,7 +166,7 @@
 |---|---|
 | Jest | Test runner |
 | React Testing Library | Component testing |
-| Coverage | ~81% line coverage, 1,382+ passing tests across 48+ suites |
+| Coverage | ~84.37% line coverage, 1,397 passing tests across 52+ suites |
 
 ### Security & Privacy
 - **WebAuthn**: Biometric authentication
@@ -478,7 +478,7 @@ npm test -- --coverage --watchAll=false
 npm test -- AddExpenseModal --watchAll=false
 ```
 
-Coverage target: 80%+ line coverage. Current coverage: approximately 81% across 48+ test suites.
+Coverage target: 80%+ line coverage. Current coverage: approximately 84.37% across 52 test suites.
 
 ---
 
@@ -606,7 +606,7 @@ This is an academic project (Final Year Project) and is not currently accepting 
 - [x] Onboarding wizard with Settings revisit
 - [x] Embedded video tutorial guides
 - [x] Input validation and maxLength on all payment fields
-- [x] ~81% automated test coverage
+- [x] ~84.73% automated test coverage
 
 ### Planned Features
 - [ ] Multi-language support (i18n)
@@ -745,6 +745,14 @@ SOFTWARE.
 | Settle Up Modal | Create Group Modal | Add Member Sync |
 |---|---|---|
 | ![Settle Up Modal](docs/screenshots/settlement-up-modal-darkmode.png) | ![Create Group Modal](docs/screenshots/create-group-dark.png) | ![Add Member Sync](docs/screenshots/member-adding-dark.png) |
+
+## Demo
+
+### Expense and Settlement Flow
+![Split-Sync expense and settlement flow](https://res.cloudinary.com/dpnpqw37p/image/upload/q_auto/f_auto/v1776125507/splitsync_trailer_02_ytduuk.gif)
+
+### Light Mode and Dark Mode
+![Split-Sync light and dark mode](https://res.cloudinary.com/dpnpqw37p/image/upload/v1776125910/splitsync_trailer_03_dugygu.gif)
 
 ---
 <div align="center">
