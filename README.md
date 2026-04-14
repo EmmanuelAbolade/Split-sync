@@ -480,10 +480,14 @@ Doxygen processes all `.js` and `.jsx` files across the entire `src/` directory 
 - `src/stores/` — Zustand state management modules
 - `src/hooks/` — custom React hooks
 
-### Regenerating Documentation
-Ensure [Doxygen](https://www.doxygen.nl) is installed, then run:
-```bash
-doxygen Doxyfile
+### Live Documentation
+View the full Doxygen documentation online:
+[https://splitsync-docs.netlify.app](https://splitsync-docs.netlify.app)
+
+### Viewing Locally
+Open the following file in your browser:
+```
+docs/doxygen/html/index.html
 ```
 
 
