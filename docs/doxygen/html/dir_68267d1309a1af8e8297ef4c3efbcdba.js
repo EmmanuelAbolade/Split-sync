@@ -8,9 +8,9 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "services", "dir_1826a32a9d780ddbaf96ec88be56c4cd.html", "dir_1826a32a9d780ddbaf96ec88be56c4cd" ],
     [ "stores", "dir_53ca2cb6bd7da516bb406a0946f59453.html", "dir_53ca2cb6bd7da516bb406a0946f59453" ],
     [ "utils", "dir_313caf1132e152dd9b58bea13a4052ca.html", "dir_313caf1132e152dd9b58bea13a4052ca" ],
-    [ "App.js", "_app_8js.html", null ],
-    [ "index.js", "index_8js.html", null ],
-    [ "reportWebVitals.js", "report_web_vitals_8js.html", null ],
-    [ "serviceWorkerRegistration.js", "service_worker_registration_8js.html", null ],
-    [ "setupTests.js", "setup_tests_8js.html", null ]
+    [ "App.js", "_app_8js.html", "_app_8js" ],
+    [ "index.js", "index_8js.html", "index_8js" ],
+    [ "reportWebVitals.js", "report_web_vitals_8js.html", "report_web_vitals_8js" ],
+    [ "serviceWorkerRegistration.js", "service_worker_registration_8js.html", "service_worker_registration_8js" ],
+    [ "setupTests.js", "setup_tests_8js.html", "setup_tests_8js" ]
 ];

@@ -1,0 +1,28 @@
+var _settings__extra_8test_8jsx =
+[
+    [ "dom", "_settings__extra_8test_8jsx.html#ace141dab1481fa1126bf476461d4ff32", null ],
+    [ "import", "_settings__extra_8test_8jsx.html#a59be084da8908b7d77ff34b25cd84488", null ],
+    [ "mockAuthenticateWithBiometric", "_settings__extra_8test_8jsx.html#ad572ecefd86ae02b7e7abcc50c524b09", null ],
+    [ "mockBatch", "_settings__extra_8test_8jsx.html#a6eaef652abab7b58242da5283069381c", null ],
+    [ "mockCollection", "_settings__extra_8test_8jsx.html#a2962cb1794d661c82f02a9881e0543e9", null ],
+    [ "mockDeleteDoc", "_settings__extra_8test_8jsx.html#a61e8ab6134ceef7addd6495bf263ba70", null ],
+    [ "mockDisableBiometric", "_settings__extra_8test_8jsx.html#a1b146de9643c46c243278dc67c51304f", null ],
+    [ "mockDoc", "_settings__extra_8test_8jsx.html#a9e42303cb6e845fc01a5020ff435af18", null ],
+    [ "mockGetDeviceInfo", "_settings__extra_8test_8jsx.html#aa61eb3ecfad25c5e9bf96353d7c58303", null ],
+    [ "mockGetDoc", "_settings__extra_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6", null ],
+    [ "mockGetDocs", "_settings__extra_8test_8jsx.html#a0bd65c068f52ef91fbeba621579b0f65", null ],
+    [ "mockIsBiometricEnabledOnDevice", "_settings__extra_8test_8jsx.html#a08d8bd989ac5c15a2a665b6316c22d7f", null ],
+    [ "mockLogout", "_settings__extra_8test_8jsx.html#a0124b3271c692357f812990271f5f02b", null ],
+    [ "mockNavigate", "_settings__extra_8test_8jsx.html#a77aa0bd763f224f88bc985d2d5c09ffb", null ],
+    [ "mockQuery", "_settings__extra_8test_8jsx.html#a9d987238f73868d6c28f274e3d2dab80", null ],
+    [ "mockRegisterBiometric", "_settings__extra_8test_8jsx.html#a3f7ea39bdaf2f8ccd1ce5abc77aec3df", null ],
+    [ "mockServerTimestamp", "_settings__extra_8test_8jsx.html#aade44bf1ccc91aba2d6659a4c71278c4", null ],
+    [ "mockUpdateDoc", "_settings__extra_8test_8jsx.html#ad8df80d01dcfe10935b20468eb0a6ced", null ],
+    [ "mockUpdateProfile", "_settings__extra_8test_8jsx.html#aa07f192b34d0f637ad01164b30f51706", null ],
+    [ "mockUpdateUserDisplayName", "_settings__extra_8test_8jsx.html#a204bab7723bed555f1871265c8489831", null ],
+    [ "mockUser", "_settings__extra_8test_8jsx.html#a1a184414a9e84bc73b478363826a0542", null ],
+    [ "mockWhere", "_settings__extra_8test_8jsx.html#a8c31c070f62bdfa9b55ae6e9243030fc", null ],
+    [ "mockWriteBatch", "_settings__extra_8test_8jsx.html#a82253ea87bd199b416242beac159421c", null ],
+    [ "react", "_settings__extra_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1", null ],
+    [ "Settings", "_settings__extra_8test_8jsx.html#a7a907622f28224196ce2b67771b7477d", null ]
+];

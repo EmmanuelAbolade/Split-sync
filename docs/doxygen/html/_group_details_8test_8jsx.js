@@ -1,0 +1,28 @@
+var _group_details_8test_8jsx =
+[
+    [ "const", "_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c", null ],
+    [ "dom", "_group_details_8test_8jsx.html#ace141dab1481fa1126bf476461d4ff32", null ],
+    [ "GroupDetails", "_group_details_8test_8jsx.html#a4cb507ac114e1702475b477c8d6f2f68", null ],
+    [ "import", "_group_details_8test_8jsx.html#a59be084da8908b7d77ff34b25cd84488", null ],
+    [ "mockArrayRemove", "_group_details_8test_8jsx.html#aba8ff68a2f0a5c72d6b33fcadfb53b98", null ],
+    [ "mockCollection", "_group_details_8test_8jsx.html#a2962cb1794d661c82f02a9881e0543e9", null ],
+    [ "mockDeleteDoc", "_group_details_8test_8jsx.html#a61e8ab6134ceef7addd6495bf263ba70", null ],
+    [ "mockDoc", "_group_details_8test_8jsx.html#a9e42303cb6e845fc01a5020ff435af18", null ],
+    [ "mockExpenses", "_group_details_8test_8jsx.html#a817fe595f442f8a29adabf5ffb246214", null ],
+    [ "mockGetDoc", "_group_details_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6", null ],
+    [ "mockGetDocs", "_group_details_8test_8jsx.html#a0bd65c068f52ef91fbeba621579b0f65", null ],
+    [ "mockGroup", "_group_details_8test_8jsx.html#aa45c40ce92c073079d5d1349252e26d8", null ],
+    [ "mockGroupDoc", "_group_details_8test_8jsx.html#a712705e2c8532aae091a04dafea92221", null ],
+    [ "mockNavigate", "_group_details_8test_8jsx.html#a77aa0bd763f224f88bc985d2d5c09ffb", null ],
+    [ "mockOnSnapshot", "_group_details_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8", null ],
+    [ "mockQuery", "_group_details_8test_8jsx.html#a9d987238f73868d6c28f274e3d2dab80", null ],
+    [ "mockUpdateDoc", "_group_details_8test_8jsx.html#ad8df80d01dcfe10935b20468eb0a6ced", null ],
+    [ "mockUserDoc", "_group_details_8test_8jsx.html#afe164b0bd64d488923ae1fb113aee761", null ],
+    [ "mockWhere", "_group_details_8test_8jsx.html#a8c31c070f62bdfa9b55ae6e9243030fc", null ],
+    [ "mockWriteBatch", "_group_details_8test_8jsx.html#a82253ea87bd199b416242beac159421c", null ],
+    [ "react", "_group_details_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1", null ],
+    [ "resetBalanceMocks", "_group_details_8test_8jsx.html#aef5531a07a77677ed96d65cc19275a35", null ],
+    [ "setupGroupNotFound", "_group_details_8test_8jsx.html#aba5e4173b549c8b0a4e6412040247d86", null ],
+    [ "setupWithGroup", "_group_details_8test_8jsx.html#ad11209fca4de764a93ada292abb38745", null ],
+    [ "setupWithNoExpenses", "_group_details_8test_8jsx.html#a954ac302a6e184695b06d38cd037818c", null ]
+];

@@ -106,78 +106,82 @@ $(function(){initNavTree('_session_timeout_warning_8jsx_source.html',''); initRe
   <div class="headertitle"><div class="title">SessionTimeoutWarning.jsx</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_session_timeout_warning_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/components/SessionTimeoutWarning.jsx</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { AlertTriangle, Clock } from &#39;lucide-react&#39;;</div>
+<a href="_session_timeout_warning_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/components/SessionTimeoutWarning.jsx</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="_session_timeout_warning_8jsx.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { AlertTriangle, Clock } from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>export default function SessionTimeoutWarning({ </div>
+<div class="foldopen" id="foldopen00004" data-start="{" data-end="}">
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="_session_timeout_warning_8jsx.html#a72df7d055142e73f799d21b1cc4a9876">    4</a></span>export <span class="keywordflow">default</span> <span class="keyword">function</span> <a class="code hl_variable" href="_app_8js.html#aef656f167a6c589e061e6c89d87c603c">SessionTimeoutWarning</a>({ </div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>  isOpen, </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  countdown, </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  onStayLoggedIn, </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  onLogoutNow </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>}) {</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  if (!isOpen) return null;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  <span class="keywordflow">if</span> (!isOpen) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>  return (</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    &lt;div className=&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-scale-in&quot;&gt;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>      &lt;div className=&quot;bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in&quot;&gt;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        {/* Header */}</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        &lt;div className=&quot;flex items-center gap-3 mb-4&quot;&gt;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>          &lt;div className=&quot;w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center&quot;&gt;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            &lt;AlertTriangle size={24} className=&quot;text-orange-600 dark:text-orange-400&quot; /&gt;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>      &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        {<span class="comment">/* Header */</span>}</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 mb-4&quot;</span>&gt;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>          &lt;div className=<span class="stringliteral">&quot;w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            &lt;AlertTriangle size={24} className=<span class="stringliteral">&quot;text-orange-600 dark:text-orange-400&quot;</span> /&gt;</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>          &lt;/div&gt;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>          &lt;div className=&quot;flex-1&quot;&gt;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>            &lt;h2 className=&quot;text-xl font-bold text-gray-900 dark:text-white&quot;&gt;Session Timeout&lt;/h2&gt;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>            &lt;p className=&quot;text-sm text-gray-600 dark:text-gray-400&quot;&gt;You&#39;ve been inactive&lt;/p&gt;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>          &lt;/div&gt;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        &lt;/div&gt;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        {/* Warning Message */}</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        &lt;div className=&quot;bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6&quot;&gt;</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>          &lt;div className=&quot;flex items-start gap-3&quot;&gt;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>            &lt;Clock size={20} className=&quot;text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5&quot; /&gt;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            &lt;div className=&quot;flex-1&quot;&gt;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>              &lt;p className=&quot;text-sm text-orange-900 dark:text-orange-200 font-medium mb-2&quot;&gt;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>                You will be automatically logged out in:</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>              &lt;/p&gt;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>              &lt;div className=&quot;text-center&quot;&gt;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                &lt;p className=&quot;text-4xl font-bold text-orange-600 dark:text-orange-400 mb-1&quot;&gt;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                  {countdown}</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                &lt;/p&gt;</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                &lt;p className=&quot;text-xs text-orange-700 dark:text-orange-300&quot;&gt;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                  seconds</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                &lt;/p&gt;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>              &lt;/div&gt;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>            &lt;/div&gt;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>          &lt;/div&gt;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        &lt;/div&gt;</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        &lt;p className=&quot;text-sm text-gray-600 dark:text-gray-400 mb-6 text-center&quot;&gt;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>          This is a security feature to protect your account when you&#39;re away.</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>          &lt;div className=<span class="stringliteral">&quot;flex-1&quot;</span>&gt;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>            &lt;h2 className=<span class="stringliteral">&quot;text-xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;Session Timeout&lt;/h2&gt;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>            &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;You<span class="stringliteral">&#39;ve been inactive&lt;/p&gt;</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="stringliteral">          &lt;/div&gt;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="stringliteral">        &lt;/div&gt;</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="stringliteral">        {/* Warning Message */}</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="stringliteral">        &lt;div className=&quot;bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6&quot;&gt;</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="stringliteral">          &lt;div className=&quot;flex items-start gap-3&quot;&gt;</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="stringliteral">            &lt;Clock size={20} className=&quot;text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5&quot; /&gt;</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="stringliteral">            &lt;div className=&quot;flex-1&quot;&gt;</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="stringliteral">              &lt;p className=&quot;text-sm text-orange-900 dark:text-orange-200 font-medium mb-2&quot;&gt;</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="stringliteral">                You will be automatically logged out in:</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="stringliteral">              &lt;/p&gt;</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="stringliteral">              &lt;div className=&quot;text-center&quot;&gt;</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="stringliteral">                &lt;p className=&quot;text-4xl font-bold text-orange-600 dark:text-orange-400 mb-1&quot;&gt;</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="stringliteral">                  {countdown}</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="stringliteral">                &lt;/p&gt;</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="stringliteral">                &lt;p className=&quot;text-xs text-orange-700 dark:text-orange-300&quot;&gt;</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="stringliteral">                  seconds</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="stringliteral">                &lt;/p&gt;</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="stringliteral">              &lt;/div&gt;</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="stringliteral">            &lt;/div&gt;</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="stringliteral">          &lt;/div&gt;</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="stringliteral">        &lt;/div&gt;</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="stringliteral">        &lt;p className=&quot;text-sm text-gray-600 dark:text-gray-400 mb-6 text-center&quot;&gt;</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="stringliteral">          This is a security feature to protect your account when you&#39;</span>re away.</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        &lt;/p&gt;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        {/* Action Buttons */}</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        &lt;div className=&quot;flex gap-3&quot;&gt;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        {<span class="comment">/* Action Buttons */</span>}</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>          &lt;button</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>            onClick={onLogoutNow}</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            className=&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>          &gt;</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>            Logout Now</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>          &lt;/button&gt;</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>          &lt;button</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>            onClick={onStayLoggedIn}</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>            className=&quot;flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition font-medium&quot;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>            className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition font-medium&quot;</span></div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>          &gt;</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>            Stay Logged In</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>          &lt;/button&gt;</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        &lt;/div&gt;</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        &lt;p className=&quot;text-xs text-gray-500 dark:text-gray-400 text-center mt-3&quot;&gt;</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>          You can change this setting in Settings → Security &amp; Privacy</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 text-center mt-3&quot;</span>&gt;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>          You can change <span class="keyword">this</span> setting in <a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a> → Security &amp; Privacy</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        &lt;/p&gt;</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      &lt;/div&gt;</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    &lt;/div&gt;</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  );</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>}</div>
+</div>
+<div class="ttc" id="a_app_8js_html_a41fced9f4a60b34be2c803b77dcada2d"><div class="ttname"><a href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a></div><div class="ttdeci">import Settings from pages Settings</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00019">App.js:19</a></div></div>
+<div class="ttc" id="a_app_8js_html_aef656f167a6c589e061e6c89d87c603c"><div class="ttname"><a href="_app_8js.html#aef656f167a6c589e061e6c89d87c603c">SessionTimeoutWarning</a></div><div class="ttdeci">import SessionTimeoutWarning from components SessionTimeoutWarning</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00022">App.js:22</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

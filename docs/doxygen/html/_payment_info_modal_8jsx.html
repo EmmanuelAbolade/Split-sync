@@ -103,11 +103,197 @@ $(function(){initNavTree('_payment_info_modal_8jsx.html',''); initResizable(true
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">PaymentInfoModal.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_payment_info_modal_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a3e43eaa2aabf8fa007485eb2b95537e5" id="r_a3e43eaa2aabf8fa007485eb2b95537e5"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3e43eaa2aabf8fa007485eb2b95537e5">PaymentInfoModal</a> ({ isOpen, onClose, paymentInfo })</td></tr>
+<tr class="separator:a3e43eaa2aabf8fa007485eb2b95537e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { X, ExternalLink, CreditCard, Smartphone, Info, DollarSign, Wallet } from 'lucide-<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a3e43eaa2aabf8fa007485eb2b95537e5" name="a3e43eaa2aabf8fa007485eb2b95537e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e43eaa2aabf8fa007485eb2b95537e5">&#9670;&#160;</a></span>PaymentInfoModal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default PaymentInfoModal </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ isOpen, onClose, paymentInfo }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_payment_info_modal_8jsx_source.html#l00004">4</a> of file <a class="el" href="_payment_info_modal_8jsx_source.html">PaymentInfoModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    4</span>                                         { isOpen, onClose, paymentInfo }) {</div>
+<div class="line"><span class="lineno">    5</span>  <span class="keywordflow">if</span> (!isOpen || !paymentInfo) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">    6</span> </div>
+<div class="line"><span class="lineno">    7</span>  <span class="keyword">const</span> { method, amount, currency, username, onProceed } = paymentInfo;</div>
+<div class="line"><span class="lineno">    8</span> </div>
+<div class="line"><span class="lineno">    9</span>  <span class="keyword">const</span> getMethodIcon = () =&gt; {</div>
+<div class="line"><span class="lineno">   10</span>    <span class="keywordflow">switch</span>(method) {</div>
+<div class="line"><span class="lineno">   11</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;paypal&#39;</span>: <span class="keywordflow">return</span> &lt;CreditCard size={20} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400&quot;</span> /&gt;;</div>
+<div class="line"><span class="lineno">   12</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;revolut&#39;</span>: <span class="keywordflow">return</span> &lt;Wallet size={20} className=<span class="stringliteral">&quot;text-purple-600 dark:text-purple-400&quot;</span> /&gt;;</div>
+<div class="line"><span class="lineno">   13</span>      <span class="keywordflow">default</span>: <span class="keywordflow">return</span> &lt;DollarSign size={20} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400&quot;</span> /&gt;;</div>
+<div class="line"><span class="lineno">   14</span>    }</div>
+<div class="line"><span class="lineno">   15</span>  };</div>
+<div class="line"><span class="lineno">   16</span> </div>
+<div class="line"><span class="lineno">   17</span>  <span class="keyword">const</span> getMethodName = () =&gt; {</div>
+<div class="line"><span class="lineno">   18</span>    <span class="keywordflow">switch</span>(method) {</div>
+<div class="line"><span class="lineno">   19</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;paypal&#39;</span>: <span class="keywordflow">return</span> <span class="stringliteral">&#39;PayPal&#39;</span>;</div>
+<div class="line"><span class="lineno">   20</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;revolut&#39;</span>: <span class="keywordflow">return</span> <span class="stringliteral">&#39;Revolut&#39;</span>;</div>
+<div class="line"><span class="lineno">   21</span>      <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&#39;Payment&#39;</span>;</div>
+<div class="line"><span class="lineno">   22</span>    }</div>
+<div class="line"><span class="lineno">   23</span>  };</div>
+<div class="line"><span class="lineno">   24</span> </div>
+<div class="line"><span class="lineno">   25</span>  <span class="keyword">const</span> handleProceed = () =&gt; {</div>
+<div class="line"><span class="lineno">   26</span>    onProceed();</div>
+<div class="line"><span class="lineno">   27</span>    onClose();</div>
+<div class="line"><span class="lineno">   28</span>  };</div>
+<div class="line"><span class="lineno">   29</span> </div>
+<div class="line"><span class="lineno">   30</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   31</span>    &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   32</span>      &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   33</span>        {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">   34</span>        &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   35</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   36</span>            &lt;div className=<span class="stringliteral">&quot;w-12 h-12 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   37</span>              {getMethodIcon()}</div>
+<div class="line"><span class="lineno">   38</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   39</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">   40</span>              &lt;h2 className=<span class="stringliteral">&quot;text-xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;Opening {getMethodName()}&lt;/h2&gt;</div>
+<div class="line"><span class="lineno">   41</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-500 dark:text-gray-400&quot;</span>&gt;Payment Instructions&lt;/p&gt;</div>
+<div class="line"><span class="lineno">   42</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   43</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   44</span>          &lt;button</div>
+<div class="line"><span class="lineno">   45</span>            onClick={onClose}</div>
+<div class="line"><span class="lineno">   46</span>            className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition&quot;</span></div>
+<div class="line"><span class="lineno">   47</span>          &gt;</div>
+<div class="line"><span class="lineno">   48</span>            &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">   49</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   50</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   51</span> </div>
+<div class="line"><span class="lineno">   52</span>        {<span class="comment">/* Payment Details Card */</span>}</div>
+<div class="line"><span class="lineno">   53</span>        &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   54</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   55</span>            &lt;CreditCard size={18} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">   56</span>            &lt;h3 className=<span class="stringliteral">&quot;font-semibold text-blue-900 dark:text-blue-300&quot;</span>&gt;Payment Details&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">   57</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   58</span>          &lt;div className=<span class="stringliteral">&quot;space-y-2 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   59</span>            &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   60</span>              &lt;span className=<span class="stringliteral">&quot;text-blue-700 dark:text-blue-400&quot;</span>&gt;Amount:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">   61</span>              &lt;span className=<span class="stringliteral">&quot;font-bold text-blue-900 dark:text-blue-200&quot;</span>&gt;{currency} {amount.toFixed(2)}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">   62</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   63</span>            &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   64</span>              &lt;span className=<span class="stringliteral">&quot;text-blue-700 dark:text-blue-400&quot;</span>&gt;Recipient:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">   65</span>              &lt;span className=<span class="stringliteral">&quot;font-bold text-blue-900 dark:text-blue-200&quot;</span>&gt;@{username}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">   66</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   67</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   68</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   69</span> </div>
+<div class="line"><span class="lineno">   70</span>        {<span class="comment">/* Instructions */</span>}</div>
+<div class="line"><span class="lineno">   71</span>        &lt;div className=<span class="stringliteral">&quot;bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   72</span>          &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   73</span>            &lt;Info size={18} className=<span class="stringliteral">&quot;text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">   74</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">   75</span>              &lt;h3 className=<span class="stringliteral">&quot;font-semibold text-yellow-900 dark:text-yellow-200 mb-2&quot;</span>&gt;Important Steps&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">   76</span>              &lt;ol className=<span class="stringliteral">&quot;text-sm text-yellow-800 dark:text-yellow-300 space-y-2 list-decimal list-inside&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   77</span>                &lt;li&gt;Enter the amount manually: &lt;strong&gt;{currency} {amount.toFixed(2)}&lt;/strong&gt;&lt;/li&gt;</div>
+<div class="line"><span class="lineno">   78</span>                {method === <span class="stringliteral">&#39;revolut&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">   79</span>                  &lt;&gt;</div>
+<div class="line"><span class="lineno">   80</span>                    &lt;li className=<span class="stringliteral">&quot;flex items-start gap-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   81</span>                      &lt;span className=<span class="stringliteral">&quot;flex-shrink-0&quot;</span>&gt;Note:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">   82</span>                      &lt;span&gt;</div>
+<div class="line"><span class="lineno">   83</span>                        &lt;strong&gt;If <span class="keyword">using </span>Mobile:&lt;/strong&gt; Choose <span class="stringliteral">&quot;Pay with Card&quot;</span> or <span class="stringliteral">&quot;Apple Pay&quot;</span> &lt;br/&gt;</div>
+<div class="line"><span class="lineno">   84</span>                        &lt;strong&gt;If <span class="keyword">using </span>Desktop:&lt;/strong&gt; Scan QR code with your phone</div>
+<div class="line"><span class="lineno">   85</span>                      &lt;/span&gt;</div>
+<div class="line"><span class="lineno">   86</span>                    &lt;/li&gt;</div>
+<div class="line"><span class="lineno">   87</span>                    &lt;li&gt;Complete the payment securely in {getMethodName()}&lt;/li&gt;</div>
+<div class="line"><span class="lineno">   88</span>                    &lt;li&gt;Return here and click <span class="stringliteral">&quot;Confirm Payment Sent&quot;</span>&lt;/li&gt;</div>
+<div class="line"><span class="lineno">   89</span>                  &lt;/&gt;</div>
+<div class="line"><span class="lineno">   90</span>                )}</div>
+<div class="line"><span class="lineno">   91</span>                {method === <span class="stringliteral">&#39;paypal&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">   92</span>                  &lt;&gt;</div>
+<div class="line"><span class="lineno">   93</span>                    &lt;li&gt;Securely <a class="code hl_variable" href="_app_8js.html#a0af6585c301a1c12e51db6613b81af42">Login</a> to your PayPal account&lt;/li&gt;</div>
+<div class="line"><span class="lineno">   94</span>                    &lt;li&gt;Click <span class="stringliteral">&quot;Send&quot;</span> and follow the instructions to complete payment (You may need to review the amount before confirming payment)&lt;/li&gt;</div>
+<div class="line"><span class="lineno">   95</span>                    &lt;li&gt;Return here and click <span class="stringliteral">&quot;Confirm Payment Sent&quot;</span>&lt;/li&gt;</div>
+<div class="line"><span class="lineno">   96</span>                  &lt;/&gt;</div>
+<div class="line"><span class="lineno">   97</span>                )}</div>
+<div class="line"><span class="lineno">   98</span>              &lt;/ol&gt;</div>
+<div class="line"><span class="lineno">   99</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  100</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  101</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  102</span> </div>
+<div class="line"><span class="lineno">  103</span>        {<span class="comment">/* Mobile Device Tip */</span>}</div>
+<div class="line"><span class="lineno">  104</span>        {method === <span class="stringliteral">&#39;revolut&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  105</span>          &lt;div className=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  106</span>            &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  107</span>              &lt;Smartphone size={16} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  108</span>              &lt;div className=<span class="stringliteral">&quot;text-xs text-blue-800 dark:text-blue-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  109</span>                &lt;p className=<span class="stringliteral">&quot;font-medium mb-1&quot;</span>&gt;Using mobile?&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  110</span>                &lt;p&gt;The QR code option works best when you have another device with your Revolut <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>. On mobile, use <span class="stringliteral">&quot;Pay with Card&quot;</span> <span class="keywordflow">for</span> instant payment.&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  111</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  112</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  113</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  114</span>        )}</div>
+<div class="line"><span class="lineno">  115</span> </div>
+<div class="line"><span class="lineno">  116</span>        {<span class="comment">/* Action Buttons */</span>}</div>
+<div class="line"><span class="lineno">  117</span>        &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  118</span>          &lt;button</div>
+<div class="line"><span class="lineno">  119</span>            onClick={onClose}</div>
+<div class="line"><span class="lineno">  120</span>            className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  121</span>          &gt;</div>
+<div class="line"><span class="lineno">  122</span>            Cancel</div>
+<div class="line"><span class="lineno">  123</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  124</span>          &lt;button</div>
+<div class="line"><span class="lineno">  125</span>            onClick={handleProceed}</div>
+<div class="line"><span class="lineno">  126</span>            className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2&quot;</span></div>
+<div class="line"><span class="lineno">  127</span>          &gt;</div>
+<div class="line"><span class="lineno">  128</span>            &lt;ExternalLink size={18} /&gt;</div>
+<div class="line"><span class="lineno">  129</span>            Open {getMethodName()}</div>
+<div class="line"><span class="lineno">  130</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  131</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  132</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  133</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  134</span>  );</div>
+<div class="line"><span class="lineno">  135</span>}</div>
+<div class="ttc" id="a_app_8js_html_a0af6585c301a1c12e51db6613b81af42"><div class="ttname"><a href="_app_8js.html#a0af6585c301a1c12e51db6613b81af42">Login</a></div><div class="ttdeci">import Login from pages Login</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00009">App.js:9</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a979397bcd61476f20722e963203a16ed"><div class="ttname"><a href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a></div><div class="ttdeci">const app</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00019">firebase.js:19</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { X, ExternalLink, CreditCard, Smartphone, Info, DollarSign, Wallet } from 'lucide-<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_payment_info_modal_8jsx_source.html#l00002">2</a> of file <a class="el" href="_payment_info_modal_8jsx_source.html">PaymentInfoModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>{ X, ExternalLink, CreditCard, Smartphone, Info, DollarSign, Wallet } from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

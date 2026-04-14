@@ -106,41 +106,53 @@ $(function(){initNavTree('firebase_auth_8js_source.html',''); initResizable(true
   <div class="headertitle"><div class="title">firebaseAuth.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="firebase_auth_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/__mocks__/firebaseAuth.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>// Mock Firebase Authentication for testing</div>
+<a href="firebase_auth_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/__mocks__/firebaseAuth.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Mock Firebase Authentication for testing</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>export const mockUser = {</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>  uid: &#39;test-user-123&#39;,</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  email: &#39;test@example.com&#39;,</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  displayName: &#39;Test User&#39;,</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  photoURL: null,</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>  emailVerified: true,</div>
+<div class="foldopen" id="foldopen00004" data-start="{" data-end="};">
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">    4</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a> = {</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>  uid: <span class="stringliteral">&#39;test-user-123&#39;</span>,</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  email: <span class="stringliteral">&#39;test@example.com&#39;</span>,</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  displayName: <span class="stringliteral">&#39;Test User&#39;</span>,</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  photoURL: <span class="keyword">null</span>,</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>  emailVerified: <span class="keyword">true</span>,</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>};</div>
+</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>export const signInWithEmailAndPassword = jest.fn(() =&gt; </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#a17ee75cec4fee66d5533265a2b5ad650">   12</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#a17ee75cec4fee66d5533265a2b5ad650">signInWithEmailAndPassword</a> = jest.fn(() =&gt; </div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  Promise.resolve({ user: mockUser })</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>);</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>export const createUserWithEmailAndPassword = jest.fn(() =&gt;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#a19a6c928490a080293ed84cf9ff5e17d">   16</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#a19a6c928490a080293ed84cf9ff5e17d">createUserWithEmailAndPassword</a> = jest.fn(() =&gt;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  Promise.resolve({ user: mockUser })</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>);</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>export const signOut = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">   20</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">signOut</a> = jest.fn(() =&gt; Promise.resolve());</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>export const onAuthStateChanged = jest.fn((auth, callback) =&gt; {</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  callback(mockUser);</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  return jest.fn(); // Unsubscribe function</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#ae1059baaabc38eb86e89f6b0b8eba42b">   22</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#ae1059baaabc38eb86e89f6b0b8eba42b">onAuthStateChanged</a> = jest.fn((<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>, callback) =&gt; {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  callback(<a class="code hl_variable" href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a>);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  <span class="keywordflow">return</span> jest.fn(); <span class="comment">// Unsubscribe function</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>});</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>export const GoogleAuthProvider = jest.fn();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#a18ccecb43d4b9170a698d07799d6bd16">   27</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#a18ccecb43d4b9170a698d07799d6bd16">GoogleAuthProvider</a> = jest.fn();</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>export const signInWithPopup = jest.fn(() =&gt;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#aea6ccfbb58e5271e07b9a4e7a2f775e8">   29</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#aea6ccfbb58e5271e07b9a4e7a2f775e8">signInWithPopup</a> = jest.fn(() =&gt;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  Promise.resolve({ user: mockUser })</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>);</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>export const sendPasswordResetEmail = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#ad311ba30e2b2844623239879f653450f">   33</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#ad311ba30e2b2844623239879f653450f">sendPasswordResetEmail</a> = jest.fn(() =&gt; Promise.resolve());</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>export const updateProfile = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="firebase_auth_8js.html#ac6e1f87478e3bfd703f0da680a1f1629">   35</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#ac6e1f87478e3bfd703f0da680a1f1629">updateProfile</a> = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="ttc" id="afirebase_8js_html_ab735783ec1f49c1b8740f4dba3dfbfd0"><div class="ttname"><a href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a></div><div class="ttdeci">export const auth</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00022">firebase.js:22</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a17ee75cec4fee66d5533265a2b5ad650"><div class="ttname"><a href="firebase_auth_8js.html#a17ee75cec4fee66d5533265a2b5ad650">signInWithEmailAndPassword</a></div><div class="ttdeci">export const signInWithEmailAndPassword</div><div class="ttdef"><b>Definition</b> <a href="#l00012">firebaseAuth.js:12</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a18ccecb43d4b9170a698d07799d6bd16"><div class="ttname"><a href="firebase_auth_8js.html#a18ccecb43d4b9170a698d07799d6bd16">GoogleAuthProvider</a></div><div class="ttdeci">export const GoogleAuthProvider</div><div class="ttdef"><b>Definition</b> <a href="#l00027">firebaseAuth.js:27</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a19a6c928490a080293ed84cf9ff5e17d"><div class="ttname"><a href="firebase_auth_8js.html#a19a6c928490a080293ed84cf9ff5e17d">createUserWithEmailAndPassword</a></div><div class="ttdeci">export const createUserWithEmailAndPassword</div><div class="ttdef"><b>Definition</b> <a href="#l00016">firebaseAuth.js:16</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a569f325aae9ea34bf4eb084e7cb94076"><div class="ttname"><a href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a></div><div class="ttdeci">export const mockUser</div><div class="ttdef"><b>Definition</b> <a href="#l00004">firebaseAuth.js:4</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a722f586b1325e6444b61040fd4f9e277"><div class="ttname"><a href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">signOut</a></div><div class="ttdeci">export const signOut</div><div class="ttdef"><b>Definition</b> <a href="#l00020">firebaseAuth.js:20</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_ac6e1f87478e3bfd703f0da680a1f1629"><div class="ttname"><a href="firebase_auth_8js.html#ac6e1f87478e3bfd703f0da680a1f1629">updateProfile</a></div><div class="ttdeci">export const updateProfile</div><div class="ttdef"><b>Definition</b> <a href="#l00035">firebaseAuth.js:35</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_ad311ba30e2b2844623239879f653450f"><div class="ttname"><a href="firebase_auth_8js.html#ad311ba30e2b2844623239879f653450f">sendPasswordResetEmail</a></div><div class="ttdeci">export const sendPasswordResetEmail</div><div class="ttdef"><b>Definition</b> <a href="#l00033">firebaseAuth.js:33</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_ae1059baaabc38eb86e89f6b0b8eba42b"><div class="ttname"><a href="firebase_auth_8js.html#ae1059baaabc38eb86e89f6b0b8eba42b">onAuthStateChanged</a></div><div class="ttdeci">export const onAuthStateChanged</div><div class="ttdef"><b>Definition</b> <a href="#l00022">firebaseAuth.js:22</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_aea6ccfbb58e5271e07b9a4e7a2f775e8"><div class="ttname"><a href="firebase_auth_8js.html#aea6ccfbb58e5271e07b9a4e7a2f775e8">signInWithPopup</a></div><div class="ttdeci">export const signInWithPopup</div><div class="ttdef"><b>Definition</b> <a href="#l00029">firebaseAuth.js:29</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -103,11 +103,432 @@ $(function(){initNavTree('_sepa_payment_modal_8test_8jsx.html',''); initResizabl
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">SepaPaymentModal.test.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_sepa_payment_modal_8test_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aaed10feaf2dda4314d93c83408affea1" id="r_aaed10feaf2dda4314d93c83408affea1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> React from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaed10feaf2dda4314d93c83408affea1">react</a></td></tr>
+<tr class="separator:aaed10feaf2dda4314d93c83408affea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { render, screen, fireEvent, waitFor, act } from '@testing-library/<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace141dab1481fa1126bf476461d4ff32" id="r_ace141dab1481fa1126bf476461d4ff32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> testing library jest&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace141dab1481fa1126bf476461d4ff32">dom</a></td></tr>
+<tr class="separator:ace141dab1481fa1126bf476461d4ff32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18a974073885cc5e723b10b617010bc6" id="r_a18a974073885cc5e723b10b617010bc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a> = jest.fn()</td></tr>
+<tr class="separator:a18a974073885cc5e723b10b617010bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e42303cb6e845fc01a5020ff435af18" id="r_a9e42303cb6e845fc01a5020ff435af18"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e42303cb6e845fc01a5020ff435af18">mockDoc</a> = jest.fn()</td></tr>
+<tr class="separator:a9e42303cb6e845fc01a5020ff435af18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb555e18ae1ce429817ecc9f0ab74705" id="r_acb555e18ae1ce429817ecc9f0ab74705"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb555e18ae1ce429817ecc9f0ab74705">mockProcessSepaPayment</a> = jest.fn()</td></tr>
+<tr class="separator:acb555e18ae1ce429817ecc9f0ab74705"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7194eb496baa8c5b3b9977e9aa0ca96d" id="r_a7194eb496baa8c5b3b9977e9aa0ca96d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7194eb496baa8c5b3b9977e9aa0ca96d">mockGeneratePaymentReference</a> = jest.fn(() =&gt; 'REF-123')</td></tr>
+<tr class="separator:a7194eb496baa8c5b3b9977e9aa0ca96d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a0b261bd8e49d6b5ae92ba9c5f953e1" id="r_a4a0b261bd8e49d6b5ae92ba9c5f953e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4a0b261bd8e49d6b5ae92ba9c5f953e1">mockFormatIBAN</a> = jest.fn(v =&gt; v)</td></tr>
+<tr class="separator:a4a0b261bd8e49d6b5ae92ba9c5f953e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b79e983e21705179211c15fbacfd81e" id="r_a4b79e983e21705179211c15fbacfd81e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b79e983e21705179211c15fbacfd81e">mockMaskIBAN</a> = jest.fn(v =&gt; `****${v.slice(-4)}`)</td></tr>
+<tr class="separator:a4b79e983e21705179211c15fbacfd81e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a392a2b2e16fecfdf34159a106916e4" id="r_a7a392a2b2e16fecfdf34159a106916e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a392a2b2e16fecfdf34159a106916e4">mockValidatePaymentAmount</a> = jest.fn(() =&gt; ({ valid: true }))</td></tr>
+<tr class="separator:a7a392a2b2e16fecfdf34159a106916e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53f11957c6cad6c93c120220d683f8c8" id="r_a53f11957c6cad6c93c120220d683f8c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a53f11957c6cad6c93c120220d683f8c8">mockCreatePaymentDescription</a> = jest.fn(() =&gt; 'SplitSync payment')</td></tr>
+<tr class="separator:a53f11957c6cad6c93c120220d683f8c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0529f9583f1632d2838a3dee4ce12dbf" id="r_a0529f9583f1632d2838a3dee4ce12dbf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0529f9583f1632d2838a3dee4ce12dbf">mockCalculatePaymentFee</a> = jest.fn(() =&gt; 0)</td></tr>
+<tr class="separator:a0529f9583f1632d2838a3dee4ce12dbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28682ffad0f4f68cf791ce2f9ad7c6c2" id="r_a28682ffad0f4f68cf791ce2f9ad7c6c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28682ffad0f4f68cf791ce2f9ad7c6c2">mockDecryptData</a> = jest.fn(v =&gt; `DECRYPTED-${v}`)</td></tr>
+<tr class="separator:a28682ffad0f4f68cf791ce2f9ad7c6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad572ecefd86ae02b7e7abcc50c524b09" id="r_ad572ecefd86ae02b7e7abcc50c524b09"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad572ecefd86ae02b7e7abcc50c524b09">mockAuthenticateWithBiometric</a> = jest.fn()</td></tr>
+<tr class="separator:ad572ecefd86ae02b7e7abcc50c524b09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a068954df8fb44f2a2117275e03abcd9e" id="r_a068954df8fb44f2a2117275e03abcd9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> SepaPaymentModal from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a068954df8fb44f2a2117275e03abcd9e">SepaPaymentModal</a></td></tr>
+<tr class="separator:a068954df8fb44f2a2117275e03abcd9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a98b66a5d5f23336bf74b01d0f77003" id="r_a7a98b66a5d5f23336bf74b01d0f77003"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a98b66a5d5f23336bf74b01d0f77003">mockPayment</a></td></tr>
+<tr class="separator:a7a98b66a5d5f23336bf74b01d0f77003"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4aef2a8a2facfcbaad4753cc073cd4bb" id="r_a4aef2a8a2facfcbaad4753cc073cd4bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4aef2a8a2facfcbaad4753cc073cd4bb">mockCurrentUser</a> = { uid: 'user-123' }</td></tr>
+<tr class="separator:a4aef2a8a2facfcbaad4753cc073cd4bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75b3247ca76252bf00a0fd94eceda969" id="r_a75b3247ca76252bf00a0fd94eceda969"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75b3247ca76252bf00a0fd94eceda969">defaultProps</a></td></tr>
+<tr class="separator:a75b3247ca76252bf00a0fd94eceda969"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe57b1fb324d1cd8d36d5966e1b06592" id="r_abe57b1fb324d1cd8d36d5966e1b06592"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe57b1fb324d1cd8d36d5966e1b06592">mockUserDocWithIBAN</a></td></tr>
+<tr class="separator:abe57b1fb324d1cd8d36d5966e1b06592"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ad772bb6997a0474e9e20effb9c89f4" id="r_a1ad772bb6997a0474e9e20effb9c89f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1ad772bb6997a0474e9e20effb9c89f4">mockUserDocNoIBAN</a></td></tr>
+<tr class="separator:a1ad772bb6997a0474e9e20effb9c89f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a75b3247ca76252bf00a0fd94eceda969" name="a75b3247ca76252bf00a0fd94eceda969"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75b3247ca76252bf00a0fd94eceda969">&#9670;&#160;</a></span>defaultProps</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> defaultProps</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  isOpen:           <span class="keyword">true</span>,</div>
+<div class="line">  onClose:          jest.fn(),</div>
+<div class="line">  payment:          <a class="code hl_variable" href="#a7a98b66a5d5f23336bf74b01d0f77003">mockPayment</a>,</div>
+<div class="line">  currentUser:      <a class="code hl_variable" href="#a4aef2a8a2facfcbaad4753cc073cd4bb">mockCurrentUser</a>,</div>
+<div class="line">  onPaymentSuccess: jest.fn(),</div>
+<div class="line">}</div>
+<div class="ttc" id="a_sepa_payment_modal_8test_8jsx_html_a4aef2a8a2facfcbaad4753cc073cd4bb"><div class="ttname"><a href="#a4aef2a8a2facfcbaad4753cc073cd4bb">mockCurrentUser</a></div><div class="ttdeci">const mockCurrentUser</div><div class="ttdef"><b>Definition</b> <a href="_sepa_payment_modal_8test_8jsx_source.html#l00069">SepaPaymentModal.test.jsx:69</a></div></div>
+<div class="ttc" id="a_sepa_payment_modal_8test_8jsx_html_a7a98b66a5d5f23336bf74b01d0f77003"><div class="ttname"><a href="#a7a98b66a5d5f23336bf74b01d0f77003">mockPayment</a></div><div class="ttdeci">const mockPayment</div><div class="ttdef"><b>Definition</b> <a href="_sepa_payment_modal_8test_8jsx_source.html#l00058">SepaPaymentModal.test.jsx:58</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00071">71</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   71</span>                     {</div>
+<div class="line"><span class="lineno">   72</span>  isOpen:           <span class="keyword">true</span>,</div>
+<div class="line"><span class="lineno">   73</span>  onClose:          jest.fn(),</div>
+<div class="line"><span class="lineno">   74</span>  payment:          <a class="code hl_variable" href="#a7a98b66a5d5f23336bf74b01d0f77003">mockPayment</a>,</div>
+<div class="line"><span class="lineno">   75</span>  currentUser:      <a class="code hl_variable" href="#a4aef2a8a2facfcbaad4753cc073cd4bb">mockCurrentUser</a>,</div>
+<div class="line"><span class="lineno">   76</span>  onPaymentSuccess: jest.fn(),</div>
+<div class="line"><span class="lineno">   77</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ace141dab1481fa1126bf476461d4ff32" name="ace141dab1481fa1126bf476461d4ff32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace141dab1481fa1126bf476461d4ff32">&#9670;&#160;</a></span>dom</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> testing library jest dom</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00007">7</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { render, screen, fireEvent, waitFor, act } from '@testing-library/<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00006">6</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    6</span>{ render, screen, fireEvent, waitFor, act } from <span class="stringliteral">&#39;@testing-library/react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ad572ecefd86ae02b7e7abcc50c524b09" name="ad572ecefd86ae02b7e7abcc50c524b09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad572ecefd86ae02b7e7abcc50c524b09">&#9670;&#160;</a></span>mockAuthenticateWithBiometric</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockAuthenticateWithBiometric = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00047">47</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a0529f9583f1632d2838a3dee4ce12dbf" name="a0529f9583f1632d2838a3dee4ce12dbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0529f9583f1632d2838a3dee4ce12dbf">&#9670;&#160;</a></span>mockCalculatePaymentFee</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockCalculatePaymentFee = jest.fn(() =&gt; 0)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00028">28</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a53f11957c6cad6c93c120220d683f8c8" name="a53f11957c6cad6c93c120220d683f8c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53f11957c6cad6c93c120220d683f8c8">&#9670;&#160;</a></span>mockCreatePaymentDescription</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockCreatePaymentDescription = jest.fn(() =&gt; 'SplitSync payment')</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00027">27</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a4aef2a8a2facfcbaad4753cc073cd4bb" name="a4aef2a8a2facfcbaad4753cc073cd4bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4aef2a8a2facfcbaad4753cc073cd4bb">&#9670;&#160;</a></span>mockCurrentUser</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockCurrentUser = { uid: 'user-123' }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00069">69</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   69</span>{ uid: <span class="stringliteral">&#39;user-123&#39;</span> };</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a28682ffad0f4f68cf791ce2f9ad7c6c2" name="a28682ffad0f4f68cf791ce2f9ad7c6c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28682ffad0f4f68cf791ce2f9ad7c6c2">&#9670;&#160;</a></span>mockDecryptData</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockDecryptData = jest.fn(v =&gt; `DECRYPTED-${v}`)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00041">41</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a9e42303cb6e845fc01a5020ff435af18" name="a9e42303cb6e845fc01a5020ff435af18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e42303cb6e845fc01a5020ff435af18">&#9670;&#160;</a></span>mockDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockDoc = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00014">14</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a4a0b261bd8e49d6b5ae92ba9c5f953e1" name="a4a0b261bd8e49d6b5ae92ba9c5f953e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a0b261bd8e49d6b5ae92ba9c5f953e1">&#9670;&#160;</a></span>mockFormatIBAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockFormatIBAN = jest.fn(v =&gt; v)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00024">24</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a7194eb496baa8c5b3b9977e9aa0ca96d" name="a7194eb496baa8c5b3b9977e9aa0ca96d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7194eb496baa8c5b3b9977e9aa0ca96d">&#9670;&#160;</a></span>mockGeneratePaymentReference</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockGeneratePaymentReference = jest.fn(() =&gt; 'REF-123')</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00023">23</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a18a974073885cc5e723b10b617010bc6" name="a18a974073885cc5e723b10b617010bc6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18a974073885cc5e723b10b617010bc6">&#9670;&#160;</a></span>mockGetDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockGetDoc = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00013">13</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a4b79e983e21705179211c15fbacfd81e" name="a4b79e983e21705179211c15fbacfd81e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b79e983e21705179211c15fbacfd81e">&#9670;&#160;</a></span>mockMaskIBAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockMaskIBAN = jest.fn(v =&gt; `****${v.slice(-4)}`)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00025">25</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a7a98b66a5d5f23336bf74b01d0f77003" name="a7a98b66a5d5f23336bf74b01d0f77003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a98b66a5d5f23336bf74b01d0f77003">&#9670;&#160;</a></span>mockPayment</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockPayment</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  amount:    30,</div>
+<div class="line">  groupName: <span class="stringliteral">&#39;Weekend Trip&#39;</span>,</div>
+<div class="line">  groupId:   <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line">  fromUser:  { id: <span class="stringliteral">&#39;user-123&#39;</span>, name: <span class="stringliteral">&#39;Alice&#39;</span> },</div>
+<div class="line">  toUser:    { id: <span class="stringliteral">&#39;user-456&#39;</span>, name: <span class="stringliteral">&#39;Bob&#39;</span>   },</div>
+<div class="line">  toUserPaymentMethods: {</div>
+<div class="line">    encryptedIBAN: <span class="stringliteral">&#39;encrypted-bob-iban&#39;</span>,</div>
+<div class="line">  },</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00058">58</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   58</span>                    {</div>
+<div class="line"><span class="lineno">   59</span>  amount:    30,</div>
+<div class="line"><span class="lineno">   60</span>  groupName: <span class="stringliteral">&#39;Weekend Trip&#39;</span>,</div>
+<div class="line"><span class="lineno">   61</span>  groupId:   <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line"><span class="lineno">   62</span>  fromUser:  { id: <span class="stringliteral">&#39;user-123&#39;</span>, name: <span class="stringliteral">&#39;Alice&#39;</span> },</div>
+<div class="line"><span class="lineno">   63</span>  toUser:    { id: <span class="stringliteral">&#39;user-456&#39;</span>, name: <span class="stringliteral">&#39;Bob&#39;</span>   },</div>
+<div class="line"><span class="lineno">   64</span>  toUserPaymentMethods: {</div>
+<div class="line"><span class="lineno">   65</span>    encryptedIBAN: <span class="stringliteral">&#39;encrypted-bob-iban&#39;</span>,</div>
+<div class="line"><span class="lineno">   66</span>  },</div>
+<div class="line"><span class="lineno">   67</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="acb555e18ae1ce429817ecc9f0ab74705" name="acb555e18ae1ce429817ecc9f0ab74705"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb555e18ae1ce429817ecc9f0ab74705">&#9670;&#160;</a></span>mockProcessSepaPayment</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockProcessSepaPayment = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00022">22</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a1ad772bb6997a0474e9e20effb9c89f4" name="a1ad772bb6997a0474e9e20effb9c89f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ad772bb6997a0474e9e20effb9c89f4">&#9670;&#160;</a></span>mockUserDocNoIBAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockUserDocNoIBAN</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  exists: () =&gt; <span class="keyword">true</span>,</div>
+<div class="line">  data:   () =&gt; ({ paymentMethods: <span class="keyword">null</span> }),</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00086">86</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   86</span>                          {</div>
+<div class="line"><span class="lineno">   87</span>  exists: () =&gt; <span class="keyword">true</span>,</div>
+<div class="line"><span class="lineno">   88</span>  data:   () =&gt; ({ paymentMethods: <span class="keyword">null</span> }),</div>
+<div class="line"><span class="lineno">   89</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abe57b1fb324d1cd8d36d5966e1b06592" name="abe57b1fb324d1cd8d36d5966e1b06592"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe57b1fb324d1cd8d36d5966e1b06592">&#9670;&#160;</a></span>mockUserDocWithIBAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockUserDocWithIBAN</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  exists: () =&gt; <span class="keyword">true</span>,</div>
+<div class="line">  data:   () =&gt; ({ paymentMethods: { encryptedIBAN: <span class="stringliteral">&#39;encrypted-alice-iban&#39;</span> } }),</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00080">80</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   80</span>                            {</div>
+<div class="line"><span class="lineno">   81</span>  exists: () =&gt; <span class="keyword">true</span>,</div>
+<div class="line"><span class="lineno">   82</span>  data:   () =&gt; ({ paymentMethods: { encryptedIBAN: <span class="stringliteral">&#39;encrypted-alice-iban&#39;</span> } }),</div>
+<div class="line"><span class="lineno">   83</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a7a392a2b2e16fecfdf34159a106916e4" name="a7a392a2b2e16fecfdf34159a106916e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a392a2b2e16fecfdf34159a106916e4">&#9670;&#160;</a></span>mockValidatePaymentAmount</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> mockValidatePaymentAmount = jest.fn(() =&gt; ({ valid: true }))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00026">26</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="aaed10feaf2dda4314d93c83408affea1" name="aaed10feaf2dda4314d93c83408affea1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaed10feaf2dda4314d93c83408affea1">&#9670;&#160;</a></span>react</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> React from react</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00005">5</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a068954df8fb44f2a2117275e03abcd9e" name="a068954df8fb44f2a2117275e03abcd9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a068954df8fb44f2a2117275e03abcd9e">&#9670;&#160;</a></span>SepaPaymentModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> SepaPaymentModal from SepaPaymentModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html#l00052">52</a> of file <a class="el" href="_sepa_payment_modal_8test_8jsx_source.html">SepaPaymentModal.test.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

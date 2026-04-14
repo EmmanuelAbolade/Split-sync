@@ -106,14 +106,15 @@ $(function(){initNavTree('firebase_8js_source.html',''); initResizable(true); })
   <div class="headertitle"><div class="title">firebase.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="firebase_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/services/firebase.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { initializeApp } from &#39;firebase/app&#39;;</div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>import { getAuth } from &#39;firebase/auth&#39;;</div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>import { getFirestore } from &#39;firebase/firestore&#39;;</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>import { getStorage } from &#39;firebase/storage&#39;;</div>
+<a href="firebase_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/services/firebase.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="firebase_8js.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { initializeApp } from <span class="stringliteral">&#39;firebase/app&#39;</span>;</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">import</span> { getAuth } from <span class="stringliteral">&#39;firebase/auth&#39;</span>;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">import</span> { getFirestore } from <span class="stringliteral">&#39;firebase/firestore&#39;</span>;</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">import</span> { getStorage } from <span class="stringliteral">&#39;firebase/storage&#39;</span>;</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>// Firebase configuration</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>const firebaseConfig = {</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// Firebase configuration</span></div>
+<div class="foldopen" id="foldopen00008" data-start="{" data-end="};">
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="firebase_8js.html#ad13e75ec0ea0c900a9d05a75c3382b75">    8</a></span><span class="keyword">const</span> <a class="code hl_variable" href="firebase_8js.html#ad13e75ec0ea0c900a9d05a75c3382b75">firebaseConfig</a> = {</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,</div>
@@ -122,17 +123,23 @@ $(function(){initNavTree('firebase_8js_source.html',''); initResizable(true); })
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  appId: process.env.REACT_APP_FIREBASE_APP_ID,</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>};</div>
+</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>// Initialize Firebase</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>const app = initializeApp(firebaseConfig);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// Initialize Firebase</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">   19</a></span><span class="keyword">const</span> <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> = initializeApp(<a class="code hl_variable" href="firebase_8js.html#ad13e75ec0ea0c900a9d05a75c3382b75">firebaseConfig</a>);</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>// Initialize services</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>export const auth = getAuth(app);</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>export const db = getFirestore(app);</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>export const storage = getStorage(app);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// Initialize services</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">   22</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a> = getAuth(<a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">   23</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a> = getFirestore(<a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="firebase_8js.html#afd218d062e673fa0c8cc8e1a5a1017bc">   24</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_8js.html#afd218d062e673fa0c8cc8e1a5a1017bc">storage</a> = getStorage(<a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>);</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>export default app;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>export <span class="keywordflow">default</span> <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>;</div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a979397bcd61476f20722e963203a16ed"><div class="ttname"><a href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a></div><div class="ttdeci">const app</div><div class="ttdef"><b>Definition</b> <a href="#l00019">firebase.js:19</a></div></div>
+<div class="ttc" id="afirebase_8js_html_ab735783ec1f49c1b8740f4dba3dfbfd0"><div class="ttname"><a href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a></div><div class="ttdeci">export const auth</div><div class="ttdef"><b>Definition</b> <a href="#l00022">firebase.js:22</a></div></div>
+<div class="ttc" id="afirebase_8js_html_ad13e75ec0ea0c900a9d05a75c3382b75"><div class="ttname"><a href="firebase_8js.html#ad13e75ec0ea0c900a9d05a75c3382b75">firebaseConfig</a></div><div class="ttdeci">const firebaseConfig</div><div class="ttdef"><b>Definition</b> <a href="#l00008">firebase.js:8</a></div></div>
+<div class="ttc" id="afirebase_8js_html_afd218d062e673fa0c8cc8e1a5a1017bc"><div class="ttname"><a href="firebase_8js.html#afd218d062e673fa0c8cc8e1a5a1017bc">storage</a></div><div class="ttdeci">export const storage</div><div class="ttdef"><b>Definition</b> <a href="#l00024">firebase.js:24</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

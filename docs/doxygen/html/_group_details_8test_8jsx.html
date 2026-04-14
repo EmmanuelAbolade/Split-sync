@@ -103,11 +103,708 @@ $(function(){initNavTree('_group_details_8test_8jsx.html',''); initResizable(tru
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">GroupDetails.test.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_group_details_8test_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aaed10feaf2dda4314d93c83408affea1" id="r_aaed10feaf2dda4314d93c83408affea1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> React from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaed10feaf2dda4314d93c83408affea1">react</a></td></tr>
+<tr class="separator:aaed10feaf2dda4314d93c83408affea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { render, screen, fireEvent, waitFor } from '@testing-library/<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace141dab1481fa1126bf476461d4ff32" id="r_ace141dab1481fa1126bf476461d4ff32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> testing library jest&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace141dab1481fa1126bf476461d4ff32">dom</a></td></tr>
+<tr class="separator:ace141dab1481fa1126bf476461d4ff32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77aa0bd763f224f88bc985d2d5c09ffb" id="r_a77aa0bd763f224f88bc985d2d5c09ffb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77aa0bd763f224f88bc985d2d5c09ffb">mockNavigate</a> = jest.fn()</td></tr>
+<tr class="separator:a77aa0bd763f224f88bc985d2d5c09ffb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18a974073885cc5e723b10b617010bc6" id="r_a18a974073885cc5e723b10b617010bc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a> = jest.fn()</td></tr>
+<tr class="separator:a18a974073885cc5e723b10b617010bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae55ac154ae069bc1500e3a54bd881fe8" id="r_ae55ac154ae069bc1500e3a54bd881fe8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a> = jest.fn()</td></tr>
+<tr class="separator:ae55ac154ae069bc1500e3a54bd881fe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e42303cb6e845fc01a5020ff435af18" id="r_a9e42303cb6e845fc01a5020ff435af18"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e42303cb6e845fc01a5020ff435af18">mockDoc</a> = jest.fn()</td></tr>
+<tr class="separator:a9e42303cb6e845fc01a5020ff435af18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2962cb1794d661c82f02a9881e0543e9" id="r_a2962cb1794d661c82f02a9881e0543e9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2962cb1794d661c82f02a9881e0543e9">mockCollection</a> = jest.fn()</td></tr>
+<tr class="separator:a2962cb1794d661c82f02a9881e0543e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d987238f73868d6c28f274e3d2dab80" id="r_a9d987238f73868d6c28f274e3d2dab80"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d987238f73868d6c28f274e3d2dab80">mockQuery</a> = jest.fn()</td></tr>
+<tr class="separator:a9d987238f73868d6c28f274e3d2dab80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c31c070f62bdfa9b55ae6e9243030fc" id="r_a8c31c070f62bdfa9b55ae6e9243030fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c31c070f62bdfa9b55ae6e9243030fc">mockWhere</a> = jest.fn()</td></tr>
+<tr class="separator:a8c31c070f62bdfa9b55ae6e9243030fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8df80d01dcfe10935b20468eb0a6ced" id="r_ad8df80d01dcfe10935b20468eb0a6ced"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8df80d01dcfe10935b20468eb0a6ced">mockUpdateDoc</a> = jest.fn(() =&gt; Promise.resolve())</td></tr>
+<tr class="separator:ad8df80d01dcfe10935b20468eb0a6ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61e8ab6134ceef7addd6495bf263ba70" id="r_a61e8ab6134ceef7addd6495bf263ba70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61e8ab6134ceef7addd6495bf263ba70">mockDeleteDoc</a> = jest.fn(() =&gt; Promise.resolve())</td></tr>
+<tr class="separator:a61e8ab6134ceef7addd6495bf263ba70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bd65c068f52ef91fbeba621579b0f65" id="r_a0bd65c068f52ef91fbeba621579b0f65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0bd65c068f52ef91fbeba621579b0f65">mockGetDocs</a> = jest.fn(() =&gt; Promise.resolve({ docs: [], forEach: () =&gt; {} }))</td></tr>
+<tr class="separator:a0bd65c068f52ef91fbeba621579b0f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82253ea87bd199b416242beac159421c" id="r_a82253ea87bd199b416242beac159421c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a82253ea87bd199b416242beac159421c">mockWriteBatch</a></td></tr>
+<tr class="separator:a82253ea87bd199b416242beac159421c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba8ff68a2f0a5c72d6b33fcadfb53b98" id="r_aba8ff68a2f0a5c72d6b33fcadfb53b98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba8ff68a2f0a5c72d6b33fcadfb53b98">mockArrayRemove</a> = jest.fn((val) =&gt; val)</td></tr>
+<tr class="separator:aba8ff68a2f0a5c72d6b33fcadfb53b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cb507ac114e1702475b477c8d6f2f68" id="r_a4cb507ac114e1702475b477c8d6f2f68"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> GroupDetails from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4cb507ac114e1702475b477c8d6f2f68">GroupDetails</a></td></tr>
+<tr class="separator:a4cb507ac114e1702475b477c8d6f2f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa45c40ce92c073079d5d1349252e26d8" id="r_aa45c40ce92c073079d5d1349252e26d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa45c40ce92c073079d5d1349252e26d8">mockGroup</a></td></tr>
+<tr class="separator:aa45c40ce92c073079d5d1349252e26d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a817fe595f442f8a29adabf5ffb246214" id="r_a817fe595f442f8a29adabf5ffb246214"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a817fe595f442f8a29adabf5ffb246214">mockExpenses</a></td></tr>
+<tr class="separator:a817fe595f442f8a29adabf5ffb246214"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92b303b76a3f942ea819498907d5e83c" id="r_a92b303b76a3f942ea819498907d5e83c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> { <a class="el" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>, <a class="el" href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a>, <a class="el" href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a> } = require('../utils/balanceCalculator')</td></tr>
+<tr class="separator:a92b303b76a3f942ea819498907d5e83c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef5531a07a77677ed96d65cc19275a35" id="r_aef5531a07a77677ed96d65cc19275a35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a></td></tr>
+<tr class="separator:aef5531a07a77677ed96d65cc19275a35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe164b0bd64d488923ae1fb113aee761" id="r_afe164b0bd64d488923ae1fb113aee761"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe164b0bd64d488923ae1fb113aee761">mockUserDoc</a> = { exists: () =&gt; false, data: () =&gt; ({}) }</td></tr>
+<tr class="separator:afe164b0bd64d488923ae1fb113aee761"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a712705e2c8532aae091a04dafea92221" id="r_a712705e2c8532aae091a04dafea92221"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a> = { exists: () =&gt; true, id: 'group-123', data: () =&gt; <a class="el" href="_expense_details_modal_8test_8jsx.html#aa45c40ce92c073079d5d1349252e26d8">mockGroup</a> }</td></tr>
+<tr class="separator:a712705e2c8532aae091a04dafea92221"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad11209fca4de764a93ada292abb38745" id="r_ad11209fca4de764a93ada292abb38745"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad11209fca4de764a93ada292abb38745">setupWithGroup</a></td></tr>
+<tr class="separator:ad11209fca4de764a93ada292abb38745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a954ac302a6e184695b06d38cd037818c" id="r_a954ac302a6e184695b06d38cd037818c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a954ac302a6e184695b06d38cd037818c">setupWithNoExpenses</a></td></tr>
+<tr class="separator:a954ac302a6e184695b06d38cd037818c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba5e4173b549c8b0a4e6412040247d86" id="r_aba5e4173b549c8b0a4e6412040247d86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba5e4173b549c8b0a4e6412040247d86">setupGroupNotFound</a></td></tr>
+<tr class="separator:aba5e4173b549c8b0a4e6412040247d86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a92b303b76a3f942ea819498907d5e83c" name="a92b303b76a3f942ea819498907d5e83c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92b303b76a3f942ea819498907d5e83c">&#9670;&#160;</a></span>const</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const { <a class="el" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>, <a class="el" href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a>, <a class="el" href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a> } = require('../utils/balanceCalculator')</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00146">146</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  146</span>{ <a class="code hl_function" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>, <a class="code hl_function" href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a>, <a class="code hl_function" href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a> } = require(<span class="stringliteral">&#39;../utils/balanceCalculator&#39;</span>);</div>
+<div class="ttc" id="abalance_calculator_8js_html_a12d4d92470fb2616edbe37a6b38ae563"><div class="ttname"><a href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a></div><div class="ttdeci">function export calculateBalances(expenses, members)</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00041">balanceCalculator.js:41</a></div></div>
+<div class="ttc" id="abalance_calculator_8js_html_ad9ce0d28e75245a2382760ce60db72b2"><div class="ttname"><a href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a></div><div class="ttdeci">function export calculateSettlements(balances)</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00085">balanceCalculator.js:85</a></div></div>
+<div class="ttc" id="abalance_calculator_8js_html_af5cb86abf0ddc74e01d7b9dbe9a23716"><div class="ttname"><a href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a></div><div class="ttdeci">function export getUserBalanceSummary(balances, userId, members)</div><div class="ttdoc">Returns a human-readable balance summary for a specific user.</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00139">balanceCalculator.js:139</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ace141dab1481fa1126bf476461d4ff32" name="ace141dab1481fa1126bf476461d4ff32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace141dab1481fa1126bf476461d4ff32">&#9670;&#160;</a></span>dom</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> testing library jest dom</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00006">6</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a4cb507ac114e1702475b477c8d6f2f68" name="a4cb507ac114e1702475b477c8d6f2f68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cb507ac114e1702475b477c8d6f2f68">&#9670;&#160;</a></span>GroupDetails</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> GroupDetails from GroupDetails</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00097">97</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { render, screen, fireEvent, waitFor } from '@testing-library/<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00005">5</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    5</span>{ render, screen, fireEvent, waitFor } from <span class="stringliteral">&#39;@testing-library/react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aba8ff68a2f0a5c72d6b33fcadfb53b98" name="aba8ff68a2f0a5c72d6b33fcadfb53b98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba8ff68a2f0a5c72d6b33fcadfb53b98">&#9670;&#160;</a></span>mockArrayRemove</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockArrayRemove = jest.fn((val) =&gt; val)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00029">29</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a2962cb1794d661c82f02a9881e0543e9" name="a2962cb1794d661c82f02a9881e0543e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2962cb1794d661c82f02a9881e0543e9">&#9670;&#160;</a></span>mockCollection</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockCollection = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00019">19</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a61e8ab6134ceef7addd6495bf263ba70" name="a61e8ab6134ceef7addd6495bf263ba70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61e8ab6134ceef7addd6495bf263ba70">&#9670;&#160;</a></span>mockDeleteDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockDeleteDoc = jest.fn(() =&gt; Promise.resolve())</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00023">23</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a9e42303cb6e845fc01a5020ff435af18" name="a9e42303cb6e845fc01a5020ff435af18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e42303cb6e845fc01a5020ff435af18">&#9670;&#160;</a></span>mockDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockDoc = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00018">18</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a817fe595f442f8a29adabf5ffb246214" name="a817fe595f442f8a29adabf5ffb246214"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a817fe595f442f8a29adabf5ffb246214">&#9670;&#160;</a></span>mockExpenses</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockExpenses</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [</div>
+<div class="line">  {</div>
+<div class="line">    id: <span class="stringliteral">&#39;exp-1&#39;</span>,</div>
+<div class="line">    title: <span class="stringliteral">&#39;Hotel&#39;</span>,</div>
+<div class="line">    amount: 200,</div>
+<div class="line">    currency: <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line">    groupId: <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line">    paidBy: <span class="stringliteral">&#39;user-123&#39;</span>,</div>
+<div class="line">    participants: [<span class="stringliteral">&#39;user-123&#39;</span>, <span class="stringliteral">&#39;user-456&#39;</span>],</div>
+<div class="line">    splits: { <span class="stringliteral">&#39;user-123&#39;</span>: 100, <span class="stringliteral">&#39;user-456&#39;</span>: 100 },</div>
+<div class="line">    splitMethod: <span class="stringliteral">&#39;equal&#39;</span>,</div>
+<div class="line">    category: <span class="stringliteral">&#39;accommodation&#39;</span>,</div>
+<div class="line">    date: <span class="stringliteral">&#39;2024-01-15&#39;</span>,</div>
+<div class="line">    description: <span class="stringliteral">&#39;Shared hotel room&#39;</span>,</div>
+<div class="line">  },</div>
+<div class="line">  {</div>
+<div class="line">    id: <span class="stringliteral">&#39;exp-2&#39;</span>,</div>
+<div class="line">    title: <span class="stringliteral">&#39;Dinner&#39;</span>,</div>
+<div class="line">    amount: 60,</div>
+<div class="line">    currency: <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line">    groupId: <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line">    paidBy: <span class="stringliteral">&#39;user-456&#39;</span>,</div>
+<div class="line">    participants: [<span class="stringliteral">&#39;user-123&#39;</span>, <span class="stringliteral">&#39;user-456&#39;</span>],</div>
+<div class="line">    splits: { <span class="stringliteral">&#39;user-123&#39;</span>: 30, <span class="stringliteral">&#39;user-456&#39;</span>: 30 },</div>
+<div class="line">    splitMethod: <span class="stringliteral">&#39;equal&#39;</span>,</div>
+<div class="line">    category: <span class="stringliteral">&#39;food&#39;</span>,</div>
+<div class="line">    date: <span class="stringliteral">&#39;2024-01-14&#39;</span>,</div>
+<div class="line">  },</div>
+<div class="line">]</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00112">112</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  113</span>  {</div>
+<div class="line"><span class="lineno">  114</span>    id: <span class="stringliteral">&#39;exp-1&#39;</span>,</div>
+<div class="line"><span class="lineno">  115</span>    title: <span class="stringliteral">&#39;Hotel&#39;</span>,</div>
+<div class="line"><span class="lineno">  116</span>    amount: 200,</div>
+<div class="line"><span class="lineno">  117</span>    currency: <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line"><span class="lineno">  118</span>    groupId: <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line"><span class="lineno">  119</span>    paidBy: <span class="stringliteral">&#39;user-123&#39;</span>,</div>
+<div class="line"><span class="lineno">  120</span>    participants: [<span class="stringliteral">&#39;user-123&#39;</span>, <span class="stringliteral">&#39;user-456&#39;</span>],</div>
+<div class="line"><span class="lineno">  121</span>    splits: { <span class="stringliteral">&#39;user-123&#39;</span>: 100, <span class="stringliteral">&#39;user-456&#39;</span>: 100 },</div>
+<div class="line"><span class="lineno">  122</span>    splitMethod: <span class="stringliteral">&#39;equal&#39;</span>,</div>
+<div class="line"><span class="lineno">  123</span>    category: <span class="stringliteral">&#39;accommodation&#39;</span>,</div>
+<div class="line"><span class="lineno">  124</span>    date: <span class="stringliteral">&#39;2024-01-15&#39;</span>,</div>
+<div class="line"><span class="lineno">  125</span>    description: <span class="stringliteral">&#39;Shared hotel room&#39;</span>,</div>
+<div class="line"><span class="lineno">  126</span>  },</div>
+<div class="line"><span class="lineno">  127</span>  {</div>
+<div class="line"><span class="lineno">  128</span>    id: <span class="stringliteral">&#39;exp-2&#39;</span>,</div>
+<div class="line"><span class="lineno">  129</span>    title: <span class="stringliteral">&#39;Dinner&#39;</span>,</div>
+<div class="line"><span class="lineno">  130</span>    amount: 60,</div>
+<div class="line"><span class="lineno">  131</span>    currency: <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line"><span class="lineno">  132</span>    groupId: <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line"><span class="lineno">  133</span>    paidBy: <span class="stringliteral">&#39;user-456&#39;</span>,</div>
+<div class="line"><span class="lineno">  134</span>    participants: [<span class="stringliteral">&#39;user-123&#39;</span>, <span class="stringliteral">&#39;user-456&#39;</span>],</div>
+<div class="line"><span class="lineno">  135</span>    splits: { <span class="stringliteral">&#39;user-123&#39;</span>: 30, <span class="stringliteral">&#39;user-456&#39;</span>: 30 },</div>
+<div class="line"><span class="lineno">  136</span>    splitMethod: <span class="stringliteral">&#39;equal&#39;</span>,</div>
+<div class="line"><span class="lineno">  137</span>    category: <span class="stringliteral">&#39;food&#39;</span>,</div>
+<div class="line"><span class="lineno">  138</span>    date: <span class="stringliteral">&#39;2024-01-14&#39;</span>,</div>
+<div class="line"><span class="lineno">  139</span>  },</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a18a974073885cc5e723b10b617010bc6" name="a18a974073885cc5e723b10b617010bc6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18a974073885cc5e723b10b617010bc6">&#9670;&#160;</a></span>mockGetDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockGetDoc = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00016">16</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a0bd65c068f52ef91fbeba621579b0f65" name="a0bd65c068f52ef91fbeba621579b0f65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bd65c068f52ef91fbeba621579b0f65">&#9670;&#160;</a></span>mockGetDocs</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockGetDocs = jest.fn(() =&gt; Promise.resolve({ docs: [], forEach: () =&gt; {} }))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00024">24</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="aa45c40ce92c073079d5d1349252e26d8" name="aa45c40ce92c073079d5d1349252e26d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa45c40ce92c073079d5d1349252e26d8">&#9670;&#160;</a></span>mockGroup</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockGroup</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  id: <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line">  name: <span class="stringliteral">&#39;Weekend Trip&#39;</span>,</div>
+<div class="line">  currency: <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line">  icon: <span class="stringliteral">&#39;plane&#39;</span>,</div>
+<div class="line">  members: [</div>
+<div class="line">    { userId: <span class="stringliteral">&#39;user-123&#39;</span>, name: <span class="stringliteral">&#39;Alice&#39;</span>, email: <span class="stringliteral">&#39;alice@example.com&#39;</span>, role: <span class="stringliteral">&#39;owner&#39;</span> },</div>
+<div class="line">    { userId: <span class="stringliteral">&#39;user-456&#39;</span>, name: <span class="stringliteral">&#39;Bob&#39;</span>,   email: <span class="stringliteral">&#39;bob@example.com&#39;</span>,   role: <span class="stringliteral">&#39;member&#39;</span> },</div>
+<div class="line">  ],</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00101">101</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  101</span>                  {</div>
+<div class="line"><span class="lineno">  102</span>  id: <span class="stringliteral">&#39;group-123&#39;</span>,</div>
+<div class="line"><span class="lineno">  103</span>  name: <span class="stringliteral">&#39;Weekend Trip&#39;</span>,</div>
+<div class="line"><span class="lineno">  104</span>  currency: <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line"><span class="lineno">  105</span>  icon: <span class="stringliteral">&#39;plane&#39;</span>,</div>
+<div class="line"><span class="lineno">  106</span>  members: [</div>
+<div class="line"><span class="lineno">  107</span>    { userId: <span class="stringliteral">&#39;user-123&#39;</span>, name: <span class="stringliteral">&#39;Alice&#39;</span>, email: <span class="stringliteral">&#39;alice@example.com&#39;</span>, role: <span class="stringliteral">&#39;owner&#39;</span> },</div>
+<div class="line"><span class="lineno">  108</span>    { userId: <span class="stringliteral">&#39;user-456&#39;</span>, name: <span class="stringliteral">&#39;Bob&#39;</span>,   email: <span class="stringliteral">&#39;bob@example.com&#39;</span>,   role: <span class="stringliteral">&#39;member&#39;</span> },</div>
+<div class="line"><span class="lineno">  109</span>  ],</div>
+<div class="line"><span class="lineno">  110</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a712705e2c8532aae091a04dafea92221" name="a712705e2c8532aae091a04dafea92221"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a712705e2c8532aae091a04dafea92221">&#9670;&#160;</a></span>mockGroupDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockGroupDoc = { exists: () =&gt; true, id: 'group-123', data: () =&gt; <a class="el" href="_expense_details_modal_8test_8jsx.html#aa45c40ce92c073079d5d1349252e26d8">mockGroup</a> }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00169">169</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  169</span>{ exists: () =&gt; <span class="keyword">true</span>, <span class="keywordtype">id</span>: <span class="stringliteral">&#39;group-123&#39;</span>, data: () =&gt; <a class="code hl_variable" href="_expense_details_modal_8test_8jsx.html#aa45c40ce92c073079d5d1349252e26d8">mockGroup</a> };</div>
+<div class="ttc" id="a_expense_details_modal_8test_8jsx_html_aa45c40ce92c073079d5d1349252e26d8"><div class="ttname"><a href="_expense_details_modal_8test_8jsx.html#aa45c40ce92c073079d5d1349252e26d8">mockGroup</a></div><div class="ttdeci">const mockGroup</div><div class="ttdef"><b>Definition</b> <a href="_expense_details_modal_8test_8jsx_source.html#l00015">ExpenseDetailsModal.test.jsx:15</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a77aa0bd763f224f88bc985d2d5c09ffb" name="a77aa0bd763f224f88bc985d2d5c09ffb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77aa0bd763f224f88bc985d2d5c09ffb">&#9670;&#160;</a></span>mockNavigate</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockNavigate = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00010">10</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="ae55ac154ae069bc1500e3a54bd881fe8" name="ae55ac154ae069bc1500e3a54bd881fe8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae55ac154ae069bc1500e3a54bd881fe8">&#9670;&#160;</a></span>mockOnSnapshot</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockOnSnapshot = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00017">17</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a9d987238f73868d6c28f274e3d2dab80" name="a9d987238f73868d6c28f274e3d2dab80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d987238f73868d6c28f274e3d2dab80">&#9670;&#160;</a></span>mockQuery</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockQuery = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00020">20</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="ad8df80d01dcfe10935b20468eb0a6ced" name="ad8df80d01dcfe10935b20468eb0a6ced"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8df80d01dcfe10935b20468eb0a6ced">&#9670;&#160;</a></span>mockUpdateDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockUpdateDoc = jest.fn(() =&gt; Promise.resolve())</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00022">22</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="afe164b0bd64d488923ae1fb113aee761" name="afe164b0bd64d488923ae1fb113aee761"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe164b0bd64d488923ae1fb113aee761">&#9670;&#160;</a></span>mockUserDoc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockUserDoc = { exists: () =&gt; false, data: () =&gt; ({}) }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00168">168</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  168</span>{ exists: () =&gt; <span class="keyword">false</span>, data: () =&gt; ({}) };</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8c31c070f62bdfa9b55ae6e9243030fc" name="a8c31c070f62bdfa9b55ae6e9243030fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c31c070f62bdfa9b55ae6e9243030fc">&#9670;&#160;</a></span>mockWhere</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockWhere = jest.fn()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00021">21</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a82253ea87bd199b416242beac159421c" name="a82253ea87bd199b416242beac159421c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82253ea87bd199b416242beac159421c">&#9670;&#160;</a></span>mockWriteBatch</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> mockWriteBatch</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= jest.fn(() =&gt; ({</div>
+<div class="line">  <span class="keyword">delete</span>: jest.fn(),</div>
+<div class="line">  commit: jest.fn(() =&gt; Promise.resolve()),</div>
+<div class="line">}))</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00025">25</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="aaed10feaf2dda4314d93c83408affea1" name="aaed10feaf2dda4314d93c83408affea1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaed10feaf2dda4314d93c83408affea1">&#9670;&#160;</a></span>react</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> React from react</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00004">4</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+
+</div>
+</div>
+<a id="aef5531a07a77677ed96d65cc19275a35" name="aef5531a07a77677ed96d65cc19275a35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef5531a07a77677ed96d65cc19275a35">&#9670;&#160;</a></span>resetBalanceMocks</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> resetBalanceMocks</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= () =&gt; {</div>
+<div class="line">  <a class="code hl_function" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>.mockReturnValue({ <span class="stringliteral">&#39;user-123&#39;</span>: 30, <span class="stringliteral">&#39;user-456&#39;</span>: -30 });</div>
+<div class="line">  <a class="code hl_function" href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a>.mockReturnValue([{ from: <span class="stringliteral">&#39;user-456&#39;</span>, to: <span class="stringliteral">&#39;user-123&#39;</span>, amount: 30 }]);</div>
+<div class="line">  <a class="code hl_function" href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a>.mockReturnValue({ status: <span class="stringliteral">&#39;owed&#39;</span>, amount: 30, message: <span class="stringliteral">&#39;You are owed&#39;</span> });</div>
+<div class="line"> </div>
+<div class="line">  </div>
+<div class="line">  <span class="keyword">const</span> { <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a> } = require(<span class="stringliteral">&#39;../stores/notificationsStore&#39;</span>);</div>
+<div class="line">  <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a>.mockReturnValue({ notifications: [] });</div>
+<div class="line"> </div>
+<div class="line">  <span class="keyword">const</span> { <a class="code hl_variable" href="invitation_system_8js.html#a1e16ba90ff6e44e568843b1df84aaab5">getMySentInvitations</a> } = require(<span class="stringliteral">&#39;../utils/invitationSystem&#39;</span>);</div>
+<div class="line">  <a class="code hl_variable" href="invitation_system_8js.html#a1e16ba90ff6e44e568843b1df84aaab5">getMySentInvitations</a>.mockResolvedValue([]);</div>
+<div class="line"> </div>
+<div class="line">  <a class="code hl_variable" href="_analytics_8test_8jsx.html#a0bd65c068f52ef91fbeba621579b0f65">mockGetDocs</a>.mockResolvedValue({ docs: [], forEach: () =&gt; {} });</div>
+<div class="line">  <a class="code hl_variable" href="_group_details_8extra_8test_8jsx.html#a82253ea87bd199b416242beac159421c">mockWriteBatch</a>.mockReturnValue({</div>
+<div class="line">    <span class="keyword">delete</span>: jest.fn(),</div>
+<div class="line">    commit: jest.fn(() =&gt; Promise.resolve()),</div>
+<div class="line">  });</div>
+<div class="line">}</div>
+<div class="ttc" id="a_analytics_8test_8jsx_html_a0bd65c068f52ef91fbeba621579b0f65"><div class="ttname"><a href="_analytics_8test_8jsx.html#a0bd65c068f52ef91fbeba621579b0f65">mockGetDocs</a></div><div class="ttdeci">const mockGetDocs</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8test_8jsx_source.html#l00021">Analytics.test.jsx:21</a></div></div>
+<div class="ttc" id="a_group_details_8extra_8test_8jsx_html_a82253ea87bd199b416242beac159421c"><div class="ttname"><a href="_group_details_8extra_8test_8jsx.html#a82253ea87bd199b416242beac159421c">mockWriteBatch</a></div><div class="ttdeci">const mockWriteBatch</div><div class="ttdef"><b>Definition</b> <a href="_group_details_8extra_8test_8jsx_source.html#l00046">GroupDetails.extra.test.jsx:46</a></div></div>
+<div class="ttc" id="ainvitation_system_8js_html_a1e16ba90ff6e44e568843b1df84aaab5"><div class="ttname"><a href="invitation_system_8js.html#a1e16ba90ff6e44e568843b1df84aaab5">getMySentInvitations</a></div><div class="ttdeci">export const getMySentInvitations</div><div class="ttdef"><b>Definition</b> <a href="invitation_system_8js_source.html#l00180">invitationSystem.js:180</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_aa5462d3ef54464b95641982675a01fcb"><div class="ttname"><a href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a></div><div class="ttdeci">export const useNotificationsStore</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00010">notificationsStore.js:10</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00148">148</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  148</span>                                {</div>
+<div class="line"><span class="lineno">  149</span>  <a class="code hl_function" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>.mockReturnValue({ <span class="stringliteral">&#39;user-123&#39;</span>: 30, <span class="stringliteral">&#39;user-456&#39;</span>: -30 });</div>
+<div class="line"><span class="lineno">  150</span>  <a class="code hl_function" href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a>.mockReturnValue([{ from: <span class="stringliteral">&#39;user-456&#39;</span>, to: <span class="stringliteral">&#39;user-123&#39;</span>, amount: 30 }]);</div>
+<div class="line"><span class="lineno">  151</span>  <a class="code hl_function" href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a>.mockReturnValue({ status: <span class="stringliteral">&#39;owed&#39;</span>, amount: 30, message: <span class="stringliteral">&#39;You are owed&#39;</span> });</div>
+<div class="line"><span class="lineno">  152</span> </div>
+<div class="line"><span class="lineno">  153</span>  <span class="comment">// Restore mocks that jest.clearAllMocks() wipes on every beforeEach</span></div>
+<div class="line"><span class="lineno">  154</span>  <span class="keyword">const</span> { <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a> } = require(<span class="stringliteral">&#39;../stores/notificationsStore&#39;</span>);</div>
+<div class="line"><span class="lineno">  155</span>  <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a>.mockReturnValue({ notifications: [] });</div>
+<div class="line"><span class="lineno">  156</span> </div>
+<div class="line"><span class="lineno">  157</span>  <span class="keyword">const</span> { <a class="code hl_variable" href="invitation_system_8js.html#a1e16ba90ff6e44e568843b1df84aaab5">getMySentInvitations</a> } = require(<span class="stringliteral">&#39;../utils/invitationSystem&#39;</span>);</div>
+<div class="line"><span class="lineno">  158</span>  <a class="code hl_variable" href="invitation_system_8js.html#a1e16ba90ff6e44e568843b1df84aaab5">getMySentInvitations</a>.mockResolvedValue([]);</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>  <a class="code hl_variable" href="_analytics_8test_8jsx.html#a0bd65c068f52ef91fbeba621579b0f65">mockGetDocs</a>.mockResolvedValue({ docs: [], forEach: () =&gt; {} });</div>
+<div class="line"><span class="lineno">  161</span>  <a class="code hl_variable" href="_group_details_8extra_8test_8jsx.html#a82253ea87bd199b416242beac159421c">mockWriteBatch</a>.mockReturnValue({</div>
+<div class="line"><span class="lineno">  162</span>    <span class="keyword">delete</span>: jest.fn(),</div>
+<div class="line"><span class="lineno">  163</span>    commit: jest.fn(() =&gt; Promise.resolve()),</div>
+<div class="line"><span class="lineno">  164</span>  });</div>
+<div class="line"><span class="lineno">  165</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aba5e4173b549c8b0a4e6412040247d86" name="aba5e4173b549c8b0a4e6412040247d86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba5e4173b549c8b0a4e6412040247d86">&#9670;&#160;</a></span>setupGroupNotFound</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> setupGroupNotFound</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= () =&gt; {</div>
+<div class="line">  <a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a>.mockResolvedValue({ exists: () =&gt; <span class="keyword">false</span> });</div>
+<div class="line">  let callCount = 0;</div>
+<div class="line">  <a class="code hl_variable" href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a>.mockImplementation((q, cb) =&gt; {</div>
+<div class="line">    callCount++;</div>
+<div class="line">    <span class="keywordflow">if</span> (typeof cb === <span class="stringliteral">&#39;function&#39;</span>) {</div>
+<div class="line">      <span class="keywordflow">if</span> (callCount === 1) {</div>
+<div class="line">        cb({ exists: () =&gt; <span class="keyword">false</span>, data: () =&gt; ({}) });</div>
+<div class="line">      } <span class="keywordflow">else</span> {</div>
+<div class="line">        cb({ docs: [] });</div>
+<div class="line">      }</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> jest.fn();</div>
+<div class="line">  });</div>
+<div class="line">}</div>
+<div class="ttc" id="a_activity_8test_8jsx_html_ae55ac154ae069bc1500e3a54bd881fe8"><div class="ttname"><a href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a></div><div class="ttdeci">const mockOnSnapshot</div><div class="ttdef"><b>Definition</b> <a href="_activity_8test_8jsx_source.html#l00016">Activity.test.jsx:16</a></div></div>
+<div class="ttc" id="a_sepa_payment_modal_8test_8jsx_html_a18a974073885cc5e723b10b617010bc6"><div class="ttname"><a href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a></div><div class="ttdeci">const mockGetDoc</div><div class="ttdef"><b>Definition</b> <a href="_sepa_payment_modal_8test_8jsx_source.html#l00013">SepaPaymentModal.test.jsx:13</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00210">210</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  210</span>                                 {</div>
+<div class="line"><span class="lineno">  211</span>  <a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a>.mockResolvedValue({ exists: () =&gt; <span class="keyword">false</span> });</div>
+<div class="line"><span class="lineno">  212</span>  let callCount = 0;</div>
+<div class="line"><span class="lineno">  213</span>  <a class="code hl_variable" href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a>.mockImplementation((q, cb) =&gt; {</div>
+<div class="line"><span class="lineno">  214</span>    callCount++;</div>
+<div class="line"><span class="lineno">  215</span>    <span class="keywordflow">if</span> (typeof cb === <span class="stringliteral">&#39;function&#39;</span>) {</div>
+<div class="line"><span class="lineno">  216</span>      <span class="keywordflow">if</span> (callCount === 1) {</div>
+<div class="line"><span class="lineno">  217</span>        cb({ exists: () =&gt; <span class="keyword">false</span>, data: () =&gt; ({}) });</div>
+<div class="line"><span class="lineno">  218</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  219</span>        cb({ docs: [] });</div>
+<div class="line"><span class="lineno">  220</span>      }</div>
+<div class="line"><span class="lineno">  221</span>    }</div>
+<div class="line"><span class="lineno">  222</span>    <span class="keywordflow">return</span> jest.fn();</div>
+<div class="line"><span class="lineno">  223</span>  });</div>
+<div class="line"><span class="lineno">  224</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ad11209fca4de764a93ada292abb38745" name="ad11209fca4de764a93ada292abb38745"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad11209fca4de764a93ada292abb38745">&#9670;&#160;</a></span>setupWithGroup</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> setupWithGroup</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= (expenses = <a class="code hl_variable" href="_activity_8test_8jsx.html#a817fe595f442f8a29adabf5ffb246214">mockExpenses</a>) =&gt; {</div>
+<div class="line">  <a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a>();</div>
+<div class="line">  <a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a>.mockResolvedValueOnce(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>)   </div>
+<div class="line">             .mockResolvedValue(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#afe164b0bd64d488923ae1fb113aee761">mockUserDoc</a>);       </div>
+<div class="line"> </div>
+<div class="line">  let callCount = 0;</div>
+<div class="line">  <a class="code hl_variable" href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a>.mockImplementation((<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>, callback) =&gt; {</div>
+<div class="line">    callCount++;</div>
+<div class="line">    <span class="keywordflow">if</span> (callCount === 1) {</div>
+<div class="line">      callback(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>);</div>
+<div class="line">    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (callCount === 2) {</div>
+<div class="line">      callback({ docs: expenses.map(e =&gt; ({ id: e.id, data: () =&gt; e })) });</div>
+<div class="line">    } <span class="keywordflow">else</span> {</div>
+<div class="line">      </div>
+<div class="line">      <span class="keywordflow">if</span> (typeof callback === <span class="stringliteral">&#39;function&#39;</span>) callback({ empty: <span class="keyword">true</span>, docs: [] });</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> jest.fn();</div>
+<div class="line">  });</div>
+<div class="line">}</div>
+<div class="ttc" id="a_activity_8test_8jsx_html_a817fe595f442f8a29adabf5ffb246214"><div class="ttname"><a href="_activity_8test_8jsx.html#a817fe595f442f8a29adabf5ffb246214">mockExpenses</a></div><div class="ttdeci">const mockExpenses</div><div class="ttdef"><b>Definition</b> <a href="_activity_8test_8jsx_source.html#l00055">Activity.test.jsx:55</a></div></div>
+<div class="ttc" id="a_group_details_8extended_8test_8jsx_html_a712705e2c8532aae091a04dafea92221"><div class="ttname"><a href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a></div><div class="ttdeci">const mockGroupDoc</div><div class="ttdef"><b>Definition</b> <a href="_group_details_8extended_8test_8jsx_source.html#l00120">GroupDetails.extended.test.jsx:120</a></div></div>
+<div class="ttc" id="a_group_details_8extended_8test_8jsx_html_aef5531a07a77677ed96d65cc19275a35"><div class="ttname"><a href="_group_details_8extended_8test_8jsx.html#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a></div><div class="ttdeci">const resetBalanceMocks</div><div class="ttdef"><b>Definition</b> <a href="_group_details_8extended_8test_8jsx_source.html#l00127">GroupDetails.extended.test.jsx:127</a></div></div>
+<div class="ttc" id="a_group_details_8extended_8test_8jsx_html_afe164b0bd64d488923ae1fb113aee761"><div class="ttname"><a href="_group_details_8extended_8test_8jsx.html#afe164b0bd64d488923ae1fb113aee761">mockUserDoc</a></div><div class="ttdeci">const mockUserDoc</div><div class="ttdef"><b>Definition</b> <a href="_group_details_8extended_8test_8jsx_source.html#l00121">GroupDetails.extended.test.jsx:121</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00171">171</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  171</span>                                                    {</div>
+<div class="line"><span class="lineno">  172</span>  <a class="code hl_variable" href="#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a>();</div>
+<div class="line"><span class="lineno">  173</span>  <a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a>.mockResolvedValueOnce(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>)   <span class="comment">// group fetch</span></div>
+<div class="line"><span class="lineno">  174</span>             .mockResolvedValue(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#afe164b0bd64d488923ae1fb113aee761">mockUserDoc</a>);       <span class="comment">// member photo/payment fetches</span></div>
+<div class="line"><span class="lineno">  175</span> </div>
+<div class="line"><span class="lineno">  176</span>  let callCount = 0;</div>
+<div class="line"><span class="lineno">  177</span>  <a class="code hl_variable" href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a>.mockImplementation((<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>, callback) =&gt; {</div>
+<div class="line"><span class="lineno">  178</span>    callCount++;</div>
+<div class="line"><span class="lineno">  179</span>    <span class="keywordflow">if</span> (callCount === 1) {</div>
+<div class="line"><span class="lineno">  180</span>      callback(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>);</div>
+<div class="line"><span class="lineno">  181</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (callCount === 2) {</div>
+<div class="line"><span class="lineno">  182</span>      callback({ docs: expenses.map(e =&gt; ({ id: e.id, data: () =&gt; e })) });</div>
+<div class="line"><span class="lineno">  183</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  184</span>      <span class="comment">// pendingPayments listener — always empty</span></div>
+<div class="line"><span class="lineno">  185</span>      <span class="keywordflow">if</span> (typeof callback === <span class="stringliteral">&#39;function&#39;</span>) callback({ empty: <span class="keyword">true</span>, docs: [] });</div>
+<div class="line"><span class="lineno">  186</span>    }</div>
+<div class="line"><span class="lineno">  187</span>    <span class="keywordflow">return</span> jest.fn();</div>
+<div class="line"><span class="lineno">  188</span>  });</div>
+<div class="line"><span class="lineno">  189</span>};</div>
+<div class="ttc" id="a_group_details_8test_8jsx_html_aef5531a07a77677ed96d65cc19275a35"><div class="ttname"><a href="#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a></div><div class="ttdeci">const resetBalanceMocks</div><div class="ttdef"><b>Definition</b> <a href="_group_details_8test_8jsx_source.html#l00148">GroupDetails.test.jsx:148</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a954ac302a6e184695b06d38cd037818c" name="a954ac302a6e184695b06d38cd037818c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a954ac302a6e184695b06d38cd037818c">&#9670;&#160;</a></span>setupWithNoExpenses</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a92b303b76a3f942ea819498907d5e83c">const</a> setupWithNoExpenses</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= () =&gt; {</div>
+<div class="line">  <a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a>();</div>
+<div class="line">  <a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a>.mockResolvedValueOnce(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>)</div>
+<div class="line">             .mockResolvedValue(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#afe164b0bd64d488923ae1fb113aee761">mockUserDoc</a>);</div>
+<div class="line"> </div>
+<div class="line">  let callCount = 0;</div>
+<div class="line">  <a class="code hl_variable" href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a>.mockImplementation((<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>, callback) =&gt; {</div>
+<div class="line">    callCount++;</div>
+<div class="line">    <span class="keywordflow">if</span> (callCount === 1) {</div>
+<div class="line">      callback(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>);</div>
+<div class="line">    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (callCount === 2) {</div>
+<div class="line">      callback({ docs: [] });</div>
+<div class="line">    } <span class="keywordflow">else</span> {</div>
+<div class="line">      <span class="keywordflow">if</span> (typeof callback === <span class="stringliteral">&#39;function&#39;</span>) callback({ empty: <span class="keyword">true</span>, docs: [] });</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> jest.fn();</div>
+<div class="line">  });</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_group_details_8test_8jsx_source.html#l00191">191</a> of file <a class="el" href="_group_details_8test_8jsx_source.html">GroupDetails.test.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  191</span>                                  {</div>
+<div class="line"><span class="lineno">  192</span>  <a class="code hl_variable" href="#aef5531a07a77677ed96d65cc19275a35">resetBalanceMocks</a>();</div>
+<div class="line"><span class="lineno">  193</span>  <a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6">mockGetDoc</a>.mockResolvedValueOnce(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>)</div>
+<div class="line"><span class="lineno">  194</span>             .mockResolvedValue(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#afe164b0bd64d488923ae1fb113aee761">mockUserDoc</a>);</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>  let callCount = 0;</div>
+<div class="line"><span class="lineno">  197</span>  <a class="code hl_variable" href="_activity_8test_8jsx.html#ae55ac154ae069bc1500e3a54bd881fe8">mockOnSnapshot</a>.mockImplementation((<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>, callback) =&gt; {</div>
+<div class="line"><span class="lineno">  198</span>    callCount++;</div>
+<div class="line"><span class="lineno">  199</span>    <span class="keywordflow">if</span> (callCount === 1) {</div>
+<div class="line"><span class="lineno">  200</span>      callback(<a class="code hl_variable" href="_group_details_8extended_8test_8jsx.html#a712705e2c8532aae091a04dafea92221">mockGroupDoc</a>);</div>
+<div class="line"><span class="lineno">  201</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (callCount === 2) {</div>
+<div class="line"><span class="lineno">  202</span>      callback({ docs: [] });</div>
+<div class="line"><span class="lineno">  203</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  204</span>      <span class="keywordflow">if</span> (typeof callback === <span class="stringliteral">&#39;function&#39;</span>) callback({ empty: <span class="keyword">true</span>, docs: [] });</div>
+<div class="line"><span class="lineno">  205</span>    }</div>
+<div class="line"><span class="lineno">  206</span>    <span class="keywordflow">return</span> jest.fn();</div>
+<div class="line"><span class="lineno">  207</span>  });</div>
+<div class="line"><span class="lineno">  208</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

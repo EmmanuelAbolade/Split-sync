@@ -103,11 +103,254 @@ $(function(){initNavTree('_balance_breakdown_modal_8jsx.html',''); initResizable
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">BalanceBreakdownModal.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_balance_breakdown_modal_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a2e265e4c5ac8357d7c73c28c227ac499" id="r_a2e265e4c5ac8357d7c73c28c227ac499"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e265e4c5ac8357d7c73c28c227ac499">CurrencyLines</a> ({ amountsByCurrency, colorClass, emptyText='—' })</td></tr>
+<tr class="separator:a2e265e4c5ac8357d7c73c28c227ac499"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac2d7fa0bed757a213f31912cd9e6f7" id="r_adac2d7fa0bed757a213f31912cd9e6f7"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adac2d7fa0bed757a213f31912cd9e6f7">BalanceBreakdownModal</a> ({ isOpen, onClose, type, breakdowns, amountsByCurrency, })</td></tr>
+<tr class="separator:adac2d7fa0bed757a213f31912cd9e6f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { X, Users, TrendingUp, TrendingDown, ChevronRight } from 'lucide-<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="adac2d7fa0bed757a213f31912cd9e6f7" name="adac2d7fa0bed757a213f31912cd9e6f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adac2d7fa0bed757a213f31912cd9e6f7">&#9670;&#160;</a></span>BalanceBreakdownModal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default BalanceBreakdownModal </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ isOpen, onClose, type, breakdowns, amountsByCurrency, }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_balance_breakdown_modal_8jsx_source.html#l00025">25</a> of file <a class="el" href="_balance_breakdown_modal_8jsx_source.html">BalanceBreakdownModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   25</span>                                              {</div>
+<div class="line"><span class="lineno">   26</span>  isOpen,</div>
+<div class="line"><span class="lineno">   27</span>  onClose,</div>
+<div class="line"><span class="lineno">   28</span>  type,              <span class="comment">// &#39;owed&#39; or &#39;owing&#39;</span></div>
+<div class="line"><span class="lineno">   29</span>  breakdowns,        <span class="comment">// array of { userId, name, photoURL, amountsByCurrency, groups }</span></div>
+<div class="line"><span class="lineno">   30</span>  amountsByCurrency, <span class="comment">// { GBP: X, EUR: Y } — total per currency for the header</span></div>
+<div class="line"><span class="lineno">   31</span>}) {</div>
+<div class="line"><span class="lineno">   32</span>  <span class="keyword">const</span> navigate = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">   33</span> </div>
+<div class="line"><span class="lineno">   34</span>  <span class="keywordflow">if</span> (!isOpen) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   35</span> </div>
+<div class="line"><span class="lineno">   36</span>  <span class="keyword">const</span> isOwed = type === <span class="stringliteral">&#39;owed&#39;</span>;</div>
+<div class="line"><span class="lineno">   37</span>  <span class="keyword">const</span> title  = isOwed ? <span class="stringliteral">&#39;Owed to You&#39;</span> : <span class="stringliteral">&#39;You Owe&#39;</span>;</div>
+<div class="line"><span class="lineno">   38</span>  <span class="keyword">const</span> Icon   = isOwed ? TrendingUp : TrendingDown;</div>
+<div class="line"><span class="lineno">   39</span> </div>
+<div class="line"><span class="lineno">   40</span>  <span class="keyword">const</span> colorClass = isOwed</div>
+<div class="line"><span class="lineno">   41</span>    ? <span class="stringliteral">&#39;text-green-600 dark:text-green-400&#39;</span></div>
+<div class="line"><span class="lineno">   42</span>    : <span class="stringliteral">&#39;text-orange-600 dark:text-orange-400&#39;</span>;</div>
+<div class="line"><span class="lineno">   43</span> </div>
+<div class="line"><span class="lineno">   44</span>  <span class="keyword">const</span> headerBg = isOwed</div>
+<div class="line"><span class="lineno">   45</span>    ? <span class="stringliteral">&#39;bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800&#39;</span></div>
+<div class="line"><span class="lineno">   46</span>    : <span class="stringliteral">&#39;bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800&#39;</span>;</div>
+<div class="line"><span class="lineno">   47</span> </div>
+<div class="line"><span class="lineno">   48</span>  <span class="keyword">const</span> iconBg = isOwed</div>
+<div class="line"><span class="lineno">   49</span>    ? <span class="stringliteral">&#39;bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400&#39;</span></div>
+<div class="line"><span class="lineno">   50</span>    : <span class="stringliteral">&#39;bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400&#39;</span>;</div>
+<div class="line"><span class="lineno">   51</span> </div>
+<div class="line"><span class="lineno">   52</span>  <span class="keyword">const</span> handleGroupClick = (groupId) =&gt; {</div>
+<div class="line"><span class="lineno">   53</span>    onClose();</div>
+<div class="line"><span class="lineno">   54</span>    navigate(`/group/${groupId}`);</div>
+<div class="line"><span class="lineno">   55</span>  };</div>
+<div class="line"><span class="lineno">   56</span> </div>
+<div class="line"><span class="lineno">   57</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   58</span>    &lt;div</div>
+<div class="line"><span class="lineno">   59</span>      className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4&quot;</span></div>
+<div class="line"><span class="lineno">   60</span>      onClick={onClose}</div>
+<div class="line"><span class="lineno">   61</span>    &gt;</div>
+<div class="line"><span class="lineno">   62</span>      &lt;div</div>
+<div class="line"><span class="lineno">   63</span>        className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden&quot;</span></div>
+<div class="line"><span class="lineno">   64</span>        onClick={(e) =&gt; e.stopPropagation()}</div>
+<div class="line"><span class="lineno">   65</span>      &gt;</div>
+<div class="line"><span class="lineno">   66</span>        {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">   67</span>        &lt;div className={`p-6 border-b border-gray-200 dark:border-gray-700 ${headerBg}`}&gt;</div>
+<div class="line"><span class="lineno">   68</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   69</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   70</span>              &lt;div className={`w-12 h-12 rounded-full flex items-center justify-center ${iconBg}`}&gt;</div>
+<div class="line"><span class="lineno">   71</span>                &lt;Icon size={24} /&gt;</div>
+<div class="line"><span class="lineno">   72</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   73</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">   74</span>                &lt;h2 className=<span class="stringliteral">&quot;text-xl font-bold text-gray-900 dark:text-white mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   75</span>                  {title}</div>
+<div class="line"><span class="lineno">   76</span>                &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">   77</span>                {<span class="comment">/* Multi-currency total */</span>}</div>
+<div class="line"><span class="lineno">   78</span>                &lt;<a class="code hl_function" href="#a2e265e4c5ac8357d7c73c28c227ac499">CurrencyLines</a></div>
+<div class="line"><span class="lineno">   79</span>                  amountsByCurrency={amountsByCurrency}</div>
+<div class="line"><span class="lineno">   80</span>                  colorClass={`text-2xl ${colorClass}`}</div>
+<div class="line"><span class="lineno">   81</span>                  emptyText=<span class="stringliteral">&quot;All settled&quot;</span></div>
+<div class="line"><span class="lineno">   82</span>                /&gt;</div>
+<div class="line"><span class="lineno">   83</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   84</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   85</span>            &lt;button</div>
+<div class="line"><span class="lineno">   86</span>              onClick={onClose}</div>
+<div class="line"><span class="lineno">   87</span>              className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition&quot;</span></div>
+<div class="line"><span class="lineno">   88</span>            &gt;</div>
+<div class="line"><span class="lineno">   89</span>              &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">   90</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   91</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   92</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   93</span> </div>
+<div class="line"><span class="lineno">   94</span>        {<span class="comment">/* Content — scrollable */</span>}</div>
+<div class="line"><span class="lineno">   95</span>        &lt;div className=<span class="stringliteral">&quot;p-6 overflow-y-auto max-h-[60vh]&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   96</span>          {breakdowns.length === 0 ? (</div>
+<div class="line"><span class="lineno">   97</span>            &lt;div className=<span class="stringliteral">&quot;text-center py-8&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   98</span>              &lt;p className=<span class="stringliteral">&quot;text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   99</span>                {isOwed ? <span class="stringliteral">&#39;Nobody owes you money&#39;</span> : <span class="stringliteral">&quot;You don&#39;t owe anyone&quot;</span>}</div>
+<div class="line"><span class="lineno">  100</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  101</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  102</span>          ) : (</div>
+<div class="line"><span class="lineno">  103</span>            &lt;div className=<span class="stringliteral">&quot;space-y-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  104</span>              {breakdowns.map((breakdown, index) =&gt; (</div>
+<div class="line"><span class="lineno">  105</span>                &lt;div</div>
+<div class="line"><span class="lineno">  106</span>                  key={index}</div>
+<div class="line"><span class="lineno">  107</span>                  className=<span class="stringliteral">&quot;border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition&quot;</span></div>
+<div class="line"><span class="lineno">  108</span>                &gt;</div>
+<div class="line"><span class="lineno">  109</span>                  {<span class="comment">/* Person row */</span>}</div>
+<div class="line"><span class="lineno">  110</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  111</span>                    {breakdown.photoURL ? (</div>
+<div class="line"><span class="lineno">  112</span>                      &lt;img</div>
+<div class="line"><span class="lineno">  113</span>                        src={breakdown.photoURL}</div>
+<div class="line"><span class="lineno">  114</span>                        alt={breakdown.name}</div>
+<div class="line"><span class="lineno">  115</span>                        className=<span class="stringliteral">&quot;w-10 h-10 rounded-full object-cover&quot;</span></div>
+<div class="line"><span class="lineno">  116</span>                      /&gt;</div>
+<div class="line"><span class="lineno">  117</span>                    ) : (</div>
+<div class="line"><span class="lineno">  118</span>                      &lt;div className=<span class="stringliteral">&quot;w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  119</span>                        &lt;Users size={20} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  120</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  121</span>                    )}</div>
+<div class="line"><span class="lineno">  122</span>                    &lt;div className=<span class="stringliteral">&quot;flex-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  123</span>                      &lt;p className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  124</span>                        {isOwed ? `${breakdown.name} owes you` : `You owe ${breakdown.name}`}</div>
+<div class="line"><span class="lineno">  125</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  126</span>                      {<span class="comment">/* Per-person multi-currency total */</span>}</div>
+<div class="line"><span class="lineno">  127</span>                      &lt;<a class="code hl_function" href="#a2e265e4c5ac8357d7c73c28c227ac499">CurrencyLines</a></div>
+<div class="line"><span class="lineno">  128</span>                        amountsByCurrency={breakdown.amountsByCurrency}</div>
+<div class="line"><span class="lineno">  129</span>                        colorClass={`text-base ${colorClass}`}</div>
+<div class="line"><span class="lineno">  130</span>                      /&gt;</div>
+<div class="line"><span class="lineno">  131</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  132</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  133</span> </div>
+<div class="line"><span class="lineno">  134</span>                  {<span class="comment">/* Groups list — clickable to navigate */</span>}</div>
+<div class="line"><span class="lineno">  135</span>                  {breakdown.groups.length &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  136</span>                    &lt;div className=<span class="stringliteral">&quot;ml-13 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  137</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 font-medium mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  138</span>                        Click a group to settle up:</div>
+<div class="line"><span class="lineno">  139</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  140</span>                      {breakdown.groups.map((group, gIndex) =&gt; (</div>
+<div class="line"><span class="lineno">  141</span>                        &lt;button</div>
+<div class="line"><span class="lineno">  142</span>                          key={gIndex}</div>
+<div class="line"><span class="lineno">  143</span>                          onClick={() =&gt; handleGroupClick(group.groupId)}</div>
+<div class="line"><span class="lineno">  144</span>                          className=<span class="stringliteral">&quot;w-full flex items-center justify-between text-sm bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded px-3 py-2 transition-all duration-200 group cursor-pointer&quot;</span></div>
+<div class="line"><span class="lineno">  145</span>                        &gt;</div>
+<div class="line"><span class="lineno">  146</span>                          &lt;span className=<span class="stringliteral">&quot;text-gray-700 dark:text-gray-300 group-hover:text-primary dark:group-hover:text-indigo-400 transition&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  147</span>                            {group.groupName}</div>
+<div class="line"><span class="lineno">  148</span>                          &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  149</span>                          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  150</span>                            &lt;span className={`font-medium ${colorClass}`}&gt;</div>
+<div class="line"><span class="lineno">  151</span>                              {group.currency ? `${group.currency} ` : <span class="stringliteral">&#39;&#39;</span>}{group.amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  152</span>                            &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  153</span>                            &lt;ChevronRight size={16} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 group-hover:text-primary dark:group-hover:text-indigo-400 transition&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  154</span>                          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  155</span>                        &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  156</span>                      ))}</div>
+<div class="line"><span class="lineno">  157</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  158</span>                  )}</div>
+<div class="line"><span class="lineno">  159</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  160</span>              ))}</div>
+<div class="line"><span class="lineno">  161</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  162</span>          )}</div>
+<div class="line"><span class="lineno">  163</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>        {<span class="comment">/* Footer */</span>}</div>
+<div class="line"><span class="lineno">  166</span>        &lt;div className=<span class="stringliteral">&quot;p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  167</span>          &lt;button</div>
+<div class="line"><span class="lineno">  168</span>            onClick={onClose}</div>
+<div class="line"><span class="lineno">  169</span>            className=<span class="stringliteral">&quot;w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  170</span>          &gt;</div>
+<div class="line"><span class="lineno">  171</span>            Close</div>
+<div class="line"><span class="lineno">  172</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  173</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  174</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  175</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  176</span>  );</div>
+<div class="line"><span class="lineno">  177</span>}</div>
+<div class="ttc" id="a_balance_breakdown_modal_8jsx_html_a2e265e4c5ac8357d7c73c28c227ac499"><div class="ttname"><a href="#a2e265e4c5ac8357d7c73c28c227ac499">CurrencyLines</a></div><div class="ttdeci">function CurrencyLines({ amountsByCurrency, colorClass, emptyText=&#39;—&#39; })</div><div class="ttdef"><b>Definition</b> <a href="_balance_breakdown_modal_8jsx_source.html#l00009">BalanceBreakdownModal.jsx:9</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a2e265e4c5ac8357d7c73c28c227ac499" name="a2e265e4c5ac8357d7c73c28c227ac499"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e265e4c5ac8357d7c73c28c227ac499">&#9670;&#160;</a></span>CurrencyLines()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function CurrencyLines </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ amountsByCurrency, colorClass, emptyText='—' }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_balance_breakdown_modal_8jsx_source.html#l00009">9</a> of file <a class="el" href="_balance_breakdown_modal_8jsx_source.html">BalanceBreakdownModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    9</span>                       { amountsByCurrency, colorClass, emptyText = <span class="stringliteral">&#39;—&#39;</span> }) {</div>
+<div class="line"><span class="lineno">   10</span>  <span class="keyword">const</span> entries = Object.entries(amountsByCurrency || {});</div>
+<div class="line"><span class="lineno">   11</span>  <span class="keywordflow">if</span> (entries.length === 0) {</div>
+<div class="line"><span class="lineno">   12</span>    <span class="keywordflow">return</span> &lt;span className={`font-bold ${colorClass}`}&gt;{emptyText}&lt;/span&gt;;</div>
+<div class="line"><span class="lineno">   13</span>  }</div>
+<div class="line"><span class="lineno">   14</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   15</span>    &lt;div className=<span class="stringliteral">&quot;space-y-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   16</span>      {entries.map(([currency, amount]) =&gt; (</div>
+<div class="line"><span class="lineno">   17</span>        &lt;p key={currency} className={`font-bold ${colorClass}`}&gt;</div>
+<div class="line"><span class="lineno">   18</span>          {currency} {amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">   19</span>        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">   20</span>      ))}</div>
+<div class="line"><span class="lineno">   21</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   22</span>  );</div>
+<div class="line"><span class="lineno">   23</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { X, Users, TrendingUp, TrendingDown, ChevronRight } from 'lucide-<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_balance_breakdown_modal_8jsx_source.html#l00005">5</a> of file <a class="el" href="_balance_breakdown_modal_8jsx_source.html">BalanceBreakdownModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    5</span>{ X, Users, TrendingUp, TrendingDown, ChevronRight } from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

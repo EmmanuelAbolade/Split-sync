@@ -103,11 +103,1288 @@ $(function(){initNavTree('_settle_up_modal_8jsx.html',''); initResizable(true); 
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">SettleUpModal.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_settle_up_modal_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ab168856046880bcccb33e1e6a0c5f2a0" id="r_ab168856046880bcccb33e1e6a0c5f2a0"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab168856046880bcccb33e1e6a0c5f2a0">SettleUpModal</a> ({ isOpen, onClose, settlement, group, currentUserId })</td></tr>
+<tr class="separator:ab168856046880bcccb33e1e6a0c5f2a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c1db037f99d3c1a8bf8f32190821475" id="r_a9c1db037f99d3c1a8bf8f32190821475"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> PaymentInfoModal from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c1db037f99d3c1a8bf8f32190821475">PaymentInfoModal</a></td></tr>
+<tr class="separator:a9c1db037f99d3c1a8bf8f32190821475"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a068954df8fb44f2a2117275e03abcd9e" id="r_a068954df8fb44f2a2117275e03abcd9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> SepaPaymentModal from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a068954df8fb44f2a2117275e03abcd9e">SepaPaymentModal</a></td></tr>
+<tr class="separator:a068954df8fb44f2a2117275e03abcd9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a887c8dd2d2acad902492459c02234474" id="r_a887c8dd2d2acad902492459c02234474"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> QRCodeCanvas from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a887c8dd2d2acad902492459c02234474">QRCodeCanvas</a></td></tr>
+<tr class="separator:a887c8dd2d2acad902492459c02234474"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ab168856046880bcccb33e1e6a0c5f2a0" name="ab168856046880bcccb33e1e6a0c5f2a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab168856046880bcccb33e1e6a0c5f2a0">&#9670;&#160;</a></span>SettleUpModal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default SettleUpModal </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ isOpen, onClose, settlement, group, currentUserId }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settle_up_modal_8jsx_source.html#l00015">15</a> of file <a class="el" href="_settle_up_modal_8jsx_source.html">SettleUpModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   15</span>                                      { isOpen, onClose, settlement, group, currentUserId }) {</div>
+<div class="line"><span class="lineno">   16</span>  <span class="keyword">const</span> [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   17</span>  <span class="keyword">const</span> [loading, setLoading] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   18</span>  <span class="keyword">const</span> [error, setError] = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   19</span>  <span class="keyword">const</span> [paymentMethod, setPaymentMethod] = useState(<span class="stringliteral">&#39;paypal&#39;</span>);</div>
+<div class="line"><span class="lineno">   20</span>  <span class="keyword">const</span> [paymentSuccess, setPaymentSuccess] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   21</span>  <span class="keyword">const</span> [showConfirmation, setShowConfirmation] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   22</span>  <span class="keyword">const</span> [recipientPaymentMethods, setRecipientPaymentMethods] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   23</span>  <span class="keyword">const</span> [loadingPaymentMethods, setLoadingPaymentMethods] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   24</span>  <span class="keyword">const</span> [selectedPaymentLink, setSelectedPaymentLink] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   25</span>  <span class="keyword">const</span> [copiedIban, setCopiedIban] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   26</span>  <span class="keyword">const</span> [showPaymentInfo, setShowPaymentInfo] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   27</span>  <span class="keyword">const</span> [showSepaModal, setShowSepaModal] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   28</span>  <span class="keyword">const</span> [sepaPaymentData, setSepaPaymentData] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   29</span>  <span class="keyword">const</span> [paymentInfo, setPaymentInfo] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   30</span>  </div>
+<div class="line"><span class="lineno">   31</span>  <span class="comment">// Pending payment confirmation state</span></div>
+<div class="line"><span class="lineno">   32</span>  <span class="keyword">const</span> [pendingPayment, setPendingPayment] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   33</span>  <span class="keyword">const</span> [showPendingConfirmation, setShowPendingConfirmation] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   34</span>  <span class="keyword">const</span> [activeQR, setActiveQR] = useState(<span class="stringliteral">&#39;paypal&#39;</span>);</div>
+<div class="line"><span class="lineno">   35</span>  <span class="keyword">const</span> [showQR, setShowQR] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   36</span>  <span class="keyword">const</span> [showDemoInfo, setShowDemoInfo] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   37</span>  <span class="keyword">const</span> fromMember = group?.members?.find(m =&gt; m.userId === settlement?.from);</div>
+<div class="line"><span class="lineno">   38</span>  <span class="keyword">const</span> toMember = group?.members?.find(m =&gt; m.userId === settlement?.to);</div>
+<div class="line"><span class="lineno">   39</span>  <span class="keyword">const</span> userIsPaying = currentUserId === settlement?.from;</div>
+<div class="line"><span class="lineno">   40</span>  <span class="keyword">const</span> userIsReceiving = currentUserId === settlement?.to;</div>
+<div class="line"><span class="lineno">   41</span> </div>
+<div class="line"><span class="lineno">   42</span>  <span class="comment">// Merge reset + pending-check into a single effect so the reset never</span></div>
+<div class="line"><span class="lineno">   43</span>  <span class="comment">// overrides the pending-check result (previous bug: two separate effects</span></div>
+<div class="line"><span class="lineno">   44</span>  <span class="comment">// on [isOpen] ran in definition order, reset was second and cleared</span></div>
+<div class="line"><span class="lineno">   45</span>  <span class="comment">// showPendingConfirmation that the check had just set to true).</span></div>
+<div class="line"><span class="lineno">   46</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">if</span> (!isOpen) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   48</span> </div>
+<div class="line"><span class="lineno">   49</span>    <span class="comment">// Step 1: Reset all transient UI state</span></div>
+<div class="line"><span class="lineno">   50</span>    setPaymentSuccess(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   51</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   52</span>    setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   53</span>    setShowConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   54</span>    setCopiedIban(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   55</span>    setAmount(settlement?.amount?.toFixed(2) || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   56</span> </div>
+<div class="line"><span class="lineno">   57</span>    <span class="comment">// Step 2: Listen to Firestore for a pending payment for this exact settlement pair.</span></div>
+<div class="line"><span class="lineno">   58</span>    <span class="comment">// Firestore persists across sessions and devices unlike sessionStorage.</span></div>
+<div class="line"><span class="lineno">   59</span>    <span class="keywordflow">if</span> (!group?.<span class="keywordtype">id</span> || !settlement?.from || !settlement?.to) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>    <span class="keyword">const</span> pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;</div>
+<div class="line"><span class="lineno">   62</span>    <span class="keyword">const</span> pendingDocRef = <a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;pendingPayments&#39;</span>, pendingDocId);</div>
+<div class="line"><span class="lineno">   63</span> </div>
+<div class="line"><span class="lineno">   64</span>    <span class="keyword">const</span> unsubscribe = <a class="code hl_variable" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a>(pendingDocRef, (snap) =&gt; {</div>
+<div class="line"><span class="lineno">   65</span>      <span class="keywordflow">if</span> (snap.exists()) {</div>
+<div class="line"><span class="lineno">   66</span>        <span class="keyword">const</span> paymentData = snap.data();</div>
+<div class="line"><span class="lineno">   67</span>        setPendingPayment(paymentData);</div>
+<div class="line"><span class="lineno">   68</span>        setShowPendingConfirmation(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   69</span>        sessionStorage.setItem(<span class="stringliteral">&#39;pendingPayment&#39;</span>, JSON.stringify(paymentData));</div>
+<div class="line"><span class="lineno">   70</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   71</span>        setPendingPayment(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   72</span>        setShowPendingConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   73</span>        sessionStorage.removeItem(<span class="stringliteral">&#39;pendingPayment&#39;</span>);</div>
+<div class="line"><span class="lineno">   74</span>      }</div>
+<div class="line"><span class="lineno">   75</span>    });</div>
+<div class="line"><span class="lineno">   76</span> </div>
+<div class="line"><span class="lineno">   77</span>    <span class="keywordflow">return</span> () =&gt; { <span class="keywordflow">if</span> (typeof unsubscribe === <span class="stringliteral">&#39;function&#39;</span>) unsubscribe(); };</div>
+<div class="line"><span class="lineno">   78</span>  }, [isOpen, group?.id, settlement?.from, settlement?.to, settlement?.amount]);</div>
+<div class="line"><span class="lineno">   79</span> </div>
+<div class="line"><span class="lineno">   80</span>  <span class="comment">// Fetch recipient&#39;s payment methods</span></div>
+<div class="line"><span class="lineno">   81</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   82</span>    <span class="keyword">const</span> fetchRecipientPaymentMethods = async () =&gt; {</div>
+<div class="line"><span class="lineno">   83</span>      <span class="keywordflow">if</span> (!settlement || !settlement.to) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   84</span>      </div>
+<div class="line"><span class="lineno">   85</span>      setLoadingPaymentMethods(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   86</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   87</span>        <span class="keyword">const</span> recipientDoc = await <a class="code hl_variable" href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;users&#39;</span>, settlement.to));</div>
+<div class="line"><span class="lineno">   88</span>        <span class="keywordflow">if</span> (recipientDoc.exists()) {</div>
+<div class="line"><span class="lineno">   89</span>          <span class="keyword">const</span> data = recipientDoc.data();</div>
+<div class="line"><span class="lineno">   90</span>          setRecipientPaymentMethods(data.paymentMethods || <span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   91</span>        }</div>
+<div class="line"><span class="lineno">   92</span>      } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line"><span class="lineno">   93</span>        console.error(<span class="stringliteral">&#39;Error fetching payment methods:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">   94</span>      } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">   95</span>        setLoadingPaymentMethods(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   96</span>      }</div>
+<div class="line"><span class="lineno">   97</span>    };</div>
+<div class="line"><span class="lineno">   98</span> </div>
+<div class="line"><span class="lineno">   99</span>    <span class="keywordflow">if</span> (isOpen) {</div>
+<div class="line"><span class="lineno">  100</span>      fetchRecipientPaymentMethods();</div>
+<div class="line"><span class="lineno">  101</span>    }</div>
+<div class="line"><span class="lineno">  102</span>  }, [settlement, isOpen]);</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>  <span class="keyword">const</span> recordSettlement = async (paypalOrderId = <span class="keyword">null</span>) =&gt; {</div>
+<div class="line"><span class="lineno">  105</span>    <span class="keyword">const</span> amountNum = parseFloat(amount);</div>
+<div class="line"><span class="lineno">  106</span> </div>
+<div class="line"><span class="lineno">  107</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  108</span>      <span class="keyword">const</span> settlementData = {</div>
+<div class="line"><span class="lineno">  109</span>        groupId: group.id,</div>
+<div class="line"><span class="lineno">  110</span>        title: `Settlement: ${fromMember?.name} → ${toMember?.name}`,</div>
+<div class="line"><span class="lineno">  111</span>        amount: amountNum,</div>
+<div class="line"><span class="lineno">  112</span>        currency: group.currency,</div>
+<div class="line"><span class="lineno">  113</span>        paidBy: settlement.from,</div>
+<div class="line"><span class="lineno">  114</span>        category: <span class="stringliteral">&#39;settlement&#39;</span>,</div>
+<div class="line"><span class="lineno">  115</span>        description: paypalOrderId </div>
+<div class="line"><span class="lineno">  116</span>          ? `PayPal Payment (Order: ${paypalOrderId})`</div>
+<div class="line"><span class="lineno">  117</span>          : `Manual payment ${userIsReceiving ? <span class="stringliteral">&#39;received&#39;</span> : <span class="stringliteral">&#39;sent&#39;</span>}`,</div>
+<div class="line"><span class="lineno">  118</span>        date: new Date(),</div>
+<div class="line"><span class="lineno">  119</span>        splitMethod: <span class="stringliteral">&#39;exact&#39;</span>,</div>
+<div class="line"><span class="lineno">  120</span>        splits: {</div>
+<div class="line"><span class="lineno">  121</span>          [settlement.to]: amountNum,</div>
+<div class="line"><span class="lineno">  122</span>        },</div>
+<div class="line"><span class="lineno">  123</span>        participants: [settlement.from, settlement.to],</div>
+<div class="line"><span class="lineno">  124</span>        createdAt: <a class="code hl_variable" href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a>(),</div>
+<div class="line"><span class="lineno">  125</span>        isSettlement: <span class="keyword">true</span>,</div>
+<div class="line"><span class="lineno">  126</span>        paymentMethod: paypalOrderId ? <span class="stringliteral">&#39;paypal&#39;</span> : <span class="stringliteral">&#39;manual&#39;</span>,</div>
+<div class="line"><span class="lineno">  127</span>        paypalOrderId: paypalOrderId || <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">  128</span>        recordedBy: currentUserId,</div>
+<div class="line"><span class="lineno">  129</span>      };</div>
+<div class="line"><span class="lineno">  130</span> </div>
+<div class="line"><span class="lineno">  131</span>      await <a class="code hl_variable" href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">addDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>), settlementData);</div>
+<div class="line"><span class="lineno">  132</span> </div>
+<div class="line"><span class="lineno">  133</span>      <span class="comment">// Notify the OTHER person (not the one who recorded it)</span></div>
+<div class="line"><span class="lineno">  134</span>      <span class="keywordflow">if</span> (userIsReceiving) {</div>
+<div class="line"><span class="lineno">  135</span>        <span class="comment">// Receiver marked as received - notify the payer</span></div>
+<div class="line"><span class="lineno">  136</span>        await <a class="code hl_variable" href="notifications_store_8js.html#a22f128f9a7c7f3837e9acb70e57033b4">createNotification</a>({</div>
+<div class="line"><span class="lineno">  137</span>          userId: settlement.from,</div>
+<div class="line"><span class="lineno">  138</span>          type: <span class="stringliteral">&#39;payment&#39;</span>,</div>
+<div class="line"><span class="lineno">  139</span>          title: <span class="stringliteral">&#39;Payment Confirmed&#39;</span>,</div>
+<div class="line"><span class="lineno">  140</span>          message: `${toMember?.name} confirmed receiving ${group.currency} ${amountNum.toFixed(2)} from you in ${group.name}`,</div>
+<div class="line"><span class="lineno">  141</span>          data: {</div>
+<div class="line"><span class="lineno">  142</span>            groupId: group.id,</div>
+<div class="line"><span class="lineno">  143</span>            amount: amountNum,</div>
+<div class="line"><span class="lineno">  144</span>            currency: group.currency,</div>
+<div class="line"><span class="lineno">  145</span>            toUserId: settlement.to,</div>
+<div class="line"><span class="lineno">  146</span>            toName: toMember?.name,</div>
+<div class="line"><span class="lineno">  147</span>          },</div>
+<div class="line"><span class="lineno">  148</span>        });</div>
+<div class="line"><span class="lineno">  149</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  150</span>        <span class="comment">// Payer marked as sent - notify the receiver</span></div>
+<div class="line"><span class="lineno">  151</span>        await <a class="code hl_variable" href="notifications_store_8js.html#a22f128f9a7c7f3837e9acb70e57033b4">createNotification</a>({</div>
+<div class="line"><span class="lineno">  152</span>          userId: settlement.to,</div>
+<div class="line"><span class="lineno">  153</span>          type: <span class="stringliteral">&#39;payment&#39;</span>,</div>
+<div class="line"><span class="lineno">  154</span>          title: <span class="stringliteral">&#39;Payment Received&#39;</span>,</div>
+<div class="line"><span class="lineno">  155</span>          message: `${fromMember?.name} paid you ${group.currency} ${amountNum.toFixed(2)} in ${group.name}`,</div>
+<div class="line"><span class="lineno">  156</span>          data: {</div>
+<div class="line"><span class="lineno">  157</span>            groupId: group.id,</div>
+<div class="line"><span class="lineno">  158</span>            amount: amountNum,</div>
+<div class="line"><span class="lineno">  159</span>            currency: group.currency,</div>
+<div class="line"><span class="lineno">  160</span>            fromUserId: settlement.from,</div>
+<div class="line"><span class="lineno">  161</span>            fromName: fromMember?.name,</div>
+<div class="line"><span class="lineno">  162</span>          },</div>
+<div class="line"><span class="lineno">  163</span>        });</div>
+<div class="line"><span class="lineno">  164</span>      }</div>
+<div class="line"><span class="lineno">  165</span> </div>
+<div class="line"><span class="lineno">  166</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  167</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  168</span>      console.error(<span class="stringliteral">&#39;Error recording settlement:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  169</span>      <span class="keywordflow">throw</span> err;</div>
+<div class="line"><span class="lineno">  170</span>    }</div>
+<div class="line"><span class="lineno">  171</span>  };</div>
+<div class="line"><span class="lineno">  172</span> </div>
+<div class="line"><span class="lineno">  173</span>  <span class="comment">// Handle &quot;Mark as Paid&quot; for pending payment</span></div>
+<div class="line"><span class="lineno">  174</span>  <span class="comment">// Handle &quot;Mark as Paid&quot; for pending payment.</span></div>
+<div class="line"><span class="lineno">  175</span>  <span class="comment">// Uses recordPaymentSent which writes to the existing notifications collection only —</span></div>
+<div class="line"><span class="lineno">  176</span>  <span class="comment">// no new Firestore collection, no additional security rules required.</span></div>
+<div class="line"><span class="lineno">  177</span>  <span class="keyword">const</span> handleMarkAsPaid = async () =&gt; {</div>
+<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">if</span> (!pendingPayment) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  179</span> </div>
+<div class="line"><span class="lineno">  180</span>    setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  181</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  182</span> </div>
+<div class="line"><span class="lineno">  183</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  184</span>      await <a class="code hl_variable" href="notifications_store_8js.html#a03feee26a762e32858554cd57d547031">recordPaymentSent</a>({</div>
+<div class="line"><span class="lineno">  185</span>        payerId: settlement.from,</div>
+<div class="line"><span class="lineno">  186</span>        payerName: fromMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span>,</div>
+<div class="line"><span class="lineno">  187</span>        payeeId: settlement.to,</div>
+<div class="line"><span class="lineno">  188</span>        payeeName: toMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span>,</div>
+<div class="line"><span class="lineno">  189</span>        groupId: group.id,</div>
+<div class="line"><span class="lineno">  190</span>        groupName: group.name,</div>
+<div class="line"><span class="lineno">  191</span>        amount: pendingPayment.amount,</div>
+<div class="line"><span class="lineno">  192</span>        currency: pendingPayment.currency,</div>
+<div class="line"><span class="lineno">  193</span>        method: pendingPayment.method,</div>
+<div class="line"><span class="lineno">  194</span>      });</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>      <span class="comment">// Delete from Firestore so all devices and sessions are unblocked</span></div>
+<div class="line"><span class="lineno">  197</span>      <span class="keyword">const</span> pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;</div>
+<div class="line"><span class="lineno">  198</span>      await <a class="code hl_variable" href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;pendingPayments&#39;</span>, pendingDocId)).catch(() =&gt; {});</div>
+<div class="line"><span class="lineno">  199</span>      sessionStorage.removeItem(<span class="stringliteral">&#39;pendingPayment&#39;</span>);</div>
+<div class="line"><span class="lineno">  200</span>      setPendingPayment(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  201</span>      setShowPendingConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  202</span>      setPaymentSuccess(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  203</span> </div>
+<div class="line"><span class="lineno">  204</span>      setTimeout(() =&gt; { onClose(); }, 2500);</div>
+<div class="line"><span class="lineno">  205</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  206</span>      console.error(<span class="stringliteral">&#39;Error marking as paid:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  207</span>      <span class="comment">// Show the actual error message so it is debuggable</span></div>
+<div class="line"><span class="lineno">  208</span>      setError(</div>
+<div class="line"><span class="lineno">  209</span>        err?.code === <span class="stringliteral">&#39;permission-denied&#39;</span></div>
+<div class="line"><span class="lineno">  210</span>          ? <span class="stringliteral">&#39;Permission denied. Please ensure you are signed in and try again.&#39;</span></div>
+<div class="line"><span class="lineno">  211</span>          : `Failed to record payment: ${err?.message || <span class="stringliteral">&#39;Please try again.&#39;</span>}`</div>
+<div class="line"><span class="lineno">  212</span>      );</div>
+<div class="line"><span class="lineno">  213</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  214</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  215</span>    }</div>
+<div class="line"><span class="lineno">  216</span>  };</div>
+<div class="line"><span class="lineno">  217</span> </div>
+<div class="line"><span class="lineno">  218</span>  <span class="comment">// Handle &quot;Not Yet&quot; for pending payment</span></div>
+<div class="line"><span class="lineno">  219</span>  <span class="keyword">const</span> handleNotYet = () =&gt; {</div>
+<div class="line"><span class="lineno">  220</span>    <span class="comment">// Keep pending payment in sessionStorage for later</span></div>
+<div class="line"><span class="lineno">  221</span>    setShowPendingConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  222</span>    setPendingPayment(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  223</span>  };</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>  <span class="keyword">const</span> handleManualSettle = async (e) =&gt; {</div>
+<div class="line"><span class="lineno">  226</span>    e.preventDefault();</div>
+<div class="line"><span class="lineno">  227</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  228</span> </div>
+<div class="line"><span class="lineno">  229</span>    <span class="keyword">const</span> amountNum = parseFloat(amount);</div>
+<div class="line"><span class="lineno">  230</span>    <span class="keywordflow">if</span> (!amountNum || amountNum &lt;= 0) {</div>
+<div class="line"><span class="lineno">  231</span>      setError(<span class="stringliteral">&#39;Valid amount is required&#39;</span>);</div>
+<div class="line"><span class="lineno">  232</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  233</span>    }</div>
+<div class="line"><span class="lineno">  234</span> </div>
+<div class="line"><span class="lineno">  235</span>    <span class="keywordflow">if</span> (userIsReceiving &amp;&amp; !showConfirmation) {</div>
+<div class="line"><span class="lineno">  236</span>      setShowConfirmation(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  237</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  238</span>    }</div>
+<div class="line"><span class="lineno">  239</span> </div>
+<div class="line"><span class="lineno">  240</span>    <span class="comment">// Set loading BEFORE biometric check</span></div>
+<div class="line"><span class="lineno">  241</span>    setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  242</span> </div>
+<div class="line"><span class="lineno">  243</span>    <span class="keywordflow">if</span> (userIsReceiving &amp;&amp; showConfirmation) {</div>
+<div class="line"><span class="lineno">  244</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  245</span>        <span class="keyword">const</span> authenticated = await <a class="code hl_variable" href="biometric_8js.html#aea5b1b5dac6efcdbd3faec1b48249ad3">authenticateWithBiometric</a>(</div>
+<div class="line"><span class="lineno">  246</span>          currentUserId,</div>
+<div class="line"><span class="lineno">  247</span>          <span class="stringliteral">&#39;Authenticate to confirm receipt&#39;</span></div>
+<div class="line"><span class="lineno">  248</span>        );</div>
+<div class="line"><span class="lineno">  249</span>        </div>
+<div class="line"><span class="lineno">  250</span>        <span class="keywordflow">if</span> (!authenticated) {</div>
+<div class="line"><span class="lineno">  251</span>          setError(<span class="stringliteral">&#39;Biometric authentication was cancelled or failed. Please try again or Enable biometric authentication in Settings.&#39;</span>);</div>
+<div class="line"><span class="lineno">  252</span>          setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  253</span>          setShowConfirmation(<span class="keyword">false</span>); <span class="comment">// Reset confirmation state</span></div>
+<div class="line"><span class="lineno">  254</span>          <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  255</span>        }</div>
+<div class="line"><span class="lineno">  256</span>      } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  257</span>        console.error(<span class="stringliteral">&#39;Biometric error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  258</span>        setError(<span class="stringliteral">&#39;Authentication failed. Please enable biometric authentication in Settings or try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  259</span>        setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  260</span>        setShowConfirmation(<span class="keyword">false</span>); <span class="comment">// Reset confirmation state</span></div>
+<div class="line"><span class="lineno">  261</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  262</span>      }</div>
+<div class="line"><span class="lineno">  263</span>    }</div>
+<div class="line"><span class="lineno">  264</span> </div>
+<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  266</span>      await recordSettlement();</div>
+<div class="line"><span class="lineno">  267</span>      setPaymentSuccess(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  268</span>      setTimeout(() =&gt; {</div>
+<div class="line"><span class="lineno">  269</span>        onClose();</div>
+<div class="line"><span class="lineno">  270</span>        setShowConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  271</span>      }, 2500);</div>
+<div class="line"><span class="lineno">  272</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  273</span>      setError(<span class="stringliteral">&#39;Failed to record settlement. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  274</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  275</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  276</span>    }</div>
+<div class="line"><span class="lineno">  277</span>  };</div>
+<div class="line"><span class="lineno">  278</span> </div>
+<div class="line"><span class="lineno">  279</span>  <span class="keyword">const</span> handleSepaPayment = () =&gt; {</div>
+<div class="line"><span class="lineno">  280</span>    <span class="keyword">const</span> paymentData = {</div>
+<div class="line"><span class="lineno">  281</span>      amount: parseFloat(amount),</div>
+<div class="line"><span class="lineno">  282</span>      fromUser: {</div>
+<div class="line"><span class="lineno">  283</span>        id: settlement.from,</div>
+<div class="line"><span class="lineno">  284</span>        name: fromMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span></div>
+<div class="line"><span class="lineno">  285</span>      },</div>
+<div class="line"><span class="lineno">  286</span>      toUser: {</div>
+<div class="line"><span class="lineno">  287</span>        id: settlement.to,</div>
+<div class="line"><span class="lineno">  288</span>        name: toMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span></div>
+<div class="line"><span class="lineno">  289</span>      },</div>
+<div class="line"><span class="lineno">  290</span>      fromUserPaymentMethods: <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">  291</span>      toUserPaymentMethods: recipientPaymentMethods,</div>
+<div class="line"><span class="lineno">  292</span>      groupName: group.name,</div>
+<div class="line"><span class="lineno">  293</span>      groupId: group.id</div>
+<div class="line"><span class="lineno">  294</span>    };</div>
+<div class="line"><span class="lineno">  295</span>    </div>
+<div class="line"><span class="lineno">  296</span>    setSepaPaymentData(paymentData);</div>
+<div class="line"><span class="lineno">  297</span>    setShowSepaModal(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  298</span>  };</div>
+<div class="line"><span class="lineno">  299</span> </div>
+<div class="line"><span class="lineno">  300</span>  <span class="comment">// Handle SEPA payment success.</span></div>
+<div class="line"><span class="lineno">  301</span>  <span class="comment">// Previously wrote the expense directly, bypassing recordPaymentSent — the payee</span></div>
+<div class="line"><span class="lineno">  302</span>  <span class="comment">// received no notification and the balance updated without their confirmation.</span></div>
+<div class="line"><span class="lineno">  303</span>  <span class="comment">// Now uses the same confirmation flow as PayPal and Revolut: recordPaymentSent</span></div>
+<div class="line"><span class="lineno">  304</span>  <span class="comment">// sends the payee a payment_confirmation_needed notification. The expense (and</span></div>
+<div class="line"><span class="lineno">  305</span>  <span class="comment">// balance update) only happens after the payee confirms receipt.</span></div>
+<div class="line"><span class="lineno">  306</span>  <span class="keyword">const</span> handleSepaPaymentSuccess = async (paymentResult) =&gt; {</div>
+<div class="line"><span class="lineno">  307</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  308</span>      await <a class="code hl_variable" href="notifications_store_8js.html#a03feee26a762e32858554cd57d547031">recordPaymentSent</a>({</div>
+<div class="line"><span class="lineno">  309</span>        payerId: settlement.from,</div>
+<div class="line"><span class="lineno">  310</span>        payerName: fromMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span>,</div>
+<div class="line"><span class="lineno">  311</span>        payeeId: settlement.to,</div>
+<div class="line"><span class="lineno">  312</span>        payeeName: toMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span>,</div>
+<div class="line"><span class="lineno">  313</span>        groupId: group.id,</div>
+<div class="line"><span class="lineno">  314</span>        groupName: group.name,</div>
+<div class="line"><span class="lineno">  315</span>        amount: paymentResult.amount,</div>
+<div class="line"><span class="lineno">  316</span>        currency: group.currency,</div>
+<div class="line"><span class="lineno">  317</span>        method: <span class="stringliteral">&#39;sepa&#39;</span>,</div>
+<div class="line"><span class="lineno">  318</span>      });</div>
+<div class="line"><span class="lineno">  319</span> </div>
+<div class="line"><span class="lineno">  320</span>      setPaymentSuccess(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  321</span>      setShowSepaModal(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  322</span> </div>
+<div class="line"><span class="lineno">  323</span>      setTimeout(() =&gt; {</div>
+<div class="line"><span class="lineno">  324</span>        onClose();</div>
+<div class="line"><span class="lineno">  325</span>      }, 2500);</div>
+<div class="line"><span class="lineno">  326</span> </div>
+<div class="line"><span class="lineno">  327</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  328</span>      console.error(<span class="stringliteral">&#39;Error recording SEPA settlement:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  329</span>      setError(</div>
+<div class="line"><span class="lineno">  330</span>        err?.code === <span class="stringliteral">&#39;permission-denied&#39;</span></div>
+<div class="line"><span class="lineno">  331</span>          ? <span class="stringliteral">&#39;Permission denied. Ensure you are signed in and try again.&#39;</span></div>
+<div class="line"><span class="lineno">  332</span>          : <span class="stringliteral">&#39;Payment processed but notification failed to send. Please contact support.&#39;</span></div>
+<div class="line"><span class="lineno">  333</span>      );</div>
+<div class="line"><span class="lineno">  334</span>    }</div>
+<div class="line"><span class="lineno">  335</span>  };</div>
+<div class="line"><span class="lineno">  336</span> </div>
+<div class="line"><span class="lineno">  337</span>  <span class="comment">// Save to sessionStorage before opening payment link</span></div>
+<div class="line"><span class="lineno">  338</span>  <span class="keyword">const</span> handlePaymentLinkClick = (method) =&gt; {</div>
+<div class="line"><span class="lineno">  339</span>    <span class="keyword">const</span> amountNum = parseFloat(amount);</div>
+<div class="line"><span class="lineno">  340</span>    </div>
+<div class="line"><span class="lineno">  341</span>    <span class="comment">// Save pending payment data</span></div>
+<div class="line"><span class="lineno">  342</span>    <span class="keyword">const</span> pendingPaymentData = {</div>
+<div class="line"><span class="lineno">  343</span>      groupId: group.id,</div>
+<div class="line"><span class="lineno">  344</span>      fromUserId: settlement.from,</div>
+<div class="line"><span class="lineno">  345</span>      toUserId: settlement.to,</div>
+<div class="line"><span class="lineno">  346</span>      fromName: fromMember?.name,</div>
+<div class="line"><span class="lineno">  347</span>      toName: toMember?.name,</div>
+<div class="line"><span class="lineno">  348</span>      amount: amountNum,</div>
+<div class="line"><span class="lineno">  349</span>      currency: group.currency,</div>
+<div class="line"><span class="lineno">  350</span>      method: method.id === <span class="stringliteral">&#39;paypal&#39;</span> || method.id === <span class="stringliteral">&#39;paypal-link&#39;</span> ? <span class="stringliteral">&#39;paypal&#39;</span> :</div>
+<div class="line"><span class="lineno">  351</span>              method.id === <span class="stringliteral">&#39;revolut&#39;</span> ? <span class="stringliteral">&#39;revolut&#39;</span> :</div>
+<div class="line"><span class="lineno">  352</span>              method.id === <span class="stringliteral">&#39;bank&#39;</span> ? <span class="stringliteral">&#39;bank&#39;</span> : <span class="stringliteral">&#39;manual&#39;</span>,</div>
+<div class="line"><span class="lineno">  353</span>      timestamp: Date.now(),</div>
+<div class="line"><span class="lineno">  354</span>    };</div>
+<div class="line"><span class="lineno">  355</span> </div>
+<div class="line"><span class="lineno">  356</span>    <span class="comment">// Save to Firestore for cross-device persistence</span></div>
+<div class="line"><span class="lineno">  357</span>    <span class="keyword">const</span> pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;</div>
+<div class="line"><span class="lineno">  358</span>    <a class="code hl_variable" href="firebase_firestore_8js.html#a25227b48ae4d1c4fbf781b9ccd4c8c17">setDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;pendingPayments&#39;</span>, pendingDocId), {</div>
+<div class="line"><span class="lineno">  359</span>      ...pendingPaymentData,</div>
+<div class="line"><span class="lineno">  360</span>      createdAt: <span class="keyword">new</span> Date(),</div>
+<div class="line"><span class="lineno">  361</span>    }).<span class="keywordflow">catch</span>(err =&gt; console.error(<span class="stringliteral">&#39;Failed to save pending payment:&#39;</span>, err));</div>
+<div class="line"><span class="lineno">  362</span> </div>
+<div class="line"><span class="lineno">  363</span>    <span class="comment">// Keep sessionStorage in sync for same-session GroupDetails banner</span></div>
+<div class="line"><span class="lineno">  364</span>    sessionStorage.setItem(<span class="stringliteral">&#39;pendingPayment&#39;</span>, JSON.stringify(pendingPaymentData));</div>
+<div class="line"><span class="lineno">  365</span>    </div>
+<div class="line"><span class="lineno">  366</span>    <span class="keywordflow">if</span> (method.id === <span class="stringliteral">&#39;paypal&#39;</span> || method.id === <span class="stringliteral">&#39;paypal-link&#39;</span>) {</div>
+<div class="line"><span class="lineno">  367</span>      setPaymentInfo({</div>
+<div class="line"><span class="lineno">  368</span>        method: <span class="stringliteral">&#39;paypal&#39;</span>,</div>
+<div class="line"><span class="lineno">  369</span>        amount: amountNum,</div>
+<div class="line"><span class="lineno">  370</span>        currency: group.currency,</div>
+<div class="line"><span class="lineno">  371</span>        username: method.username,</div>
+<div class="line"><span class="lineno">  372</span>        onProceed: () =&gt; {</div>
+<div class="line"><span class="lineno">  373</span>        <span class="comment">// Copy amount to clipboard so user can paste it in the payment app</span></div>
+<div class="line"><span class="lineno">  374</span>        navigator.clipboard?.writeText(amountNum.toFixed(2)).catch(() =&gt; {});</div>
+<div class="line"><span class="lineno">  375</span>        <span class="keyword">const</span> link = <a class="code hl_variable" href="payment_links_8js.html#a6be2e69edf491ad7211f013ed5cce31f">generatePayPalLink</a>(method.username, amountNum, group.currency);</div>
+<div class="line"><span class="lineno">  376</span>        window.open(link, <span class="stringliteral">&#39;_blank&#39;</span>);</div>
+<div class="line"><span class="lineno">  377</span>        setShowPaymentInfo(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  378</span>        onClose();</div>
+<div class="line"><span class="lineno">  379</span>      }</div>
+<div class="line"><span class="lineno">  380</span>      });</div>
+<div class="line"><span class="lineno">  381</span>      setShowPaymentInfo(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  382</span>      </div>
+<div class="line"><span class="lineno">  383</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (method.id === <span class="stringliteral">&#39;revolut&#39;</span>) {</div>
+<div class="line"><span class="lineno">  384</span>      setPaymentInfo({</div>
+<div class="line"><span class="lineno">  385</span>        method: <span class="stringliteral">&#39;revolut&#39;</span>,</div>
+<div class="line"><span class="lineno">  386</span>        amount: amountNum,</div>
+<div class="line"><span class="lineno">  387</span>        currency: group.currency,</div>
+<div class="line"><span class="lineno">  388</span>        username: method.username,</div>
+<div class="line"><span class="lineno">  389</span>        onProceed: () =&gt; {</div>
+<div class="line"><span class="lineno">  390</span>        <span class="comment">// Copy amount to clipboard so user can paste it in the payment app</span></div>
+<div class="line"><span class="lineno">  391</span>        navigator.clipboard?.writeText(amountNum.toFixed(2)).catch(() =&gt; {});</div>
+<div class="line"><span class="lineno">  392</span>        <span class="keyword">const</span> link = <a class="code hl_variable" href="payment_links_8js.html#abba97eab07419c7c6f0050724ed7c07b">generateRevolutLink</a>(method.username, amountNum, group.currency);</div>
+<div class="line"><span class="lineno">  393</span>        window.open(link, <span class="stringliteral">&#39;_blank&#39;</span>);</div>
+<div class="line"><span class="lineno">  394</span>        setShowPaymentInfo(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  395</span>        onClose();</div>
+<div class="line"><span class="lineno">  396</span>      }</div>
+<div class="line"><span class="lineno">  397</span>      });</div>
+<div class="line"><span class="lineno">  398</span>      setShowPaymentInfo(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  399</span>      </div>
+<div class="line"><span class="lineno">  400</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (method.id === <span class="stringliteral">&#39;bank&#39;</span>) {</div>
+<div class="line"><span class="lineno">  401</span>      <span class="comment">// Shows inline bank details - user copies IBAN and makes transfer</span></div>
+<div class="line"><span class="lineno">  402</span>      setSelectedPaymentLink(method);</div>
+<div class="line"><span class="lineno">  403</span>    }</div>
+<div class="line"><span class="lineno">  404</span>  };</div>
+<div class="line"><span class="lineno">  405</span> </div>
+<div class="line"><span class="lineno">  406</span>  <span class="keyword">const</span> createPayPalOrder = (data, actions) =&gt; {</div>
+<div class="line"><span class="lineno">  407</span>    <span class="keyword">const</span> amountNum = parseFloat(amount);</div>
+<div class="line"><span class="lineno">  408</span>    <span class="keywordflow">if</span> (!amountNum || amountNum &lt;= 0) {</div>
+<div class="line"><span class="lineno">  409</span>      setError(<span class="stringliteral">&#39;Please enter a valid amount&#39;</span>);</div>
+<div class="line"><span class="lineno">  410</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  411</span>    }</div>
+<div class="line"><span class="lineno">  412</span> </div>
+<div class="line"><span class="lineno">  413</span>    <span class="keywordflow">return</span> actions.order.create({</div>
+<div class="line"><span class="lineno">  414</span>      purchase_units: [</div>
+<div class="line"><span class="lineno">  415</span>        {</div>
+<div class="line"><span class="lineno">  416</span>          description: `Settlement: ${fromMember?.name} pays ${toMember?.name}`,</div>
+<div class="line"><span class="lineno">  417</span>          amount: {</div>
+<div class="line"><span class="lineno">  418</span>            currency_code: group.currency || <span class="stringliteral">&#39;EUR&#39;</span>,</div>
+<div class="line"><span class="lineno">  419</span>            value: amountNum.toFixed(2),</div>
+<div class="line"><span class="lineno">  420</span>          },</div>
+<div class="line"><span class="lineno">  421</span>          payee: {</div>
+<div class="line"><span class="lineno">  422</span>            email_address: toMember?.email || <span class="stringliteral">&#39;receiver@example.com&#39;</span>,</div>
+<div class="line"><span class="lineno">  423</span>          },</div>
+<div class="line"><span class="lineno">  424</span>        },</div>
+<div class="line"><span class="lineno">  425</span>      ],</div>
+<div class="line"><span class="lineno">  426</span>      application_context: {</div>
+<div class="line"><span class="lineno">  427</span>        shipping_preference: <span class="stringliteral">&#39;NO_SHIPPING&#39;</span>,</div>
+<div class="line"><span class="lineno">  428</span>      },</div>
+<div class="line"><span class="lineno">  429</span>    });</div>
+<div class="line"><span class="lineno">  430</span>  };</div>
+<div class="line"><span class="lineno">  431</span> </div>
+<div class="line"><span class="lineno">  432</span>  <span class="keyword">const</span> onPayPalApprove = async (data, actions) =&gt; {</div>
+<div class="line"><span class="lineno">  433</span>    setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  434</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  435</span> </div>
+<div class="line"><span class="lineno">  436</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  437</span>      <span class="keyword">const</span> details = await actions.order.capture();</div>
+<div class="line"><span class="lineno">  438</span>      </div>
+<div class="line"><span class="lineno">  439</span>      await recordSettlement(details.id);</div>
+<div class="line"><span class="lineno">  440</span>      setPaymentSuccess(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  441</span>      setTimeout(() =&gt; onClose(), 2500);</div>
+<div class="line"><span class="lineno">  442</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  443</span>      console.error(<span class="stringliteral">&#39;PayPal error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  444</span>      setError(<span class="stringliteral">&#39;Payment failed. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  445</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  446</span>    }</div>
+<div class="line"><span class="lineno">  447</span>  };</div>
+<div class="line"><span class="lineno">  448</span> </div>
+<div class="line"><span class="lineno">  449</span>  <span class="keyword">const</span> onPayPalError = (err) =&gt; {</div>
+<div class="line"><span class="lineno">  450</span>    console.error(<span class="stringliteral">&#39;PayPal error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  451</span>    setError(<span class="stringliteral">&#39;Payment initialization failed. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  452</span>  };</div>
+<div class="line"><span class="lineno">  453</span> </div>
+<div class="line"><span class="lineno">  454</span>  <span class="keywordflow">if</span> (!isOpen) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">  455</span> </div>
+<div class="line"><span class="lineno">  456</span>  <span class="comment">// Pending payment confirmation dialog</span></div>
+<div class="line"><span class="lineno">  457</span>  <span class="keywordflow">if</span> (showPendingConfirmation &amp;&amp; pendingPayment) {</div>
+<div class="line"><span class="lineno">  458</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  459</span>      &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  460</span>        &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  461</span>          &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  462</span>            &lt;h2 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  463</span>              Did you complete the payment?</div>
+<div class="line"><span class="lineno">  464</span>            &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  465</span>            &lt;button</div>
+<div class="line"><span class="lineno">  466</span>              onClick={() =&gt; {</div>
+<div class="line"><span class="lineno">  467</span>                setShowPendingConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  468</span>                setPendingPayment(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  469</span>              }}</div>
+<div class="line"><span class="lineno">  470</span>              className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  471</span>            &gt;</div>
+<div class="line"><span class="lineno">  472</span>              &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">  473</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  474</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  475</span> </div>
+<div class="line"><span class="lineno">  476</span>          &lt;div className=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  477</span>            &lt;div className=<span class="stringliteral">&quot;flex items-start gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  478</span>              &lt;Info size={20} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  479</span>              &lt;div className=<span class="stringliteral">&quot;text-sm text-blue-900 dark:text-blue-200&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  480</span>                &lt;p className=<span class="stringliteral">&quot;font-medium mb-2&quot;</span>&gt;Payment Summary&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  481</span>                &lt;div className=<span class="stringliteral">&quot;space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  482</span>                  &lt;p&gt;&lt;strong&gt;Amount:&lt;/strong&gt; {pendingPayment.currency} {pendingPayment.amount.toFixed(2)}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  483</span>                  &lt;p&gt;&lt;strong&gt;To:&lt;/strong&gt; {pendingPayment.toName}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  484</span>                  &lt;p&gt;&lt;strong&gt;Method:&lt;/strong&gt; {pendingPayment.method.toUpperCase()}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  485</span>                  &lt;p className=<span class="stringliteral">&quot;text-xs text-blue-700 dark:text-blue-300 mt-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  486</span>                    {<span class="keyword">new</span> Date(pendingPayment.timestamp).toLocaleString()}</div>
+<div class="line"><span class="lineno">  487</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  488</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  489</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  490</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  491</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  492</span> </div>
+<div class="line"><span class="lineno">  493</span>          &lt;div className=<span class="stringliteral">&quot;bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  494</span>            &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  495</span>              &lt;AlertCircle size={16} className=<span class="stringliteral">&quot;text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  496</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-yellow-800 dark:text-yellow-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  497</span>                &lt;strong&gt;Important:&lt;/strong&gt; Only mark as paid <span class="keywordflow">if</span> you actually transferred the money. This will update your group balances.</div>
+<div class="line"><span class="lineno">  498</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  499</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  500</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  501</span> </div>
+<div class="line"><span class="lineno">  502</span>          {error &amp;&amp; (</div>
+<div class="line"><span class="lineno">  503</span>            &lt;div className=<span class="stringliteral">&quot;bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  504</span>              {error}</div>
+<div class="line"><span class="lineno">  505</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  506</span>          )}</div>
+<div class="line"><span class="lineno">  507</span> </div>
+<div class="line"><span class="lineno">  508</span>          &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  509</span>            &lt;button</div>
+<div class="line"><span class="lineno">  510</span>              onClick={handleNotYet}</div>
+<div class="line"><span class="lineno">  511</span>              disabled={loading}</div>
+<div class="line"><span class="lineno">  512</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50&quot;</span></div>
+<div class="line"><span class="lineno">  513</span>            &gt;</div>
+<div class="line"><span class="lineno">  514</span>              Not Yet</div>
+<div class="line"><span class="lineno">  515</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  516</span>            &lt;button</div>
+<div class="line"><span class="lineno">  517</span>              onClick={handleMarkAsPaid}</div>
+<div class="line"><span class="lineno">  518</span>              disabled={loading}</div>
+<div class="line"><span class="lineno">  519</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium flex items-center justify-center gap-2&quot;</span></div>
+<div class="line"><span class="lineno">  520</span>            &gt;</div>
+<div class="line"><span class="lineno">  521</span>              {loading ? (</div>
+<div class="line"><span class="lineno">  522</span>                <span class="stringliteral">&#39;Processing...&#39;</span></div>
+<div class="line"><span class="lineno">  523</span>              ) : (</div>
+<div class="line"><span class="lineno">  524</span>                &lt;&gt;</div>
+<div class="line"><span class="lineno">  525</span>                  &lt;CheckCircle2 size={18} /&gt;</div>
+<div class="line"><span class="lineno">  526</span>                  Mark as Paid</div>
+<div class="line"><span class="lineno">  527</span>                &lt;/&gt;</div>
+<div class="line"><span class="lineno">  528</span>              )}</div>
+<div class="line"><span class="lineno">  529</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  530</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  531</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  532</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  533</span>    );</div>
+<div class="line"><span class="lineno">  534</span>  }</div>
+<div class="line"><span class="lineno">  535</span> </div>
+<div class="line"><span class="lineno">  536</span>  <span class="keywordflow">if</span> (paymentSuccess) {</div>
+<div class="line"><span class="lineno">  537</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  538</span>      &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  539</span>        &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  540</span>          &lt;div className=<span class="stringliteral">&quot;flex justify-end mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  541</span>            &lt;button</div>
+<div class="line"><span class="lineno">  542</span>              onClick={onClose}</div>
+<div class="line"><span class="lineno">  543</span>              className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  544</span>            &gt;</div>
+<div class="line"><span class="lineno">  545</span>              &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">  546</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  547</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  548</span>          &lt;div className=<span class="stringliteral">&quot;mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  549</span>            &lt;CheckCircle2 className=<span class="stringliteral">&quot;mx-auto text-green-500 dark:text-green-400&quot;</span> size={64} /&gt;</div>
+<div class="line"><span class="lineno">  550</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  551</span>          &lt;h3 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  552</span>            {userIsPaying ? <span class="stringliteral">&#39;Payment Sent!&#39;</span> : <span class="stringliteral">&#39;Payment Recorded!&#39;</span>}</div>
+<div class="line"><span class="lineno">  553</span>          &lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  554</span>          &lt;p className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  555</span>            {userIsPaying</div>
+<div class="line"><span class="lineno">  556</span>              ? `${toMember?.name} has been notified and will confirm receipt.`</div>
+<div class="line"><span class="lineno">  557</span>              : `${group?.currency} ${amount} has been settled.`}</div>
+<div class="line"><span class="lineno">  558</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  559</span>          &lt;button</div>
+<div class="line"><span class="lineno">  560</span>            onClick={onClose}</div>
+<div class="line"><span class="lineno">  561</span>            className=<span class="stringliteral">&quot;w-full px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  562</span>          &gt;</div>
+<div class="line"><span class="lineno">  563</span>            Close</div>
+<div class="line"><span class="lineno">  564</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  565</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  566</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  567</span>    );</div>
+<div class="line"><span class="lineno">  568</span>  }</div>
+<div class="line"><span class="lineno">  569</span> </div>
+<div class="line"><span class="lineno">  570</span>  <span class="keywordflow">if</span> (showConfirmation &amp;&amp; userIsReceiving) {</div>
+<div class="line"><span class="lineno">  571</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  572</span>      &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  573</span>        &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  574</span>          &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  575</span>            &lt;h2 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;Confirm Payment&lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  576</span>            &lt;button</div>
+<div class="line"><span class="lineno">  577</span>              onClick={() =&gt; setShowConfirmation(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  578</span>              className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  579</span>            &gt;</div>
+<div class="line"><span class="lineno">  580</span>              &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">  581</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  582</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  583</span> </div>
+<div class="line"><span class="lineno">  584</span>          &lt;div className=<span class="stringliteral">&quot;bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  585</span>            &lt;div className=<span class="stringliteral">&quot;flex items-start gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  586</span>              &lt;AlertCircle className=<span class="stringliteral">&quot;text-yellow-600 dark:text-yellow-400 flex-shrink-0&quot;</span> size={24} /&gt;</div>
+<div class="line"><span class="lineno">  587</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  588</span>                &lt;p className=<span class="stringliteral">&quot;text-sm font-medium text-yellow-900 dark:text-yellow-200 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  589</span>                  Please confirm the payment details:</div>
+<div class="line"><span class="lineno">  590</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  591</span>                &lt;div className=<span class="stringliteral">&quot;space-y-2 text-sm text-yellow-800 dark:text-yellow-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  592</span>                  &lt;p&gt;&lt;strong&gt;From:&lt;/strong&gt; {fromMember?.name}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  593</span>                  &lt;p&gt;&lt;strong&gt;To:&lt;/strong&gt; {toMember?.name} (You)&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  594</span>                  &lt;p&gt;&lt;strong&gt;Amount:&lt;/strong&gt; {group?.currency} {amount}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  595</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  596</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  597</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  598</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  599</span> </div>
+<div class="line"><span class="lineno">  600</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  601</span>            By confirming, you acknowledge that you have received <span class="keyword">this</span> payment from {fromMember?.name}.</div>
+<div class="line"><span class="lineno">  602</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  603</span> </div>
+<div class="line"><span class="lineno">  604</span>          &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  605</span>            &lt;button</div>
+<div class="line"><span class="lineno">  606</span>              onClick={() =&gt; setShowConfirmation(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  607</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  608</span>            &gt;</div>
+<div class="line"><span class="lineno">  609</span>              Go Back</div>
+<div class="line"><span class="lineno">  610</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  611</span>            &lt;button</div>
+<div class="line"><span class="lineno">  612</span>              onClick={handleManualSettle}</div>
+<div class="line"><span class="lineno">  613</span>              disabled={loading}</div>
+<div class="line"><span class="lineno">  614</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2&quot;</span></div>
+<div class="line"><span class="lineno">  615</span>            &gt;</div>
+<div class="line"><span class="lineno">  616</span>              {loading ? (</div>
+<div class="line"><span class="lineno">  617</span>                &lt;&gt;</div>
+<div class="line"><span class="lineno">  618</span>                  &lt;div className=<span class="stringliteral">&quot;animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent&quot;</span>&gt;&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  619</span>                  Authenticating...</div>
+<div class="line"><span class="lineno">  620</span>                &lt;/&gt;</div>
+<div class="line"><span class="lineno">  621</span>              ) : (</div>
+<div class="line"><span class="lineno">  622</span>                <span class="stringliteral">&#39;Confirm Receipt&#39;</span></div>
+<div class="line"><span class="lineno">  623</span>              )}</div>
+<div class="line"><span class="lineno">  624</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  625</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  626</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  627</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  628</span>    );</div>
+<div class="line"><span class="lineno">  629</span>  }</div>
+<div class="line"><span class="lineno">  630</span> </div>
+<div class="line"><span class="lineno">  631</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  632</span>    &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  633</span>      &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  634</span>        &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  635</span>          &lt;h2 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  636</span>            {userIsPaying ? <span class="stringliteral">&#39;Pay Settlement&#39;</span> : <span class="stringliteral">&#39;Mark as Received&#39;</span>}</div>
+<div class="line"><span class="lineno">  637</span>          &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  638</span>          &lt;button</div>
+<div class="line"><span class="lineno">  639</span>            onClick={onClose}</div>
+<div class="line"><span class="lineno">  640</span>            className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  641</span>          &gt;</div>
+<div class="line"><span class="lineno">  642</span>            &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">  643</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  644</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  645</span> </div>
+<div class="line"><span class="lineno">  646</span>        {error &amp;&amp; (</div>
+<div class="line"><span class="lineno">  647</span>          &lt;div className=<span class="stringliteral">&quot;bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm flex items-start gap-2 border border-red-200 dark:border-red-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  648</span>            &lt;span className=<span class="stringliteral">&quot;font-semibold&quot;</span>&gt;Error:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  649</span>            &lt;span&gt;{error}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  650</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  651</span>        )}</div>
+<div class="line"><span class="lineno">  652</span> </div>
+<div class="line"><span class="lineno">  653</span>        &lt;div className=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  654</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-700 dark:text-gray-300 mb-2&quot;</span>&gt;Settlement Details:&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  655</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center justify-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  656</span>            &lt;span className=<span class="stringliteral">&quot;text-lg font-semibold text-primary dark:text-indigo-400&quot;</span>&gt;{fromMember?.name}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  657</span>            &lt;ArrowRight size={20} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  658</span>            &lt;span className=<span class="stringliteral">&quot;text-lg font-semibold text-primary dark:text-indigo-400&quot;</span>&gt;{toMember?.name}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  659</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  660</span>          &lt;p className=<span class="stringliteral">&quot;text-center text-2xl font-bold text-gray-900 dark:text-white mt-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  661</span>            {group?.currency} {settlement?.amount?.toFixed(2)}</div>
+<div class="line"><span class="lineno">  662</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  663</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  664</span>        {<span class="comment">/* Pending payment lock warning */</span>}</div>
+<div class="line"><span class="lineno">  665</span>        {pendingPayment &amp;&amp; !showPendingConfirmation &amp;&amp; (</div>
+<div class="line"><span class="lineno">  666</span>          &lt;div className=<span class="stringliteral">&quot;mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  667</span>            &lt;AlertCircle size={16} className=<span class="stringliteral">&quot;text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  668</span>            &lt;p className=<span class="stringliteral">&quot;text-sm text-amber-800 dark:text-amber-200&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  669</span>              A payment of {pendingPayment.currency} {pendingPayment.amount?.toFixed(2)} to {pendingPayment.toName} is awaiting confirmation. You cannot initiate another payment until <span class="keyword">this</span> is resolved.</div>
+<div class="line"><span class="lineno">  670</span>            &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  671</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  672</span>        )}</div>
+<div class="line"><span class="lineno">  673</span> </div>
+<div class="line"><span class="lineno">  674</span>        &lt;div className=<span class="stringliteral">&quot;mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  675</span>          &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  676</span>            Amount ({group?.currency})</div>
+<div class="line"><span class="lineno">  677</span>          &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  678</span>          &lt;input</div>
+<div class="line"><span class="lineno">  679</span>            type=<span class="stringliteral">&quot;number&quot;</span></div>
+<div class="line"><span class="lineno">  680</span>            step=<span class="stringliteral">&quot;0.01&quot;</span></div>
+<div class="line"><span class="lineno">  681</span>            min=<span class="stringliteral">&quot;0.01&quot;</span></div>
+<div class="line"><span class="lineno">  682</span>            max=<span class="stringliteral">&quot;1000000&quot;</span></div>
+<div class="line"><span class="lineno">  683</span>            value={amount}</div>
+<div class="line"><span class="lineno">  684</span>            readOnly={!!pendingPayment}</div>
+<div class="line"><span class="lineno">  685</span>            onChange={(e) =&gt; {</div>
+<div class="line"><span class="lineno">  686</span>              <span class="comment">// Prevent changes when a payment is pending confirmation</span></div>
+<div class="line"><span class="lineno">  687</span>              <span class="keywordflow">if</span> (pendingPayment) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  688</span>              <span class="keyword">const</span> value = e.target.value;</div>
+<div class="line"><span class="lineno">  689</span>              </div>
+<div class="line"><span class="lineno">  690</span>              <span class="comment">// Check if amount exceeds limit</span></div>
+<div class="line"><span class="lineno">  691</span>              <span class="keywordflow">if</span> (value &amp;&amp; parseFloat(value) &gt; 1000000) {</div>
+<div class="line"><span class="lineno">  692</span>                setError(<span class="stringliteral">&#39;Settlement amount cannot exceed 1,000,000&#39;</span>);</div>
+<div class="line"><span class="lineno">  693</span>                <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  694</span>              }</div>
+<div class="line"><span class="lineno">  695</span>              </div>
+<div class="line"><span class="lineno">  696</span>              <span class="comment">// Allow empty or valid numbers with max 2 decimals</span></div>
+<div class="line"><span class="lineno">  697</span>              <span class="keywordflow">if</span> (value === <span class="stringliteral">&#39;&#39;</span> || /^\d*\.?\d{0,2}$/.test(value)) {</div>
+<div class="line"><span class="lineno">  698</span>                setAmount(value);</div>
+<div class="line"><span class="lineno">  699</span>                <span class="keywordflow">if</span> (error &amp;&amp; error.includes(<span class="stringliteral">&#39;cannot exceed&#39;</span>)) {</div>
+<div class="line"><span class="lineno">  700</span>                  setError(<span class="stringliteral">&#39;&#39;</span>); <span class="comment">// Clear error when user fixes amount</span></div>
+<div class="line"><span class="lineno">  701</span>                }</div>
+<div class="line"><span class="lineno">  702</span>              }</div>
+<div class="line"><span class="lineno">  703</span>            }}</div>
+<div class="line"><span class="lineno">  704</span>            onBlur={(e) =&gt; {</div>
+<div class="line"><span class="lineno">  705</span>              <span class="comment">// Format to 2 decimals when user leaves field</span></div>
+<div class="line"><span class="lineno">  706</span>              <span class="keywordflow">if</span> (e.target.value &amp;&amp; !isNaN(e.target.value)) {</div>
+<div class="line"><span class="lineno">  707</span>                <span class="keyword">const</span> formatted = parseFloat(e.target.value).toFixed(2);</div>
+<div class="line"><span class="lineno">  708</span>                setAmount(formatted);</div>
+<div class="line"><span class="lineno">  709</span>              }</div>
+<div class="line"><span class="lineno">  710</span>            }}</div>
+<div class="line"><span class="lineno">  711</span>            placeholder=<span class="stringliteral">&quot;0.00&quot;</span></div>
+<div class="line"><span class="lineno">  712</span>            className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none text-lg font-semibold&quot;</span></div>
+<div class="line"><span class="lineno">  713</span>            required</div>
+<div class="line"><span class="lineno">  714</span>            autoFocus</div>
+<div class="line"><span class="lineno">  715</span>          /&gt;</div>
+<div class="line"><span class="lineno">  716</span>          &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  717</span>            Suggested: {group?.currency} {settlement?.amount?.toFixed(2)} • Maximum: {group?.currency} 1,000,000.00</div>
+<div class="line"><span class="lineno">  718</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  719</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  720</span> </div>
+<div class="line"><span class="lineno">  721</span>        {userIsPaying ? (</div>
+<div class="line"><span class="lineno">  722</span>          <span class="comment">/* User is paying - show payment options */</span></div>
+<div class="line"><span class="lineno">  723</span>          &lt;div className=<span class="stringliteral">&quot;mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  724</span>            {<span class="comment">/* Quick Payment Links Section — hidden when Paid Offline is selected */</span>}</div>
+<div class="line"><span class="lineno">  725</span>            {!loadingPaymentMethods &amp;&amp; (<a class="code hl_variable" href="payment_links_8js.html#a559aae314ec609b3e27d57b9ab9dcfa6">getAvailablePaymentMethods</a>(recipientPaymentMethods) || []).length &gt; 0 &amp;&amp; !selectedPaymentLink &amp;&amp; paymentMethod !== <span class="stringliteral">&#39;manual&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  726</span>              &lt;div className=<span class="stringliteral">&quot;mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  727</span>                &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  728</span>                  &lt;div className=<span class="stringliteral">&quot;relative group&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  729</span>                    &lt;Info size={18} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  730</span>                    &lt;div className=<span class="stringliteral">&quot;absolute left-0 top-6 w-64 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  731</span>                      These payment methods are <span class="keyword">set</span> up by the recipient in their <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> settings</div>
+<div class="line"><span class="lineno">  732</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  733</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  734</span>                  &lt;h3 className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;Quick Payment Options&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  735</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  736</span>                &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  737</span>                  {toMember?.name} accepts payments via:</div>
+<div class="line"><span class="lineno">  738</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  739</span>                &lt;div className=<span class="stringliteral">&quot;space-y-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  740</span>                  {<a class="code hl_variable" href="payment_links_8js.html#a559aae314ec609b3e27d57b9ab9dcfa6">getAvailablePaymentMethods</a>(recipientPaymentMethods).map((method) =&gt; (</div>
+<div class="line"><span class="lineno">  741</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  742</span>                      key={method.id}</div>
+<div class="line"><span class="lineno">  743</span>                      type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  744</span>                      onClick={() =&gt; handlePaymentLinkClick(method)}</div>
+<div class="line"><span class="lineno">  745</span>                      disabled={!amount || parseFloat(amount) &lt;= 0 || !!pendingPayment}</div>
+<div class="line"><span class="lineno">  746</span>                      className=<span class="stringliteral">&quot;w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-700 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group&quot;</span></div>
+<div class="line"><span class="lineno">  747</span>                    &gt;</div>
+<div class="line"><span class="lineno">  748</span>                      &lt;div className=<span class="stringliteral">&quot;w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  749</span>                        {method.icon}</div>
+<div class="line"><span class="lineno">  750</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  751</span>                      &lt;div className=<span class="stringliteral">&quot;flex-1 text-left&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  752</span>                        &lt;p className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;{method.name}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  753</span>                        &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-600 dark:text-gray-400&quot;</span>&gt;{method.description}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  754</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  755</span>                      &lt;ExternalLink size={16} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  756</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  757</span>                  ))}</div>
+<div class="line"><span class="lineno">  758</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  759</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-3 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  760</span>                  Click to open payment <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>, then <span class="keywordflow">return</span> here to mark as paid</div>
+<div class="line"><span class="lineno">  761</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  762</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  763</span>            )}</div>
+<div class="line"><span class="lineno">  764</span> </div>
+<div class="line"><span class="lineno">  765</span>            {<span class="comment">/* SEPA Bank Transfer Button — hidden when Paid Offline is selected */</span>}</div>
+<div class="line"><span class="lineno">  766</span>            {!loadingPaymentMethods &amp;&amp; recipientPaymentMethods?.encryptedIBAN &amp;&amp; !selectedPaymentLink &amp;&amp; paymentMethod !== <span class="stringliteral">&#39;manual&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  767</span>              &lt;div className=<span class="stringliteral">&quot;mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  768</span>                &lt;h3 className=<span class="stringliteral">&quot;text-sm font-medium text-gray-700 dark:text-gray-300 mb-2&quot;</span>&gt;Or pay directly with SEPA&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  769</span>                &lt;button</div>
+<div class="line"><span class="lineno">  770</span>                  onClick={handleSepaPayment}</div>
+<div class="line"><span class="lineno">  771</span>                  disabled={!amount || parseFloat(amount) &lt;= 0 || !!pendingPayment}</div>
+<div class="line"><span class="lineno">  772</span>                  className=<span class="stringliteral">&quot;w-full flex items-center gap-3 p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed&quot;</span></div>
+<div class="line"><span class="lineno">  773</span>                &gt;</div>
+<div class="line"><span class="lineno">  774</span>                  &lt;div className=<span class="stringliteral">&quot;w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900/50 transition&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  775</span>                    &lt;Landmark size={24} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  776</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  777</span>                  &lt;div className=<span class="stringliteral">&quot;text-left flex-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  778</span>                    &lt;div className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;SEPA Bank Transfer&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  779</span>                    &lt;div className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  780</span>                      Secure bank-to-bank payment</div>
+<div class="line"><span class="lineno">  781</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  782</span>                    &lt;div className=<span class="stringliteral">&quot;text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  783</span>                      &lt;CheckCircle2 size={12} /&gt;</div>
+<div class="line"><span class="lineno">  784</span>                      IBAN available · Biometric secured</div>
+<div class="line"><span class="lineno">  785</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  786</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  787</span>                  &lt;ArrowRight size={20} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  788</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  789</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  790</span>            )}</div>
+<div class="line"><span class="lineno">  791</span> </div>
+<div class="line"><span class="lineno">  792</span>            {<span class="comment">/* Bank Transfer Details */</span>}</div>
+<div class="line"><span class="lineno">  793</span>            {selectedPaymentLink &amp;&amp; selectedPaymentLink.id === <span class="stringliteral">&#39;bank&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  794</span>              &lt;div className=<span class="stringliteral">&quot;mb-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  795</span>                &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  796</span>                  &lt;h3 className=<span class="stringliteral">&quot;font-semibold text-blue-900 dark:text-blue-300 flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  797</span>                    &lt;CreditCard size={18} /&gt;</div>
+<div class="line"><span class="lineno">  798</span>                    Bank Transfer Details</div>
+<div class="line"><span class="lineno">  799</span>                  &lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  800</span>                  &lt;button</div>
+<div class="line"><span class="lineno">  801</span>                    onClick={() =&gt; setSelectedPaymentLink(<span class="keyword">null</span>)}</div>
+<div class="line"><span class="lineno">  802</span>                    className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 text-sm hover:underline&quot;</span></div>
+<div class="line"><span class="lineno">  803</span>                  &gt;</div>
+<div class="line"><span class="lineno">  804</span>                    Back to options</div>
+<div class="line"><span class="lineno">  805</span>                  &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  806</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  807</span>                </div>
+<div class="line"><span class="lineno">  808</span>                &lt;div className=<span class="stringliteral">&quot;space-y-3 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  809</span>                  &lt;div&gt;</div>
+<div class="line"><span class="lineno">  810</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 font-medium&quot;</span>&gt;Recipient&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  811</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-900 dark:text-blue-200&quot;</span>&gt;{toMember?.name}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  812</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  813</span>                  </div>
+<div class="line"><span class="lineno">  814</span>                  &lt;div&gt;</div>
+<div class="line"><span class="lineno">  815</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 font-medium&quot;</span>&gt;IBAN&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  816</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  817</span>                      &lt;p className=<span class="stringliteral">&quot;text-blue-900 dark:text-blue-200 font-mono text-xs flex-1 break-all bg-white dark:bg-gray-700 p-2 rounded&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  818</span>                        {selectedPaymentLink.iban}</div>
+<div class="line"><span class="lineno">  819</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  820</span>                      &lt;button</div>
+<div class="line"><span class="lineno">  821</span>                        type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  822</span>                        onClick={() =&gt; {</div>
+<div class="line"><span class="lineno">  823</span>                          navigator.clipboard.writeText(selectedPaymentLink.iban);</div>
+<div class="line"><span class="lineno">  824</span>                          setCopiedIban(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  825</span>                          setTimeout(() =&gt; setCopiedIban(<span class="keyword">false</span>), 2000);</div>
+<div class="line"><span class="lineno">  826</span>                        }}</div>
+<div class="line"><span class="lineno">  827</span>                        className=<span class="stringliteral">&quot;p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded flex-shrink-0&quot;</span></div>
+<div class="line"><span class="lineno">  828</span>                      &gt;</div>
+<div class="line"><span class="lineno">  829</span>                        {copiedIban ? &lt;Check size={16} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400&quot;</span> /&gt; : &lt;Copy size={16} className=<span class="stringliteral">&quot;dark:text-blue-400&quot;</span> /&gt;}</div>
+<div class="line"><span class="lineno">  830</span>                      &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  831</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  832</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  833</span>                  </div>
+<div class="line"><span class="lineno">  834</span>                  {selectedPaymentLink.bic &amp;&amp; (</div>
+<div class="line"><span class="lineno">  835</span>                    &lt;div&gt;</div>
+<div class="line"><span class="lineno">  836</span>                      &lt;p className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 font-medium&quot;</span>&gt;BIC&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  837</span>                      &lt;p className=<span class="stringliteral">&quot;text-blue-900 dark:text-blue-200 font-mono text-sm bg-white dark:bg-gray-700 p-2 rounded&quot;</span>&gt;{selectedPaymentLink.bic}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  838</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  839</span>                  )}</div>
+<div class="line"><span class="lineno">  840</span>                  </div>
+<div class="line"><span class="lineno">  841</span>                  &lt;div&gt;</div>
+<div class="line"><span class="lineno">  842</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 font-medium&quot;</span>&gt;Amount&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  843</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-900 dark:text-blue-200 font-semibold bg-white dark:bg-gray-700 p-2 rounded&quot;</span>&gt;{group.currency} {amount}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  844</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  845</span>                  </div>
+<div class="line"><span class="lineno">  846</span>                  &lt;div&gt;</div>
+<div class="line"><span class="lineno">  847</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 font-medium&quot;</span>&gt;Reference&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  848</span>                    &lt;p className=<span class="stringliteral">&quot;text-blue-900 dark:text-blue-200 bg-white dark:bg-gray-700 p-2 rounded&quot;</span>&gt;SplitSync Settlement&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  849</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  850</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  851</span>                </div>
+<div class="line"><span class="lineno">  852</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-blue-700 dark:text-blue-400 mt-3 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  853</span>                  After making the transfer, mark the payment as completed below</div>
+<div class="line"><span class="lineno">  854</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  855</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  856</span>            )}</div>
+<div class="line"><span class="lineno">  857</span> </div>
+<div class="line"><span class="lineno">  858</span>            {<span class="comment">/* Divider — hidden when Paid Offline is selected */</span>}</div>
+<div class="line"><span class="lineno">  859</span>{!loadingPaymentMethods &amp;&amp; (<a class="code hl_variable" href="payment_links_8js.html#a559aae314ec609b3e27d57b9ab9dcfa6">getAvailablePaymentMethods</a>(recipientPaymentMethods) || []).length &gt; 0 &amp;&amp; !selectedPaymentLink &amp;&amp; paymentMethod !== <span class="stringliteral">&#39;manual&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  860</span>              &lt;div className=<span class="stringliteral">&quot;relative mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  861</span>                &lt;div className=<span class="stringliteral">&quot;absolute inset-0 flex items-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  862</span>                  &lt;div className=<span class="stringliteral">&quot;w-full border-t border-gray-300 dark:border-gray-600&quot;</span>&gt;&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  863</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  864</span>                &lt;div className=<span class="stringliteral">&quot;relative flex justify-center text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  865</span>                  &lt;span className=<span class="stringliteral">&quot;px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400&quot;</span>&gt;or use&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  866</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  867</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  868</span>            )}</div>
+<div class="line"><span class="lineno">  869</span> </div>
+<div class="line"><span class="lineno">  870</span>            &lt;div className=<span class="stringliteral">&quot;flex gap-2 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  871</span>              &lt;button</div>
+<div class="line"><span class="lineno">  872</span>                type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  873</span>                onClick={() =&gt; setPaymentMethod(<span class="stringliteral">&#39;paypal&#39;</span>)}</div>
+<div class="line"><span class="lineno">  874</span>                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition ${</div>
+<div class="line"><span class="lineno">  875</span>                  paymentMethod === <span class="stringliteral">&#39;paypal&#39;</span></div>
+<div class="line"><span class="lineno">  876</span>                    ? <span class="stringliteral">&#39;bg-blue-600 dark:bg-blue-700 text-white&#39;</span></div>
+<div class="line"><span class="lineno">  877</span>                    : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</span></div>
+<div class="line"><span class="lineno">  878</span>                }`}</div>
+<div class="line"><span class="lineno">  879</span>              &gt;</div>
+<div class="line"><span class="lineno">  880</span>                &lt;CreditCard size={18} /&gt;</div>
+<div class="line"><span class="lineno">  881</span>                &lt;span className=<span class="stringliteral">&quot;font-medium&quot;</span>&gt;Pay In-<a class="code hl_variable" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a>&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  882</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  883</span>              &lt;button</div>
+<div class="line"><span class="lineno">  884</span>                type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  885</span>                onClick={() =&gt; setPaymentMethod(<span class="stringliteral">&#39;manual&#39;</span>)}</div>
+<div class="line"><span class="lineno">  886</span>                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition ${</div>
+<div class="line"><span class="lineno">  887</span>                  paymentMethod === <span class="stringliteral">&#39;manual&#39;</span></div>
+<div class="line"><span class="lineno">  888</span>                    ? <span class="stringliteral">&#39;bg-blue-600 dark:bg-blue-700 text-white&#39;</span></div>
+<div class="line"><span class="lineno">  889</span>                    : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</span></div>
+<div class="line"><span class="lineno">  890</span>                }`}</div>
+<div class="line"><span class="lineno">  891</span>              &gt;</div>
+<div class="line"><span class="lineno">  892</span>                &lt;DollarSign size={18} /&gt;</div>
+<div class="line"><span class="lineno">  893</span>                &lt;span className=<span class="stringliteral">&quot;font-medium&quot;</span>&gt;Paid Offline&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  894</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  895</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  896</span> </div>
+<div class="line"><span class="lineno">  897</span>            {paymentMethod === <span class="stringliteral">&#39;paypal&#39;</span> ? (</div>
+<div class="line"><span class="lineno">  898</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  899</span> </div>
+<div class="line"><span class="lineno">  900</span>                {<span class="comment">/* Notice when recipient has no PayPal configured */</span>}</div>
+<div class="line"><span class="lineno">  901</span>                {!loadingPaymentMethods &amp;&amp; !recipientPaymentMethods?.paypalUsername &amp;&amp; (</div>
+<div class="line"><span class="lineno">  902</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  903</span>                    &lt;AlertCircle size={18} className=<span class="stringliteral">&quot;text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  904</span>                    &lt;div&gt;</div>
+<div class="line"><span class="lineno">  905</span>                      &lt;p className=<span class="stringliteral">&quot;text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  906</span>                        {toMember?.name} has not <span class="keyword">set</span> up PayPal</div>
+<div class="line"><span class="lineno">  907</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  908</span>                      &lt;p className=<span class="stringliteral">&quot;text-sm text-amber-700 dark:text-amber-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  909</span>                        They need to add their PayPal username in their <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> settings before you can pay via PayPal.</div>
+<div class="line"><span class="lineno">  910</span>                        Use &lt;strong&gt;Paid Offline&lt;/strong&gt; to record a cash or bank transfer instead.</div>
+<div class="line"><span class="lineno">  911</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  912</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  913</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  914</span>                )}</div>
+<div class="line"><span class="lineno">  915</span> </div>
+<div class="line"><span class="lineno">  916</span>                {<span class="comment">/* Notice when current user has no biometric set up — shown to payer only */</span>}</div>
+<div class="line"><span class="lineno">  917</span>                {!loadingPaymentMethods &amp;&amp; recipientPaymentMethods?.paypalUsername &amp;&amp; (</div>
+<div class="line"><span class="lineno">  918</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  919</span>                    &lt;Info size={18} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  920</span>                    &lt;p className=<span class="stringliteral">&quot;text-sm text-blue-700 dark:text-blue-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  921</span>                      Click a payment method above to open the <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> and complete the payment, then <span class="keywordflow">return</span> here to confirm.</div>
+<div class="line"><span class="lineno">  922</span>                      For faster future payments, enable biometric authentication in your <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> settings.</div>
+<div class="line"><span class="lineno">  923</span>                    &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  924</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  925</span>                )}</div>
+<div class="line"><span class="lineno">  926</span>                {<span class="comment">/* Demo Mode — collapsible panel containing all PayPal sandbox UI */</span>}</div>
+<div class="line"><span class="lineno">  927</span>                &lt;button</div>
+<div class="line"><span class="lineno">  928</span>                  type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  929</span>                  onClick={() =&gt; setShowDemoInfo(prev =&gt; !prev)}</div>
+<div class="line"><span class="lineno">  930</span>                  className=<span class="stringliteral">&quot;w-full flex items-center justify-between px-4 py-3 mb-2 rounded-xl border-2 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  931</span>                &gt;</div>
+<div class="line"><span class="lineno">  932</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  933</span>                    &lt;div className=<span class="stringliteral">&quot;w-8 h-8 bg-yellow-400 dark:bg-yellow-600 rounded-lg flex items-center justify-center shrink-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  934</span>                      &lt;CreditCard size={16} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  935</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  936</span>                    &lt;div className=<span class="stringliteral">&quot;text-left&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  937</span>                      &lt;p className=<span class="stringliteral">&quot;text-sm font-bold text-yellow-900 dark:text-yellow-200&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  938</span>                        Future feature - Settlement Payment Flow</div>
+<div class="line"><span class="lineno">  939</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  940</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-yellow-700 dark:text-yellow-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  941</span>                        {showDemoInfo ? <span class="stringliteral">&#39;Tap to collapse&#39;</span> : <span class="stringliteral">&#39;PayPal or Credit/Debit Card payment demo&#39;</span>}</div>
+<div class="line"><span class="lineno">  942</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  943</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  944</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  945</span>                  &lt;ChevronDown</div>
+<div class="line"><span class="lineno">  946</span>                    size={18}</div>
+<div class="line"><span class="lineno">  947</span>                    className={`text-yellow-600 dark:text-yellow-400 transition-transform duration-300 shrink-0 ${showDemoInfo ? <span class="stringliteral">&#39;rotate-180&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}`}</div>
+<div class="line"><span class="lineno">  948</span>                  /&gt;</div>
+<div class="line"><span class="lineno">  949</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  950</span> </div>
+<div class="line"><span class="lineno">  951</span>                {<span class="comment">/* Expanded PayPal sandbox panel */</span>}</div>
+<div class="line"><span class="lineno">  952</span>                {showDemoInfo &amp;&amp; (</div>
+<div class="line"><span class="lineno">  953</span>                  &lt;div className=<span class="stringliteral">&quot;mb-2 border border-yellow-200 dark:border-yellow-800 rounded-xl overflow-hidden&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  954</span>                    {<span class="comment">/* Demo notice */</span>}</div>
+<div class="line"><span class="lineno">  955</span>                    &lt;div className=<span class="stringliteral">&quot;bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 flex items-start gap-2 border-b border-yellow-200 dark:border-yellow-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  956</span>                      &lt;Info size={14} className=<span class="stringliteral">&quot;text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  957</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-yellow-800 dark:text-yellow-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  958</span>                        &lt;strong&gt;Demo Mode:&lt;/strong&gt; This uses a PayPal Sandbox environment. No real money is transferred. Use sandbox test credentials to complete the payment flow.</div>
+<div class="line"><span class="lineno">  959</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  960</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  961</span>                    {<span class="comment">/* PayPal buttons */</span>}</div>
+<div class="line"><span class="lineno">  962</span>                    &lt;div className=<span class="stringliteral">&quot;px-4 py-4 bg-white dark:bg-gray-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  963</span>                      {parseFloat(amount) &gt; 0 ? (</div>
+<div class="line"><span class="lineno">  964</span>                        &lt;PayPalButtons</div>
+<div class="line"><span class="lineno">  965</span>                          style={{ layout: <span class="stringliteral">&#39;vertical&#39;</span>, label: <span class="stringliteral">&#39;pay&#39;</span> }}</div>
+<div class="line"><span class="lineno">  966</span>                          createOrder={createPayPalOrder}</div>
+<div class="line"><span class="lineno">  967</span>                          onApprove={onPayPalApprove}</div>
+<div class="line"><span class="lineno">  968</span>                          onError={onPayPalError}</div>
+<div class="line"><span class="lineno">  969</span>                          disabled={loading}</div>
+<div class="line"><span class="lineno">  970</span>                        /&gt;</div>
+<div class="line"><span class="lineno">  971</span>                      ) : (</div>
+<div class="line"><span class="lineno">  972</span>                        &lt;div className=<span class="stringliteral">&quot;text-center py-4 text-gray-500 dark:text-gray-400 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  973</span>                          Enter an amount above to continue</div>
+<div class="line"><span class="lineno">  974</span>                        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  975</span>                      )}</div>
+<div class="line"><span class="lineno">  976</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  977</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  978</span>                )}</div>
+<div class="line"><span class="lineno">  979</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  980</span>            ) : (</div>
+<div class="line"><span class="lineno">  981</span>              <span class="comment">/* Paid Offline — payer confirms they paid outside the app */</span></div>
+<div class="line"><span class="lineno">  982</span>              &lt;form onSubmit={handleManualSettle}&gt;</div>
+<div class="line"><span class="lineno">  983</span>                &lt;div className=<span class="stringliteral">&quot;bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  984</span>                  &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-700 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  985</span>                    Mark <span class="keyword">this</span> payment as completed <span class="keywordflow">if</span> you paid {toMember?.name} via cash, bank transfer, or another method.</div>
+<div class="line"><span class="lineno">  986</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  987</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  988</span>                &lt;button</div>
+<div class="line"><span class="lineno">  989</span>                  type=<span class="stringliteral">&quot;submit&quot;</span></div>
+<div class="line"><span class="lineno">  990</span>                  disabled={loading}</div>
+<div class="line"><span class="lineno">  991</span>                  className=<span class="stringliteral">&quot;w-full px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  992</span>                &gt;</div>
+<div class="line"><span class="lineno">  993</span>                  {loading ? <span class="stringliteral">&#39;Recording...&#39;</span> : <span class="stringliteral">&#39;Confirm Payment Sent&#39;</span>}</div>
+<div class="line"><span class="lineno">  994</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  995</span>              &lt;/form&gt;</div>
+<div class="line"><span class="lineno">  996</span>            )}</div>
+<div class="line"><span class="lineno">  997</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  998</span>        ) : (</div>
+<div class="line"><span class="lineno">  999</span>          <span class="comment">/* ── Receiver view: collapsible QR + confirm received ── */</span></div>
+<div class="line"><span class="lineno"> 1000</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno"> 1001</span> </div>
+<div class="line"><span class="lineno"> 1002</span>            {<span class="comment">/* QR toggle button — hidden by default, tap to reveal for payer to scan */</span>}</div>
+<div class="line"><span class="lineno"> 1003</span>            &lt;button</div>
+<div class="line"><span class="lineno"> 1004</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno"> 1005</span>              onClick={() =&gt; setShowQR(prev =&gt; !prev)}</div>
+<div class="line"><span class="lineno"> 1006</span>              className=<span class="stringliteral">&quot;w-full flex items-center justify-between px-4 py-3 mb-3 rounded-xl border-2 border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno"> 1007</span>            &gt;</div>
+<div class="line"><span class="lineno"> 1008</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1009</span>                &lt;div className=<span class="stringliteral">&quot;w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-lg flex items-center justify-center shrink-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1010</span>                  &lt;QrCode size={16} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno"> 1011</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1012</span>                &lt;div className=<span class="stringliteral">&quot;text-left&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1013</span>                  &lt;p className=<span class="stringliteral">&quot;text-sm font-bold text-indigo-800 dark:text-indigo-200&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1014</span>                    Let {fromMember?.name} scan to pay you</div>
+<div class="line"><span class="lineno"> 1015</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1016</span>                  &lt;p className=<span class="stringliteral">&quot;text-xs text-indigo-600 dark:text-indigo-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1017</span>                    {showQR ? <span class="stringliteral">&#39;Tap to hide QR code&#39;</span> : <span class="stringliteral">&#39;Tap to show PayPal or Revolut QR code&#39;</span>}</div>
+<div class="line"><span class="lineno"> 1018</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1019</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1020</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1021</span>              &lt;ChevronDown</div>
+<div class="line"><span class="lineno"> 1022</span>                size={18}</div>
+<div class="line"><span class="lineno"> 1023</span>                className={`text-indigo-500 dark:text-indigo-400 transition-transform duration-300 shrink-0 ${showQR ? <span class="stringliteral">&#39;rotate-180&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}`}</div>
+<div class="line"><span class="lineno"> 1024</span>              /&gt;</div>
+<div class="line"><span class="lineno"> 1025</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno"> 1026</span> </div>
+<div class="line"><span class="lineno"> 1027</span>            {<span class="comment">/* Collapsible QR panel */</span>}</div>
+<div class="line"><span class="lineno"> 1028</span>            {showQR &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1029</span>              &lt;div className=<span class="stringliteral">&quot;mb-4 border border-indigo-200 dark:border-indigo-800 rounded-xl overflow-hidden&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1030</span> </div>
+<div class="line"><span class="lineno"> 1031</span>                {<span class="comment">/* Instruction */</span>}</div>
+<div class="line"><span class="lineno"> 1032</span>                &lt;div className=<span class="stringliteral">&quot;bg-indigo-50 dark:bg-indigo-900/30 px-4 py-3 flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1033</span>                  &lt;Smartphone size={15} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno"> 1034</span>                  &lt;p className=<span class="stringliteral">&quot;text-xs font-semibold text-indigo-800 dark:text-indigo-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1035</span>                    Show <span class="keyword">this</span> screen to &lt;strong&gt;{fromMember?.name}&lt;/strong&gt; — they scan the QR code with their phone camera to pay you instantly via PayPal or Revolut.</div>
+<div class="line"><span class="lineno"> 1036</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1037</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1038</span> </div>
+<div class="line"><span class="lineno"> 1039</span>                {<span class="comment">/* Tab selector — only show tabs for methods the receiver has configured */</span>}</div>
+<div class="line"><span class="lineno"> 1040</span>                {recipientPaymentMethods &amp;&amp; (recipientPaymentMethods.paypalUsername || recipientPaymentMethods.revolutUsername) &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1041</span>                  &lt;div className=<span class="stringliteral">&quot;flex gap-2 px-4 pt-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1042</span>                    {recipientPaymentMethods.paypalUsername &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1043</span>                      &lt;button</div>
+<div class="line"><span class="lineno"> 1044</span>                        type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno"> 1045</span>                        onClick={() =&gt; setActiveQR(<span class="stringliteral">&#39;paypal&#39;</span>)}</div>
+<div class="line"><span class="lineno"> 1046</span>                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${</div>
+<div class="line"><span class="lineno"> 1047</span>                          activeQR === <span class="stringliteral">&#39;paypal&#39;</span></div>
+<div class="line"><span class="lineno"> 1048</span>                            ? <span class="stringliteral">&#39;bg-blue-600 text-white&#39;</span></div>
+<div class="line"><span class="lineno"> 1049</span>                            : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</span></div>
+<div class="line"><span class="lineno"> 1050</span>                        }`}</div>
+<div class="line"><span class="lineno"> 1051</span>                      &gt;</div>
+<div class="line"><span class="lineno"> 1052</span>                        PayPal</div>
+<div class="line"><span class="lineno"> 1053</span>                      &lt;/button&gt;</div>
+<div class="line"><span class="lineno"> 1054</span>                    )}</div>
+<div class="line"><span class="lineno"> 1055</span>                    {recipientPaymentMethods.revolutUsername &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1056</span>                      &lt;button</div>
+<div class="line"><span class="lineno"> 1057</span>                        type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno"> 1058</span>                        onClick={() =&gt; setActiveQR(<span class="stringliteral">&#39;revolut&#39;</span>)}</div>
+<div class="line"><span class="lineno"> 1059</span>                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${</div>
+<div class="line"><span class="lineno"> 1060</span>                          activeQR === <span class="stringliteral">&#39;revolut&#39;</span></div>
+<div class="line"><span class="lineno"> 1061</span>                            ? <span class="stringliteral">&#39;bg-indigo-600 text-white&#39;</span></div>
+<div class="line"><span class="lineno"> 1062</span>                            : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</span></div>
+<div class="line"><span class="lineno"> 1063</span>                        }`}</div>
+<div class="line"><span class="lineno"> 1064</span>                      &gt;</div>
+<div class="line"><span class="lineno"> 1065</span>                        Revolut</div>
+<div class="line"><span class="lineno"> 1066</span>                      &lt;/button&gt;</div>
+<div class="line"><span class="lineno"> 1067</span>                    )}</div>
+<div class="line"><span class="lineno"> 1068</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1069</span>                )}</div>
+<div class="line"><span class="lineno"> 1070</span> </div>
+<div class="line"><span class="lineno"> 1071</span>                {<span class="comment">/* QR code display */</span>}</div>
+<div class="line"><span class="lineno"> 1072</span>                &lt;div className=<span class="stringliteral">&quot;flex flex-col items-center py-4 px-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1073</span>                  {recipientPaymentMethods?.paypalUsername &amp;&amp; activeQR === <span class="stringliteral">&#39;paypal&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1074</span>                    &lt;&gt;</div>
+<div class="line"><span class="lineno"> 1075</span>                      &lt;<a class="code hl_variable" href="_q_r_code_canvas_8test_8jsx.html#a887c8dd2d2acad902492459c02234474">QRCodeCanvas</a></div>
+<div class="line"><span class="lineno"> 1076</span>                        value={<a class="code hl_variable" href="payment_links_8js.html#a6be2e69edf491ad7211f013ed5cce31f">generatePayPalLink</a>(</div>
+<div class="line"><span class="lineno"> 1077</span>                          recipientPaymentMethods.paypalUsername,</div>
+<div class="line"><span class="lineno"> 1078</span>                          parseFloat(amount),</div>
+<div class="line"><span class="lineno"> 1079</span>                          group?.currency || <span class="stringliteral">&#39;EUR&#39;</span></div>
+<div class="line"><span class="lineno"> 1080</span>                        )}</div>
+<div class="line"><span class="lineno"> 1081</span>                        size={200}</div>
+<div class="line"><span class="lineno"> 1082</span>                      /&gt;</div>
+<div class="line"><span class="lineno"> 1083</span>                      &lt;p className=<span class="stringliteral">&quot;mt-3 text-sm font-semibold text-gray-800 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1084</span>                        Scan to pay via PayPal</div>
+<div class="line"><span class="lineno"> 1085</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1086</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1087</span>                        Opens PayPal pre-filled with {group?.currency || <span class="stringliteral">&#39;EUR&#39;</span>} {parseFloat(amount || 0).toFixed(2)}</div>
+<div class="line"><span class="lineno"> 1088</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1089</span>                    &lt;/&gt;</div>
+<div class="line"><span class="lineno"> 1090</span>                  )}</div>
+<div class="line"><span class="lineno"> 1091</span>                  {recipientPaymentMethods?.revolutUsername &amp;&amp; activeQR === <span class="stringliteral">&#39;revolut&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1092</span>                    &lt;&gt;</div>
+<div class="line"><span class="lineno"> 1093</span>                      &lt;<a class="code hl_variable" href="_q_r_code_canvas_8test_8jsx.html#a887c8dd2d2acad902492459c02234474">QRCodeCanvas</a></div>
+<div class="line"><span class="lineno"> 1094</span>                        value={<a class="code hl_variable" href="payment_links_8js.html#abba97eab07419c7c6f0050724ed7c07b">generateRevolutLink</a>(</div>
+<div class="line"><span class="lineno"> 1095</span>                          recipientPaymentMethods.revolutUsername,</div>
+<div class="line"><span class="lineno"> 1096</span>                          parseFloat(amount),</div>
+<div class="line"><span class="lineno"> 1097</span>                          group?.currency || <span class="stringliteral">&#39;EUR&#39;</span></div>
+<div class="line"><span class="lineno"> 1098</span>                        )}</div>
+<div class="line"><span class="lineno"> 1099</span>                        size={200}</div>
+<div class="line"><span class="lineno"> 1100</span>                      /&gt;</div>
+<div class="line"><span class="lineno"> 1101</span>                      &lt;p className=<span class="stringliteral">&quot;mt-3 text-sm font-semibold text-gray-800 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1102</span>                        Scan to pay via Revolut</div>
+<div class="line"><span class="lineno"> 1103</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1104</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1105</span>                        Opens Revolut — enter {group?.currency || <span class="stringliteral">&#39;EUR&#39;</span>} {parseFloat(amount || 0).toFixed(2)} to complete</div>
+<div class="line"><span class="lineno"> 1106</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1107</span>                    &lt;/&gt;</div>
+<div class="line"><span class="lineno"> 1108</span>                  )}</div>
+<div class="line"><span class="lineno"> 1109</span>                  {<span class="comment">/* Fallback — no payment methods configured */</span>}</div>
+<div class="line"><span class="lineno"> 1110</span>                  {!recipientPaymentMethods?.paypalUsername &amp;&amp; !recipientPaymentMethods?.revolutUsername &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1111</span>                    &lt;div className=<span class="stringliteral">&quot;text-center py-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1112</span>                      &lt;QrCode size={36} className=<span class="stringliteral">&quot;text-gray-300 dark:text-gray-600 mx-auto mb-2&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno"> 1113</span>                      &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-500 dark:text-gray-400&quot;</span>&gt;No payment methods <span class="keyword">set</span> up yet.&lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1114</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno"> 1115</span>                        Add your PayPal or Revolut username in <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> to enable QR payments.</div>
+<div class="line"><span class="lineno"> 1116</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno"> 1117</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1118</span>                  )}</div>
+<div class="line"><span class="lineno"> 1119</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1120</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1121</span>            )}</div>
+<div class="line"><span class="lineno"> 1122</span> </div>
+<div class="line"><span class="lineno"> 1123</span>            {<span class="comment">/* Confirm received button — always visible regardless of QR state */</span>}</div>
+<div class="line"><span class="lineno"> 1124</span>            &lt;form onSubmit={handleManualSettle}&gt;</div>
+<div class="line"><span class="lineno"> 1125</span>              &lt;button</div>
+<div class="line"><span class="lineno"> 1126</span>                type=<span class="stringliteral">&quot;submit&quot;</span></div>
+<div class="line"><span class="lineno"> 1127</span>                disabled={loading}</div>
+<div class="line"><span class="lineno"> 1128</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium&quot;</span></div>
+<div class="line"><span class="lineno"> 1129</span>              &gt;</div>
+<div class="line"><span class="lineno"> 1130</span>                {loading ? <span class="stringliteral">&#39;Recording...&#39;</span> : <span class="stringliteral">&#39;Confirm Payment Received&#39;</span>}</div>
+<div class="line"><span class="lineno"> 1131</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno"> 1132</span>            &lt;/form&gt;</div>
+<div class="line"><span class="lineno"> 1133</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1134</span>        )}</div>
+<div class="line"><span class="lineno"> 1135</span> </div>
+<div class="line"><span class="lineno"> 1136</span>        &lt;button</div>
+<div class="line"><span class="lineno"> 1137</span>          type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno"> 1138</span>          onClick={onClose}</div>
+<div class="line"><span class="lineno"> 1139</span>          className=<span class="stringliteral">&quot;w-full mt-3 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno"> 1140</span>        &gt;</div>
+<div class="line"><span class="lineno"> 1141</span>          Cancel</div>
+<div class="line"><span class="lineno"> 1142</span>        &lt;/button&gt;</div>
+<div class="line"><span class="lineno"> 1143</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1144</span> </div>
+<div class="line"><span class="lineno"> 1145</span>      {<span class="comment">/* Payment Info Modal */</span>}</div>
+<div class="line"><span class="lineno"> 1146</span>      &lt;<a class="code hl_variable" href="_payment_info_modal_8test_8jsx.html#a9c1db037f99d3c1a8bf8f32190821475">PaymentInfoModal</a></div>
+<div class="line"><span class="lineno"> 1147</span>        isOpen={showPaymentInfo}</div>
+<div class="line"><span class="lineno"> 1148</span>        onClose={() =&gt; setShowPaymentInfo(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno"> 1149</span>        paymentInfo={paymentInfo}</div>
+<div class="line"><span class="lineno"> 1150</span>      /&gt;</div>
+<div class="line"><span class="lineno"> 1151</span> </div>
+<div class="line"><span class="lineno"> 1152</span>      {<span class="comment">/* SEPA Payment Modal */</span>}</div>
+<div class="line"><span class="lineno"> 1153</span>      {showSepaModal &amp;&amp; sepaPaymentData &amp;&amp; (</div>
+<div class="line"><span class="lineno"> 1154</span>        &lt;<a class="code hl_variable" href="_sepa_payment_modal_8test_8jsx.html#a068954df8fb44f2a2117275e03abcd9e">SepaPaymentModal</a></div>
+<div class="line"><span class="lineno"> 1155</span>          isOpen={showSepaModal}</div>
+<div class="line"><span class="lineno"> 1156</span>          onClose={() =&gt; setShowSepaModal(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno"> 1157</span>          payment={sepaPaymentData}</div>
+<div class="line"><span class="lineno"> 1158</span>          currentUser={{ uid: currentUserId }}</div>
+<div class="line"><span class="lineno"> 1159</span>          onPaymentSuccess={handleSepaPaymentSuccess}</div>
+<div class="line"><span class="lineno"> 1160</span>        /&gt;</div>
+<div class="line"><span class="lineno"> 1161</span>      )}</div>
+<div class="line"><span class="lineno"> 1162</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno"> 1163</span>  );</div>
+<div class="line"><span class="lineno"> 1164</span>}</div>
+<div class="ttc" id="a_app_8js_html_a5aa8005d6278eb7eecc1b3cd3f87aad6"><div class="ttname"><a href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a></div><div class="ttdeci">import Profile from pages Profile</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00015">App.js:15</a></div></div>
+<div class="ttc" id="a_app_8js_html_ae0d191b66cbd429e8c16cc4a4b87a81c"><div class="ttname"><a href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a></div><div class="ttdeci">export default App</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00221">App.js:221</a></div></div>
+<div class="ttc" id="a_payment_info_modal_8test_8jsx_html_a9c1db037f99d3c1a8bf8f32190821475"><div class="ttname"><a href="_payment_info_modal_8test_8jsx.html#a9c1db037f99d3c1a8bf8f32190821475">PaymentInfoModal</a></div><div class="ttdeci">import PaymentInfoModal from PaymentInfoModal</div><div class="ttdef"><b>Definition</b> <a href="_payment_info_modal_8test_8jsx_source.html#l00007">PaymentInfoModal.test.jsx:7</a></div></div>
+<div class="ttc" id="a_q_r_code_canvas_8test_8jsx_html_a887c8dd2d2acad902492459c02234474"><div class="ttname"><a href="_q_r_code_canvas_8test_8jsx.html#a887c8dd2d2acad902492459c02234474">QRCodeCanvas</a></div><div class="ttdeci">import QRCodeCanvas from QRCodeCanvas</div><div class="ttdef"><b>Definition</b> <a href="_q_r_code_canvas_8test_8jsx_source.html#l00007">QRCodeCanvas.test.jsx:7</a></div></div>
+<div class="ttc" id="a_sepa_payment_modal_8test_8jsx_html_a068954df8fb44f2a2117275e03abcd9e"><div class="ttname"><a href="_sepa_payment_modal_8test_8jsx.html#a068954df8fb44f2a2117275e03abcd9e">SepaPaymentModal</a></div><div class="ttdeci">import SepaPaymentModal from SepaPaymentModal</div><div class="ttdef"><b>Definition</b> <a href="_sepa_payment_modal_8test_8jsx_source.html#l00052">SepaPaymentModal.test.jsx:52</a></div></div>
+<div class="ttc" id="abiometric_8js_html_aea5b1b5dac6efcdbd3faec1b48249ad3"><div class="ttname"><a href="biometric_8js.html#aea5b1b5dac6efcdbd3faec1b48249ad3">authenticateWithBiometric</a></div><div class="ttdeci">export const authenticateWithBiometric</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00034">biometric.js:34</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a979397bcd61476f20722e963203a16ed"><div class="ttname"><a href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a></div><div class="ttdeci">const app</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00019">firebase.js:19</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a13ad744fba2fa725454157c61f84ea79"><div class="ttname"><a href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a></div><div class="ttdeci">export const deleteDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00016">firebaseFirestore.js:16</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a25227b48ae4d1c4fbf781b9ccd4c8c17"><div class="ttname"><a href="firebase_firestore_8js.html#a25227b48ae4d1c4fbf781b9ccd4c8c17">setDoc</a></div><div class="ttdeci">export const setDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00012">firebaseFirestore.js:12</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a4c9f6367db9a8b9f6d64a0d27c9ff6e3"><div class="ttname"><a href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a></div><div class="ttdeci">export const getDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00010">firebaseFirestore.js:10</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a66d1f375d7706c9a5a0976c507a3438e"><div class="ttname"><a href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a></div><div class="ttdeci">export const doc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00020">firebaseFirestore.js:20</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a737ca0f23063ed37c6115359d6a9548b"><div class="ttname"><a href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a></div><div class="ttdeci">export const onSnapshot</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00043">firebaseFirestore.js:43</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a9801e4ebcb689f00edf1a8b0ef4ea2d8"><div class="ttname"><a href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">addDoc</a></div><div class="ttdeci">export const addDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00033">firebaseFirestore.js:33</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ad91b99036fb11671e4ef5d9b6a670142"><div class="ttname"><a href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a></div><div class="ttdeci">export const serverTimestamp</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00037">firebaseFirestore.js:37</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_a03feee26a762e32858554cd57d547031"><div class="ttname"><a href="notifications_store_8js.html#a03feee26a762e32858554cd57d547031">recordPaymentSent</a></div><div class="ttdeci">export const recordPaymentSent</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00119">notificationsStore.js:119</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_a22f128f9a7c7f3837e9acb70e57033b4"><div class="ttname"><a href="notifications_store_8js.html#a22f128f9a7c7f3837e9acb70e57033b4">createNotification</a></div><div class="ttdeci">export const createNotification</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00091">notificationsStore.js:91</a></div></div>
+<div class="ttc" id="apayment_links_8js_html_a559aae314ec609b3e27d57b9ab9dcfa6"><div class="ttname"><a href="payment_links_8js.html#a559aae314ec609b3e27d57b9ab9dcfa6">getAvailablePaymentMethods</a></div><div class="ttdeci">export const getAvailablePaymentMethods</div><div class="ttdef"><b>Definition</b> <a href="payment_links_8js_source.html#l00127">paymentLinks.js:127</a></div></div>
+<div class="ttc" id="apayment_links_8js_html_a6be2e69edf491ad7211f013ed5cce31f"><div class="ttname"><a href="payment_links_8js.html#a6be2e69edf491ad7211f013ed5cce31f">generatePayPalLink</a></div><div class="ttdeci">export const generatePayPalLink</div><div class="ttdef"><b>Definition</b> <a href="payment_links_8js_source.html#l00037">paymentLinks.js:37</a></div></div>
+<div class="ttc" id="apayment_links_8js_html_abba97eab07419c7c6f0050724ed7c07b"><div class="ttname"><a href="payment_links_8js.html#abba97eab07419c7c6f0050724ed7c07b">generateRevolutLink</a></div><div class="ttdeci">export const generateRevolutLink</div><div class="ttdef"><b>Definition</b> <a href="payment_links_8js_source.html#l00066">paymentLinks.js:66</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settle_up_modal_8jsx_source.html#l00002">2</a> of file <a class="el" href="_settle_up_modal_8jsx_source.html">SettleUpModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>{ useState, useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a9c1db037f99d3c1a8bf8f32190821475" name="a9c1db037f99d3c1a8bf8f32190821475"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c1db037f99d3c1a8bf8f32190821475">&#9670;&#160;</a></span>PaymentInfoModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> PaymentInfoModal from PaymentInfoModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settle_up_modal_8jsx_source.html#l00009">9</a> of file <a class="el" href="_settle_up_modal_8jsx_source.html">SettleUpModal.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a887c8dd2d2acad902492459c02234474" name="a887c8dd2d2acad902492459c02234474"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a887c8dd2d2acad902492459c02234474">&#9670;&#160;</a></span>QRCodeCanvas</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> QRCodeCanvas from QRCodeCanvas</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settle_up_modal_8jsx_source.html#l00013">13</a> of file <a class="el" href="_settle_up_modal_8jsx_source.html">SettleUpModal.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a068954df8fb44f2a2117275e03abcd9e" name="a068954df8fb44f2a2117275e03abcd9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a068954df8fb44f2a2117275e03abcd9e">&#9670;&#160;</a></span>SepaPaymentModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> SepaPaymentModal from SepaPaymentModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settle_up_modal_8jsx_source.html#l00010">10</a> of file <a class="el" href="_settle_up_modal_8jsx_source.html">SettleUpModal.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

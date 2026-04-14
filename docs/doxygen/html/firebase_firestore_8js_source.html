@@ -106,58 +106,76 @@ $(function(){initNavTree('firebase_firestore_8js_source.html',''); initResizable
   <div class="headertitle"><div class="title">firebaseFirestore.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="firebase_firestore_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/__mocks__/firebaseFirestore.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>// Mock Firestore for testing</div>
+<a href="firebase_firestore_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/__mocks__/firebaseFirestore.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Mock Firestore for testing</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>export const mockDoc = {</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>  id: &#39;test-doc-id&#39;,</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  data: () =&gt; ({ name: &#39;Test Data&#39; }),</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  exists: () =&gt; true,</div>
+<div class="foldopen" id="foldopen00004" data-start="{" data-end="};">
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#afd1f98198578deb99c25253735c0ef19">    4</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#afd1f98198578deb99c25253735c0ef19">mockDoc</a> = {</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>  id: <span class="stringliteral">&#39;test-doc-id&#39;</span>,</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  data: () =&gt; ({ name: <span class="stringliteral">&#39;Test Data&#39;</span> }),</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  exists: () =&gt; <span class="keyword">true</span>,</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>};</div>
+</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>export const getDoc = jest.fn(() =&gt; Promise.resolve(mockDoc));</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">   10</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a> = jest.fn(() =&gt; Promise.resolve(<a class="code hl_variable" href="firebase_firestore_8js.html#afd1f98198578deb99c25253735c0ef19">mockDoc</a>));</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>export const setDoc = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a25227b48ae4d1c4fbf781b9ccd4c8c17">   12</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a25227b48ae4d1c4fbf781b9ccd4c8c17">setDoc</a> = jest.fn(() =&gt; Promise.resolve());</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>export const updateDoc = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">   14</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a> = jest.fn(() =&gt; Promise.resolve());</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>export const deleteDoc = jest.fn(() =&gt; Promise.resolve());</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">   16</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a> = jest.fn(() =&gt; Promise.resolve());</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>export const collection = jest.fn(() =&gt; ({}));</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">   18</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a> = jest.fn(() =&gt; ({}));</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>export const doc = jest.fn(() =&gt; ({}));</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">   20</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a> = jest.fn(() =&gt; ({}));</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>export const query = jest.fn(() =&gt; ({}));</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">   22</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a> = jest.fn(() =&gt; ({}));</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>export const where = jest.fn(() =&gt; ({}));</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">   24</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a> = jest.fn(() =&gt; ({}));</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>export const getDocs = jest.fn(() =&gt; </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">   26</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a> = jest.fn(() =&gt; </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  Promise.resolve({</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    docs: [mockDoc],</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    forEach: (callback) =&gt; [mockDoc].forEach(callback),</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  })</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>);</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>export const addDoc = jest.fn(() =&gt; </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  Promise.resolve({ id: &#39;new-doc-id&#39; })</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">   33</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">addDoc</a> = jest.fn(() =&gt; </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  Promise.resolve({ id: <span class="stringliteral">&#39;new-doc-id&#39;</span> })</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>);</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>export const serverTimestamp = jest.fn(() =&gt; new Date());</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">   37</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a> = jest.fn(() =&gt; <span class="keyword">new</span> Date());</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>export const arrayUnion = jest.fn((val) =&gt; val);</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a4b836852c1aa78247ceeb5d990ffdb6b">   39</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a4b836852c1aa78247ceeb5d990ffdb6b">arrayUnion</a> = jest.fn((val) =&gt; val);</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>export const arrayRemove = jest.fn((val) =&gt; val);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#abc7666638678d71b686fa41a6a8c00a8">   41</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#abc7666638678d71b686fa41a6a8c00a8">arrayRemove</a> = jest.fn((val) =&gt; val);</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>export const onSnapshot = jest.fn((ref, callback) =&gt; {</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  callback({ exists: () =&gt; false, data: () =&gt; ({}) });</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  return jest.fn();</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">   43</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a> = jest.fn((ref, callback) =&gt; {</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  callback({ exists: () =&gt; <span class="keyword">false</span>, data: () =&gt; ({}) });</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <span class="keywordflow">return</span> jest.fn();</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>});</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>export const writeBatch = jest.fn(() =&gt; ({</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="firebase_firestore_8js.html#a8835a809611b087b42fa9cbdecd69753">   48</a></span>export <span class="keyword">const</span> <a class="code hl_variable" href="firebase_firestore_8js.html#a8835a809611b087b42fa9cbdecd69753">writeBatch</a> = jest.fn(() =&gt; ({</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  update: jest.fn(),</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  delete: jest.fn(),</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  <span class="keyword">delete</span>: jest.fn(),</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  commit: jest.fn(() =&gt; Promise.resolve()),</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}));</div>
+<div class="ttc" id="afirebase_firestore_8js_html_a13ad744fba2fa725454157c61f84ea79"><div class="ttname"><a href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a></div><div class="ttdeci">export const deleteDoc</div><div class="ttdef"><b>Definition</b> <a href="#l00016">firebaseFirestore.js:16</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a25227b48ae4d1c4fbf781b9ccd4c8c17"><div class="ttname"><a href="firebase_firestore_8js.html#a25227b48ae4d1c4fbf781b9ccd4c8c17">setDoc</a></div><div class="ttdeci">export const setDoc</div><div class="ttdef"><b>Definition</b> <a href="#l00012">firebaseFirestore.js:12</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a3259366f21a7fc0c2b72a4b024568536"><div class="ttname"><a href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a></div><div class="ttdeci">export const getDocs</div><div class="ttdef"><b>Definition</b> <a href="#l00026">firebaseFirestore.js:26</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a4b836852c1aa78247ceeb5d990ffdb6b"><div class="ttname"><a href="firebase_firestore_8js.html#a4b836852c1aa78247ceeb5d990ffdb6b">arrayUnion</a></div><div class="ttdeci">export const arrayUnion</div><div class="ttdef"><b>Definition</b> <a href="#l00039">firebaseFirestore.js:39</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a4c9f6367db9a8b9f6d64a0d27c9ff6e3"><div class="ttname"><a href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a></div><div class="ttdeci">export const getDoc</div><div class="ttdef"><b>Definition</b> <a href="#l00010">firebaseFirestore.js:10</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a5fdb89ebdc78c2cdcd9653313e89224d"><div class="ttname"><a href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a></div><div class="ttdeci">export const where</div><div class="ttdef"><b>Definition</b> <a href="#l00024">firebaseFirestore.js:24</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a66d1f375d7706c9a5a0976c507a3438e"><div class="ttname"><a href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a></div><div class="ttdeci">export const doc</div><div class="ttdef"><b>Definition</b> <a href="#l00020">firebaseFirestore.js:20</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a737ca0f23063ed37c6115359d6a9548b"><div class="ttname"><a href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a></div><div class="ttdeci">export const onSnapshot</div><div class="ttdef"><b>Definition</b> <a href="#l00043">firebaseFirestore.js:43</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a8835a809611b087b42fa9cbdecd69753"><div class="ttname"><a href="firebase_firestore_8js.html#a8835a809611b087b42fa9cbdecd69753">writeBatch</a></div><div class="ttdeci">export const writeBatch</div><div class="ttdef"><b>Definition</b> <a href="#l00048">firebaseFirestore.js:48</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a9801e4ebcb689f00edf1a8b0ef4ea2d8"><div class="ttname"><a href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">addDoc</a></div><div class="ttdeci">export const addDoc</div><div class="ttdef"><b>Definition</b> <a href="#l00033">firebaseFirestore.js:33</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_aa2d0bd9afc4f4546b1589010db746116"><div class="ttname"><a href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a></div><div class="ttdeci">export const updateDoc</div><div class="ttdef"><b>Definition</b> <a href="#l00014">firebaseFirestore.js:14</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_abc7666638678d71b686fa41a6a8c00a8"><div class="ttname"><a href="firebase_firestore_8js.html#abc7666638678d71b686fa41a6a8c00a8">arrayRemove</a></div><div class="ttdeci">export const arrayRemove</div><div class="ttdef"><b>Definition</b> <a href="#l00041">firebaseFirestore.js:41</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ad91b99036fb11671e4ef5d9b6a670142"><div class="ttname"><a href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a></div><div class="ttdeci">export const serverTimestamp</div><div class="ttdef"><b>Definition</b> <a href="#l00037">firebaseFirestore.js:37</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_afd1f98198578deb99c25253735c0ef19"><div class="ttname"><a href="firebase_firestore_8js.html#afd1f98198578deb99c25253735c0ef19">mockDoc</a></div><div class="ttdeci">export const mockDoc</div><div class="ttdef"><b>Definition</b> <a href="#l00004">firebaseFirestore.js:4</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

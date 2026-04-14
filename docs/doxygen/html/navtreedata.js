@@ -26,14 +26,24 @@ var NAVTREE =
 [
   [ "Split-Sync", "index.html", [
     [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ]
-    ] ]
+      [ "File List", "files.html", "files_dup" ],
+      [ "Globals", "globals.html", [
+        [ "All", "globals.html", "globals_dup" ],
+        [ "Functions", "globals_func.html", null ],
+        [ "Variables", "globals_vars.html", "globals_vars" ]
+      ] ]
+    ] ],
+    [ "Examples", "examples.html", "examples" ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"_activity_8jsx.html"
+"_activity_8jsx.html",
+"_group_details_8extended_8test_8jsx.html#a9e42303cb6e845fc01a5020ff435af18",
+"_profile_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1",
+"_settle_up_modal_8jsx_source.html",
+"invitation_system_8test_8js.html#aa0c1135d480141c15e35ec9d0817cf11"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

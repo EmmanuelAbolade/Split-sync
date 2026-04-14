@@ -106,52 +106,57 @@ $(function(){initNavTree('_icon_selector_8jsx_source.html',''); initResizable(tr
   <div class="headertitle"><div class="title">IconSelector.jsx</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_icon_selector_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/components/IconSelector.jsx</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { </div>
+<a href="_icon_selector_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/components/IconSelector.jsx</span></div>
+<div class="foldopen" id="foldopen00002" data-start="{" data-end="};">
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="_icon_selector_8jsx.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>  Home, Plane, Pizza, PartyPopper, Car, </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>  Palmtree, Gamepad2, Heart, Users, </div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>  ShoppingCart, Coffee, Utensils, Music,</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  Briefcase, GraduationCap, Gift</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>} from &#39;lucide-react&#39;;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>} from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
+</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>const ICONS = [</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  { name: &#39;home&#39;, Icon: Home, label: &#39;Home&#39; },</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  { name: &#39;plane&#39;, Icon: Plane, label: &#39;Travel&#39; },</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>  { name: &#39;pizza&#39;, Icon: Pizza, label: &#39;Food&#39; },</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  { name: &#39;party&#39;, Icon: PartyPopper, label: &#39;Party&#39; },</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  { name: &#39;car&#39;, Icon: Car, label: &#39;Transport&#39; },</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  { name: &#39;beach&#39;, Icon: Palmtree, label: &#39;Beach&#39; },</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  { name: &#39;game&#39;, Icon: Gamepad2, label: &#39;Gaming&#39; },</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  { name: &#39;heart&#39;, Icon: Heart, label: &#39;Couple&#39; },</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  { name: &#39;users&#39;, Icon: Users, label: &#39;Friends&#39; },</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  { name: &#39;shopping&#39;, Icon: ShoppingCart, label: &#39;Shopping&#39; },</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  { name: &#39;coffee&#39;, Icon: Coffee, label: &#39;Coffee&#39; },</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  { name: &#39;dining&#39;, Icon: Utensils, label: &#39;Dining&#39; },</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  { name: &#39;music&#39;, Icon: Music, label: &#39;Music&#39; },</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  { name: &#39;work&#39;, Icon: Briefcase, label: &#39;Work&#39; },</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  { name: &#39;study&#39;, Icon: GraduationCap, label: &#39;Study&#39; },</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  { name: &#39;gift&#39;, Icon: Gift, label: &#39;Gift&#39; },</div>
+<div class="foldopen" id="foldopen00009" data-start="{" data-end="};">
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="_icon_selector_8jsx.html#afe8367ca31c0fd3300e9b8b830a64f0d">    9</a></span><span class="keyword">const</span> <a class="code hl_variable" href="_icon_selector_8jsx.html#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a> = [</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  { name: <span class="stringliteral">&#39;home&#39;</span>, Icon: Home, label: <span class="stringliteral">&#39;Home&#39;</span> },</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  { name: <span class="stringliteral">&#39;plane&#39;</span>, Icon: Plane, label: <span class="stringliteral">&#39;Travel&#39;</span> },</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>  { name: <span class="stringliteral">&#39;pizza&#39;</span>, Icon: Pizza, label: <span class="stringliteral">&#39;Food&#39;</span> },</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  { name: <span class="stringliteral">&#39;party&#39;</span>, Icon: PartyPopper, label: <span class="stringliteral">&#39;Party&#39;</span> },</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  { name: <span class="stringliteral">&#39;car&#39;</span>, Icon: Car, label: <span class="stringliteral">&#39;Transport&#39;</span> },</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  { name: <span class="stringliteral">&#39;beach&#39;</span>, Icon: Palmtree, label: <span class="stringliteral">&#39;Beach&#39;</span> },</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  { name: <span class="stringliteral">&#39;game&#39;</span>, Icon: Gamepad2, label: <span class="stringliteral">&#39;Gaming&#39;</span> },</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  { name: <span class="stringliteral">&#39;heart&#39;</span>, Icon: Heart, label: <span class="stringliteral">&#39;Couple&#39;</span> },</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  { name: <span class="stringliteral">&#39;users&#39;</span>, Icon: Users, label: <span class="stringliteral">&#39;Friends&#39;</span> },</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  { name: <span class="stringliteral">&#39;shopping&#39;</span>, Icon: ShoppingCart, label: <span class="stringliteral">&#39;Shopping&#39;</span> },</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  { name: <span class="stringliteral">&#39;coffee&#39;</span>, Icon: Coffee, label: <span class="stringliteral">&#39;Coffee&#39;</span> },</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  { name: <span class="stringliteral">&#39;dining&#39;</span>, Icon: Utensils, label: <span class="stringliteral">&#39;Dining&#39;</span> },</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  { name: <span class="stringliteral">&#39;music&#39;</span>, Icon: Music, label: <span class="stringliteral">&#39;Music&#39;</span> },</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  { name: <span class="stringliteral">&#39;work&#39;</span>, Icon: Briefcase, label: <span class="stringliteral">&#39;Work&#39;</span> },</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  { name: <span class="stringliteral">&#39;study&#39;</span>, Icon: GraduationCap, label: <span class="stringliteral">&#39;Study&#39;</span> },</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  { name: <span class="stringliteral">&#39;gift&#39;</span>, Icon: Gift, label: <span class="stringliteral">&#39;Gift&#39;</span> },</div>
+</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>];</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>export default function IconSelector({ selected, onSelect }) {</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  return (</div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="_icon_selector_8jsx.html#a46a2143392b9e4fcc3febccff906c7eb">   28</a></span>export <span class="keywordflow">default</span> <span class="keyword">function</span> <a class="code hl_variable" href="_create_group_modal_8jsx.html#a0453513a57019891ffbce1bdb4743d58">IconSelector</a>({ selected, onSelect }) {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  <span class="keywordflow">return</span> (</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    &lt;div&gt;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>      &lt;label className=&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2&quot;&gt;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>      &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2&quot;</span>&gt;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        Choose Icon</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      &lt;/label&gt;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      &lt;div className=&quot;grid grid-cols-3 sm:grid-cols-4 gap-2&quot;&gt;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        {ICONS.map(({ name, Icon, label }) =&gt; {</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>          const isSelected = selected === name;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>          return (</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      &lt;div className=<span class="stringliteral">&quot;grid grid-cols-3 sm:grid-cols-4 gap-2&quot;</span>&gt;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        {<a class="code hl_variable" href="_icon_selector_8jsx.html#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a>.map(({ name, Icon, label }) =&gt; {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>          <span class="keyword">const</span> isSelected = selected === name;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>          <span class="keywordflow">return</span> (</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            &lt;button</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>              key={name}</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>              type=&quot;button&quot;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>              onClick={() =&gt; onSelect(name)}</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>              title={label}</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>              className={`p-3 rounded-lg transition flex items-center justify-center ${</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                isSelected</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                  ? &#39;bg-primary dark:bg-indigo-600 text-white ring-2 ring-primary dark:ring-indigo-500&#39;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                  : &#39;bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                  ? <span class="stringliteral">&#39;bg-primary dark:bg-indigo-600 text-white ring-2 ring-primary dark:ring-indigo-500&#39;</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                  : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</span></div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>              }`}</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>            &gt;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>              &lt;Icon size={24} /&gt;</div>
@@ -162,8 +167,11 @@ $(function(){initNavTree('_icon_selector_8jsx_source.html',''); initResizable(tr
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    &lt;/div&gt;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  );</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>}</div>
+</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>export { ICONS };</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>export { <a class="code hl_variable" href="_icon_selector_8jsx.html#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a> };</div>
+<div class="ttc" id="a_create_group_modal_8jsx_html_a0453513a57019891ffbce1bdb4743d58"><div class="ttname"><a href="_create_group_modal_8jsx.html#a0453513a57019891ffbce1bdb4743d58">IconSelector</a></div><div class="ttdeci">import IconSelector from IconSelector</div><div class="ttdef"><b>Definition</b> <a href="_create_group_modal_8jsx_source.html#l00006">CreateGroupModal.jsx:6</a></div></div>
+<div class="ttc" id="a_icon_selector_8jsx_html_afe8367ca31c0fd3300e9b8b830a64f0d"><div class="ttname"><a href="_icon_selector_8jsx.html#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a></div><div class="ttdeci">const ICONS</div><div class="ttdef"><b>Definition</b> <a href="#l00009">IconSelector.jsx:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -106,51 +106,58 @@ $(function(){initNavTree('_dark_mode_context_8jsx_source.html',''); initResizabl
   <div class="headertitle"><div class="title">DarkModeContext.jsx</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_dark_mode_context_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/contexts/DarkModeContext.jsx</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { createContext, useContext, useState, useEffect } from &#39;react&#39;;</div>
+<a href="_dark_mode_context_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/contexts/DarkModeContext.jsx</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="_dark_mode_context_8jsx.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { createContext, useContext, useState, useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>const DarkModeContext = createContext();</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="_dark_mode_context_8jsx.html#a8085cb8046db254913f1ea6b1a4a9e1a">    4</a></span><span class="keyword">const</span> <a class="code hl_variable" href="_dark_mode_context_8jsx.html#a8085cb8046db254913f1ea6b1a4a9e1a">DarkModeContext</a> = createContext();</div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>export function useDarkMode() {</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  const context = useContext(DarkModeContext);</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  if (!context) {</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    throw new Error(&#39;useDarkMode must be used within DarkModeProvider&#39;);</div>
+<div class="foldopen" id="foldopen00006" data-start="{" data-end="}">
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="_dark_mode_context_8jsx.html#a0c7bea9fa9fb49032ffd975e28ef4104">    6</a></span>export <span class="keyword">function</span> <a class="code hl_function" href="_dark_mode_context_8jsx.html#a0c7bea9fa9fb49032ffd975e28ef4104">useDarkMode</a>() {</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  <span class="keyword">const</span> context = useContext(<a class="code hl_variable" href="_dark_mode_context_8jsx.html#a8085cb8046db254913f1ea6b1a4a9e1a">DarkModeContext</a>);</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  <span class="keywordflow">if</span> (!context) {</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;useDarkMode must be used within DarkModeProvider&#39;</span>);</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  }</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  return context;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  <span class="keywordflow">return</span> context;</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>}</div>
+</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>export function DarkModeProvider({ children }) {</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  // Initialize dark mode from localStorage or system preference</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  const [isDarkMode, setIsDarkMode] = useState(() =&gt; {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    const saved = localStorage.getItem(&#39;darkMode&#39;);</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    if (saved !== null) {</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>      return JSON.parse(saved);</div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="}">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">   14</a></span>export <span class="keyword">function</span> <a class="code hl_function" href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">DarkModeProvider</a>({ children }) {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  <span class="comment">// Initialize dark mode from localStorage or system preference</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <span class="keyword">const</span> [isDarkMode, setIsDarkMode] = useState(() =&gt; {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keyword">const</span> saved = localStorage.getItem(<span class="stringliteral">&#39;darkMode&#39;</span>);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="keywordflow">if</span> (saved !== <span class="keyword">null</span>) {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>      <span class="keywordflow">return</span> JSON.parse(saved);</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    }</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    // Check system preference</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    return window.matchMedia(&#39;(prefers-color-scheme: dark)&#39;).matches;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="comment">// Check system preference</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordflow">return</span> window.matchMedia(<span class="stringliteral">&#39;(prefers-color-scheme: dark)&#39;</span>).matches;</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  });</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  // Update localStorage and apply class to document</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  <span class="comment">// Update localStorage and apply class to document</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  useEffect(() =&gt; {</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    localStorage.setItem(&#39;darkMode&#39;, JSON.stringify(isDarkMode));</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    localStorage.setItem(<span class="stringliteral">&#39;darkMode&#39;</span>, JSON.stringify(isDarkMode));</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    if (isDarkMode) {</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      document.documentElement.classList.add(&#39;dark&#39;);</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    } else {</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>      document.documentElement.classList.remove(&#39;dark&#39;);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordflow">if</span> (isDarkMode) {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      document.documentElement.classList.add(<span class="stringliteral">&#39;dark&#39;</span>);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>      document.documentElement.classList.remove(<span class="stringliteral">&#39;dark&#39;</span>);</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    }</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  }, [isDarkMode]);</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  const toggleDarkMode = () =&gt; {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  <span class="keyword">const</span> toggleDarkMode = () =&gt; {</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    setIsDarkMode(prev =&gt; !prev);</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  };</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  return (</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    &lt;DarkModeContext.Provider value={{ isDarkMode, toggleDarkMode }}&gt;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    &lt;<a class="code hl_variable" href="_dark_mode_context_8jsx.html#a8085cb8046db254913f1ea6b1a4a9e1a">DarkModeContext</a>.Provider value={{ isDarkMode, toggleDarkMode }}&gt;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      {children}</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    &lt;/DarkModeContext.Provider&gt;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    &lt;/<a class="code hl_variable" href="_dark_mode_context_8jsx.html#a8085cb8046db254913f1ea6b1a4a9e1a">DarkModeContext</a>.Provider&gt;</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  );</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>}</div>
+</div>
+<div class="ttc" id="a_dark_mode_context_8jsx_html_a0c7bea9fa9fb49032ffd975e28ef4104"><div class="ttname"><a href="_dark_mode_context_8jsx.html#a0c7bea9fa9fb49032ffd975e28ef4104">useDarkMode</a></div><div class="ttdeci">function export useDarkMode()</div><div class="ttdef"><b>Definition</b> <a href="#l00006">DarkModeContext.jsx:6</a></div></div>
+<div class="ttc" id="a_dark_mode_context_8jsx_html_a433e9ef42bbce1132a17b71f286fdd39"><div class="ttname"><a href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">DarkModeProvider</a></div><div class="ttdeci">function export DarkModeProvider({ children })</div><div class="ttdef"><b>Definition</b> <a href="#l00014">DarkModeContext.jsx:14</a></div></div>
+<div class="ttc" id="a_dark_mode_context_8jsx_html_a8085cb8046db254913f1ea6b1a4a9e1a"><div class="ttname"><a href="_dark_mode_context_8jsx.html#a8085cb8046db254913f1ea6b1a4a9e1a">DarkModeContext</a></div><div class="ttdeci">const DarkModeContext</div><div class="ttdef"><b>Definition</b> <a href="#l00004">DarkModeContext.jsx:4</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

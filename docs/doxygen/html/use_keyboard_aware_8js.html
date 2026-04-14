@@ -103,11 +103,85 @@ $(function(){initNavTree('use_keyboard_aware_8js.html',''); initResizable(true);
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">useKeyboardAware.js File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="use_keyboard_aware_8js_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a56c3c6d6f62fee3647a3367c94e57636" id="r_a56c3c6d6f62fee3647a3367c94e57636"><td class="memItemLeft" align="right" valign="top">function export&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56c3c6d6f62fee3647a3367c94e57636">useKeyboardAware</a> (inputRef)</td></tr>
+<tr class="separator:a56c3c6d6f62fee3647a3367c94e57636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a56c3c6d6f62fee3647a3367c94e57636" name="a56c3c6d6f62fee3647a3367c94e57636"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56c3c6d6f62fee3647a3367c94e57636">&#9670;&#160;</a></span>useKeyboardAware()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function export useKeyboardAware </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>inputRef</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="use_keyboard_aware_8js_source.html#l00005">5</a> of file <a class="el" href="use_keyboard_aware_8js_source.html">useKeyboardAware.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    5</span>                                           {</div>
+<div class="line"><span class="lineno">    6</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">    7</span>    <span class="keywordflow">if</span> (!inputRef?.current) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">    8</span> </div>
+<div class="line"><span class="lineno">    9</span>    <span class="keyword">const</span> handleFocus = () =&gt; {</div>
+<div class="line"><span class="lineno">   10</span>      <span class="comment">// Wait for keyboard to appear</span></div>
+<div class="line"><span class="lineno">   11</span>      setTimeout(() =&gt; {</div>
+<div class="line"><span class="lineno">   12</span>        inputRef.current?.scrollIntoView({ </div>
+<div class="line"><span class="lineno">   13</span>          behavior: <span class="stringliteral">&#39;smooth&#39;</span>, </div>
+<div class="line"><span class="lineno">   14</span>          block: <span class="stringliteral">&#39;center&#39;</span> </div>
+<div class="line"><span class="lineno">   15</span>        });</div>
+<div class="line"><span class="lineno">   16</span>      }, 300);</div>
+<div class="line"><span class="lineno">   17</span>    };</div>
+<div class="line"><span class="lineno">   18</span> </div>
+<div class="line"><span class="lineno">   19</span>    <span class="keyword">const</span> element = inputRef.current;</div>
+<div class="line"><span class="lineno">   20</span>    element.addEventListener(<span class="stringliteral">&#39;focus&#39;</span>, handleFocus);</div>
+<div class="line"><span class="lineno">   21</span> </div>
+<div class="line"><span class="lineno">   22</span>    <span class="keywordflow">return</span> () =&gt; {</div>
+<div class="line"><span class="lineno">   23</span>      element.removeEventListener(<span class="stringliteral">&#39;focus&#39;</span>, handleFocus);</div>
+<div class="line"><span class="lineno">   24</span>    };</div>
+<div class="line"><span class="lineno">   25</span>  }, [inputRef]);</div>
+<div class="line"><span class="lineno">   26</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="use_keyboard_aware_8js_source.html#l00003">3</a> of file <a class="el" href="use_keyboard_aware_8js_source.html">useKeyboardAware.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    3</span>{ useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

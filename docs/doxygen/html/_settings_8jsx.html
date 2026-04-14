@@ -103,11 +103,927 @@ $(function(){initNavTree('_settings_8jsx.html',''); initResizable(true); });
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Settings.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_settings_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a593e200fcaba27a036078a4bf16900e4" id="r_a593e200fcaba27a036078a4bf16900e4"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a593e200fcaba27a036078a4bf16900e4">Section</a> ({ title, icon:Icon, iconColor='text-indigo-600 dark:text-indigo-400', iconBg='bg-indigo-50 dark:bg-indigo-900/30', defaultOpen=false, children })</td></tr>
+<tr class="separator:a593e200fcaba27a036078a4bf16900e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46d9b05cb58a2f698d9be9accac86014" id="r_a46d9b05cb58a2f698d9be9accac86014"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46d9b05cb58a2f698d9be9accac86014">ToggleRow</a> ({ label, description, value, onChange })</td></tr>
+<tr class="separator:a46d9b05cb58a2f698d9be9accac86014"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03e0ceccd3fd3a7fde34677c0f6f15ca" id="r_a03e0ceccd3fd3a7fde34677c0f6f15ca"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">ActionRow</a> ({ icon:Icon, iconBg, iconColor, label, description, onClick, chevron=true, destructive=false })</td></tr>
+<tr class="separator:a03e0ceccd3fd3a7fde34677c0f6f15ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc4ebaae94e50ae62ab2607f5fe0378b" id="r_abc4ebaae94e50ae62ab2607f5fe0378b"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc4ebaae94e50ae62ab2607f5fe0378b">Settings</a> ()</td></tr>
+<tr class="separator:abc4ebaae94e50ae62ab2607f5fe0378b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f1ccc794373a7a49a972fb1e6f53e6a" id="r_a4f1ccc794373a7a49a972fb1e6f53e6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> QRCodeModal from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f1ccc794373a7a49a972fb1e6f53e6a">QRCodeModal</a></td></tr>
+<tr class="separator:a4f1ccc794373a7a49a972fb1e6f53e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89627e9bfe8cee548dd3d583fa05d504" id="r_a89627e9bfe8cee548dd3d583fa05d504"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> InfoHubModal from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89627e9bfe8cee548dd3d583fa05d504">InfoHubModal</a></td></tr>
+<tr class="separator:a89627e9bfe8cee548dd3d583fa05d504"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa141d4b4d4d7c8fa622e15413a3b9dcb" id="r_aa141d4b4d4d7c8fa622e15413a3b9dcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> DarkModeToggle from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa141d4b4d4d7c8fa622e15413a3b9dcb">DarkModeToggle</a></td></tr>
+<tr class="separator:aa141d4b4d4d7c8fa622e15413a3b9dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a03e0ceccd3fd3a7fde34677c0f6f15ca" name="a03e0ceccd3fd3a7fde34677c0f6f15ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">&#9670;&#160;</a></span>ActionRow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function ActionRow </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ icon:Icon, iconBg, iconColor, label, description, onClick, chevron=true, destructive=false }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00091">91</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   91</span>                   { icon: Icon, iconBg, iconColor, label, description, onClick, chevron = <span class="keyword">true</span>, destructive = <span class="keyword">false</span> }) {</div>
+<div class="line"><span class="lineno">   92</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   93</span>    &lt;button</div>
+<div class="line"><span class="lineno">   94</span>      onClick={onClick}</div>
+<div class="line"><span class="lineno">   95</span>      className={`w-full flex items-center justify-between py-3 px-4 rounded-xl transition-colors ${</div>
+<div class="line"><span class="lineno">   96</span>        destructive</div>
+<div class="line"><span class="lineno">   97</span>          ? <span class="stringliteral">&#39;bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30&#39;</span></div>
+<div class="line"><span class="lineno">   98</span>          : <span class="stringliteral">&#39;bg-gray-50 dark:bg-gray-700/60 hover:bg-gray-100 dark:hover:bg-gray-700&#39;</span></div>
+<div class="line"><span class="lineno">   99</span>      }`}</div>
+<div class="line"><span class="lineno">  100</span>    &gt;</div>
+<div class="line"><span class="lineno">  101</span>      &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  102</span>        &lt;div className={`w-9 h-9 ${iconBg} rounded-xl flex items-center justify-center shrink-0`}&gt;</div>
+<div class="line"><span class="lineno">  103</span>          &lt;Icon size={17} className={iconColor} /&gt;</div>
+<div class="line"><span class="lineno">  104</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  105</span>        &lt;div className=<span class="stringliteral">&quot;text-left&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  106</span>          &lt;p className={`font-medium text-sm ${destructive ? <span class="stringliteral">&#39;text-red-700 dark:text-red-400&#39;</span> : <span class="stringliteral">&#39;text-gray-900 dark:text-white&#39;</span>}`}&gt;{label}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  107</span>          {description &amp;&amp; &lt;p className={`text-xs mt-0.5 ${destructive ? <span class="stringliteral">&#39;text-red-500 dark:text-red-500&#39;</span> : <span class="stringliteral">&#39;text-gray-500 dark:text-gray-400&#39;</span>}`}&gt;{description}&lt;/p&gt;}</div>
+<div class="line"><span class="lineno">  108</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  109</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  110</span>      {chevron &amp;&amp; (</div>
+<div class="line"><span class="lineno">  111</span>        &lt;ChevronDown size={16} className={`-rotate-90 ${destructive ? <span class="stringliteral">&#39;text-red-400&#39;</span> : <span class="stringliteral">&#39;text-gray-400 dark:text-gray-500&#39;</span>}`} /&gt;</div>
+<div class="line"><span class="lineno">  112</span>      )}</div>
+<div class="line"><span class="lineno">  113</span>    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  114</span>  );</div>
+<div class="line"><span class="lineno">  115</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a593e200fcaba27a036078a4bf16900e4" name="a593e200fcaba27a036078a4bf16900e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a593e200fcaba27a036078a4bf16900e4">&#9670;&#160;</a></span>Section()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Section </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ title, icon:Icon, iconColor='text-indigo-600 dark:text-indigo-400', iconBg='bg-indigo-50 dark:bg-indigo-900/30', defaultOpen=false, children }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00036">36</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   36</span>                 { title, icon: Icon, iconColor = <span class="stringliteral">&#39;text-indigo-600 dark:text-indigo-400&#39;</span>, iconBg = <span class="stringliteral">&#39;bg-indigo-50 dark:bg-indigo-900/30&#39;</span>, defaultOpen = <span class="keyword">false</span>, children }) {</div>
+<div class="line"><span class="lineno">   37</span>  <span class="keyword">const</span> [open, setOpen] = useState(defaultOpen);</div>
+<div class="line"><span class="lineno">   38</span> </div>
+<div class="line"><span class="lineno">   39</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   40</span>    &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   41</span>      {<span class="comment">/* Header — click to toggle */</span>}</div>
+<div class="line"><span class="lineno">   42</span>      &lt;button</div>
+<div class="line"><span class="lineno">   43</span>        onClick={() =&gt; setOpen(o =&gt; !o)}</div>
+<div class="line"><span class="lineno">   44</span>        className=<span class="stringliteral">&quot;w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">   45</span>        aria-expanded={open}</div>
+<div class="line"><span class="lineno">   46</span>      &gt;</div>
+<div class="line"><span class="lineno">   47</span>        &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   48</span>          &lt;div className={`w-9 h-9 ${iconBg} rounded-xl flex items-center justify-center`}&gt;</div>
+<div class="line"><span class="lineno">   49</span>            &lt;Icon size={18} className={iconColor} /&gt;</div>
+<div class="line"><span class="lineno">   50</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   51</span>          &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;{title}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">   52</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   53</span>        &lt;ChevronDown</div>
+<div class="line"><span class="lineno">   54</span>          size={18}</div>
+<div class="line"><span class="lineno">   55</span>          className={`text-gray-400 dark:text-gray-500 transition-transform duration-300 ${open ? <span class="stringliteral">&#39;rotate-180&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}`}</div>
+<div class="line"><span class="lineno">   56</span>        /&gt;</div>
+<div class="line"><span class="lineno">   57</span>      &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   58</span> </div>
+<div class="line"><span class="lineno">   59</span>      {<span class="comment">/* Collapsible body */</span>}</div>
+<div class="line"><span class="lineno">   60</span>      &lt;div className={`transition-all duration-300 ease-in-out overflow-hidden ${open ? <span class="stringliteral">&#39;max-h-[1000px] opacity-100&#39;</span> : <span class="stringliteral">&#39;max-h-0 opacity-0&#39;</span>}`}&gt;</div>
+<div class="line"><span class="lineno">   61</span>        &lt;div className=<span class="stringliteral">&quot;px-5 pb-5 pt-1 border-t border-gray-100 dark:border-gray-700 space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   62</span>          {children}</div>
+<div class="line"><span class="lineno">   63</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   64</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   65</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   66</span>  );</div>
+<div class="line"><span class="lineno">   67</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abc4ebaae94e50ae62ab2607f5fe0378b" name="abc4ebaae94e50ae62ab2607f5fe0378b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc4ebaae94e50ae62ab2607f5fe0378b">&#9670;&#160;</a></span>Settings()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default Settings </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00119">119</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  119</span>                                   {</div>
+<div class="line"><span class="lineno">  120</span>  <span class="keyword">const</span> navigate       = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">  121</span>  <span class="keyword">const</span> { user, logout, updateUserDisplayName } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><span class="lineno">  122</span> </div>
+<div class="line"><span class="lineno">  123</span>  <span class="keyword">const</span> [notifications,    setNotifications]    = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  124</span>  <span class="keyword">const</span> [biometricEnabled, setBiometricEnabled] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  125</span>  <span class="keyword">const</span> [loading,          setLoading]          = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  126</span>  <span class="keyword">const</span> [error,            setError]            = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  127</span>  <span class="keyword">const</span> [success,          setSuccess]          = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  128</span>  <span class="keyword">const</span> [showQRCode,       setShowQRCode]       = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  129</span>  <span class="keyword">const</span> [showInfoHub,      setShowInfoHub]      = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  130</span> </div>
+<div class="line"><span class="lineno">  131</span>  <span class="comment">// Profile edit</span></div>
+<div class="line"><span class="lineno">  132</span>  <span class="keyword">const</span> [editingName, setEditingName] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  133</span>  <span class="keyword">const</span> [newName,     setNewName]     = useState(user?.displayName || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  134</span> </div>
+<div class="line"><span class="lineno">  135</span>  <span class="comment">// Delete account</span></div>
+<div class="line"><span class="lineno">  136</span>  <span class="keyword">const</span> [showDeleteModal, setShowDeleteModal] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  137</span>  <span class="keyword">const</span> [deletePassword,  setDeletePassword]  = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  138</span>  <span class="keyword">const</span> [showPassword,    setShowPassword]    = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  139</span>  <span class="keyword">const</span> [deleteLoading,   setDeleteLoading]   = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  140</span>  <span class="keyword">const</span> [deleteError,     setDeleteError]     = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  141</span> </div>
+<div class="line"><span class="lineno">  142</span>  <span class="comment">// Load biometric state from device</span></div>
+<div class="line"><span class="lineno">  143</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  144</span>    <span class="keywordflow">if</span> (user) setBiometricEnabled(<a class="code hl_variable" href="biometric_8js.html#af4ee6a9df1a3b8b32baf021f21bb7820">isBiometricEnabledOnDevice</a>(user.uid));</div>
+<div class="line"><span class="lineno">  145</span>  }, [user]);</div>
+<div class="line"><span class="lineno">  146</span> </div>
+<div class="line"><span class="lineno">  147</span>  <span class="comment">// Session timeout settings</span></div>
+<div class="line"><span class="lineno">  148</span>  <span class="keyword">const</span> { timeoutSetting, updateTimeoutSetting } = <a class="code hl_variable" href="use_session_timeout_8js.html#a92579e7b1de77f51ba0917fd2670c107">useSessionTimeout</a>();</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>  <span class="keyword">const</span> <a class="code hl_variable" href="use_session_timeout_8js.html#a81f6ae082a8f42a1b830c47104c7f726">TIMEOUT_OPTIONS</a> = [</div>
+<div class="line"><span class="lineno">  151</span>    { value: <span class="stringliteral">&#39;5min&#39;</span>,  label: <span class="stringliteral">&#39;5 minutes&#39;</span> },</div>
+<div class="line"><span class="lineno">  152</span>    { value: <span class="stringliteral">&#39;10min&#39;</span>, label: <span class="stringliteral">&#39;10 minutes&#39;</span> },</div>
+<div class="line"><span class="lineno">  153</span>    { value: <span class="stringliteral">&#39;20min&#39;</span>, label: <span class="stringliteral">&#39;20 minutes&#39;</span> },</div>
+<div class="line"><span class="lineno">  154</span>    { value: <span class="stringliteral">&#39;30min&#39;</span>, label: <span class="stringliteral">&#39;30 minutes&#39;</span> },</div>
+<div class="line"><span class="lineno">  155</span>    { value: <span class="stringliteral">&#39;never&#39;</span>, label: <span class="stringliteral">&#39;Never&#39;</span> },</div>
+<div class="line"><span class="lineno">  156</span>  ];</div>
+<div class="line"><span class="lineno">  157</span> </div>
+<div class="line"><span class="lineno">  158</span>  <span class="comment">// ── PWA Install ────────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  159</span>  <span class="comment">// Captures the browser&#39;s beforeinstallprompt event so we can trigger it via</span></div>
+<div class="line"><span class="lineno">  160</span>  <span class="comment">// a button. Works on Chrome and Edge (Android + desktop). iOS requires the</span></div>
+<div class="line"><span class="lineno">  161</span>  <span class="comment">// user to use Safari&#39;s Share sheet manually, so we detect and show steps.</span></div>
+<div class="line"><span class="lineno">  162</span> </div>
+<div class="line"><span class="lineno">  163</span>  <span class="keyword">const</span> [installPrompt, setInstallPrompt] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  164</span>  <span class="keyword">const</span> [isInstalled,   setIsInstalled]   = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  165</span>  <span class="keyword">const</span> [installDone,   setInstallDone]   = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  166</span> </div>
+<div class="line"><span class="lineno">  167</span>  <span class="keyword">const</span> isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);</div>
+<div class="line"><span class="lineno">  168</span>  <span class="keyword">const</span> isInStandaloneMode =</div>
+<div class="line"><span class="lineno">  169</span>    window.matchMedia(<span class="stringliteral">&#39;(display-mode: standalone)&#39;</span>).matches ||</div>
+<div class="line"><span class="lineno">  170</span>    navigator.standalone === <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  171</span> </div>
+<div class="line"><span class="lineno">  172</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  173</span>    <span class="keywordflow">if</span> (isInStandaloneMode) {</div>
+<div class="line"><span class="lineno">  174</span>      setIsInstalled(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  175</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  176</span>    }</div>
+<div class="line"><span class="lineno">  177</span> </div>
+<div class="line"><span class="lineno">  178</span>    <span class="keyword">const</span> handler = (e) =&gt; {</div>
+<div class="line"><span class="lineno">  179</span>      e.preventDefault();          <span class="comment">// Stop the browser&#39;s own mini-infobar</span></div>
+<div class="line"><span class="lineno">  180</span>      setInstallPrompt(e);         <span class="comment">// Save the event for later use</span></div>
+<div class="line"><span class="lineno">  181</span>    };</div>
+<div class="line"><span class="lineno">  182</span> </div>
+<div class="line"><span class="lineno">  183</span>    window.addEventListener(<span class="stringliteral">&#39;beforeinstallprompt&#39;</span>, handler);</div>
+<div class="line"><span class="lineno">  184</span> </div>
+<div class="line"><span class="lineno">  185</span>    <span class="comment">// Detect successful install via appinstalled event</span></div>
+<div class="line"><span class="lineno">  186</span>    <span class="keyword">const</span> onInstalled = () =&gt; {</div>
+<div class="line"><span class="lineno">  187</span>      setIsInstalled(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  188</span>      setInstallPrompt(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  189</span>    };</div>
+<div class="line"><span class="lineno">  190</span>    window.addEventListener(<span class="stringliteral">&#39;appinstalled&#39;</span>, onInstalled);</div>
+<div class="line"><span class="lineno">  191</span> </div>
+<div class="line"><span class="lineno">  192</span>    <span class="keywordflow">return</span> () =&gt; {</div>
+<div class="line"><span class="lineno">  193</span>      window.removeEventListener(<span class="stringliteral">&#39;beforeinstallprompt&#39;</span>, handler);</div>
+<div class="line"><span class="lineno">  194</span>      window.removeEventListener(<span class="stringliteral">&#39;appinstalled&#39;</span>, onInstalled);</div>
+<div class="line"><span class="lineno">  195</span>    };</div>
+<div class="line"><span class="lineno">  196</span>  }, [isInStandaloneMode]);</div>
+<div class="line"><span class="lineno">  197</span> </div>
+<div class="line"><span class="lineno">  198</span>  <span class="keyword">const</span> handleInstallClick = async () =&gt; {</div>
+<div class="line"><span class="lineno">  199</span>    <span class="keywordflow">if</span> (!installPrompt) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  200</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  201</span>      await installPrompt.prompt();</div>
+<div class="line"><span class="lineno">  202</span>      <span class="keyword">const</span> { outcome } = await installPrompt.userChoice;</div>
+<div class="line"><span class="lineno">  203</span>      <span class="keywordflow">if</span> (outcome === <span class="stringliteral">&#39;accepted&#39;</span>) {</div>
+<div class="line"><span class="lineno">  204</span>        setInstallDone(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  205</span>        setInstallPrompt(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  206</span>      }</div>
+<div class="line"><span class="lineno">  207</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  208</span>      console.error(<span class="stringliteral">&#39;PWA install error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  209</span>    }</div>
+<div class="line"><span class="lineno">  210</span>  };</div>
+<div class="line"><span class="lineno">  211</span> </div>
+<div class="line"><span class="lineno">  212</span>  <span class="comment">// ── Handlers ──────────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  213</span> </div>
+<div class="line"><span class="lineno">  214</span>  <span class="comment">// Update name across Firebase Auth, Firestore user doc, and all group member arrays</span></div>
+<div class="line"><span class="lineno">  215</span>  <span class="keyword">const</span> handleUpdateName = async () =&gt; {</div>
+<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">if</span> (!newName.trim()) { setError(<span class="stringliteral">&#39;Name cannot be empty&#39;</span>); <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="lineno">  217</span>    <span class="keywordflow">if</span> (newName.trim().length &gt; 50) { setError(<span class="stringliteral">&#39;Name cannot exceed 50 characters&#39;</span>); <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="lineno">  218</span>    setLoading(<span class="keyword">true</span>); setError(<span class="stringliteral">&#39;&#39;</span>); setSuccess(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  219</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  220</span>      <span class="keyword">const</span> trimmedName = newName.trim();</div>
+<div class="line"><span class="lineno">  221</span> </div>
+<div class="line"><span class="lineno">  222</span>      <span class="comment">// 1. Update Firebase Auth display name</span></div>
+<div class="line"><span class="lineno">  223</span>      await <a class="code hl_variable" href="firebase_auth_8js.html#ac6e1f87478e3bfd703f0da680a1f1629">updateProfile</a>(<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>.currentUser, { displayName: trimmedName });</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>      <span class="comment">// 2. Update Firestore user document — keep both displayName and fullName in sync</span></div>
+<div class="line"><span class="lineno">  226</span>      await <a class="code hl_variable" href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;users&#39;</span>, user.uid), { displayName: trimmedName, fullName: trimmedName });</div>
+<div class="line"><span class="lineno">  227</span> </div>
+<div class="line"><span class="lineno">  228</span>      <span class="comment">// 3. Update this user&#39;s name inside every group&#39;s members array</span></div>
+<div class="line"><span class="lineno">  229</span>      <span class="keyword">const</span> groupsSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(</div>
+<div class="line"><span class="lineno">  230</span>        <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;groups&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;memberIds&#39;</span>, <span class="stringliteral">&#39;array-contains&#39;</span>, user.uid))</div>
+<div class="line"><span class="lineno">  231</span>      );</div>
+<div class="line"><span class="lineno">  232</span>      <span class="keyword">const</span> batch = <a class="code hl_variable" href="firebase_firestore_8js.html#a8835a809611b087b42fa9cbdecd69753">writeBatch</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>);</div>
+<div class="line"><span class="lineno">  233</span>      groupsSnap.forEach(groupDoc =&gt; {</div>
+<div class="line"><span class="lineno">  234</span>        <span class="keyword">const</span> members = groupDoc.data().members || [];</div>
+<div class="line"><span class="lineno">  235</span>        <span class="keyword">const</span> updatedMembers = members.map(m =&gt;</div>
+<div class="line"><span class="lineno">  236</span>          m.userId === user.uid ? { ...m, name: trimmedName } : m</div>
+<div class="line"><span class="lineno">  237</span>        );</div>
+<div class="line"><span class="lineno">  238</span>        batch.update(groupDoc.ref, { members: updatedMembers });</div>
+<div class="line"><span class="lineno">  239</span>      });</div>
+<div class="line"><span class="lineno">  240</span>      await batch.commit();</div>
+<div class="line"><span class="lineno">  241</span> </div>
+<div class="line"><span class="lineno">  242</span>      <span class="comment">// Update the in-memory store so all components reflect the new name immediately</span></div>
+<div class="line"><span class="lineno">  243</span>      updateUserDisplayName(trimmedName);</div>
+<div class="line"><span class="lineno">  244</span>      setSuccess(<span class="stringliteral">&#39;Name updated successfully!&#39;</span>);</div>
+<div class="line"><span class="lineno">  245</span>      setEditingName(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  246</span>      setTimeout(() =&gt; setSuccess(<span class="stringliteral">&#39;&#39;</span>), 3000);</div>
+<div class="line"><span class="lineno">  247</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  248</span>      console.error(<span class="stringliteral">&#39;Error updating name:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  249</span>      setError(<span class="stringliteral">&#39;Failed to update name. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  250</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  251</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  252</span>    }</div>
+<div class="line"><span class="lineno">  253</span>  };</div>
+<div class="line"><span class="lineno">  254</span> </div>
+<div class="line"><span class="lineno">  255</span>  <span class="keyword">const</span> handleLogout = async () =&gt; {</div>
+<div class="line"><span class="lineno">  256</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  257</span>      await logout();</div>
+<div class="line"><span class="lineno">  258</span>      navigate(<span class="stringliteral">&#39;/login&#39;</span>);</div>
+<div class="line"><span class="lineno">  259</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  260</span>      console.error(<span class="stringliteral">&#39;Logout error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  261</span>      setError(<span class="stringliteral">&#39;Failed to log out. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  262</span>    }</div>
+<div class="line"><span class="lineno">  263</span>  };</div>
+<div class="line"><span class="lineno">  264</span> </div>
+<div class="line"><span class="lineno">  265</span>  <span class="keyword">const</span> handleDeleteAccount = async () =&gt; {</div>
+<div class="line"><span class="lineno">  266</span>    <span class="keywordflow">if</span> (!deletePassword) { setDeleteError(<span class="stringliteral">&#39;Password is required&#39;</span>); <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="lineno">  267</span>    setDeleteLoading(<span class="keyword">true</span>); setDeleteError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  268</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  269</span>      <span class="keyword">const</span> credential = EmailAuthProvider.credential(<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>.currentUser.email, deletePassword);</div>
+<div class="line"><span class="lineno">  270</span>      await reauthenticateWithCredential(<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>.currentUser, credential);</div>
+<div class="line"><span class="lineno">  271</span> </div>
+<div class="line"><span class="lineno">  272</span>      <span class="keyword">const</span> groupsSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;groups&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;createdBy&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, user.uid)));</div>
+<div class="line"><span class="lineno">  273</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> g of groupsSnap.docs) await <a class="code hl_variable" href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;groups&#39;</span>, g.id));</div>
+<div class="line"><span class="lineno">  274</span> </div>
+<div class="line"><span class="lineno">  275</span>      <span class="keyword">const</span> expSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;paidBy&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, user.uid)));</div>
+<div class="line"><span class="lineno">  276</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> e of expSnap.docs) await <a class="code hl_variable" href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>, e.id));</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>      await deleteUser(<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>.currentUser);</div>
+<div class="line"><span class="lineno">  279</span>      navigate(<span class="stringliteral">&#39;/login&#39;</span>);</div>
+<div class="line"><span class="lineno">  280</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  281</span>      console.error(<span class="stringliteral">&#39;Delete account error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  282</span>      <span class="keywordflow">if</span> (err.code === <span class="stringliteral">&#39;auth/wrong-password&#39;</span> || err.code === <span class="stringliteral">&#39;auth/invalid-credential&#39;</span>) {</div>
+<div class="line"><span class="lineno">  283</span>        setDeleteError(<span class="stringliteral">&#39;Incorrect password. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  284</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (err.code === <span class="stringliteral">&#39;auth/too-many-requests&#39;</span>) {</div>
+<div class="line"><span class="lineno">  285</span>        setDeleteError(<span class="stringliteral">&#39;Too many attempts. Please try again later.&#39;</span>);</div>
+<div class="line"><span class="lineno">  286</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  287</span>        setDeleteError(<span class="stringliteral">&#39;Failed to delete account. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  288</span>      }</div>
+<div class="line"><span class="lineno">  289</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  290</span>      setDeleteLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  291</span>    }</div>
+<div class="line"><span class="lineno">  292</span>  };</div>
+<div class="line"><span class="lineno">  293</span> </div>
+<div class="line"><span class="lineno">  294</span>  <span class="keyword">const</span> handleBiometricToggle = async (newValue) =&gt; {</div>
+<div class="line"><span class="lineno">  295</span>    <span class="keywordflow">if</span> (newValue &amp;&amp; !biometricEnabled) {</div>
+<div class="line"><span class="lineno">  296</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  297</span>        setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  298</span>        <span class="keyword">const</span> ok = await <a class="code hl_variable" href="biometric_8js.html#a17a5778ea1fc64f3d1b356381eed7382">registerBiometric</a>(user.uid, user.email, user.displayName);</div>
+<div class="line"><span class="lineno">  299</span>        <span class="keywordflow">if</span> (ok) {</div>
+<div class="line"><span class="lineno">  300</span>          setBiometricEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  301</span>          setSuccess(`Biometric authentication enabled on ${<a class="code hl_variable" href="biometric_8js.html#aff6da1a2ca2ccaaae4a4947a68b25200">getDeviceInfo</a>()}`);</div>
+<div class="line"><span class="lineno">  302</span>          setTimeout(() =&gt; setSuccess(<span class="stringliteral">&#39;&#39;</span>), 4000);</div>
+<div class="line"><span class="lineno">  303</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  304</span>          setError(<span class="stringliteral">&#39;Failed to enable biometric. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  305</span>          setTimeout(() =&gt; setError(<span class="stringliteral">&#39;&#39;</span>), 3000);</div>
+<div class="line"><span class="lineno">  306</span>        }</div>
+<div class="line"><span class="lineno">  307</span>      } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  308</span>        console.error(<span class="stringliteral">&#39;Biometric enable error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  309</span>        setError(<span class="stringliteral">&#39;Failed to enable biometric authentication&#39;</span>);</div>
+<div class="line"><span class="lineno">  310</span>        setTimeout(() =&gt; setError(<span class="stringliteral">&#39;&#39;</span>), 3000);</div>
+<div class="line"><span class="lineno">  311</span>      } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  312</span>        setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  313</span>      }</div>
+<div class="line"><span class="lineno">  314</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  315</span>    }</div>
+<div class="line"><span class="lineno">  316</span> </div>
+<div class="line"><span class="lineno">  317</span>    <span class="keywordflow">if</span> (!newValue &amp;&amp; biometricEnabled) {</div>
+<div class="line"><span class="lineno">  318</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  319</span>        setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  320</span>        <span class="keyword">const</span> authenticated = await <a class="code hl_variable" href="biometric_8js.html#aea5b1b5dac6efcdbd3faec1b48249ad3">authenticateWithBiometric</a>(user.uid, <span class="stringliteral">&#39;Authenticate to disable biometric security&#39;</span>);</div>
+<div class="line"><span class="lineno">  321</span>        <span class="keywordflow">if</span> (!authenticated) { setLoading(<span class="keyword">false</span>); <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="lineno">  322</span>        <a class="code hl_variable" href="biometric_8js.html#afec02f0935f13e191237834a861f7472">disableBiometric</a>(user.uid);</div>
+<div class="line"><span class="lineno">  323</span>        setBiometricEnabled(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  324</span>        setSuccess(`Biometric authentication disabled on ${<a class="code hl_variable" href="biometric_8js.html#aff6da1a2ca2ccaaae4a4947a68b25200">getDeviceInfo</a>()}`);</div>
+<div class="line"><span class="lineno">  325</span>        setTimeout(() =&gt; setSuccess(<span class="stringliteral">&#39;&#39;</span>), 3000);</div>
+<div class="line"><span class="lineno">  326</span>      } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  327</span>        console.error(<span class="stringliteral">&#39;Biometric disable error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  328</span>        setError(<span class="stringliteral">&#39;Failed to disable biometric authentication&#39;</span>);</div>
+<div class="line"><span class="lineno">  329</span>        setTimeout(() =&gt; setError(<span class="stringliteral">&#39;&#39;</span>), 3000);</div>
+<div class="line"><span class="lineno">  330</span>      } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  331</span>        setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  332</span>      }</div>
+<div class="line"><span class="lineno">  333</span>    }</div>
+<div class="line"><span class="lineno">  334</span>  };</div>
+<div class="line"><span class="lineno">  335</span> </div>
+<div class="line"><span class="lineno">  336</span>  <span class="comment">// ── Render ─────────────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  337</span> </div>
+<div class="line"><span class="lineno">  338</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  339</span>    &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 dark:bg-gray-900 pb-28&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  340</span> </div>
+<div class="line"><span class="lineno">  341</span>      {<span class="comment">/* ── Header ── */</span>}</div>
+<div class="line"><span class="lineno">  342</span>      &lt;div className=<span class="stringliteral">&quot;sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  343</span>        &lt;div className=<span class="stringliteral">&quot;max-w-2xl mx-auto flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  344</span>          &lt;button</div>
+<div class="line"><span class="lineno">  345</span>            onClick={() =&gt; navigate(<span class="stringliteral">&#39;/dashboard&#39;</span>)}</div>
+<div class="line"><span class="lineno">  346</span>            className=<span class="stringliteral">&quot;p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  347</span>            aria-label=<span class="stringliteral">&quot;Back to dashboard&quot;</span></div>
+<div class="line"><span class="lineno">  348</span>          &gt;</div>
+<div class="line"><span class="lineno">  349</span>            &lt;ArrowLeft size={20} className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  350</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  351</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno">  352</span>            &lt;h1 className=<span class="stringliteral">&quot;text-lg font-bold text-gray-900 dark:text-white&quot;</span>&gt;<a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a>&lt;/h1&gt;</div>
+<div class="line"><span class="lineno">  353</span>            &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Manage your preferences&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  354</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  355</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  356</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  357</span> </div>
+<div class="line"><span class="lineno">  358</span>      &lt;div className=<span class="stringliteral">&quot;max-w-2xl mx-auto px-4 pt-5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  359</span> </div>
+<div class="line"><span class="lineno">  360</span>        {<span class="comment">/* ── Toast messages ── */</span>}</div>
+<div class="line"><span class="lineno">  361</span>        {success &amp;&amp; (</div>
+<div class="line"><span class="lineno">  362</span>          &lt;div className=<span class="stringliteral">&quot;mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl text-green-700 dark:text-green-300 text-sm flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  363</span>            &lt;Info size={15} /&gt; {success}</div>
+<div class="line"><span class="lineno">  364</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  365</span>        )}</div>
+<div class="line"><span class="lineno">  366</span>        {error &amp;&amp; (</div>
+<div class="line"><span class="lineno">  367</span>          &lt;div className=<span class="stringliteral">&quot;mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  368</span>            &lt;AlertTriangle size={15} /&gt; {error}</div>
+<div class="line"><span class="lineno">  369</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  370</span>        )}</div>
+<div class="line"><span class="lineno">  371</span> </div>
+<div class="line"><span class="lineno">  372</span>        {<span class="comment">/* ── 1. Profile ── */</span>}</div>
+<div class="line"><span class="lineno">  373</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a> title=<span class="stringliteral">&quot;Profile&quot;</span> icon={User} defaultOpen={<span class="keyword">true</span>}&gt;</div>
+<div class="line"><span class="lineno">  374</span> </div>
+<div class="line"><span class="lineno">  375</span>          {<span class="comment">/* Display Name */</span>}</div>
+<div class="line"><span class="lineno">  376</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno">  377</span>            &lt;label className=<span class="stringliteral">&quot;block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  378</span>              Display Name</div>
+<div class="line"><span class="lineno">  379</span>            &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  380</span>            {editingName ? (</div>
+<div class="line"><span class="lineno">  381</span>              &lt;div className=<span class="stringliteral">&quot;flex gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  382</span>                &lt;input</div>
+<div class="line"><span class="lineno">  383</span>                  type=<span class="stringliteral">&quot;text&quot;</span></div>
+<div class="line"><span class="lineno">  384</span>                  value={newName}</div>
+<div class="line"><span class="lineno">  385</span>                  onChange={(e) =&gt; setNewName(e.target.value)}</div>
+<div class="line"><span class="lineno">  386</span>                  className=<span class="stringliteral">&quot;flex-1 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  387</span>                  placeholder=<span class="stringliteral">&quot;Enter your name&quot;</span></div>
+<div class="line"><span class="lineno">  388</span>                  maxLength={50}</div>
+<div class="line"><span class="lineno">  389</span>                  autoFocus</div>
+<div class="line"><span class="lineno">  390</span>                /&gt;</div>
+<div class="line"><span class="lineno">  391</span>                &lt;button</div>
+<div class="line"><span class="lineno">  392</span>                  onClick={handleUpdateName}</div>
+<div class="line"><span class="lineno">  393</span>                  disabled={loading}</div>
+<div class="line"><span class="lineno">  394</span>                  className=<span class="stringliteral">&quot;px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50&quot;</span></div>
+<div class="line"><span class="lineno">  395</span>                &gt;</div>
+<div class="line"><span class="lineno">  396</span>                  {loading ? <span class="stringliteral">&#39;Saving...&#39;</span> : <span class="stringliteral">&#39;Save&#39;</span>}</div>
+<div class="line"><span class="lineno">  397</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  398</span>                &lt;button</div>
+<div class="line"><span class="lineno">  399</span>                  onClick={() =&gt; { setEditingName(<span class="keyword">false</span>); setNewName(user?.displayName || <span class="stringliteral">&#39;&#39;</span>); }}</div>
+<div class="line"><span class="lineno">  400</span>                  className=<span class="stringliteral">&quot;px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  401</span>                &gt;</div>
+<div class="line"><span class="lineno">  402</span>                  Cancel</div>
+<div class="line"><span class="lineno">  403</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  404</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  405</span>            ) : (</div>
+<div class="line"><span class="lineno">  406</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  407</span>                &lt;span className=<span class="stringliteral">&quot;text-sm text-gray-900 dark:text-white&quot;</span>&gt;{user?.displayName || <span class="stringliteral">&#39;Not set&#39;</span>}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  408</span>                &lt;button</div>
+<div class="line"><span class="lineno">  409</span>                  onClick={() =&gt; setEditingName(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  410</span>                  className=<span class="stringliteral">&quot;text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline&quot;</span></div>
+<div class="line"><span class="lineno">  411</span>                &gt;</div>
+<div class="line"><span class="lineno">  412</span>                  Edit</div>
+<div class="line"><span class="lineno">  413</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  414</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  415</span>            )}</div>
+<div class="line"><span class="lineno">  416</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  417</span> </div>
+<div class="line"><span class="lineno">  418</span>          {<span class="comment">/* Email */</span>}</div>
+<div class="line"><span class="lineno">  419</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno">  420</span>            &lt;label className=<span class="stringliteral">&quot;block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  421</span>              Email Address</div>
+<div class="line"><span class="lineno">  422</span>            &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  423</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  424</span>              &lt;Mail size={15} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  425</span>              &lt;span className=<span class="stringliteral">&quot;text-sm text-gray-900 dark:text-white&quot;</span>&gt;{user?.email}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  426</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  427</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  428</span> </div>
+<div class="line"><span class="lineno">  429</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  430</span> </div>
+<div class="line"><span class="lineno">  431</span>        {<span class="comment">/* ── 2. Notifications ── */</span>}</div>
+<div class="line"><span class="lineno">  432</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div>
+<div class="line"><span class="lineno">  433</span>          title=<span class="stringliteral">&quot;Notifications&quot;</span></div>
+<div class="line"><span class="lineno">  434</span>          icon={Bell}</div>
+<div class="line"><span class="lineno">  435</span>          iconBg=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  436</span>          iconColor=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400&quot;</span></div>
+<div class="line"><span class="lineno">  437</span>        &gt;</div>
+<div class="line"><span class="lineno">  438</span>          &lt;<a class="code hl_function" href="#a46d9b05cb58a2f698d9be9accac86014">ToggleRow</a></div>
+<div class="line"><span class="lineno">  439</span>            label=<span class="stringliteral">&quot;Push Notifications&quot;</span></div>
+<div class="line"><span class="lineno">  440</span>            description=<span class="stringliteral">&quot;Get notified about new expenses and settlements&quot;</span></div>
+<div class="line"><span class="lineno">  441</span>            value={notifications}</div>
+<div class="line"><span class="lineno">  442</span>            onChange={setNotifications}</div>
+<div class="line"><span class="lineno">  443</span>          /&gt;</div>
+<div class="line"><span class="lineno">  444</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  445</span> </div>
+<div class="line"><span class="lineno">  446</span>        {<span class="comment">/* ── 3. Appearance ── */</span>}</div>
+<div class="line"><span class="lineno">  447</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div>
+<div class="line"><span class="lineno">  448</span>          title=<span class="stringliteral">&quot;Appearance&quot;</span></div>
+<div class="line"><span class="lineno">  449</span>          icon={Moon}</div>
+<div class="line"><span class="lineno">  450</span>          iconBg=<span class="stringliteral">&quot;bg-purple-50 dark:bg-purple-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  451</span>          iconColor=<span class="stringliteral">&quot;text-purple-600 dark:text-purple-400&quot;</span></div>
+<div class="line"><span class="lineno">  452</span>        &gt;</div>
+<div class="line"><span class="lineno">  453</span>          {<span class="comment">/* DarkModeToggle already has its own row styling — wrap in a neutral container */</span>}</div>
+<div class="line"><span class="lineno">  454</span>          &lt;div className=<span class="stringliteral">&quot;py-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  455</span>            &lt;<a class="code hl_variable" href="_dark_mode_toggle_8test_8jsx.html#ac4873bad09f855980ebe606020cbaf1c">DarkModeToggle</a> /&gt;</div>
+<div class="line"><span class="lineno">  456</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  457</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  458</span> </div>
+<div class="line"><span class="lineno">  459</span>        {<span class="comment">/* ── 4. Install App ── */</span>}</div>
+<div class="line"><span class="lineno">  460</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div>
+<div class="line"><span class="lineno">  461</span>          title=<span class="stringliteral">&quot;Install App&quot;</span></div>
+<div class="line"><span class="lineno">  462</span>          icon={MonitorDown}</div>
+<div class="line"><span class="lineno">  463</span>          iconBg=<span class="stringliteral">&quot;bg-teal-50 dark:bg-teal-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  464</span>          iconColor=<span class="stringliteral">&quot;text-teal-600 dark:text-teal-400&quot;</span></div>
+<div class="line"><span class="lineno">  465</span>        &gt;</div>
+<div class="line"><span class="lineno">  466</span>          {<span class="comment">/* Already installed */</span>}</div>
+<div class="line"><span class="lineno">  467</span>          {isInstalled &amp;&amp; (</div>
+<div class="line"><span class="lineno">  468</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  469</span>              &lt;CheckCircle2 size={18} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400 shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  470</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  471</span>                &lt;p className=<span class="stringliteral">&quot;text-sm font-medium text-green-800 dark:text-green-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  472</span>                  Split-Sync is installed</div>
+<div class="line"><span class="lineno">  473</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  474</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-green-700 dark:text-green-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  475</span>                  Open it from your home screen or <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> launcher.</div>
+<div class="line"><span class="lineno">  476</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  477</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  478</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  479</span>          )}</div>
+<div class="line"><span class="lineno">  480</span> </div>
+<div class="line"><span class="lineno">  481</span>          {<span class="comment">/* Install completed this session */</span>}</div>
+<div class="line"><span class="lineno">  482</span>          {!isInstalled &amp;&amp; installDone &amp;&amp; (</div>
+<div class="line"><span class="lineno">  483</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  484</span>              &lt;CheckCircle2 size={18} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400 shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  485</span>              &lt;p className=<span class="stringliteral">&quot;text-sm font-medium text-green-800 dark:text-green-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  486</span>                Installation started — check your home screen.</div>
+<div class="line"><span class="lineno">  487</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  488</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  489</span>          )}</div>
+<div class="line"><span class="lineno">  490</span> </div>
+<div class="line"><span class="lineno">  491</span>          {<span class="comment">/* Chrome / Edge install button */</span>}</div>
+<div class="line"><span class="lineno">  492</span>          {!isInstalled &amp;&amp; !installDone &amp;&amp; installPrompt &amp;&amp; (</div>
+<div class="line"><span class="lineno">  493</span>            &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  494</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 px-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  495</span>                Install Split-Sync as an <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> <span class="keywordflow">for</span> faster access, offline support, and a full-screen experience — no <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> store required.</div>
+<div class="line"><span class="lineno">  496</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  497</span>              &lt;button</div>
+<div class="line"><span class="lineno">  498</span>                onClick={handleInstallClick}</div>
+<div class="line"><span class="lineno">  499</span>                className=<span class="stringliteral">&quot;w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 dark:bg-teal-700 text-white rounded-xl text-sm font-medium hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  500</span>              &gt;</div>
+<div class="line"><span class="lineno">  501</span>                &lt;MonitorDown size={17} /&gt;</div>
+<div class="line"><span class="lineno">  502</span>                Install Split-Sync</div>
+<div class="line"><span class="lineno">  503</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  504</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  505</span>          )}</div>
+<div class="line"><span class="lineno">  506</span> </div>
+<div class="line"><span class="lineno">  507</span>          {<span class="comment">/* iOS Safari instructions */</span>}</div>
+<div class="line"><span class="lineno">  508</span>          {!isInstalled &amp;&amp; !installDone &amp;&amp; isIOS &amp;&amp; (</div>
+<div class="line"><span class="lineno">  509</span>            &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  510</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 px-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  511</span>                To install on iOS, use Safari and follow these steps:</div>
+<div class="line"><span class="lineno">  512</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  513</span>              &lt;ol className=<span class="stringliteral">&quot;space-y-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  514</span>                {[</div>
+<div class="line"><span class="lineno">  515</span>                  { icon: Share2,      text: <span class="stringliteral">&#39;Tap the Share button in Safari\&#39;s toolbar&#39;</span> },</div>
+<div class="line"><span class="lineno">  516</span>                  { icon: Smartphone,  text: <span class="stringliteral">&#39;Scroll down and tap &quot;Add to Home Screen&quot;&#39;</span> },</div>
+<div class="line"><span class="lineno">  517</span>                  { icon: CheckCircle2,text: <span class="stringliteral">&#39;Tap &quot;Add&quot; to confirm&#39;</span> },</div>
+<div class="line"><span class="lineno">  518</span>                ].map(({ icon: Icon, text }, i) =&gt; (</div>
+<div class="line"><span class="lineno">  519</span>                  &lt;li key={i} className=<span class="stringliteral">&quot;flex items-start gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  520</span>                    &lt;div className=<span class="stringliteral">&quot;w-7 h-7 bg-teal-100 dark:bg-teal-900/40 rounded-lg flex items-center justify-center shrink-0 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  521</span>                      &lt;Icon size={14} className=<span class="stringliteral">&quot;text-teal-600 dark:text-teal-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  522</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  523</span>                    &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-700 dark:text-gray-300&quot;</span>&gt;{text}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  524</span>                  &lt;/li&gt;</div>
+<div class="line"><span class="lineno">  525</span>                ))}</div>
+<div class="line"><span class="lineno">  526</span>              &lt;/ol&gt;</div>
+<div class="line"><span class="lineno">  527</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  528</span>          )}</div>
+<div class="line"><span class="lineno">  529</span> </div>
+<div class="line"><span class="lineno">  530</span>          {<span class="comment">/* Fallback: browser does not support install prompt and is not iOS */</span>}</div>
+<div class="line"><span class="lineno">  531</span>          {!isInstalled &amp;&amp; !installDone &amp;&amp; !installPrompt &amp;&amp; !isIOS &amp;&amp; (</div>
+<div class="line"><span class="lineno">  532</span>            &lt;div className=<span class="stringliteral">&quot;px-4 py-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  533</span>              &lt;p className=<span class="stringliteral">&quot;text-sm font-medium text-gray-900 dark:text-white&quot;</span>&gt;Install not available&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  534</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  535</span>                To install Split-Sync, open it in Chrome or Edge on your device. The install option will appear here automatically.</div>
+<div class="line"><span class="lineno">  536</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  537</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  538</span>          )}</div>
+<div class="line"><span class="lineno">  539</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  540</span> </div>
+<div class="line"><span class="lineno">  541</span>        {<span class="comment">/* ── 5. Security &amp; Privacy ── */</span>}</div>
+<div class="line"><span class="lineno">  542</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div>
+<div class="line"><span class="lineno">  543</span>          title=<span class="stringliteral">&quot;Security &amp; Privacy&quot;</span></div>
+<div class="line"><span class="lineno">  544</span>          icon={Shield}</div>
+<div class="line"><span class="lineno">  545</span>          iconBg=<span class="stringliteral">&quot;bg-emerald-50 dark:bg-emerald-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  546</span>          iconColor=<span class="stringliteral">&quot;text-emerald-600 dark:text-emerald-400&quot;</span></div>
+<div class="line"><span class="lineno">  547</span>        &gt;</div>
+<div class="line"><span class="lineno">  548</span>          {<span class="comment">/* Biometric Authentication */</span>}</div>
+<div class="line"><span class="lineno">  549</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-700/60 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  550</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  551</span>              &lt;div className=<span class="stringliteral">&quot;w-9 h-9 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  552</span>                &lt;Fingerprint size={17} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  553</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  554</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  555</span>                &lt;p className=<span class="stringliteral">&quot;font-medium text-sm text-gray-900 dark:text-white&quot;</span>&gt;Biometric Authentication&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  556</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  557</span>                  Fingerprint / Face ID on {<a class="code hl_variable" href="biometric_8js.html#aff6da1a2ca2ccaaae4a4947a68b25200">getDeviceInfo</a>()}</div>
+<div class="line"><span class="lineno">  558</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  559</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  560</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  561</span>            &lt;button</div>
+<div class="line"><span class="lineno">  562</span>              onClick={() =&gt; handleBiometricToggle(!biometricEnabled)}</div>
+<div class="line"><span class="lineno">  563</span>              disabled={loading}</div>
+<div class="line"><span class="lineno">  564</span>              className={`relative w-12 h-6 rounded-full transition-colors duration-200 disabled:opacity-50 ${</div>
+<div class="line"><span class="lineno">  565</span>                biometricEnabled ? <span class="stringliteral">&#39;bg-indigo-600&#39;</span> : <span class="stringliteral">&#39;bg-gray-300 dark:bg-gray-600&#39;</span></div>
+<div class="line"><span class="lineno">  566</span>              }`}</div>
+<div class="line"><span class="lineno">  567</span>              aria-label=<span class="stringliteral">&quot;Toggle biometric authentication&quot;</span></div>
+<div class="line"><span class="lineno">  568</span>            &gt;</div>
+<div class="line"><span class="lineno">  569</span>              &lt;span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${</div>
+<div class="line"><span class="lineno">  570</span>                biometricEnabled ? <span class="stringliteral">&#39;right-0.5&#39;</span> : <span class="stringliteral">&#39;left-0.5&#39;</span></div>
+<div class="line"><span class="lineno">  571</span>              }`} /&gt;</div>
+<div class="line"><span class="lineno">  572</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  573</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  574</span>          {<span class="comment">/* Auto-Logout Timer */</span>}</div>
+<div class="line"><span class="lineno">  575</span>          &lt;div className=<span class="stringliteral">&quot;py-3 px-4 bg-gray-50 dark:bg-gray-700/60 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  576</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  577</span>              &lt;div className=<span class="stringliteral">&quot;w-9 h-9 bg-amber-50 dark:bg-amber-900/30 rounded-xl flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  578</span>                &lt;Timer size={17} className=<span class="stringliteral">&quot;text-amber-600 dark:text-amber-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  579</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  580</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  581</span>                &lt;p className=<span class="stringliteral">&quot;font-medium text-sm text-gray-900 dark:text-white&quot;</span>&gt;Auto-Logout Timer&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  582</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  583</span>                  Automatically sign out after inactivity</div>
+<div class="line"><span class="lineno">  584</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  585</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  586</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  587</span>            &lt;div className=<span class="stringliteral">&quot;grid grid-cols-3 gap-2 sm:grid-cols-5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  588</span>              {<a class="code hl_variable" href="use_session_timeout_8js.html#a81f6ae082a8f42a1b830c47104c7f726">TIMEOUT_OPTIONS</a>.map((opt) =&gt; (</div>
+<div class="line"><span class="lineno">  589</span>                &lt;button</div>
+<div class="line"><span class="lineno">  590</span>                  key={opt.value}</div>
+<div class="line"><span class="lineno">  591</span>                  onClick={() =&gt; updateTimeoutSetting(opt.value)}</div>
+<div class="line"><span class="lineno">  592</span>                  className={`py-2 px-2 rounded-xl text-xs font-medium text-center transition-all ${</div>
+<div class="line"><span class="lineno">  593</span>                    timeoutSetting === opt.value</div>
+<div class="line"><span class="lineno">  594</span>                      ? <span class="stringliteral">&#39;bg-indigo-600 text-white shadow-sm&#39;</span></div>
+<div class="line"><span class="lineno">  595</span>                      : <span class="stringliteral">&#39;bg-white dark:bg-gray-600 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-500 hover:border-indigo-400 dark:hover:border-indigo-500&#39;</span></div>
+<div class="line"><span class="lineno">  596</span>                  }`}</div>
+<div class="line"><span class="lineno">  597</span>                &gt;</div>
+<div class="line"><span class="lineno">  598</span>                  {opt.label}</div>
+<div class="line"><span class="lineno">  599</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  600</span>              ))}</div>
+<div class="line"><span class="lineno">  601</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  602</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  603</span> </div>
+<div class="line"><span class="lineno">  604</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  605</span> </div>
+<div class="line"><span class="lineno">  606</span>        {<span class="comment">/* ── 6. Account ── */</span>}</div>
+<div class="line"><span class="lineno">  607</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div>
+<div class="line"><span class="lineno">  608</span>          title=<span class="stringliteral">&quot;Account&quot;</span></div>
+<div class="line"><span class="lineno">  609</span>          icon={User}</div>
+<div class="line"><span class="lineno">  610</span>          iconBg=<span class="stringliteral">&quot;bg-amber-50 dark:bg-amber-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  611</span>          iconColor=<span class="stringliteral">&quot;text-amber-600 dark:text-amber-400&quot;</span></div>
+<div class="line"><span class="lineno">  612</span>        &gt;</div>
+<div class="line"><span class="lineno">  613</span>          {<span class="comment">/* Log Out */</span>}</div>
+<div class="line"><span class="lineno">  614</span>          &lt;<a class="code hl_function" href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">ActionRow</a></div>
+<div class="line"><span class="lineno">  615</span>            icon={LogOut}</div>
+<div class="line"><span class="lineno">  616</span>            iconBg=<span class="stringliteral">&quot;bg-gray-100 dark:bg-gray-600&quot;</span></div>
+<div class="line"><span class="lineno">  617</span>            iconColor=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  618</span>            label=<span class="stringliteral">&quot;Log Out&quot;</span></div>
+<div class="line"><span class="lineno">  619</span>            description=<span class="stringliteral">&quot;Sign out of your account&quot;</span></div>
+<div class="line"><span class="lineno">  620</span>            onClick={handleLogout}</div>
+<div class="line"><span class="lineno">  621</span>          /&gt;</div>
+<div class="line"><span class="lineno">  622</span> </div>
+<div class="line"><span class="lineno">  623</span>          {<span class="comment">/* Delete Account */</span>}</div>
+<div class="line"><span class="lineno">  624</span>          &lt;<a class="code hl_function" href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">ActionRow</a></div>
+<div class="line"><span class="lineno">  625</span>            icon={Trash2}</div>
+<div class="line"><span class="lineno">  626</span>            iconBg=<span class="stringliteral">&quot;bg-red-100 dark:bg-red-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  627</span>            iconColor=<span class="stringliteral">&quot;text-red-600 dark:text-red-400&quot;</span></div>
+<div class="line"><span class="lineno">  628</span>            label=<span class="stringliteral">&quot;Delete Account&quot;</span></div>
+<div class="line"><span class="lineno">  629</span>            description=<span class="stringliteral">&quot;Permanently erase all your data&quot;</span></div>
+<div class="line"><span class="lineno">  630</span>            onClick={() =&gt; setShowDeleteModal(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  631</span>            destructive</div>
+<div class="line"><span class="lineno">  632</span>          /&gt;</div>
+<div class="line"><span class="lineno">  633</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  634</span> </div>
+<div class="line"><span class="lineno">  635</span>        {<span class="comment">/* ── 7. Support ── */</span>}</div>
+<div class="line"><span class="lineno">  636</span>        &lt;<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div>
+<div class="line"><span class="lineno">  637</span>          title=<span class="stringliteral">&quot;Support&quot;</span></div>
+<div class="line"><span class="lineno">  638</span>          icon={HelpCircle}</div>
+<div class="line"><span class="lineno">  639</span>          iconBg=<span class="stringliteral">&quot;bg-cyan-50 dark:bg-cyan-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  640</span>          iconColor=<span class="stringliteral">&quot;text-cyan-600 dark:text-cyan-400&quot;</span></div>
+<div class="line"><span class="lineno">  641</span>        &gt;</div>
+<div class="line"><span class="lineno">  642</span>          &lt;<a class="code hl_function" href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">ActionRow</a></div>
+<div class="line"><span class="lineno">  643</span>            icon={QrCode}</div>
+<div class="line"><span class="lineno">  644</span>            iconBg=<span class="stringliteral">&quot;bg-indigo-50 dark:bg-indigo-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  645</span>            iconColor=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span></div>
+<div class="line"><span class="lineno">  646</span>            label=<span class="stringliteral">&quot;Share Split-Sync&quot;</span></div>
+<div class="line"><span class="lineno">  647</span>            description=<span class="stringliteral">&quot;QR code and download link&quot;</span></div>
+<div class="line"><span class="lineno">  648</span>            onClick={() =&gt; setShowQRCode(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  649</span>          /&gt;</div>
+<div class="line"><span class="lineno">  650</span>          &lt;<a class="code hl_function" href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">ActionRow</a></div>
+<div class="line"><span class="lineno">  651</span>            icon={HelpCircle}</div>
+<div class="line"><span class="lineno">  652</span>            iconBg=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30&quot;</span></div>
+<div class="line"><span class="lineno">  653</span>            iconColor=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400&quot;</span></div>
+<div class="line"><span class="lineno">  654</span>            label=<span class="stringliteral">&quot;Help &amp; Information&quot;</span></div>
+<div class="line"><span class="lineno">  655</span>            description=<span class="stringliteral">&quot;Guides, tutorials and support&quot;</span></div>
+<div class="line"><span class="lineno">  656</span>            onClick={() =&gt; setShowInfoHub(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  657</span>          /&gt;</div>
+<div class="line"><span class="lineno">  658</span>        &lt;/<a class="code hl_function" href="#a593e200fcaba27a036078a4bf16900e4">Section</a>&gt;</div>
+<div class="line"><span class="lineno">  659</span> </div>
+<div class="line"><span class="lineno">  660</span>        &lt;button</div>
+<div class="line"><span class="lineno">  661</span>          onClick={() =&gt; {</div>
+<div class="line"><span class="lineno">  662</span>            localStorage.setItem(<span class="stringliteral">&#39;splitsync_reopen_wizard&#39;</span>, <span class="charliteral">&#39;1&#39;</span>);</div>
+<div class="line"><span class="lineno">  663</span>            navigate(<span class="stringliteral">&#39;/dashboard&#39;</span>);</div>
+<div class="line"><span class="lineno">  664</span>          }}</div>
+<div class="line"><span class="lineno">  665</span>          className=<span class="stringliteral">&quot;w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition rounded-lg&quot;</span></div>
+<div class="line"><span class="lineno">  666</span>        &gt;</div>
+<div class="line"><span class="lineno">  667</span>          &lt;Compass size={18} className=<span class="stringliteral">&quot;text-indigo-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  668</span>          &lt;div className=<span class="stringliteral">&quot;text-left&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  669</span>            &lt;p className=<span class="stringliteral">&quot;font-medium&quot;</span>&gt;Revisit Getting Started Guide&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  670</span>            &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Reopen the onboarding walkthrough&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  671</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  672</span>        &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  673</span> </div>
+<div class="line"><span class="lineno">  674</span>        {<span class="comment">/* ── App version ── */</span>}</div>
+<div class="line"><span class="lineno">  675</span>        &lt;p className=<span class="stringliteral">&quot;text-center text-xs text-gray-400 dark:text-gray-500 mt-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  676</span>          Split-Sync v1.0.0</div>
+<div class="line"><span class="lineno">  677</span>        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  678</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  679</span> </div>
+<div class="line"><span class="lineno">  680</span>      {<span class="comment">/* ── Delete Account Modal ── */</span>}</div>
+<div class="line"><span class="lineno">  681</span>      {showDeleteModal &amp;&amp; (</div>
+<div class="line"><span class="lineno">  682</span>        &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  683</span>          &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  684</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  685</span>              &lt;div className=<span class="stringliteral">&quot;w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  686</span>                &lt;AlertTriangle size={24} className=<span class="stringliteral">&quot;text-red-600 dark:text-red-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  687</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  688</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  689</span>                &lt;h2 className=<span class="stringliteral">&quot;text-lg font-bold text-gray-900 dark:text-white&quot;</span>&gt;Delete Account&lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  690</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;This action cannot be undone&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  691</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  692</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  693</span> </div>
+<div class="line"><span class="lineno">  694</span>            &lt;div className=<span class="stringliteral">&quot;bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-4 text-sm text-red-700 dark:text-red-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  695</span>              &lt;p className=<span class="stringliteral">&quot;font-semibold mb-2&quot;</span>&gt;This will permanently:&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  696</span>              &lt;ul className=<span class="stringliteral">&quot;space-y-1 list-disc list-inside&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  697</span>                &lt;li&gt;Delete all groups you own&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  698</span>                &lt;li&gt;Delete all your expenses&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  699</span>                &lt;li&gt;Remove you from shared groups&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  700</span>                &lt;li&gt;Erase all your account data&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  701</span>              &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  702</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  703</span> </div>
+<div class="line"><span class="lineno">  704</span>            {deleteError &amp;&amp; (</div>
+<div class="line"><span class="lineno">  705</span>              &lt;div className=<span class="stringliteral">&quot;mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  706</span>                {deleteError}</div>
+<div class="line"><span class="lineno">  707</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  708</span>            )}</div>
+<div class="line"><span class="lineno">  709</span> </div>
+<div class="line"><span class="lineno">  710</span>            &lt;div className=<span class="stringliteral">&quot;mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  711</span>              &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  712</span>                Enter your password to confirm</div>
+<div class="line"><span class="lineno">  713</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  714</span>              &lt;div className=<span class="stringliteral">&quot;relative&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  715</span>                &lt;input</div>
+<div class="line"><span class="lineno">  716</span>                  type={showPassword ? <span class="stringliteral">&#39;text&#39;</span> : <span class="stringliteral">&#39;password&#39;</span>}</div>
+<div class="line"><span class="lineno">  717</span>                  value={deletePassword}</div>
+<div class="line"><span class="lineno">  718</span>                  onChange={(e) =&gt; setDeletePassword(e.target.value)}</div>
+<div class="line"><span class="lineno">  719</span>                  placeholder=<span class="stringliteral">&quot;Your password&quot;</span></div>
+<div class="line"><span class="lineno">  720</span>                  className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  721</span>                /&gt;</div>
+<div class="line"><span class="lineno">  722</span>                &lt;button</div>
+<div class="line"><span class="lineno">  723</span>                  type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  724</span>                  onClick={() =&gt; setShowPassword(!showPassword)}</div>
+<div class="line"><span class="lineno">  725</span>                  className=<span class="stringliteral">&quot;absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  726</span>                &gt;</div>
+<div class="line"><span class="lineno">  727</span>                  {showPassword ? &lt;EyeOff size={18} /&gt; : &lt;Eye size={18} /&gt;}</div>
+<div class="line"><span class="lineno">  728</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  729</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  730</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  731</span> </div>
+<div class="line"><span class="lineno">  732</span>            &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  733</span>              &lt;button</div>
+<div class="line"><span class="lineno">  734</span>                onClick={() =&gt; { setShowDeleteModal(<span class="keyword">false</span>); setDeletePassword(<span class="stringliteral">&#39;&#39;</span>); setDeleteError(<span class="stringliteral">&#39;&#39;</span>); }}</div>
+<div class="line"><span class="lineno">  735</span>                className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  736</span>              &gt;</div>
+<div class="line"><span class="lineno">  737</span>                Cancel</div>
+<div class="line"><span class="lineno">  738</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  739</span>              &lt;button</div>
+<div class="line"><span class="lineno">  740</span>                onClick={handleDeleteAccount}</div>
+<div class="line"><span class="lineno">  741</span>                disabled={deleteLoading || !deletePassword}</div>
+<div class="line"><span class="lineno">  742</span>                className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition disabled:opacity-50&quot;</span></div>
+<div class="line"><span class="lineno">  743</span>              &gt;</div>
+<div class="line"><span class="lineno">  744</span>                {deleteLoading ? <span class="stringliteral">&#39;Deleting...&#39;</span> : <span class="stringliteral">&#39;Delete Account&#39;</span>}</div>
+<div class="line"><span class="lineno">  745</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  746</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  747</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  748</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  749</span>      )}</div>
+<div class="line"><span class="lineno">  750</span> </div>
+<div class="line"><span class="lineno">  751</span>      {<span class="comment">/* ── Modals ── */</span>}</div>
+<div class="line"><span class="lineno">  752</span>      &lt;<a class="code hl_variable" href="_q_r_code_modal_8test_8jsx.html#a41a7d64c8cb02754bf2ab0a287a56fe5">QRCodeModal</a></div>
+<div class="line"><span class="lineno">  753</span>        isOpen={showQRCode}</div>
+<div class="line"><span class="lineno">  754</span>        onClose={() =&gt; setShowQRCode(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  755</span>        appUrl={process.env.REACT_APP_BASE_URL || window.location.origin}</div>
+<div class="line"><span class="lineno">  756</span>      /&gt;</div>
+<div class="line"><span class="lineno">  757</span>      &lt;<a class="code hl_variable" href="_info_hub_modal_8test_8jsx.html#a601805f1360d387977c1e41a2be6446d">InfoHubModal</a></div>
+<div class="line"><span class="lineno">  758</span>        isOpen={showInfoHub}</div>
+<div class="line"><span class="lineno">  759</span>        onClose={() =&gt; setShowInfoHub(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  760</span>      /&gt;</div>
+<div class="line"><span class="lineno">  761</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  762</span>  );</div>
+<div class="line"><span class="lineno">  763</span>}</div>
+<div class="ttc" id="a_app_8js_html_a41fced9f4a60b34be2c803b77dcada2d"><div class="ttname"><a href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a></div><div class="ttdeci">import Settings from pages Settings</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00019">App.js:19</a></div></div>
+<div class="ttc" id="a_dark_mode_toggle_8test_8jsx_html_ac4873bad09f855980ebe606020cbaf1c"><div class="ttname"><a href="_dark_mode_toggle_8test_8jsx.html#ac4873bad09f855980ebe606020cbaf1c">DarkModeToggle</a></div><div class="ttdeci">import DarkModeToggle from DarkModeToggle</div><div class="ttdef"><b>Definition</b> <a href="_dark_mode_toggle_8test_8jsx_source.html#l00006">DarkModeToggle.test.jsx:6</a></div></div>
+<div class="ttc" id="a_info_hub_modal_8test_8jsx_html_a601805f1360d387977c1e41a2be6446d"><div class="ttname"><a href="_info_hub_modal_8test_8jsx.html#a601805f1360d387977c1e41a2be6446d">InfoHubModal</a></div><div class="ttdeci">import InfoHubModal from InfoHubModal</div><div class="ttdef"><b>Definition</b> <a href="_info_hub_modal_8test_8jsx_source.html#l00007">InfoHubModal.test.jsx:7</a></div></div>
+<div class="ttc" id="a_q_r_code_modal_8test_8jsx_html_a41a7d64c8cb02754bf2ab0a287a56fe5"><div class="ttname"><a href="_q_r_code_modal_8test_8jsx.html#a41a7d64c8cb02754bf2ab0a287a56fe5">QRCodeModal</a></div><div class="ttdeci">import QRCodeModal from QRCodeModal</div><div class="ttdef"><b>Definition</b> <a href="_q_r_code_modal_8test_8jsx_source.html#l00017">QRCodeModal.test.jsx:17</a></div></div>
+<div class="ttc" id="a_settings_8jsx_html_a03e0ceccd3fd3a7fde34677c0f6f15ca"><div class="ttname"><a href="#a03e0ceccd3fd3a7fde34677c0f6f15ca">ActionRow</a></div><div class="ttdeci">function ActionRow({ icon:Icon, iconBg, iconColor, label, description, onClick, chevron=true, destructive=false })</div><div class="ttdef"><b>Definition</b> <a href="_settings_8jsx_source.html#l00091">Settings.jsx:91</a></div></div>
+<div class="ttc" id="a_settings_8jsx_html_a46d9b05cb58a2f698d9be9accac86014"><div class="ttname"><a href="#a46d9b05cb58a2f698d9be9accac86014">ToggleRow</a></div><div class="ttdeci">function ToggleRow({ label, description, value, onChange })</div><div class="ttdef"><b>Definition</b> <a href="_settings_8jsx_source.html#l00071">Settings.jsx:71</a></div></div>
+<div class="ttc" id="a_settings_8jsx_html_a593e200fcaba27a036078a4bf16900e4"><div class="ttname"><a href="#a593e200fcaba27a036078a4bf16900e4">Section</a></div><div class="ttdeci">function Section({ title, icon:Icon, iconColor=&#39;text-indigo-600 dark:text-indigo-400&#39;, iconBg=&#39;bg-indigo-50 dark:bg-indigo-900/30&#39;, defaultOpen=false, children })</div><div class="ttdef"><b>Definition</b> <a href="_settings_8jsx_source.html#l00036">Settings.jsx:36</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="abiometric_8js_html_a17a5778ea1fc64f3d1b356381eed7382"><div class="ttname"><a href="biometric_8js.html#a17a5778ea1fc64f3d1b356381eed7382">registerBiometric</a></div><div class="ttdeci">export const registerBiometric</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00114">biometric.js:114</a></div></div>
+<div class="ttc" id="abiometric_8js_html_aea5b1b5dac6efcdbd3faec1b48249ad3"><div class="ttname"><a href="biometric_8js.html#aea5b1b5dac6efcdbd3faec1b48249ad3">authenticateWithBiometric</a></div><div class="ttdeci">export const authenticateWithBiometric</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00034">biometric.js:34</a></div></div>
+<div class="ttc" id="abiometric_8js_html_af4ee6a9df1a3b8b32baf021f21bb7820"><div class="ttname"><a href="biometric_8js.html#af4ee6a9df1a3b8b32baf021f21bb7820">isBiometricEnabledOnDevice</a></div><div class="ttdeci">export const isBiometricEnabledOnDevice</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00022">biometric.js:22</a></div></div>
+<div class="ttc" id="abiometric_8js_html_afec02f0935f13e191237834a861f7472"><div class="ttname"><a href="biometric_8js.html#afec02f0935f13e191237834a861f7472">disableBiometric</a></div><div class="ttdeci">export const disableBiometric</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00214">biometric.js:214</a></div></div>
+<div class="ttc" id="abiometric_8js_html_aff6da1a2ca2ccaaae4a4947a68b25200"><div class="ttname"><a href="biometric_8js.html#aff6da1a2ca2ccaaae4a4947a68b25200">getDeviceInfo</a></div><div class="ttdeci">export const getDeviceInfo</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00224">biometric.js:224</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a979397bcd61476f20722e963203a16ed"><div class="ttname"><a href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a></div><div class="ttdeci">const app</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00019">firebase.js:19</a></div></div>
+<div class="ttc" id="afirebase_8js_html_ab735783ec1f49c1b8740f4dba3dfbfd0"><div class="ttname"><a href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a></div><div class="ttdeci">export const auth</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00022">firebase.js:22</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_ac6e1f87478e3bfd703f0da680a1f1629"><div class="ttname"><a href="firebase_auth_8js.html#ac6e1f87478e3bfd703f0da680a1f1629">updateProfile</a></div><div class="ttdeci">export const updateProfile</div><div class="ttdef"><b>Definition</b> <a href="firebase_auth_8js_source.html#l00035">firebaseAuth.js:35</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a13ad744fba2fa725454157c61f84ea79"><div class="ttname"><a href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a></div><div class="ttdeci">export const deleteDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00016">firebaseFirestore.js:16</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a3259366f21a7fc0c2b72a4b024568536"><div class="ttname"><a href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a></div><div class="ttdeci">export const getDocs</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00026">firebaseFirestore.js:26</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a5fdb89ebdc78c2cdcd9653313e89224d"><div class="ttname"><a href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a></div><div class="ttdeci">export const where</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00024">firebaseFirestore.js:24</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a66d1f375d7706c9a5a0976c507a3438e"><div class="ttname"><a href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a></div><div class="ttdeci">export const doc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00020">firebaseFirestore.js:20</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a8835a809611b087b42fa9cbdecd69753"><div class="ttname"><a href="firebase_firestore_8js.html#a8835a809611b087b42fa9cbdecd69753">writeBatch</a></div><div class="ttdeci">export const writeBatch</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00048">firebaseFirestore.js:48</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_aa2d0bd9afc4f4546b1589010db746116"><div class="ttname"><a href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a></div><div class="ttdeci">export const updateDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00014">firebaseFirestore.js:14</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+<div class="ttc" id="ause_session_timeout_8js_html_a81f6ae082a8f42a1b830c47104c7f726"><div class="ttname"><a href="use_session_timeout_8js.html#a81f6ae082a8f42a1b830c47104c7f726">TIMEOUT_OPTIONS</a></div><div class="ttdeci">const TIMEOUT_OPTIONS</div><div class="ttdef"><b>Definition</b> <a href="use_session_timeout_8js_source.html#l00007">useSessionTimeout.js:7</a></div></div>
+<div class="ttc" id="ause_session_timeout_8js_html_a92579e7b1de77f51ba0917fd2670c107"><div class="ttname"><a href="use_session_timeout_8js.html#a92579e7b1de77f51ba0917fd2670c107">useSessionTimeout</a></div><div class="ttdeci">export const useSessionTimeout</div><div class="ttdef"><b>Definition</b> <a href="use_session_timeout_8js_source.html#l00017">useSessionTimeout.js:17</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a46d9b05cb58a2f698d9be9accac86014" name="a46d9b05cb58a2f698d9be9accac86014"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46d9b05cb58a2f698d9be9accac86014">&#9670;&#160;</a></span>ToggleRow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function ToggleRow </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ label, description, value, onChange }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00071">71</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   71</span>                   { label, description, value, onChange }) {</div>
+<div class="line"><span class="lineno">   72</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   73</span>    &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-700/60 rounded-xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   74</span>      &lt;div&gt;</div>
+<div class="line"><span class="lineno">   75</span>        &lt;p className=<span class="stringliteral">&quot;font-medium text-gray-900 dark:text-white text-sm&quot;</span>&gt;{label}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">   76</span>        {description &amp;&amp; &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-0.5&quot;</span>&gt;{description}&lt;/p&gt;}</div>
+<div class="line"><span class="lineno">   77</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   78</span>      &lt;button</div>
+<div class="line"><span class="lineno">   79</span>        onClick={() =&gt; onChange(!value)}</div>
+<div class="line"><span class="lineno">   80</span>        className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${value ? <span class="stringliteral">&#39;bg-indigo-600&#39;</span> : <span class="stringliteral">&#39;bg-gray-300 dark:bg-gray-600&#39;</span>}`}</div>
+<div class="line"><span class="lineno">   81</span>        aria-label={label}</div>
+<div class="line"><span class="lineno">   82</span>      &gt;</div>
+<div class="line"><span class="lineno">   83</span>        &lt;span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${value ? <span class="stringliteral">&#39;right-0.5&#39;</span> : <span class="stringliteral">&#39;left-0.5&#39;</span>}`} /&gt;</div>
+<div class="line"><span class="lineno">   84</span>      &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   85</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   86</span>  );</div>
+<div class="line"><span class="lineno">   87</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aa141d4b4d4d7c8fa622e15413a3b9dcb" name="aa141d4b4d4d7c8fa622e15413a3b9dcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa141d4b4d4d7c8fa622e15413a3b9dcb">&#9670;&#160;</a></span>DarkModeToggle</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> DarkModeToggle from components DarkModeToggle</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00025">25</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00005">5</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    5</span>{ useState, useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a89627e9bfe8cee548dd3d583fa05d504" name="a89627e9bfe8cee548dd3d583fa05d504"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89627e9bfe8cee548dd3d583fa05d504">&#9670;&#160;</a></span>InfoHubModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> InfoHubModal from components InfoHubModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00024">24</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a4f1ccc794373a7a49a972fb1e6f53e6a" name="a4f1ccc794373a7a49a972fb1e6f53e6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f1ccc794373a7a49a972fb1e6f53e6a">&#9670;&#160;</a></span>QRCodeModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> QRCodeModal from components QRCodeModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_settings_8jsx_source.html#l00023">23</a> of file <a class="el" href="_settings_8jsx_source.html">Settings.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -106,16 +106,16 @@ $(function(){initNavTree('setup_tests_8js_source.html',''); initResizable(true);
   <div class="headertitle"><div class="title">setupTests.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="setup_tests_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/setupTests.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import &#39;@testing-library/jest-dom&#39;;</div>
+<a href="setup_tests_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/setupTests.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="setup_tests_8js.html#ace141dab1481fa1126bf476461d4ff32">    2</a></span><span class="keyword">import</span> <span class="stringliteral">&#39;@testing-library/jest-dom&#39;</span>;</div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>// Mock window.matchMedia for responsive tests</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>Object.defineProperty(window, &#39;matchMedia&#39;, {</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  writable: true,</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  value: jest.fn().mockImplementation(query =&gt; ({</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    matches: false,</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    media: query,</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    onchange: null,</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// Mock window.matchMedia for responsive tests</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>Object.defineProperty(window, <span class="stringliteral">&#39;matchMedia&#39;</span>, {</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  writable: <span class="keyword">true</span>,</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>  value: jest.fn().mockImplementation(<a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a> =&gt; ({</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    matches: <span class="keyword">false</span>,</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    media: <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>,</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    onchange: <span class="keyword">null</span>,</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    addListener: jest.fn(),</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    removeListener: jest.fn(),</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    addEventListener: jest.fn(),</div>
@@ -124,14 +124,18 @@ $(function(){initNavTree('setup_tests_8js_source.html',''); initResizable(true);
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  })),</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>});</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>// Mock IntersectionObserver</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>global.IntersectionObserver = class IntersectionObserver {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// Mock IntersectionObserver</span></div>
+<div class="foldopen" id="foldopen00020" data-start="{" data-end="};">
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="setup_tests_8js.html#a59410ef2c1316d69751cd7939832b83b">   20</a></span>global.IntersectionObserver = <span class="keyword">class </span><a class="code hl_variable" href="setup_tests_8js.html#a59410ef2c1316d69751cd7939832b83b">IntersectionObserver</a> {</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  constructor() {}</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  disconnect() {}</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  observe() {}</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  takeRecords() { return []; }</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  takeRecords() { <span class="keywordflow">return</span> []; }</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  unobserve() {}</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>};</div>
+</div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="asetup_tests_8js_html_a59410ef2c1316d69751cd7939832b83b"><div class="ttname"><a href="setup_tests_8js.html#a59410ef2c1316d69751cd7939832b83b">IntersectionObserver</a></div><div class="ttdeci">global IntersectionObserver</div><div class="ttdef"><b>Definition</b> <a href="#l00020">setupTests.js:20</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

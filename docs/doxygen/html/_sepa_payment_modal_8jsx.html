@@ -103,11 +103,488 @@ $(function(){initNavTree('_sepa_payment_modal_8jsx.html',''); initResizable(true
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">SepaPaymentModal.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_sepa_payment_modal_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a5f671d65a81ee1c45043fd50af8eb340" id="r_a5f671d65a81ee1c45043fd50af8eb340"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f671d65a81ee1c45043fd50af8eb340">SepaPaymentModal</a> ({ isOpen, onClose, payment, currentUser, onPaymentSuccess })</td></tr>
+<tr class="separator:a5f671d65a81ee1c45043fd50af8eb340"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a5f671d65a81ee1c45043fd50af8eb340" name="a5f671d65a81ee1c45043fd50af8eb340"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f671d65a81ee1c45043fd50af8eb340">&#9670;&#160;</a></span>SepaPaymentModal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default SepaPaymentModal </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ isOpen, onClose, payment, currentUser, onPaymentSuccess }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8jsx_source.html#l00017">17</a> of file <a class="el" href="_sepa_payment_modal_8jsx_source.html">SepaPaymentModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   17</span>                                         { </div>
+<div class="line"><span class="lineno">   18</span>  isOpen, </div>
+<div class="line"><span class="lineno">   19</span>  onClose, </div>
+<div class="line"><span class="lineno">   20</span>  payment,</div>
+<div class="line"><span class="lineno">   21</span>  currentUser,</div>
+<div class="line"><span class="lineno">   22</span>  onPaymentSuccess </div>
+<div class="line"><span class="lineno">   23</span>}) {</div>
+<div class="line"><span class="lineno">   24</span>  <span class="keyword">const</span> [step, setStep] = useState(<span class="stringliteral">&#39;confirm&#39;</span>); <span class="comment">// &#39;confirm&#39;, &#39;processing&#39;, &#39;success&#39;, &#39;error&#39;</span></div>
+<div class="line"><span class="lineno">   25</span>  <span class="keyword">const</span> [error, setError] = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   26</span>  <span class="keyword">const</span> [paymentResult, setPaymentResult] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   27</span>  <span class="keyword">const</span> [isAuthenticating, setIsAuthenticating] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   28</span>  <span class="keyword">const</span> [senderPaymentMethods, setSenderPaymentMethods] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   29</span>  <span class="keyword">const</span> [loadingPaymentData, setLoadingPaymentData] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   30</span> </div>
+<div class="line"><span class="lineno">   31</span>  <span class="comment">// Fetch sender&#39;s payment methods</span></div>
+<div class="line"><span class="lineno">   32</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   33</span>    <span class="keyword">const</span> fetchSenderPaymentMethods = async () =&gt; {</div>
+<div class="line"><span class="lineno">   34</span>      <span class="keywordflow">if</span> (!isOpen || !currentUser) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   35</span>      </div>
+<div class="line"><span class="lineno">   36</span>      setLoadingPaymentData(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   37</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   38</span>        <span class="keyword">const</span> userDoc = await <a class="code hl_variable" href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;users&#39;</span>, currentUser.uid));</div>
+<div class="line"><span class="lineno">   39</span>        <span class="keywordflow">if</span> (userDoc.exists()) {</div>
+<div class="line"><span class="lineno">   40</span>          <span class="keyword">const</span> data = userDoc.data();</div>
+<div class="line"><span class="lineno">   41</span>          setSenderPaymentMethods(data.paymentMethods || <span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   42</span>        }</div>
+<div class="line"><span class="lineno">   43</span>      } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line"><span class="lineno">   44</span>        console.error(<span class="stringliteral">&#39;Error fetching sender payment methods:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">   45</span>        setError(<span class="stringliteral">&#39;Could not load your payment information&#39;</span>);</div>
+<div class="line"><span class="lineno">   46</span>      } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">   47</span>        setLoadingPaymentData(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   48</span>      }</div>
+<div class="line"><span class="lineno">   49</span>    };</div>
+<div class="line"><span class="lineno">   50</span> </div>
+<div class="line"><span class="lineno">   51</span>    fetchSenderPaymentMethods();</div>
+<div class="line"><span class="lineno">   52</span>  }, [isOpen, currentUser]);</div>
+<div class="line"><span class="lineno">   53</span> </div>
+<div class="line"><span class="lineno">   54</span>  <span class="keywordflow">if</span> (!isOpen || !payment) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   55</span> </div>
+<div class="line"><span class="lineno">   56</span>  <span class="keyword">const</span> {</div>
+<div class="line"><span class="lineno">   57</span>    amount,</div>
+<div class="line"><span class="lineno">   58</span>    fromUser,</div>
+<div class="line"><span class="lineno">   59</span>    toUser,</div>
+<div class="line"><span class="lineno">   60</span>    toUserPaymentMethods,</div>
+<div class="line"><span class="lineno">   61</span>    groupName,</div>
+<div class="line"><span class="lineno">   62</span>    groupId</div>
+<div class="line"><span class="lineno">   63</span>  } = payment;</div>
+<div class="line"><span class="lineno">   64</span> </div>
+<div class="line"><span class="lineno">   65</span>  <span class="comment">// Decrypt IBANs for processing</span></div>
+<div class="line"><span class="lineno">   66</span>  <span class="keyword">const</span> getDecryptedIBAN = (encryptedIBAN) =&gt; {</div>
+<div class="line"><span class="lineno">   67</span>    <span class="keywordflow">if</span> (!encryptedIBAN) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   68</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   69</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="encryption_8js.html#afd25c31ee6552cf9bb8cd9468b84ba4b">decryptData</a>(encryptedIBAN);</div>
+<div class="line"><span class="lineno">   70</span>    } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line"><span class="lineno">   71</span>      console.error(<span class="stringliteral">&#39;Error decrypting IBAN:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">   72</span>      <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   73</span>    }</div>
+<div class="line"><span class="lineno">   74</span>  };</div>
+<div class="line"><span class="lineno">   75</span> </div>
+<div class="line"><span class="lineno">   76</span>  <span class="keyword">const</span> fromIBAN = senderPaymentMethods?.encryptedIBAN </div>
+<div class="line"><span class="lineno">   77</span>    ? getDecryptedIBAN(senderPaymentMethods.encryptedIBAN)</div>
+<div class="line"><span class="lineno">   78</span>    : null;</div>
+<div class="line"><span class="lineno">   79</span>    </div>
+<div class="line"><span class="lineno">   80</span>  <span class="keyword">const</span> toIBAN = toUserPaymentMethods?.encryptedIBAN</div>
+<div class="line"><span class="lineno">   81</span>    ? getDecryptedIBAN(toUserPaymentMethods.encryptedIBAN)</div>
+<div class="line"><span class="lineno">   82</span>    : null;</div>
+<div class="line"><span class="lineno">   83</span> </div>
+<div class="line"><span class="lineno">   84</span>  <span class="keyword">const</span> paymentFee = <a class="code hl_variable" href="sepa_payment_8js.html#a0454f780634c8a15995d6721d16e871e">calculatePaymentFee</a>(amount);</div>
+<div class="line"><span class="lineno">   85</span>  <span class="keyword">const</span> totalAmount = amount + paymentFee;</div>
+<div class="line"><span class="lineno">   86</span> </div>
+<div class="line"><span class="lineno">   87</span>  <span class="keyword">const</span> handleConfirmPayment = async () =&gt; {</div>
+<div class="line"><span class="lineno">   88</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   89</span>    setIsAuthenticating(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   90</span> </div>
+<div class="line"><span class="lineno">   91</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   92</span>      <span class="comment">// Require biometric authentication before payment</span></div>
+<div class="line"><span class="lineno">   93</span>      <span class="keyword">const</span> authenticated = await <a class="code hl_variable" href="biometric_8js.html#aea5b1b5dac6efcdbd3faec1b48249ad3">authenticateWithBiometric</a>(</div>
+<div class="line"><span class="lineno">   94</span>        currentUser.uid,</div>
+<div class="line"><span class="lineno">   95</span>        <span class="stringliteral">&#39;Authenticate to confirm payment&#39;</span></div>
+<div class="line"><span class="lineno">   96</span>      );</div>
+<div class="line"><span class="lineno">   97</span> </div>
+<div class="line"><span class="lineno">   98</span>      <span class="keywordflow">if</span> (!authenticated) {</div>
+<div class="line"><span class="lineno">   99</span>        setError(<span class="stringliteral">&#39;Authentication failed. Payment cancelled.&#39;</span>);</div>
+<div class="line"><span class="lineno">  100</span>        setIsAuthenticating(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  101</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  102</span>      }</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>      setIsAuthenticating(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  105</span>      setStep(<span class="stringliteral">&#39;processing&#39;</span>);</div>
+<div class="line"><span class="lineno">  106</span> </div>
+<div class="line"><span class="lineno">  107</span>      <span class="comment">// Validate amount</span></div>
+<div class="line"><span class="lineno">  108</span>      <span class="keyword">const</span> validation = <a class="code hl_variable" href="sepa_payment_8js.html#a102176d836ca928978b84b79a55b7c9f">validatePaymentAmount</a>(amount);</div>
+<div class="line"><span class="lineno">  109</span>      <span class="keywordflow">if</span> (!validation.valid) {</div>
+<div class="line"><span class="lineno">  110</span>        <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(validation.error);</div>
+<div class="line"><span class="lineno">  111</span>      }</div>
+<div class="line"><span class="lineno">  112</span> </div>
+<div class="line"><span class="lineno">  113</span>      <span class="comment">// Check IBANs exist</span></div>
+<div class="line"><span class="lineno">  114</span>      <span class="keywordflow">if</span> (!fromIBAN) {</div>
+<div class="line"><span class="lineno">  115</span>        <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;Your IBAN is not set. Please add it in your profile settings.&#39;</span>);</div>
+<div class="line"><span class="lineno">  116</span>      }</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>      <span class="keywordflow">if</span> (!toIBAN) {</div>
+<div class="line"><span class="lineno">  119</span>        <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;Recipient IBAN not available. They need to set up their payment method.&#39;</span>);</div>
+<div class="line"><span class="lineno">  120</span>      }</div>
+<div class="line"><span class="lineno">  121</span> </div>
+<div class="line"><span class="lineno">  122</span>      <span class="comment">// Generate payment reference</span></div>
+<div class="line"><span class="lineno">  123</span>      <span class="keyword">const</span> reference = <a class="code hl_variable" href="sepa_payment_8js.html#a8a6d080982e753129d1b1a416ad2966e">generatePaymentReference</a>();</div>
+<div class="line"><span class="lineno">  124</span>      <span class="keyword">const</span> description = <a class="code hl_variable" href="sepa_payment_8js.html#a1248a11b541dc6e58d8d3caaa12931e2">createPaymentDescription</a>(groupName, fromUser.name);</div>
+<div class="line"><span class="lineno">  125</span> </div>
+<div class="line"><span class="lineno">  126</span>      <span class="comment">// Process payment (simulated)</span></div>
+<div class="line"><span class="lineno">  127</span>      <span class="keyword">const</span> result = await <a class="code hl_variable" href="sepa_payment_8js.html#a22f0ff572aacdd6c8c87b16f5f6a5aaf">processSepaPayment</a>({</div>
+<div class="line"><span class="lineno">  128</span>        amount,</div>
+<div class="line"><span class="lineno">  129</span>        fromUserId: fromUser.id,</div>
+<div class="line"><span class="lineno">  130</span>        toUserId: toUser.id,</div>
+<div class="line"><span class="lineno">  131</span>        fromIBAN,</div>
+<div class="line"><span class="lineno">  132</span>        toIBAN,</div>
+<div class="line"><span class="lineno">  133</span>        reference,</div>
+<div class="line"><span class="lineno">  134</span>        description,</div>
+<div class="line"><span class="lineno">  135</span>        groupId</div>
+<div class="line"><span class="lineno">  136</span>      });</div>
+<div class="line"><span class="lineno">  137</span> </div>
+<div class="line"><span class="lineno">  138</span>      setPaymentResult(result);</div>
+<div class="line"><span class="lineno">  139</span>      setStep(<span class="stringliteral">&#39;success&#39;</span>);</div>
+<div class="line"><span class="lineno">  140</span> </div>
+<div class="line"><span class="lineno">  141</span>      <span class="comment">// Call success callback to update balances</span></div>
+<div class="line"><span class="lineno">  142</span>      <span class="keywordflow">if</span> (onPaymentSuccess) {</div>
+<div class="line"><span class="lineno">  143</span>        await onPaymentSuccess({</div>
+<div class="line"><span class="lineno">  144</span>          ...result,</div>
+<div class="line"><span class="lineno">  145</span>          groupId,</div>
+<div class="line"><span class="lineno">  146</span>          fromUserId: fromUser.id,</div>
+<div class="line"><span class="lineno">  147</span>          toUserId: toUser.id,</div>
+<div class="line"><span class="lineno">  148</span>          amount</div>
+<div class="line"><span class="lineno">  149</span>        });</div>
+<div class="line"><span class="lineno">  150</span>      }</div>
+<div class="line"><span class="lineno">  151</span> </div>
+<div class="line"><span class="lineno">  152</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  153</span>      console.error(<span class="stringliteral">&#39;Payment error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  154</span>      setError(err.message || <span class="stringliteral">&#39;Payment failed. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  155</span>      setStep(<span class="stringliteral">&#39;error&#39;</span>);</div>
+<div class="line"><span class="lineno">  156</span>    }</div>
+<div class="line"><span class="lineno">  157</span>  };</div>
+<div class="line"><span class="lineno">  158</span> </div>
+<div class="line"><span class="lineno">  159</span>  <span class="keyword">const</span> handleClose = () =&gt; {</div>
+<div class="line"><span class="lineno">  160</span>    <span class="keywordflow">if</span> (step === <span class="stringliteral">&#39;processing&#39;</span>) <span class="keywordflow">return</span>; <span class="comment">// Don&#39;t allow closing during processing</span></div>
+<div class="line"><span class="lineno">  161</span>    onClose();</div>
+<div class="line"><span class="lineno">  162</span>    <span class="comment">// Reset state after modal closes</span></div>
+<div class="line"><span class="lineno">  163</span>    setTimeout(() =&gt; {</div>
+<div class="line"><span class="lineno">  164</span>      setStep(<span class="stringliteral">&#39;confirm&#39;</span>);</div>
+<div class="line"><span class="lineno">  165</span>      setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  166</span>      setPaymentResult(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  167</span>    }, 300);</div>
+<div class="line"><span class="lineno">  168</span>  };</div>
+<div class="line"><span class="lineno">  169</span> </div>
+<div class="line"><span class="lineno">  170</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  171</span>    &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 overflow-y-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  172</span>      &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-gray-900/50 max-w-md w-full my-4 flex flex-col max-h-[90vh]&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  173</span>        {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">  174</span>        &lt;div className=<span class="stringliteral">&quot;sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between rounded-t-2xl&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  175</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  176</span>            &lt;div className=<span class="stringliteral">&quot;w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  177</span>              &lt;CreditCard size={20} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  178</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  179</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  180</span>              &lt;h2 className=<span class="stringliteral">&quot;text-xl font-semibold text-gray-900 dark:text-white&quot;</span>&gt;SEPA Payment&lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  181</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Demo Mode - Simulation&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  182</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  183</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  184</span>          {step !== <span class="stringliteral">&#39;processing&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  185</span>            &lt;button</div>
+<div class="line"><span class="lineno">  186</span>              onClick={handleClose}</div>
+<div class="line"><span class="lineno">  187</span>              className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition&quot;</span></div>
+<div class="line"><span class="lineno">  188</span>            &gt;</div>
+<div class="line"><span class="lineno">  189</span>              &lt;X size={24} /&gt;</div>
+<div class="line"><span class="lineno">  190</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  191</span>          )}</div>
+<div class="line"><span class="lineno">  192</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  193</span> </div>
+<div class="line"><span class="lineno">  194</span>        {<span class="comment">/* Content */</span>}</div>
+<div class="line"><span class="lineno">  195</span>        &lt;div className=<span class="stringliteral">&quot;p-6 overflow-y-auto flex-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  196</span>          {<span class="comment">/* Loading State */</span>}</div>
+<div class="line"><span class="lineno">  197</span>          {loadingPaymentData ? (</div>
+<div class="line"><span class="lineno">  198</span>            &lt;div className=<span class="stringliteral">&quot;py-12 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  199</span>              &lt;div className=<span class="stringliteral">&quot;w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  200</span>                &lt;Loader size={32} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 animate-spin&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  201</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  202</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;Loading payment information...&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  203</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  204</span>          ) : (</div>
+<div class="line"><span class="lineno">  205</span>            &lt;&gt;</div>
+<div class="line"><span class="lineno">  206</span>              {<span class="comment">/* Confirm Step */</span>}</div>
+<div class="line"><span class="lineno">  207</span>              {step === <span class="stringliteral">&#39;confirm&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  208</span>                &lt;div className=<span class="stringliteral">&quot;space-y-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  209</span>                  {<span class="comment">/* Demo Mode Notice */</span>}</div>
+<div class="line"><span class="lineno">  210</span>                  &lt;div className=<span class="stringliteral">&quot;bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  211</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  212</span>                      &lt;Info size={16} className=<span class="stringliteral">&quot;text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  213</span>                      &lt;div className=<span class="stringliteral">&quot;text-xs text-yellow-800 dark:text-yellow-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  214</span>                        &lt;p className=<span class="stringliteral">&quot;font-medium mb-1&quot;</span>&gt;Demo Mode&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  215</span>                        &lt;p&gt;This is a simulated SEPA payment <span class="keywordflow">for</span> demonstration purposes. No real money will be transferred.&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  216</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  217</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  218</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  219</span> </div>
+<div class="line"><span class="lineno">  220</span>                  {<span class="comment">/* Payment Details */</span>}</div>
+<div class="line"><span class="lineno">  221</span>                  &lt;div className=<span class="stringliteral">&quot;space-y-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  222</span>                    &lt;div&gt;</div>
+<div class="line"><span class="lineno">  223</span>                      &lt;label className=<span class="stringliteral">&quot;text-sm font-medium text-gray-700 dark:text-gray-300&quot;</span>&gt;From&lt;/label&gt;</div>
+<div class="line"><span class="lineno">  224</span>                      &lt;div className=<span class="stringliteral">&quot;mt-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  225</span>                        &lt;p className=<span class="stringliteral">&quot;font-medium text-gray-900 dark:text-white&quot;</span>&gt;{fromUser.name}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  226</span>                        &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 font-mono mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  227</span>                          {fromIBAN ? <a class="code hl_variable" href="encryption_8js.html#ae2490809d009a05695360a2663d260bf">maskIBAN</a>(fromIBAN) : (</div>
+<div class="line"><span class="lineno">  228</span>                            &lt;span className=<span class="stringliteral">&quot;text-red-600 dark:text-red-400&quot;</span>&gt;IBAN not set - Go to <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a>&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  229</span>                          )}</div>
+<div class="line"><span class="lineno">  230</span>                        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  231</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  232</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  233</span> </div>
+<div class="line"><span class="lineno">  234</span>                    &lt;div className=<span class="stringliteral">&quot;flex justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  235</span>                      &lt;div className=<span class="stringliteral">&quot;w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  236</span>                        &lt;span className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500&quot;</span>&gt;→&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  237</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  238</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  239</span> </div>
+<div class="line"><span class="lineno">  240</span>                    &lt;div&gt;</div>
+<div class="line"><span class="lineno">  241</span>                      &lt;label className=<span class="stringliteral">&quot;text-sm font-medium text-gray-700 dark:text-gray-300&quot;</span>&gt;To&lt;/label&gt;</div>
+<div class="line"><span class="lineno">  242</span>                      &lt;div className=<span class="stringliteral">&quot;mt-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  243</span>                        &lt;p className=<span class="stringliteral">&quot;font-medium text-gray-900 dark:text-white&quot;</span>&gt;{toUser.name}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  244</span>                        &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 font-mono mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  245</span>                          {toIBAN ? <a class="code hl_variable" href="encryption_8js.html#ae2490809d009a05695360a2663d260bf">maskIBAN</a>(toIBAN) : (</div>
+<div class="line"><span class="lineno">  246</span>                            &lt;span className=<span class="stringliteral">&quot;text-red-600 dark:text-red-400&quot;</span>&gt;IBAN not set&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  247</span>                          )}</div>
+<div class="line"><span class="lineno">  248</span>                        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  249</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  250</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>                    &lt;div className=<span class="stringliteral">&quot;border-t border-gray-200 dark:border-gray-700 pt-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  253</span>                      &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  254</span>                        &lt;span className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;Amount&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  255</span>                        &lt;span className=<span class="stringliteral">&quot;text-lg font-semibold text-gray-900 dark:text-white&quot;</span>&gt;€{amount.toFixed(2)}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  256</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  257</span>                      &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  258</span>                        &lt;span className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;Payment Fee&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  259</span>                        &lt;span className=<span class="stringliteral">&quot;text-sm text-green-600 dark:text-green-400 font-medium&quot;</span>&gt;FREE&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  260</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  261</span>                      &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  262</span>                        &lt;span className=<span class="stringliteral">&quot;text-sm font-medium text-gray-700 dark:text-gray-300&quot;</span>&gt;Total&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  263</span>                        &lt;span className=<span class="stringliteral">&quot;text-xl font-bold text-indigo-600 dark:text-indigo-400&quot;</span>&gt;€{totalAmount.toFixed(2)}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  264</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  265</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  266</span> </div>
+<div class="line"><span class="lineno">  267</span>                    &lt;div className=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  268</span>                      &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  269</span>                        &lt;Shield size={16} className=<span class="stringliteral">&quot;text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  270</span>                        &lt;div className=<span class="stringliteral">&quot;text-xs text-blue-800 dark:text-blue-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  271</span>                          &lt;p className=<span class="stringliteral">&quot;font-medium mb-1&quot;</span>&gt;Secure Payment&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  272</span>                          &lt;p&gt;Your payment will be authenticated with biometric verification <span class="keywordflow">for</span> security.&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  273</span>                        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  274</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  275</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  276</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>                  {<span class="comment">/* Error Display */</span>}</div>
+<div class="line"><span class="lineno">  279</span>                  {error &amp;&amp; (</div>
+<div class="line"><span class="lineno">  280</span>                    &lt;div className=<span class="stringliteral">&quot;bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  281</span>                      &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  282</span>                        &lt;AlertCircle size={16} className=<span class="stringliteral">&quot;text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  283</span>                        &lt;p className=<span class="stringliteral">&quot;text-sm text-red-800 dark:text-red-300&quot;</span>&gt;{error}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  284</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  285</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  286</span>                  )}</div>
+<div class="line"><span class="lineno">  287</span> </div>
+<div class="line"><span class="lineno">  288</span>                  {<span class="comment">/* Actions */</span>}</div>
+<div class="line"><span class="lineno">  289</span>                  &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  290</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  291</span>                      onClick={handleClose}</div>
+<div class="line"><span class="lineno">  292</span>                      className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  293</span>                    &gt;</div>
+<div class="line"><span class="lineno">  294</span>                      Cancel</div>
+<div class="line"><span class="lineno">  295</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  296</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  297</span>                      onClick={handleConfirmPayment}</div>
+<div class="line"><span class="lineno">  298</span>                      disabled={isAuthenticating || !fromIBAN || !toIBAN}</div>
+<div class="line"><span class="lineno">  299</span>                      className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2&quot;</span></div>
+<div class="line"><span class="lineno">  300</span>                    &gt;</div>
+<div class="line"><span class="lineno">  301</span>                      {isAuthenticating ? (</div>
+<div class="line"><span class="lineno">  302</span>                        &lt;&gt;</div>
+<div class="line"><span class="lineno">  303</span>                          &lt;Loader size={16} className=<span class="stringliteral">&quot;animate-spin&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  304</span>                          Authenticating...</div>
+<div class="line"><span class="lineno">  305</span>                        &lt;/&gt;</div>
+<div class="line"><span class="lineno">  306</span>                      ) : (</div>
+<div class="line"><span class="lineno">  307</span>                        &lt;&gt;</div>
+<div class="line"><span class="lineno">  308</span>                          &lt;Shield size={16} /&gt;</div>
+<div class="line"><span class="lineno">  309</span>                          Confirm Payment</div>
+<div class="line"><span class="lineno">  310</span>                        &lt;/&gt;</div>
+<div class="line"><span class="lineno">  311</span>                      )}</div>
+<div class="line"><span class="lineno">  312</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  313</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  314</span> </div>
+<div class="line"><span class="lineno">  315</span>                  {(!fromIBAN || !toIBAN) &amp;&amp; (</div>
+<div class="line"><span class="lineno">  316</span>                    &lt;p className=<span class="stringliteral">&quot;text-xs text-center text-red-600 dark:text-red-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  317</span>                      {!fromIBAN &amp;&amp; <span class="stringliteral">&quot;Set up your IBAN in Profile Settings first. &quot;</span>}</div>
+<div class="line"><span class="lineno">  318</span>                      {!toIBAN &amp;&amp; <span class="stringliteral">&quot;Recipient hasn&#39;t set up their IBAN yet.&quot;</span>}</div>
+<div class="line"><span class="lineno">  319</span>                    &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  320</span>                  )}</div>
+<div class="line"><span class="lineno">  321</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  322</span>              )}</div>
+<div class="line"><span class="lineno">  323</span> </div>
+<div class="line"><span class="lineno">  324</span>              {<span class="comment">/* Processing Step */</span>}</div>
+<div class="line"><span class="lineno">  325</span>              {step === <span class="stringliteral">&#39;processing&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  326</span>                &lt;div className=<span class="stringliteral">&quot;py-12 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  327</span>                  &lt;div className=<span class="stringliteral">&quot;w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  328</span>                    &lt;Loader size={32} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400 animate-spin&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  329</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  330</span>                  &lt;h3 className=<span class="stringliteral">&quot;text-lg font-semibold text-gray-900 dark:text-white mb-2&quot;</span>&gt;Processing Payment&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  331</span>                  &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;Please wait <span class="keywordflow">while</span> we process your SEPA transfer...&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  332</span>                  &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-500 mt-4&quot;</span>&gt;This may take a few seconds&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  333</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  334</span>              )}</div>
+<div class="line"><span class="lineno">  335</span> </div>
+<div class="line"><span class="lineno">  336</span>              {<span class="comment">/* Success Step */</span>}</div>
+<div class="line"><span class="lineno">  337</span>              {step === <span class="stringliteral">&#39;success&#39;</span> &amp;&amp; paymentResult &amp;&amp; (</div>
+<div class="line"><span class="lineno">  338</span>                &lt;div className=<span class="stringliteral">&quot;space-y-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  339</span>                  &lt;div className=<span class="stringliteral">&quot;text-center py-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  340</span>                    &lt;div className=<span class="stringliteral">&quot;w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  341</span>                      &lt;CheckCircle size={32} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  342</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  343</span>                    &lt;h3 className=<span class="stringliteral">&quot;text-lg font-semibold text-gray-900 dark:text-white mb-2&quot;</span>&gt;Payment Successful!&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  344</span>                    &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400&quot;</span>&gt;Your SEPA transfer has been initiated&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  345</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  346</span> </div>
+<div class="line"><span class="lineno">  347</span>                  &lt;div className=<span class="stringliteral">&quot;bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  348</span>                    &lt;div className=<span class="stringliteral">&quot;flex justify-between text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  349</span>                      &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Payment Reference&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  350</span>                      &lt;span className=<span class="stringliteral">&quot;font-mono text-gray-900 dark:text-white&quot;</span>&gt;{paymentResult.reference}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  351</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  352</span>                    &lt;div className=<span class="stringliteral">&quot;flex justify-between text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  353</span>                      &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Amount&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  354</span>                      &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;€{amount.toFixed(2)}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  355</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  356</span>                    &lt;div className=<span class="stringliteral">&quot;flex justify-between text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  357</span>                      &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Status&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  358</span>                      &lt;span className=<span class="stringliteral">&quot;px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded text-xs font-medium&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  359</span>                        Completed</div>
+<div class="line"><span class="lineno">  360</span>                      &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  361</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  362</span>                    &lt;div className=<span class="stringliteral">&quot;flex justify-between text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  363</span>                      &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Estimated Arrival&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  364</span>                      &lt;span className=<span class="stringliteral">&quot;text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  365</span>                        {<span class="keyword">new</span> Date(paymentResult.estimatedArrival).toLocaleDateString()}</div>
+<div class="line"><span class="lineno">  366</span>                      &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  367</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  368</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  369</span> </div>
+<div class="line"><span class="lineno">  370</span>                  &lt;div className=<span class="stringliteral">&quot;bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  371</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-start gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  372</span>                      &lt;CheckCircle size={16} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  373</span>                      &lt;div className=<span class="stringliteral">&quot;text-xs text-green-800 dark:text-green-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  374</span>                        &lt;p className=<span class="stringliteral">&quot;font-medium mb-1&quot;</span>&gt;Payment Initiated&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  375</span>                        &lt;p&gt;The funds will typically arrive in 1-2 business days. You<span class="stringliteral">&#39;ll receive a confirmation once the transfer is complete.&lt;/p&gt;</span></div>
+<div class="line"><span class="lineno">  376</span><span class="stringliteral">                      &lt;/div&gt;</span></div>
+<div class="line"><span class="lineno">  377</span><span class="stringliteral">                    &lt;/div&gt;</span></div>
+<div class="line"><span class="lineno">  378</span><span class="stringliteral">                  &lt;/div&gt;</span></div>
+<div class="line"><span class="lineno">  379</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  380</span><span class="stringliteral">                  &lt;button</span></div>
+<div class="line"><span class="lineno">  381</span><span class="stringliteral">                    onClick={handleClose}</span></div>
+<div class="line"><span class="lineno">  382</span><span class="stringliteral">                    className=&quot;w-full px-4 py-3 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-700 transition font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  383</span><span class="stringliteral">                  &gt;</span></div>
+<div class="line"><span class="lineno">  384</span><span class="stringliteral">                    Done</span></div>
+<div class="line"><span class="lineno">  385</span><span class="stringliteral">                  &lt;/button&gt;</span></div>
+<div class="line"><span class="lineno">  386</span><span class="stringliteral">                &lt;/div&gt;</span></div>
+<div class="line"><span class="lineno">  387</span><span class="stringliteral">              )}</span></div>
+<div class="line"><span class="lineno">  388</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  389</span><span class="stringliteral">              {/* Error Step */}</span></div>
+<div class="line"><span class="lineno">  390</span><span class="stringliteral">              {step === &#39;</span>error<span class="stringliteral">&#39; &amp;&amp; (</span></div>
+<div class="line"><span class="lineno">  391</span><span class="stringliteral">                &lt;div className=&quot;space-y-6&quot;&gt;</span></div>
+<div class="line"><span class="lineno">  392</span><span class="stringliteral">                  &lt;div className=&quot;text-center py-6&quot;&gt;</span></div>
+<div class="line"><span class="lineno">  393</span><span class="stringliteral">                    &lt;div className=&quot;w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4&quot;&gt;</span></div>
+<div class="line"><span class="lineno">  394</span><span class="stringliteral">                      &lt;AlertCircle size={32} className=&quot;text-red-600 dark:text-red-400&quot; /&gt;</span></div>
+<div class="line"><span class="lineno">  395</span><span class="stringliteral">                    &lt;/div&gt;</span></div>
+<div class="line"><span class="lineno">  396</span><span class="stringliteral">                    &lt;h3 className=&quot;text-lg font-semibold text-gray-900 dark:text-white mb-2&quot;&gt;Payment Failed&lt;/h3&gt;</span></div>
+<div class="line"><span class="lineno">  397</span><span class="stringliteral">                    &lt;p className=&quot;text-sm text-gray-600 dark:text-gray-400&quot;&gt;We couldn&#39;</span>t process your payment&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  398</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  399</span> </div>
+<div class="line"><span class="lineno">  400</span>                  &lt;div className=<span class="stringliteral">&quot;bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  401</span>                    &lt;p className=<span class="stringliteral">&quot;text-sm text-red-800 dark:text-red-300&quot;</span>&gt;{error}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  402</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  403</span> </div>
+<div class="line"><span class="lineno">  404</span>                  &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  405</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  406</span>                      onClick={handleClose}</div>
+<div class="line"><span class="lineno">  407</span>                      className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  408</span>                    &gt;</div>
+<div class="line"><span class="lineno">  409</span>                      Cancel</div>
+<div class="line"><span class="lineno">  410</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  411</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  412</span>                      onClick={() =&gt; {</div>
+<div class="line"><span class="lineno">  413</span>                        setStep(<span class="stringliteral">&#39;confirm&#39;</span>);</div>
+<div class="line"><span class="lineno">  414</span>                        setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  415</span>                      }}</div>
+<div class="line"><span class="lineno">  416</span>                      className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-700 transition font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  417</span>                    &gt;</div>
+<div class="line"><span class="lineno">  418</span>                      Try Again</div>
+<div class="line"><span class="lineno">  419</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  420</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  421</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  422</span>              )}</div>
+<div class="line"><span class="lineno">  423</span>            &lt;/&gt;</div>
+<div class="line"><span class="lineno">  424</span>          )}</div>
+<div class="line"><span class="lineno">  425</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  426</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  427</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  428</span>  );</div>
+<div class="line"><span class="lineno">  429</span>}</div>
+<div class="ttc" id="a_app_8js_html_a5aa8005d6278eb7eecc1b3cd3f87aad6"><div class="ttname"><a href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a></div><div class="ttdeci">import Profile from pages Profile</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00015">App.js:15</a></div></div>
+<div class="ttc" id="abiometric_8js_html_aea5b1b5dac6efcdbd3faec1b48249ad3"><div class="ttname"><a href="biometric_8js.html#aea5b1b5dac6efcdbd3faec1b48249ad3">authenticateWithBiometric</a></div><div class="ttdeci">export const authenticateWithBiometric</div><div class="ttdef"><b>Definition</b> <a href="biometric_8js_source.html#l00034">biometric.js:34</a></div></div>
+<div class="ttc" id="aencryption_8js_html_ae2490809d009a05695360a2663d260bf"><div class="ttname"><a href="encryption_8js.html#ae2490809d009a05695360a2663d260bf">maskIBAN</a></div><div class="ttdeci">export const maskIBAN</div><div class="ttdef"><b>Definition</b> <a href="encryption_8js_source.html#l00140">encryption.js:140</a></div></div>
+<div class="ttc" id="aencryption_8js_html_afd25c31ee6552cf9bb8cd9468b84ba4b"><div class="ttname"><a href="encryption_8js.html#afd25c31ee6552cf9bb8cd9468b84ba4b">decryptData</a></div><div class="ttdeci">export const decryptData</div><div class="ttdef"><b>Definition</b> <a href="encryption_8js_source.html#l00072">encryption.js:72</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a4c9f6367db9a8b9f6d64a0d27c9ff6e3"><div class="ttname"><a href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a></div><div class="ttdeci">export const getDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00010">firebaseFirestore.js:10</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a66d1f375d7706c9a5a0976c507a3438e"><div class="ttname"><a href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a></div><div class="ttdeci">export const doc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00020">firebaseFirestore.js:20</a></div></div>
+<div class="ttc" id="asepa_payment_8js_html_a0454f780634c8a15995d6721d16e871e"><div class="ttname"><a href="sepa_payment_8js.html#a0454f780634c8a15995d6721d16e871e">calculatePaymentFee</a></div><div class="ttdeci">export const calculatePaymentFee</div><div class="ttdef"><b>Definition</b> <a href="sepa_payment_8js_source.html#l00146">sepaPayment.js:146</a></div></div>
+<div class="ttc" id="asepa_payment_8js_html_a102176d836ca928978b84b79a55b7c9f"><div class="ttname"><a href="sepa_payment_8js.html#a102176d836ca928978b84b79a55b7c9f">validatePaymentAmount</a></div><div class="ttdeci">export const validatePaymentAmount</div><div class="ttdef"><b>Definition</b> <a href="sepa_payment_8js_source.html#l00202">sepaPayment.js:202</a></div></div>
+<div class="ttc" id="asepa_payment_8js_html_a1248a11b541dc6e58d8d3caaa12931e2"><div class="ttname"><a href="sepa_payment_8js.html#a1248a11b541dc6e58d8d3caaa12931e2">createPaymentDescription</a></div><div class="ttdeci">export const createPaymentDescription</div><div class="ttdef"><b>Definition</b> <a href="sepa_payment_8js_source.html#l00227">sepaPayment.js:227</a></div></div>
+<div class="ttc" id="asepa_payment_8js_html_a22f0ff572aacdd6c8c87b16f5f6a5aaf"><div class="ttname"><a href="sepa_payment_8js.html#a22f0ff572aacdd6c8c87b16f5f6a5aaf">processSepaPayment</a></div><div class="ttdeci">export const processSepaPayment</div><div class="ttdef"><b>Definition</b> <a href="sepa_payment_8js_source.html#l00080">sepaPayment.js:80</a></div></div>
+<div class="ttc" id="asepa_payment_8js_html_a8a6d080982e753129d1b1a416ad2966e"><div class="ttname"><a href="sepa_payment_8js.html#a8a6d080982e753129d1b1a416ad2966e">generatePaymentReference</a></div><div class="ttdeci">export const generatePaymentReference</div><div class="ttdef"><b>Definition</b> <a href="sepa_payment_8js_source.html#l00016">sepaPayment.js:16</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sepa_payment_modal_8jsx_source.html#l00002">2</a> of file <a class="el" href="_sepa_payment_modal_8jsx_source.html">SepaPaymentModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>{ useState, useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

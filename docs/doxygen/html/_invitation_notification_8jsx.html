@@ -103,11 +103,284 @@ $(function(){initNavTree('_invitation_notification_8jsx.html',''); initResizable
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">InvitationNotification.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_invitation_notification_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a9af9ba8b8a8a6570f10ccc1dadfdb23d" id="r_a9af9ba8b8a8a6570f10ccc1dadfdb23d"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9af9ba8b8a8a6570f10ccc1dadfdb23d">InvitationNotification</a> ({ user, onInvitationUpdate })</td></tr>
+<tr class="separator:a9af9ba8b8a8a6570f10ccc1dadfdb23d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a9af9ba8b8a8a6570f10ccc1dadfdb23d" name="a9af9ba8b8a8a6570f10ccc1dadfdb23d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9af9ba8b8a8a6570f10ccc1dadfdb23d">&#9670;&#160;</a></span>InvitationNotification()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default InvitationNotification </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ user, onInvitationUpdate }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_invitation_notification_8jsx_source.html#l00009">9</a> of file <a class="el" href="_invitation_notification_8jsx_source.html">InvitationNotification.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    9</span>                                               { user, onInvitationUpdate }) {</div>
+<div class="line"><span class="lineno">   10</span>  <span class="keyword">const</span> [invitations, setInvitations] = useState([]);</div>
+<div class="line"><span class="lineno">   11</span>  <span class="keyword">const</span> [loading, setLoading] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   12</span>  <span class="keyword">const</span> [processingId, setProcessingId] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   13</span>  <span class="keyword">const</span> navigate = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">   14</span> </div>
+<div class="line"><span class="lineno">   15</span>  <span class="comment">// eslint-disable-next-line react-hooks/exhaustive-deps</span></div>
+<div class="line"><span class="lineno">   16</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   17</span>    <span class="keywordflow">if</span> (user) {</div>
+<div class="line"><span class="lineno">   18</span>      loadInvitations();</div>
+<div class="line"><span class="lineno">   19</span>      </div>
+<div class="line"><span class="lineno">   20</span>      <span class="comment">// Poll for new invitations every 30 seconds</span></div>
+<div class="line"><span class="lineno">   21</span>      <span class="keyword">const</span> interval = setInterval(loadInvitations, 30000);</div>
+<div class="line"><span class="lineno">   22</span>      <span class="keywordflow">return</span> () =&gt; clearInterval(interval);</div>
+<div class="line"><span class="lineno">   23</span>    }</div>
+<div class="line"><span class="lineno">   24</span>  }, [user]);</div>
+<div class="line"><span class="lineno">   25</span> </div>
+<div class="line"><span class="lineno">   26</span>  <span class="keyword">const</span> loadInvitations = async () =&gt; {</div>
+<div class="line"><span class="lineno">   27</span>    <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   28</span> </div>
+<div class="line"><span class="lineno">   29</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   30</span>      <span class="keyword">const</span> userInvitations = await <a class="code hl_variable" href="invitation_system_8js.html#a7967ca975f3373af683ceb5727093550">getMyInvitations</a>(user.uid);</div>
+<div class="line"><span class="lineno">   31</span>      setInvitations(userInvitations);</div>
+<div class="line"><span class="lineno">   32</span>      </div>
+<div class="line"><span class="lineno">   33</span>      <span class="comment">// Notify parent of invitation count</span></div>
+<div class="line"><span class="lineno">   34</span>      <span class="keywordflow">if</span> (onInvitationUpdate) {</div>
+<div class="line"><span class="lineno">   35</span>        onInvitationUpdate(userInvitations.length);</div>
+<div class="line"><span class="lineno">   36</span>      }</div>
+<div class="line"><span class="lineno">   37</span>    } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line"><span class="lineno">   38</span>      console.error(<span class="stringliteral">&#39;Error loading invitations:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">   39</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">   40</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   41</span>    }</div>
+<div class="line"><span class="lineno">   42</span>  };</div>
+<div class="line"><span class="lineno">   43</span> </div>
+<div class="line"><span class="lineno">   44</span>  <span class="keyword">const</span> handleAccept = async (invitation) =&gt; {</div>
+<div class="line"><span class="lineno">   45</span>    setProcessingId(invitation.id);</div>
+<div class="line"><span class="lineno">   46</span> </div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   48</span>      <span class="keyword">const</span> result = await <a class="code hl_variable" href="invitation_system_8js.html#abf19174409ae8eda7eb71da561b59d24">acceptInvitation</a>(invitation.id, user.uid);</div>
+<div class="line"><span class="lineno">   49</span>      </div>
+<div class="line"><span class="lineno">   50</span>      <span class="keywordflow">if</span> (result.success) {</div>
+<div class="line"><span class="lineno">   51</span>        <span class="comment">// Remove from list</span></div>
+<div class="line"><span class="lineno">   52</span>        setInvitations(invitations.filter(inv =&gt; inv.id !== invitation.id));</div>
+<div class="line"><span class="lineno">   53</span>        </div>
+<div class="line"><span class="lineno">   54</span>        <span class="comment">// Show success message</span></div>
+<div class="line"><span class="lineno">   55</span>        <a class="code hl_variable" href="_create_group_modal_8test_8jsx.html#ade82d91fa8e0278173352b9dd1797ecd">alert</a>(`✅ You<span class="stringliteral">&#39;ve joined ${invitation.groupName}!`);</span></div>
+<div class="line"><span class="lineno">   56</span><span class="stringliteral">        </span></div>
+<div class="line"><span class="lineno">   57</span><span class="stringliteral">        // Navigate to the group</span></div>
+<div class="line"><span class="lineno">   58</span><span class="stringliteral">        navigate(`/groups/${result.groupId}`);</span></div>
+<div class="line"><span class="lineno">   59</span><span class="stringliteral">        </span></div>
+<div class="line"><span class="lineno">   60</span><span class="stringliteral">        // Update parent</span></div>
+<div class="line"><span class="lineno">   61</span><span class="stringliteral">        if (onInvitationUpdate) {</span></div>
+<div class="line"><span class="lineno">   62</span><span class="stringliteral">          onInvitationUpdate(invitations.length - 1);</span></div>
+<div class="line"><span class="lineno">   63</span><span class="stringliteral">        }</span></div>
+<div class="line"><span class="lineno">   64</span><span class="stringliteral">      } else {</span></div>
+<div class="line"><span class="lineno">   65</span><span class="stringliteral">        alert(`❌ ${result.message}`);</span></div>
+<div class="line"><span class="lineno">   66</span><span class="stringliteral">      }</span></div>
+<div class="line"><span class="lineno">   67</span><span class="stringliteral">    } catch (error) {</span></div>
+<div class="line"><span class="lineno">   68</span><span class="stringliteral">      console.error(&#39;</span>Error accepting invitation:<span class="stringliteral">&#39;, error);</span></div>
+<div class="line"><span class="lineno">   69</span><span class="stringliteral">      alert(&#39;</span>❌ Failed to accept invitation. Please <span class="keywordflow">try</span> again.<span class="stringliteral">&#39;);</span></div>
+<div class="line"><span class="lineno">   70</span><span class="stringliteral">    } finally {</span></div>
+<div class="line"><span class="lineno">   71</span><span class="stringliteral">      setProcessingId(null);</span></div>
+<div class="line"><span class="lineno">   72</span><span class="stringliteral">    }</span></div>
+<div class="line"><span class="lineno">   73</span><span class="stringliteral">  };</span></div>
+<div class="line"><span class="lineno">   74</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">   75</span><span class="stringliteral">  const handleDecline = async (invitation) =&gt; {</span></div>
+<div class="line"><span class="lineno">   76</span><span class="stringliteral">    setProcessingId(invitation.id);</span></div>
+<div class="line"><span class="lineno">   77</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">   78</span><span class="stringliteral">    try {</span></div>
+<div class="line"><span class="lineno">   79</span><span class="stringliteral">      const result = await declineInvitation(invitation.id, user.uid);</span></div>
+<div class="line"><span class="lineno">   80</span><span class="stringliteral">      </span></div>
+<div class="line"><span class="lineno">   81</span><span class="stringliteral">      if (result.success) {</span></div>
+<div class="line"><span class="lineno">   82</span><span class="stringliteral">        // Remove from list</span></div>
+<div class="line"><span class="lineno">   83</span><span class="stringliteral">        setInvitations(invitations.filter(inv =&gt; inv.id !== invitation.id));</span></div>
+<div class="line"><span class="lineno">   84</span><span class="stringliteral">        </span></div>
+<div class="line"><span class="lineno">   85</span><span class="stringliteral">        // Update parent</span></div>
+<div class="line"><span class="lineno">   86</span><span class="stringliteral">        if (onInvitationUpdate) {</span></div>
+<div class="line"><span class="lineno">   87</span><span class="stringliteral">          onInvitationUpdate(invitations.length - 1);</span></div>
+<div class="line"><span class="lineno">   88</span><span class="stringliteral">        }</span></div>
+<div class="line"><span class="lineno">   89</span><span class="stringliteral">      } else {</span></div>
+<div class="line"><span class="lineno">   90</span><span class="stringliteral">        alert(`❌ ${result.message}`);</span></div>
+<div class="line"><span class="lineno">   91</span><span class="stringliteral">      }</span></div>
+<div class="line"><span class="lineno">   92</span><span class="stringliteral">    } catch (error) {</span></div>
+<div class="line"><span class="lineno">   93</span><span class="stringliteral">      console.error(&#39;</span>Error declining invitation:<span class="stringliteral">&#39;, error);</span></div>
+<div class="line"><span class="lineno">   94</span><span class="stringliteral">      alert(&#39;</span>❌ Failed to decline invitation. Please <span class="keywordflow">try</span> again.<span class="stringliteral">&#39;);</span></div>
+<div class="line"><span class="lineno">   95</span><span class="stringliteral">    } finally {</span></div>
+<div class="line"><span class="lineno">   96</span><span class="stringliteral">      setProcessingId(null);</span></div>
+<div class="line"><span class="lineno">   97</span><span class="stringliteral">    }</span></div>
+<div class="line"><span class="lineno">   98</span><span class="stringliteral">  };</span></div>
+<div class="line"><span class="lineno">   99</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  100</span><span class="stringliteral">  const getTimeAgo = (timestamp) =&gt; {</span></div>
+<div class="line"><span class="lineno">  101</span><span class="stringliteral">    if (!timestamp) return &#39;</span>Just now<span class="stringliteral">&#39;;</span></div>
+<div class="line"><span class="lineno">  102</span><span class="stringliteral">    </span></div>
+<div class="line"><span class="lineno">  103</span><span class="stringliteral">    const now = Date.now();</span></div>
+<div class="line"><span class="lineno">  104</span><span class="stringliteral">    const createdAt = timestamp.toMillis ? timestamp.toMillis() : timestamp;</span></div>
+<div class="line"><span class="lineno">  105</span><span class="stringliteral">    const diffMs = now - createdAt;</span></div>
+<div class="line"><span class="lineno">  106</span><span class="stringliteral">    const diffMins = Math.floor(diffMs / 60000);</span></div>
+<div class="line"><span class="lineno">  107</span><span class="stringliteral">    const diffHours = Math.floor(diffMs / 3600000);</span></div>
+<div class="line"><span class="lineno">  108</span><span class="stringliteral">    const diffDays = Math.floor(diffMs / 86400000);</span></div>
+<div class="line"><span class="lineno">  109</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  110</span><span class="stringliteral">    if (diffMins &lt; 1) return &#39;</span>Just now<span class="stringliteral">&#39;;</span></div>
+<div class="line"><span class="lineno">  111</span><span class="stringliteral">    if (diffMins &lt; 60) return `${diffMins}m ago`;</span></div>
+<div class="line"><span class="lineno">  112</span><span class="stringliteral">    if (diffHours &lt; 24) return `${diffHours}h ago`;</span></div>
+<div class="line"><span class="lineno">  113</span><span class="stringliteral">    if (diffDays &lt; 7) return `${diffDays}d ago`;</span></div>
+<div class="line"><span class="lineno">  114</span><span class="stringliteral">    return `${Math.floor(diffDays / 7)}w ago`;</span></div>
+<div class="line"><span class="lineno">  115</span><span class="stringliteral">  };</span></div>
+<div class="line"><span class="lineno">  116</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  117</span><span class="stringliteral">  if (loading) {</span></div>
+<div class="line"><span class="lineno">  118</span><span class="stringliteral">    return null; // Don&#39;</span>t show anything <span class="keywordflow">while</span> loading</div>
+<div class="line"><span class="lineno">  119</span>  }</div>
+<div class="line"><span class="lineno">  120</span> </div>
+<div class="line"><span class="lineno">  121</span>  <span class="keywordflow">if</span> (invitations.length === 0) {</div>
+<div class="line"><span class="lineno">  122</span>    return null; <span class="comment">// Don&#39;t show if no invitations</span></div>
+<div class="line"><span class="lineno">  123</span>  }</div>
+<div class="line"><span class="lineno">  124</span> </div>
+<div class="line"><span class="lineno">  125</span>  return (</div>
+<div class="line"><span class="lineno">  126</span>    &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 border border-indigo-200 dark:border-indigo-800 overflow-hidden&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  127</span>      {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">  128</span>      &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 px-4 py-3 border-b border-indigo-200 dark:border-indigo-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  129</span>        &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  130</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  131</span>            &lt;div className=<span class="stringliteral">&quot;w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  132</span>              &lt;Bell size={16} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  133</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  134</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  135</span>              &lt;h3 className=<span class="stringliteral">&quot;text-sm font-semibold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  136</span>                Group Invitations</div>
+<div class="line"><span class="lineno">  137</span>              &lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  138</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-600 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  139</span>                {invitations.length} pending</div>
+<div class="line"><span class="lineno">  140</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  141</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  142</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  143</span>          &lt;span className=<span class="stringliteral">&quot;bg-indigo-600 dark:bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  144</span>            {invitations.length}</div>
+<div class="line"><span class="lineno">  145</span>          &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  146</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  147</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  148</span> </div>
+<div class="line"><span class="lineno">  149</span>      {<span class="comment">/* Invitation List */</span>}</div>
+<div class="line"><span class="lineno">  150</span>      &lt;div className=<span class="stringliteral">&quot;divide-y divide-gray-200 dark:divide-gray-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  151</span>        {invitations.map((invitation) =&gt; {</div>
+<div class="line"><span class="lineno">  152</span>          <span class="keyword">const</span> isProcessing = processingId === invitation.id;</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span>          <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  155</span>            &lt;div</div>
+<div class="line"><span class="lineno">  156</span>              key={invitation.id}</div>
+<div class="line"><span class="lineno">  157</span>              className=<span class="stringliteral">&quot;p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition&quot;</span></div>
+<div class="line"><span class="lineno">  158</span>            &gt;</div>
+<div class="line"><span class="lineno">  159</span>              &lt;div className=<span class="stringliteral">&quot;flex items-start gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  160</span>                {<span class="comment">/* Sender Photo */</span>}</div>
+<div class="line"><span class="lineno">  161</span>                {invitation.fromUserPhoto ? (</div>
+<div class="line"><span class="lineno">  162</span>                  &lt;img</div>
+<div class="line"><span class="lineno">  163</span>                    src={invitation.fromUserPhoto}</div>
+<div class="line"><span class="lineno">  164</span>                    alt={invitation.fromUserName}</div>
+<div class="line"><span class="lineno">  165</span>                    className=<span class="stringliteral">&quot;w-10 h-10 rounded-full object-cover&quot;</span></div>
+<div class="line"><span class="lineno">  166</span>                  /&gt;</div>
+<div class="line"><span class="lineno">  167</span>                ) : (</div>
+<div class="line"><span class="lineno">  168</span>                  &lt;div className=<span class="stringliteral">&quot;w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-semibold&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  169</span>                    {invitation.fromUserName.charAt(0).toUpperCase()}</div>
+<div class="line"><span class="lineno">  170</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  171</span>                )}</div>
+<div class="line"><span class="lineno">  172</span> </div>
+<div class="line"><span class="lineno">  173</span>                {<span class="comment">/* Content */</span>}</div>
+<div class="line"><span class="lineno">  174</span>                &lt;div className=<span class="stringliteral">&quot;flex-1 min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  175</span>                  {<span class="comment">/* Message */</span>}</div>
+<div class="line"><span class="lineno">  176</span>                  &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-900 dark:text-white mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  177</span>                    &lt;span className=<span class="stringliteral">&quot;font-semibold&quot;</span>&gt;{invitation.fromUserName}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  178</span>                    {<span class="stringliteral">&#39; invited you to join&#39;</span>}</div>
+<div class="line"><span class="lineno">  179</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  180</span> </div>
+<div class="line"><span class="lineno">  181</span>                  {<span class="comment">/* Group Name */</span>}</div>
+<div class="line"><span class="lineno">  182</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  183</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5 bg-indigo-100 dark:bg-indigo-900/30 px-2 py-1 rounded-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  184</span>                      &lt;Users size={14} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  185</span>                      &lt;span className=<span class="stringliteral">&quot;text-sm font-semibold text-indigo-900 dark:text-indigo-200&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  186</span>                        {invitation.groupName}</div>
+<div class="line"><span class="lineno">  187</span>                      &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  188</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  189</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  190</span> </div>
+<div class="line"><span class="lineno">  191</span>                  {<span class="comment">/* Time */</span>}</div>
+<div class="line"><span class="lineno">  192</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  193</span>                    &lt;Clock size={12} /&gt;</div>
+<div class="line"><span class="lineno">  194</span>                    &lt;span&gt;{getTimeAgo(invitation.createdAt)}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  195</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  196</span> </div>
+<div class="line"><span class="lineno">  197</span>                  {<span class="comment">/* Action Buttons */</span>}</div>
+<div class="line"><span class="lineno">  198</span>                  &lt;div className=<span class="stringliteral">&quot;flex gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  199</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  200</span>                      onClick={() =&gt; handleAccept(invitation)}</div>
+<div class="line"><span class="lineno">  201</span>                      disabled={isProcessing}</div>
+<div class="line"><span class="lineno">  202</span>                      className=<span class="stringliteral">&quot;flex-1 flex items-center justify-center gap-1.5 bg-green-600 dark:bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  203</span>                    &gt;</div>
+<div class="line"><span class="lineno">  204</span>                      &lt;Check size={16} /&gt;</div>
+<div class="line"><span class="lineno">  205</span>                      &lt;span&gt;{isProcessing ? <span class="stringliteral">&#39;Accepting...&#39;</span> : <span class="stringliteral">&#39;Accept&#39;</span>}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  206</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  207</span> </div>
+<div class="line"><span class="lineno">  208</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  209</span>                      onClick={() =&gt; handleDecline(invitation)}</div>
+<div class="line"><span class="lineno">  210</span>                      disabled={isProcessing}</div>
+<div class="line"><span class="lineno">  211</span>                      className=<span class="stringliteral">&quot;flex-1 flex items-center justify-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  212</span>                    &gt;</div>
+<div class="line"><span class="lineno">  213</span>                      &lt;X size={16} /&gt;</div>
+<div class="line"><span class="lineno">  214</span>                      &lt;span&gt;{isProcessing ? <span class="stringliteral">&#39;Declining...&#39;</span> : <span class="stringliteral">&#39;Decline&#39;</span>}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  215</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  216</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  217</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  218</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  219</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  220</span>          );</div>
+<div class="line"><span class="lineno">  221</span>        })}</div>
+<div class="line"><span class="lineno">  222</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  223</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  224</span>  );</div>
+<div class="line"><span class="lineno">  225</span>}</div>
+<div class="ttc" id="a_create_group_modal_8test_8jsx_html_ade82d91fa8e0278173352b9dd1797ecd"><div class="ttname"><a href="_create_group_modal_8test_8jsx.html#ade82d91fa8e0278173352b9dd1797ecd">alert</a></div><div class="ttdeci">global alert</div><div class="ttdef"><b>Definition</b> <a href="_create_group_modal_8test_8jsx_source.html#l00015">CreateGroupModal.test.jsx:15</a></div></div>
+<div class="ttc" id="ainvitation_system_8js_html_a7967ca975f3373af683ceb5727093550"><div class="ttname"><a href="invitation_system_8js.html#a7967ca975f3373af683ceb5727093550">getMyInvitations</a></div><div class="ttdeci">export const getMyInvitations</div><div class="ttdef"><b>Definition</b> <a href="invitation_system_8js_source.html#l00133">invitationSystem.js:133</a></div></div>
+<div class="ttc" id="ainvitation_system_8js_html_abf19174409ae8eda7eb71da561b59d24"><div class="ttname"><a href="invitation_system_8js.html#abf19174409ae8eda7eb71da561b59d24">acceptInvitation</a></div><div class="ttdeci">export const acceptInvitation</div><div class="ttdef"><b>Definition</b> <a href="invitation_system_8js_source.html#l00210">invitationSystem.js:210</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_invitation_notification_8jsx_source.html#l00004">4</a> of file <a class="el" href="_invitation_notification_8jsx_source.html">InvitationNotification.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    4</span>{ useState, useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

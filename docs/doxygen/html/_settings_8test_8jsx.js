@@ -1,0 +1,26 @@
+var _settings_8test_8jsx =
+[
+    [ "dom", "_settings_8test_8jsx.html#ace141dab1481fa1126bf476461d4ff32", null ],
+    [ "import", "_settings_8test_8jsx.html#a59be084da8908b7d77ff34b25cd84488", null ],
+    [ "mockAuthenticateWithBiometric", "_settings_8test_8jsx.html#ad572ecefd86ae02b7e7abcc50c524b09", null ],
+    [ "mockCollection", "_settings_8test_8jsx.html#a2962cb1794d661c82f02a9881e0543e9", null ],
+    [ "mockDeleteDoc", "_settings_8test_8jsx.html#a61e8ab6134ceef7addd6495bf263ba70", null ],
+    [ "mockDeleteUser", "_settings_8test_8jsx.html#a6ea1f8b4b73b86d80cece53b3117a6e3", null ],
+    [ "mockDisableBiometric", "_settings_8test_8jsx.html#a1b146de9643c46c243278dc67c51304f", null ],
+    [ "mockDoc", "_settings_8test_8jsx.html#a9e42303cb6e845fc01a5020ff435af18", null ],
+    [ "mockEmailAuthProvider", "_settings_8test_8jsx.html#a15395840f1e5c52f91c29a2b079762d3", null ],
+    [ "mockGetDeviceInfo", "_settings_8test_8jsx.html#aa61eb3ecfad25c5e9bf96353d7c58303", null ],
+    [ "mockGetDoc", "_settings_8test_8jsx.html#a18a974073885cc5e723b10b617010bc6", null ],
+    [ "mockGetDocs", "_settings_8test_8jsx.html#a0bd65c068f52ef91fbeba621579b0f65", null ],
+    [ "mockIsBiometricEnabledOnDevice", "_settings_8test_8jsx.html#a08d8bd989ac5c15a2a665b6316c22d7f", null ],
+    [ "mockLogout", "_settings_8test_8jsx.html#a0124b3271c692357f812990271f5f02b", null ],
+    [ "mockNavigate", "_settings_8test_8jsx.html#a77aa0bd763f224f88bc985d2d5c09ffb", null ],
+    [ "mockQuery", "_settings_8test_8jsx.html#a9d987238f73868d6c28f274e3d2dab80", null ],
+    [ "mockReauthenticateWithCredential", "_settings_8test_8jsx.html#afd4545b61fb793ad849eef28c024e743", null ],
+    [ "mockRegisterBiometric", "_settings_8test_8jsx.html#a3f7ea39bdaf2f8ccd1ce5abc77aec3df", null ],
+    [ "mockUpdateProfile", "_settings_8test_8jsx.html#aa07f192b34d0f637ad01164b30f51706", null ],
+    [ "mockUser", "_settings_8test_8jsx.html#a1a184414a9e84bc73b478363826a0542", null ],
+    [ "mockWhere", "_settings_8test_8jsx.html#a8c31c070f62bdfa9b55ae6e9243030fc", null ],
+    [ "react", "_settings_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1", null ],
+    [ "Settings", "_settings_8test_8jsx.html#a7a907622f28224196ce2b67771b7477d", null ]
+];

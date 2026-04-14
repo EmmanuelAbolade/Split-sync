@@ -103,11 +103,156 @@ $(function(){initNavTree('_icon_selector_8jsx.html',''); initResizable(true); })
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">IconSelector.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_icon_selector_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a46a2143392b9e4fcc3febccff906c7eb" id="r_a46a2143392b9e4fcc3febccff906c7eb"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46a2143392b9e4fcc3febccff906c7eb">IconSelector</a> ({ selected, onSelect })</td></tr>
+<tr class="separator:a46a2143392b9e4fcc3febccff906c7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a></td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe8367ca31c0fd3300e9b8b830a64f0d" id="r_afe8367ca31c0fd3300e9b8b830a64f0d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a></td></tr>
+<tr class="separator:afe8367ca31c0fd3300e9b8b830a64f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a46a2143392b9e4fcc3febccff906c7eb" name="a46a2143392b9e4fcc3febccff906c7eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46a2143392b9e4fcc3febccff906c7eb">&#9670;&#160;</a></span>IconSelector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default IconSelector </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ selected, onSelect }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_icon_selector_8jsx_source.html#l00028">28</a> of file <a class="el" href="_icon_selector_8jsx_source.html">IconSelector.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   28</span>                                     { selected, onSelect }) {</div>
+<div class="line"><span class="lineno">   29</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   30</span>    &lt;div&gt;</div>
+<div class="line"><span class="lineno">   31</span>      &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   32</span>        Choose Icon</div>
+<div class="line"><span class="lineno">   33</span>      &lt;/label&gt;</div>
+<div class="line"><span class="lineno">   34</span>      &lt;div className=<span class="stringliteral">&quot;grid grid-cols-3 sm:grid-cols-4 gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   35</span>        {<a class="code hl_variable" href="#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a>.map(({ name, Icon, label }) =&gt; {</div>
+<div class="line"><span class="lineno">   36</span>          <span class="keyword">const</span> isSelected = selected === name;</div>
+<div class="line"><span class="lineno">   37</span>          <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   38</span>            &lt;button</div>
+<div class="line"><span class="lineno">   39</span>              key={name}</div>
+<div class="line"><span class="lineno">   40</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">   41</span>              onClick={() =&gt; onSelect(name)}</div>
+<div class="line"><span class="lineno">   42</span>              title={label}</div>
+<div class="line"><span class="lineno">   43</span>              className={`p-3 rounded-lg transition flex items-center justify-center ${</div>
+<div class="line"><span class="lineno">   44</span>                isSelected</div>
+<div class="line"><span class="lineno">   45</span>                  ? <span class="stringliteral">&#39;bg-primary dark:bg-indigo-600 text-white ring-2 ring-primary dark:ring-indigo-500&#39;</span></div>
+<div class="line"><span class="lineno">   46</span>                  : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600&#39;</span></div>
+<div class="line"><span class="lineno">   47</span>              }`}</div>
+<div class="line"><span class="lineno">   48</span>            &gt;</div>
+<div class="line"><span class="lineno">   49</span>              &lt;Icon size={24} /&gt;</div>
+<div class="line"><span class="lineno">   50</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   51</span>          );</div>
+<div class="line"><span class="lineno">   52</span>        })}</div>
+<div class="line"><span class="lineno">   53</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   54</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   55</span>  );</div>
+<div class="line"><span class="lineno">   56</span>}</div>
+<div class="ttc" id="a_icon_selector_8jsx_html_afe8367ca31c0fd3300e9b8b830a64f0d"><div class="ttname"><a href="#afe8367ca31c0fd3300e9b8b830a64f0d">ICONS</a></div><div class="ttdeci">const ICONS</div><div class="ttdef"><b>Definition</b> <a href="_icon_selector_8jsx_source.html#l00009">IconSelector.jsx:9</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="afe8367ca31c0fd3300e9b8b830a64f0d" name="afe8367ca31c0fd3300e9b8b830a64f0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe8367ca31c0fd3300e9b8b830a64f0d">&#9670;&#160;</a></span>ICONS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ICONS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [</div>
+<div class="line">  { name: <span class="stringliteral">&#39;home&#39;</span>, Icon: Home, label: <span class="stringliteral">&#39;Home&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;plane&#39;</span>, Icon: Plane, label: <span class="stringliteral">&#39;Travel&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;pizza&#39;</span>, Icon: Pizza, label: <span class="stringliteral">&#39;Food&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;party&#39;</span>, Icon: PartyPopper, label: <span class="stringliteral">&#39;Party&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;car&#39;</span>, Icon: Car, label: <span class="stringliteral">&#39;Transport&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;beach&#39;</span>, Icon: Palmtree, label: <span class="stringliteral">&#39;Beach&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;game&#39;</span>, Icon: Gamepad2, label: <span class="stringliteral">&#39;Gaming&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;heart&#39;</span>, Icon: Heart, label: <span class="stringliteral">&#39;Couple&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;users&#39;</span>, Icon: Users, label: <span class="stringliteral">&#39;Friends&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;shopping&#39;</span>, Icon: ShoppingCart, label: <span class="stringliteral">&#39;Shopping&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;coffee&#39;</span>, Icon: Coffee, label: <span class="stringliteral">&#39;Coffee&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;dining&#39;</span>, Icon: Utensils, label: <span class="stringliteral">&#39;Dining&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;music&#39;</span>, Icon: Music, label: <span class="stringliteral">&#39;Music&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;work&#39;</span>, Icon: Briefcase, label: <span class="stringliteral">&#39;Work&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;study&#39;</span>, Icon: GraduationCap, label: <span class="stringliteral">&#39;Study&#39;</span> },</div>
+<div class="line">  { name: <span class="stringliteral">&#39;gift&#39;</span>, Icon: Gift, label: <span class="stringliteral">&#39;Gift&#39;</span> },</div>
+<div class="line">]</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_icon_selector_8jsx_source.html#l00009">9</a> of file <a class="el" href="_icon_selector_8jsx_source.html">IconSelector.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   10</span>  { name: <span class="stringliteral">&#39;home&#39;</span>, Icon: Home, label: <span class="stringliteral">&#39;Home&#39;</span> },</div>
+<div class="line"><span class="lineno">   11</span>  { name: <span class="stringliteral">&#39;plane&#39;</span>, Icon: Plane, label: <span class="stringliteral">&#39;Travel&#39;</span> },</div>
+<div class="line"><span class="lineno">   12</span>  { name: <span class="stringliteral">&#39;pizza&#39;</span>, Icon: Pizza, label: <span class="stringliteral">&#39;Food&#39;</span> },</div>
+<div class="line"><span class="lineno">   13</span>  { name: <span class="stringliteral">&#39;party&#39;</span>, Icon: PartyPopper, label: <span class="stringliteral">&#39;Party&#39;</span> },</div>
+<div class="line"><span class="lineno">   14</span>  { name: <span class="stringliteral">&#39;car&#39;</span>, Icon: Car, label: <span class="stringliteral">&#39;Transport&#39;</span> },</div>
+<div class="line"><span class="lineno">   15</span>  { name: <span class="stringliteral">&#39;beach&#39;</span>, Icon: Palmtree, label: <span class="stringliteral">&#39;Beach&#39;</span> },</div>
+<div class="line"><span class="lineno">   16</span>  { name: <span class="stringliteral">&#39;game&#39;</span>, Icon: Gamepad2, label: <span class="stringliteral">&#39;Gaming&#39;</span> },</div>
+<div class="line"><span class="lineno">   17</span>  { name: <span class="stringliteral">&#39;heart&#39;</span>, Icon: Heart, label: <span class="stringliteral">&#39;Couple&#39;</span> },</div>
+<div class="line"><span class="lineno">   18</span>  { name: <span class="stringliteral">&#39;users&#39;</span>, Icon: Users, label: <span class="stringliteral">&#39;Friends&#39;</span> },</div>
+<div class="line"><span class="lineno">   19</span>  { name: <span class="stringliteral">&#39;shopping&#39;</span>, Icon: ShoppingCart, label: <span class="stringliteral">&#39;Shopping&#39;</span> },</div>
+<div class="line"><span class="lineno">   20</span>  { name: <span class="stringliteral">&#39;coffee&#39;</span>, Icon: Coffee, label: <span class="stringliteral">&#39;Coffee&#39;</span> },</div>
+<div class="line"><span class="lineno">   21</span>  { name: <span class="stringliteral">&#39;dining&#39;</span>, Icon: Utensils, label: <span class="stringliteral">&#39;Dining&#39;</span> },</div>
+<div class="line"><span class="lineno">   22</span>  { name: <span class="stringliteral">&#39;music&#39;</span>, Icon: Music, label: <span class="stringliteral">&#39;Music&#39;</span> },</div>
+<div class="line"><span class="lineno">   23</span>  { name: <span class="stringliteral">&#39;work&#39;</span>, Icon: Briefcase, label: <span class="stringliteral">&#39;Work&#39;</span> },</div>
+<div class="line"><span class="lineno">   24</span>  { name: <span class="stringliteral">&#39;study&#39;</span>, Icon: GraduationCap, label: <span class="stringliteral">&#39;Study&#39;</span> },</div>
+<div class="line"><span class="lineno">   25</span>  { name: <span class="stringliteral">&#39;gift&#39;</span>, Icon: Gift, label: <span class="stringliteral">&#39;Gift&#39;</span> },</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">{ </div>
+<div class="line">  Home, Plane, Pizza, PartyPopper, Car, </div>
+<div class="line">  Palmtree, Gamepad2, Heart, Users, </div>
+<div class="line">  ShoppingCart, Coffee, Utensils, Music,</div>
+<div class="line">  Briefcase, GraduationCap, Gift</div>
+<div class="line">} from <span class="stringliteral">&#39;lucide-react&#39;</span></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_icon_selector_8jsx_source.html#l00002">2</a> of file <a class="el" href="_icon_selector_8jsx_source.html">IconSelector.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>       { </div>
+<div class="line"><span class="lineno">    3</span>  Home, Plane, Pizza, PartyPopper, Car, </div>
+<div class="line"><span class="lineno">    4</span>  Palmtree, Gamepad2, Heart, Users, </div>
+<div class="line"><span class="lineno">    5</span>  ShoppingCart, Coffee, Utensils, Music,</div>
+<div class="line"><span class="lineno">    6</span>  Briefcase, GraduationCap, Gift</div>
+<div class="line"><span class="lineno">    7</span>} from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

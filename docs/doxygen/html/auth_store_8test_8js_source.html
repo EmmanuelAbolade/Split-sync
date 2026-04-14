@@ -106,284 +106,295 @@ $(function(){initNavTree('auth_store_8test_8js_source.html',''); initResizable(t
   <div class="headertitle"><div class="title">authStore.test.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="auth_store_8test_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/stores/authStore.test.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>// Test suite for authStore - authentication state management with Zustand</div>
+<a href="auth_store_8test_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/stores/authStore.test.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Test suite for authStore - authentication state management with Zustand</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>import { act } from &#39;@testing-library/react&#39;;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#a59be084da8908b7d77ff34b25cd84488">    4</a></span><span class="keyword">import</span> { act } from <span class="stringliteral">&#39;@testing-library/react&#39;</span>;</div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>// ─── Mocks ────────────────────────────────────────────────────────────────────</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// ─── Mocks ────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>// Mock Firebase auth</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>const mockSignOut = jest.fn();</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>jest.mock(&#39;firebase/auth&#39;, () =&gt; ({</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  signOut: (...args) =&gt; mockSignOut(...args),</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// Mock Firebase auth</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#ad8e073bc1591051a4b69c8f0edf0ca62">    9</a></span><span class="keyword">const</span> <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a> = jest.fn();</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>jest.mock(<span class="stringliteral">&#39;firebase/auth&#39;</span>, () =&gt; ({</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  <a class="code hl_variable" href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">signOut</a>: (...args) =&gt; <a class="code hl_variable" href="auth_store_8test_8js.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>(...args),</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>}));</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>jest.mock(&#39;../services/firebase&#39;, () =&gt; ({ auth: {} }));</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>jest.mock(<span class="stringliteral">&#39;../services/firebase&#39;</span>, () =&gt; ({ <a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>: {} }));</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>// Mock localStorage</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>const localStorageMock = (() =&gt; {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// Mock localStorage</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#a72e0888b6e58f722cc6f7991c2bc4044">   17</a></span><span class="keyword">const</span> <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a> = (() =&gt; {</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  let store = {};</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  return {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    getItem:    (key)        =&gt; store[key] ?? null,</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  <span class="keywordflow">return</span> {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    getItem:    (key)        =&gt; store[key] ?? <span class="keyword">null</span>,</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    setItem:    (key, value) =&gt; { store[key] = String(value); },</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    removeItem: (key)        =&gt; { delete store[key]; },</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    removeItem: (key)        =&gt; { <span class="keyword">delete</span> store[key]; },</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    clear:      ()           =&gt; { store = {}; },</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  };</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>})();</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>Object.defineProperty(window, &#39;localStorage&#39;, { value: localStorageMock });</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>Object.defineProperty(window, <span class="stringliteral">&#39;localStorage&#39;</span>, { value: <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a> });</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>// Mock sessionStorage</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>const sessionStorageMock = { clear: jest.fn() };</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>Object.defineProperty(window, &#39;sessionStorage&#39;, { value: sessionStorageMock });</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">// Mock sessionStorage</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#aec2f8abd0f73277bde4707fae241fb66">   29</a></span><span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8test_8js.html#aec2f8abd0f73277bde4707fae241fb66">sessionStorageMock</a> = { clear: jest.fn() };</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>Object.defineProperty(window, <span class="stringliteral">&#39;sessionStorage&#39;</span>, { value: <a class="code hl_variable" href="auth_store_8test_8js.html#aec2f8abd0f73277bde4707fae241fb66">sessionStorageMock</a> });</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>// Mock window.location</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>delete window.location;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>window.location = { href: &#39;&#39; };</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment">// Mock window.location</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">   33</a></span><span class="keyword">delete</span> window.location;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>window.location = { href: <span class="stringliteral">&#39;&#39;</span> };</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>// Mock caches API</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>global.caches = {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment">// Mock caches API</span></div>
+<div class="foldopen" id="foldopen00037" data-start="{" data-end="};">
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#a1f632c28b2fe70941e71daf6e935b60a">   37</a></span>global.caches = {</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  keys:   jest.fn().mockResolvedValue([]),</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  delete: jest.fn().mockResolvedValue(true),</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  <span class="keyword">delete</span>: jest.fn().mockResolvedValue(<span class="keyword">true</span>),</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>};</div>
+</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>// ─────────────────────────────────────────────────────────────────────────────</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">// ─────────────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>// Import AFTER mocks are set up</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>const getStore = () =&gt; require(&#39;./authStore&#39;).useAuthStore;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment">// Import AFTER mocks are set up</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">   45</a></span><span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a> = () =&gt; require(<span class="stringliteral">&#39;./authStore&#39;</span>).useAuthStore;</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>describe(&#39;authStore - Initial state&#39;, () =&gt; {</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>describe(<span class="stringliteral">&#39;authStore - Initial state&#39;</span>, () =&gt; {</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  beforeEach(() =&gt; {</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    jest.resetModules();</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    jest.clearAllMocks();</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    localStorageMock.clear();</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.clear();</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  });</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  test(&#39;Initial user is null&#39;, () =&gt; {</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    expect(useAuthStore.getState().user).toBeNull();</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  test(<span class="stringliteral">&#39;Initial user is null&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user).toBeNull();</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  });</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  test(&#39;Initial isAuthenticated is false&#39;, () =&gt; {</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    expect(useAuthStore.getState().isAuthenticated).toBe(false);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  test(<span class="stringliteral">&#39;Initial isAuthenticated is false&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().isAuthenticated).toBe(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  });</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>  test(&#39;Initial loading is true&#39;, () =&gt; {</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    expect(useAuthStore.getState().loading).toBe(true);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>  test(<span class="stringliteral">&#39;Initial loading is true&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().loading).toBe(<span class="keyword">true</span>);</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  });</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>});</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>// ─────────────────────────────────────────────────────────────────────────────</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment">// ─────────────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>describe(&#39;authStore - setUser action&#39;, () =&gt; {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>describe(<span class="stringliteral">&#39;authStore - setUser action&#39;</span>, () =&gt; {</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  beforeEach(() =&gt; {</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    jest.resetModules();</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    jest.clearAllMocks();</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    localStorageMock.clear();</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.clear();</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  });</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  test(&#39;Sets user correctly&#39;, () =&gt; {</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    const mockUser = { uid: &#39;user-123&#39;, email: &#39;test@example.com&#39; };</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    act(() =&gt; useAuthStore.getState().setUser(mockUser));</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    expect(useAuthStore.getState().user).toEqual(mockUser);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  test(<span class="stringliteral">&#39;Sets user correctly&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keyword">const</span> <a class="code hl_variable" href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a> = { uid: <span class="stringliteral">&#39;user-123&#39;</span>, email: <span class="stringliteral">&#39;test@example.com&#39;</span> };</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser(<a class="code hl_variable" href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a>));</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user).toEqual(<a class="code hl_variable" href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a>);</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>  });</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  test(&#39;Sets isAuthenticated to true when user is provided&#39;, () =&gt; {</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39; }));</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    expect(useAuthStore.getState().isAuthenticated).toBe(true);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  test(<span class="stringliteral">&#39;Sets isAuthenticated to true when user is provided&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span> }));</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().isAuthenticated).toBe(<span class="keyword">true</span>);</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>  });</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  test(&#39;Sets isAuthenticated to false when user is null&#39;, () =&gt; {</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    act(() =&gt; useAuthStore.getState().setUser(null));</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    expect(useAuthStore.getState().isAuthenticated).toBe(false);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  test(<span class="stringliteral">&#39;Sets isAuthenticated to false when user is null&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser(<span class="keyword">null</span>));</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().isAuthenticated).toBe(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  });</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>  test(&#39;Sets loading to false after setUser&#39;, () =&gt; {</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39; }));</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    expect(useAuthStore.getState().loading).toBe(false);</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>  test(<span class="stringliteral">&#39;Sets loading to false after setUser&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span> }));</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().loading).toBe(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  });</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  test(&#39;Clears user when called with null&#39;, () =&gt; {</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39; }));</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    act(() =&gt; useAuthStore.getState().setUser(null));</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    expect(useAuthStore.getState().user).toBeNull();</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  test(<span class="stringliteral">&#39;Clears user when called with null&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span> }));</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser(<span class="keyword">null</span>));</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user).toBeNull();</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>  });</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  test(&#39;Updates user when called again with new user&#39;, () =&gt; {</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-1&#39; }));</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-2&#39; }));</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    expect(useAuthStore.getState().user.uid).toBe(&#39;user-2&#39;);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  test(<span class="stringliteral">&#39;Updates user when called again with new user&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-1&#39;</span> }));</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-2&#39;</span> }));</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user.uid).toBe(<span class="stringliteral">&#39;user-2&#39;</span>);</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>  });</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>});</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>// ─────────────────────────────────────────────────────────────────────────────</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment">// ─────────────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>describe(&#39;authStore - setLoading action&#39;, () =&gt; {</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>describe(<span class="stringliteral">&#39;authStore - setLoading action&#39;</span>, () =&gt; {</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  beforeEach(() =&gt; {</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    jest.resetModules();</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    jest.clearAllMocks();</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    localStorageMock.clear();</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.clear();</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  });</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  test(&#39;Sets loading to false&#39;, () =&gt; {</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    act(() =&gt; useAuthStore.getState().setLoading(false));</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    expect(useAuthStore.getState().loading).toBe(false);</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  test(<span class="stringliteral">&#39;Sets loading to false&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setLoading(<span class="keyword">false</span>));</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().loading).toBe(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>  });</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>  test(&#39;Sets loading to true&#39;, () =&gt; {</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    act(() =&gt; useAuthStore.getState().setLoading(false));</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    act(() =&gt; useAuthStore.getState().setLoading(true));</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    expect(useAuthStore.getState().loading).toBe(true);</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>  test(<span class="stringliteral">&#39;Sets loading to true&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setLoading(<span class="keyword">false</span>));</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setLoading(<span class="keyword">true</span>));</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().loading).toBe(<span class="keyword">true</span>);</div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>  });</div>
 <div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>});</div>
 <div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>// ─────────────────────────────────────────────────────────────────────────────</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment">// ─────────────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>describe(&#39;authStore - updateUserPhoto action&#39;, () =&gt; {</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>describe(<span class="stringliteral">&#39;authStore - updateUserPhoto action&#39;</span>, () =&gt; {</div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  beforeEach(() =&gt; {</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    jest.resetModules();</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    jest.clearAllMocks();</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    localStorageMock.clear();</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.clear();</div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>  });</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>  test(&#39;Updates photoURL on current user&#39;, () =&gt; {</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39;, displayName: &#39;Alice&#39; }));</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    act(() =&gt; useAuthStore.getState().updateUserPhoto(&#39;https://example.com/photo.jpg&#39;));</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    expect(useAuthStore.getState().user.photoURL).toBe(&#39;https://example.com/photo.jpg&#39;);</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>  test(<span class="stringliteral">&#39;Updates photoURL on current user&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span>, displayName: <span class="stringliteral">&#39;Alice&#39;</span> }));</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().updateUserPhoto(<span class="stringliteral">&#39;https://example.com/photo.jpg&#39;</span>));</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user.photoURL).toBe(<span class="stringliteral">&#39;https://example.com/photo.jpg&#39;</span>);</div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  });</div>
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  test(&#39;Preserves other user fields when updating photo&#39;, () =&gt; {</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39;, email: &#39;alice@example.com&#39; }));</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    act(() =&gt; useAuthStore.getState().updateUserPhoto(&#39;https://example.com/photo.jpg&#39;));</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    expect(useAuthStore.getState().user.uid).toBe(&#39;user-123&#39;);</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    expect(useAuthStore.getState().user.email).toBe(&#39;alice@example.com&#39;);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  test(<span class="stringliteral">&#39;Preserves other user fields when updating photo&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span>, email: <span class="stringliteral">&#39;alice@example.com&#39;</span> }));</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().updateUserPhoto(<span class="stringliteral">&#39;https://example.com/photo.jpg&#39;</span>));</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user.uid).toBe(<span class="stringliteral">&#39;user-123&#39;</span>);</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user.email).toBe(<span class="stringliteral">&#39;alice@example.com&#39;</span>);</div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>  });</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span> </div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  test(&#39;Does nothing when user is null&#39;, () =&gt; {</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    // user is null by default</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  test(<span class="stringliteral">&#39;Does nothing when user is null&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <span class="comment">// user is null by default</span></div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    expect(() =&gt; {</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>      act(() =&gt; useAuthStore.getState().updateUserPhoto(&#39;https://example.com/photo.jpg&#39;));</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>      act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().updateUserPhoto(<span class="stringliteral">&#39;https://example.com/photo.jpg&#39;</span>));</div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    }).not.toThrow();</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    expect(useAuthStore.getState().user).toBeNull();</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user).toBeNull();</div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>  });</div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>  test(&#39;Updates photoURL to null&#39;, () =&gt; {</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39;, photoURL: &#39;old.jpg&#39; }));</div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    act(() =&gt; useAuthStore.getState().updateUserPhoto(null));</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    expect(useAuthStore.getState().user.photoURL).toBeNull();</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>  test(<span class="stringliteral">&#39;Updates photoURL to null&#39;</span>, () =&gt; {</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span>, photoURL: <span class="stringliteral">&#39;old.jpg&#39;</span> }));</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().updateUserPhoto(<span class="keyword">null</span>));</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user.photoURL).toBeNull();</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>  });</div>
 <div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>});</div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>// ─────────────────────────────────────────────────────────────────────────────</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment">// ─────────────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>describe(&#39;authStore - logout action&#39;, () =&gt; {</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>describe(<span class="stringliteral">&#39;authStore - logout action&#39;</span>, () =&gt; {</div>
 <div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>  beforeEach(() =&gt; {</div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    jest.resetModules();</div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    jest.clearAllMocks();</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    localStorageMock.clear();</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    window.location.href = &#39;&#39;;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.clear();</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    window.location.href = <span class="stringliteral">&#39;&#39;</span>;</div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    global.caches.keys.mockResolvedValue([]);</div>
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>  });</div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  test(&#39;Clears user state on logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39; }));</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    expect(useAuthStore.getState().user).toBeNull();</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  test(<span class="stringliteral">&#39;Clears user state on logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span> }));</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().user).toBeNull();</div>
 <div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>  });</div>
 <div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>  test(&#39;Sets isAuthenticated to false on logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    act(() =&gt; useAuthStore.getState().setUser({ uid: &#39;user-123&#39; }));</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    expect(useAuthStore.getState().isAuthenticated).toBe(false);</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>  test(<span class="stringliteral">&#39;Sets isAuthenticated to false on logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    act(() =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().setUser({ uid: <span class="stringliteral">&#39;user-123&#39;</span> }));</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().isAuthenticated).toBe(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>  });</div>
 <div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  test(&#39;Sets loading to false on logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    expect(useAuthStore.getState().loading).toBe(false);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  test(<span class="stringliteral">&#39;Sets loading to false on logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    expect(<a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().loading).toBe(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>  });</div>
 <div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>  test(&#39;Calls Firebase signOut on logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    expect(mockSignOut).toHaveBeenCalledTimes(1);</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>  test(<span class="stringliteral">&#39;Calls Firebase signOut on logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    expect(<a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>).toHaveBeenCalledTimes(1);</div>
 <div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>  });</div>
 <div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span> </div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>  test(&#39;Removes auth-storage from localStorage on logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    localStorageMock.setItem(&#39;auth-storage&#39;, &#39;{&quot;user&quot;:{&quot;uid&quot;:&quot;123&quot;}}&#39;);</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    expect(localStorageMock.getItem(&#39;auth-storage&#39;)).toBeNull();</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>  test(<span class="stringliteral">&#39;Removes auth-storage from localStorage on logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    <a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.setItem(<span class="stringliteral">&#39;auth-storage&#39;</span>, <span class="stringliteral">&#39;{&quot;user&quot;:{&quot;uid&quot;:&quot;123&quot;}}&#39;</span>);</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    expect(<a class="code hl_variable" href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a>.getItem(<span class="stringliteral">&#39;auth-storage&#39;</span>)).toBeNull();</div>
 <div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>  });</div>
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span> </div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>  test(&#39;Clears sessionStorage on logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    expect(sessionStorageMock.clear).toHaveBeenCalled();</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>  test(<span class="stringliteral">&#39;Clears sessionStorage on logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    expect(<a class="code hl_variable" href="auth_store_8test_8js.html#aec2f8abd0f73277bde4707fae241fb66">sessionStorageMock</a>.clear).toHaveBeenCalled();</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>  });</div>
 <div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  test(&#39;Redirects to /login on successful logout&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    expect(window.location.href).toBe(&#39;/login&#39;);</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  test(<span class="stringliteral">&#39;Redirects to /login on successful logout&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    expect(window.location.href).toBe(<span class="stringliteral">&#39;/login&#39;</span>);</div>
 <div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>  });</div>
 <div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>  test(&#39;Still redirects to /login even when signOut throws&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    mockSignOut.mockRejectedValue(new Error(&#39;Firebase error&#39;));</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    const consoleSpy = jest.spyOn(console, &#39;error&#39;).mockImplementation(() =&gt; {});</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    expect(window.location.href).toBe(&#39;/login&#39;);</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>  test(<span class="stringliteral">&#39;Still redirects to /login even when signOut throws&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockRejectedValue(<span class="keyword">new</span> Error(<span class="stringliteral">&#39;Firebase error&#39;</span>));</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    <span class="keyword">const</span> consoleSpy = jest.spyOn(console, <span class="stringliteral">&#39;error&#39;</span>).mockImplementation(() =&gt; {});</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    expect(window.location.href).toBe(<span class="stringliteral">&#39;/login&#39;</span>);</div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    consoleSpy.mockRestore();</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>  });</div>
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span> </div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>  test(&#39;Logs error when logout fails&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    mockSignOut.mockRejectedValue(new Error(&#39;Firebase error&#39;));</div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    const consoleSpy = jest.spyOn(console, &#39;error&#39;).mockImplementation(() =&gt; {});</div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    expect(consoleSpy).toHaveBeenCalledWith(&#39;Logout error:&#39;, expect.any(Error));</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>  test(<span class="stringliteral">&#39;Logs error when logout fails&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockRejectedValue(<span class="keyword">new</span> Error(<span class="stringliteral">&#39;Firebase error&#39;</span>));</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="keyword">const</span> consoleSpy = jest.spyOn(console, <span class="stringliteral">&#39;error&#39;</span>).mockImplementation(() =&gt; {});</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    expect(consoleSpy).toHaveBeenCalledWith(<span class="stringliteral">&#39;Logout error:&#39;</span>, expect.any(Error));</div>
 <div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    consoleSpy.mockRestore();</div>
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>  });</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>  test(&#39;Clears caches on logout when caches API is available&#39;, async () =&gt; {</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    const useAuthStore = getStore();</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    mockSignOut.mockResolvedValue();</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    global.caches.keys.mockResolvedValue([&#39;cache-1&#39;, &#39;cache-2&#39;]);</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    global.caches.delete.mockResolvedValue(true);</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    await act(async () =&gt; useAuthStore.getState().logout());</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    expect(global.caches.delete).toHaveBeenCalledWith(&#39;cache-1&#39;);</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    expect(global.caches.delete).toHaveBeenCalledWith(&#39;cache-2&#39;);</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>  test(<span class="stringliteral">&#39;Clears caches on logout when caches API is available&#39;</span>, async () =&gt; {</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> = <a class="code hl_variable" href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a>();</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    <a class="code hl_variable" href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a>.mockResolvedValue();</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    global.caches.keys.mockResolvedValue([<span class="stringliteral">&#39;cache-1&#39;</span>, <span class="stringliteral">&#39;cache-2&#39;</span>]);</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    global.caches.delete.mockResolvedValue(<span class="keyword">true</span>);</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    await act(async () =&gt; <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>.getState().logout());</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    expect(global.caches.delete).toHaveBeenCalledWith(<span class="stringliteral">&#39;cache-1&#39;</span>);</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    expect(global.caches.delete).toHaveBeenCalledWith(<span class="stringliteral">&#39;cache-2&#39;</span>);</div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>  });</div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>});</div>
+<div class="ttc" id="a_dark_mode_context_8test_8jsx_html_a72e0888b6e58f722cc6f7991c2bc4044"><div class="ttname"><a href="_dark_mode_context_8test_8jsx.html#a72e0888b6e58f722cc6f7991c2bc4044">localStorageMock</a></div><div class="ttdeci">const localStorageMock</div><div class="ttdef"><b>Definition</b> <a href="_dark_mode_context_8test_8jsx_source.html#l00012">DarkModeContext.test.jsx:12</a></div></div>
+<div class="ttc" id="a_dashboard_8test_8jsx_html_ad8e073bc1591051a4b69c8f0edf0ca62"><div class="ttname"><a href="_dashboard_8test_8jsx.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a></div><div class="ttdeci">const mockSignOut</div><div class="ttdef"><b>Definition</b> <a href="_dashboard_8test_8jsx_source.html#l00015">Dashboard.test.jsx:15</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="aauth_store_8test_8js_html_a9748e645c4cb657d9cdaad5e0e416ebe"><div class="ttname"><a href="auth_store_8test_8js.html#a9748e645c4cb657d9cdaad5e0e416ebe">getStore</a></div><div class="ttdeci">const getStore</div><div class="ttdef"><b>Definition</b> <a href="#l00045">authStore.test.js:45</a></div></div>
+<div class="ttc" id="aauth_store_8test_8js_html_ad8e073bc1591051a4b69c8f0edf0ca62"><div class="ttname"><a href="auth_store_8test_8js.html#ad8e073bc1591051a4b69c8f0edf0ca62">mockSignOut</a></div><div class="ttdeci">const mockSignOut</div><div class="ttdef"><b>Definition</b> <a href="#l00009">authStore.test.js:9</a></div></div>
+<div class="ttc" id="aauth_store_8test_8js_html_aec2f8abd0f73277bde4707fae241fb66"><div class="ttname"><a href="auth_store_8test_8js.html#aec2f8abd0f73277bde4707fae241fb66">sessionStorageMock</a></div><div class="ttdeci">const sessionStorageMock</div><div class="ttdef"><b>Definition</b> <a href="#l00029">authStore.test.js:29</a></div></div>
+<div class="ttc" id="afirebase_8js_html_ab735783ec1f49c1b8740f4dba3dfbfd0"><div class="ttname"><a href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a></div><div class="ttdeci">export const auth</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00022">firebase.js:22</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a569f325aae9ea34bf4eb084e7cb94076"><div class="ttname"><a href="firebase_auth_8js.html#a569f325aae9ea34bf4eb084e7cb94076">mockUser</a></div><div class="ttdeci">export const mockUser</div><div class="ttdef"><b>Definition</b> <a href="firebase_auth_8js_source.html#l00004">firebaseAuth.js:4</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a722f586b1325e6444b61040fd4f9e277"><div class="ttname"><a href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">signOut</a></div><div class="ttdeci">export const signOut</div><div class="ttdef"><b>Definition</b> <a href="firebase_auth_8js_source.html#l00020">firebaseAuth.js:20</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

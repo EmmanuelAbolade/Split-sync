@@ -103,11 +103,447 @@ $(function(){initNavTree('_activity_8jsx.html',''); initResizable(true); });
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Activity.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_activity_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:aff41d8191ad0d01e294db90bc6788c8d" id="r_aff41d8191ad0d01e294db90bc6788c8d"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff41d8191ad0d01e294db90bc6788c8d">Activity</a> ()</td></tr>
+<tr class="separator:aff41d8191ad0d01e294db90bc6788c8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4947180774e286f07f31d4ac939f3f89" id="r_a4947180774e286f07f31d4ac939f3f89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> ExpenseDetailsModal from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4947180774e286f07f31d4ac939f3f89">ExpenseDetailsModal</a></td></tr>
+<tr class="separator:a4947180774e286f07f31d4ac939f3f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="aff41d8191ad0d01e294db90bc6788c8d" name="aff41d8191ad0d01e294db90bc6788c8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff41d8191ad0d01e294db90bc6788c8d">&#9670;&#160;</a></span>Activity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default Activity </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_activity_8jsx_source.html#l00011">11</a> of file <a class="el" href="_activity_8jsx_source.html">Activity.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   11</span>                                   {</div>
+<div class="line"><span class="lineno">   12</span>  <span class="keyword">const</span> navigate  = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">   13</span>  <span class="keyword">const</span> { user }  = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><span class="lineno">   14</span>  <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a>  = <a class="code hl_variable" href="react_router_8js.html#a39f31427712d32956bea93ee68b371c3">useLocation</a>();</div>
+<div class="line"><span class="lineno">   15</span> </div>
+<div class="line"><span class="lineno">   16</span>  <span class="keyword">const</span> [expenses,        setExpenses]        = useState([]);</div>
+<div class="line"><span class="lineno">   17</span>  <span class="keyword">const</span> [groups,          setGroups]          = useState([]);</div>
+<div class="line"><span class="lineno">   18</span>  <span class="keyword">const</span> [loading,         setLoading]         = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   19</span>  <span class="keyword">const</span> [selectedExpense, setSelectedExpense] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   20</span> </div>
+<div class="line"><span class="lineno">   21</span>  <span class="comment">// Role filter: &#39;all&#39; | &#39;paid&#39; | &#39;owe&#39;</span></div>
+<div class="line"><span class="lineno">   22</span>  <span class="keyword">const</span> [filter, setFilter] = useState(<a class="code hl_variable" href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a>.state?.filter || <span class="stringliteral">&#39;all&#39;</span>);</div>
+<div class="line"><span class="lineno">   23</span>  <span class="comment">// Status filter: &#39;active&#39; | &#39;archived&#39;</span></div>
+<div class="line"><span class="lineno">   24</span>  <span class="keyword">const</span> [statusFilter, setStatusFilter] = useState(<span class="stringliteral">&#39;active&#39;</span>);</div>
+<div class="line"><span class="lineno">   25</span> </div>
+<div class="line"><span class="lineno">   26</span>  <span class="keyword">const</span> getDisplayTitle = (expense, group) =&gt; {</div>
+<div class="line"><span class="lineno">   27</span>    <span class="keywordflow">if</span> (!expense.isSettlement) <span class="keywordflow">return</span> expense.title;</div>
+<div class="line"><span class="lineno">   28</span>    <span class="keyword">const</span> fromMember = group?.members?.find(m =&gt; m.userId === expense.paidBy);</div>
+<div class="line"><span class="lineno">   29</span>    <span class="keyword">const</span> toUserId   = expense.participants?.find(<span class="keywordtype">id</span> =&gt; <span class="keywordtype">id</span> !== expense.paidBy);</div>
+<div class="line"><span class="lineno">   30</span>    <span class="keyword">const</span> toMember   = group?.members?.find(m =&gt; m.userId === toUserId);</div>
+<div class="line"><span class="lineno">   31</span>    <span class="keywordflow">return</span> `Settlement: ${fromMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span>} → ${toMember?.name || <span class="stringliteral">&#39;Unknown&#39;</span>}`;</div>
+<div class="line"><span class="lineno">   32</span>  };</div>
+<div class="line"><span class="lineno">   33</span> </div>
+<div class="line"><span class="lineno">   34</span>  <span class="comment">// Fetch groups</span></div>
+<div class="line"><span class="lineno">   35</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   36</span>    <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   37</span>    <span class="keyword">const</span> q = <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;groups&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;memberIds&#39;</span>, <span class="stringliteral">&#39;array-contains&#39;</span>, user.uid));</div>
+<div class="line"><span class="lineno">   38</span>    <span class="keyword">const</span> unsub = <a class="code hl_variable" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a>(q, (snapshot) =&gt; {</div>
+<div class="line"><span class="lineno">   39</span>      setGroups(snapshot.docs.map(d =&gt; ({ id: d.id, ...d.data() })));</div>
+<div class="line"><span class="lineno">   40</span>      <span class="keywordflow">if</span> (snapshot.docs.length === 0) setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   41</span>    });</div>
+<div class="line"><span class="lineno">   42</span>    <span class="keywordflow">return</span> () =&gt; unsub();</div>
+<div class="line"><span class="lineno">   43</span>  }, [user]);</div>
+<div class="line"><span class="lineno">   44</span> </div>
+<div class="line"><span class="lineno">   45</span>  <span class="comment">// Fetch expenses</span></div>
+<div class="line"><span class="lineno">   46</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">if</span> (!user || groups.length === 0) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   48</span>    <span class="keyword">const</span> groupIds = groups.map(g =&gt; g.id);</div>
+<div class="line"><span class="lineno">   49</span>    <span class="keyword">const</span> q = <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;groupId&#39;</span>, <span class="stringliteral">&#39;in&#39;</span>, groupIds));</div>
+<div class="line"><span class="lineno">   50</span>    <span class="keyword">const</span> unsub = <a class="code hl_variable" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a>(q, (snapshot) =&gt; {</div>
+<div class="line"><span class="lineno">   51</span>      <span class="keyword">const</span> data = snapshot.docs.map(d =&gt; ({ id: d.id, ...d.data() }));</div>
+<div class="line"><span class="lineno">   52</span>      data.sort((a, b) =&gt; {</div>
+<div class="line"><span class="lineno">   53</span>        <span class="keyword">const</span> dA = a.date?.toDate ? a.date.toDate() : <span class="keyword">new</span> Date(a.date);</div>
+<div class="line"><span class="lineno">   54</span>        <span class="keyword">const</span> dB = b.date?.toDate ? b.date.toDate() : <span class="keyword">new</span> Date(b.date);</div>
+<div class="line"><span class="lineno">   55</span>        <span class="keywordflow">return</span> dB - dA;</div>
+<div class="line"><span class="lineno">   56</span>      });</div>
+<div class="line"><span class="lineno">   57</span>      setExpenses(data);</div>
+<div class="line"><span class="lineno">   58</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   59</span>    });</div>
+<div class="line"><span class="lineno">   60</span>    <span class="keywordflow">return</span> () =&gt; unsub();</div>
+<div class="line"><span class="lineno">   61</span>  }, [user, groups]);</div>
+<div class="line"><span class="lineno">   62</span> </div>
+<div class="line"><span class="lineno">   63</span>  <span class="keyword">const</span> getGroupForExpense = (groupId) =&gt; groups.find(g =&gt; g.id === groupId);</div>
+<div class="line"><span class="lineno">   64</span> </div>
+<div class="line"><span class="lineno">   65</span>  <span class="comment">// Apply status filter first then role filter</span></div>
+<div class="line"><span class="lineno">   66</span>  <span class="keyword">const</span> filteredExpenses = expenses</div>
+<div class="line"><span class="lineno">   67</span>    .filter(e =&gt; {</div>
+<div class="line"><span class="lineno">   68</span>      <span class="keywordflow">if</span> (statusFilter === <span class="stringliteral">&#39;active&#39;</span>)   <span class="keywordflow">return</span> !e.status || e.status === <span class="stringliteral">&#39;active&#39;</span>;</div>
+<div class="line"><span class="lineno">   69</span>      <span class="keywordflow">if</span> (statusFilter === <span class="stringliteral">&#39;archived&#39;</span>) <span class="keywordflow">return</span> e.status === <span class="stringliteral">&#39;archived&#39;</span>;</div>
+<div class="line"><span class="lineno">   70</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   71</span>    })</div>
+<div class="line"><span class="lineno">   72</span>    .filter(e =&gt; {</div>
+<div class="line"><span class="lineno">   73</span>      <span class="keywordflow">if</span> (filter === <span class="stringliteral">&#39;paid&#39;</span>) <span class="keywordflow">return</span> e.paidBy === user.uid;</div>
+<div class="line"><span class="lineno">   74</span>      <span class="keywordflow">if</span> (filter === <span class="stringliteral">&#39;owe&#39;</span>)  <span class="keywordflow">return</span> e.participants?.includes(user.uid) &amp;&amp; e.paidBy !== user.uid;</div>
+<div class="line"><span class="lineno">   75</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   76</span>    });</div>
+<div class="line"><span class="lineno">   77</span> </div>
+<div class="line"><span class="lineno">   78</span>  <span class="comment">// Stats — exclude deleted and archived from displayed totals</span></div>
+<div class="line"><span class="lineno">   79</span>  <span class="keyword">const</span> activeExpenses = expenses.filter(e =&gt; !e.status || e.status === <span class="stringliteral">&#39;active&#39;</span>);</div>
+<div class="line"><span class="lineno">   80</span> </div>
+<div class="line"><span class="lineno">   81</span>  <span class="keyword">const</span> paidByCurrency = {};</div>
+<div class="line"><span class="lineno">   82</span>  activeExpenses</div>
+<div class="line"><span class="lineno">   83</span>    .filter(e =&gt; e.paidBy === user.uid &amp;&amp; !e.isSettlement)</div>
+<div class="line"><span class="lineno">   84</span>    .forEach(e =&gt; {</div>
+<div class="line"><span class="lineno">   85</span>      <span class="keyword">const</span> currency = getGroupForExpense(e.groupId)?.currency || <span class="stringliteral">&#39;EUR&#39;</span>;</div>
+<div class="line"><span class="lineno">   86</span>      paidByCurrency[currency] = (paidByCurrency[currency] || 0) + e.amount;</div>
+<div class="line"><span class="lineno">   87</span>    });</div>
+<div class="line"><span class="lineno">   88</span> </div>
+<div class="line"><span class="lineno">   89</span>  <span class="keyword">const</span> owedByCurrency = {};</div>
+<div class="line"><span class="lineno">   90</span>  activeExpenses</div>
+<div class="line"><span class="lineno">   91</span>    .filter(e =&gt; e.participants?.includes(user.uid) &amp;&amp; e.paidBy !== user.uid &amp;&amp; !e.isSettlement)</div>
+<div class="line"><span class="lineno">   92</span>    .forEach(e =&gt; {</div>
+<div class="line"><span class="lineno">   93</span>      <span class="keyword">const</span> currency = getGroupForExpense(e.groupId)?.currency || <span class="stringliteral">&#39;EUR&#39;</span>;</div>
+<div class="line"><span class="lineno">   94</span>      <span class="keyword">const</span> share    = e.splits?.[user.uid] || 0;</div>
+<div class="line"><span class="lineno">   95</span>      owedByCurrency[currency] = (owedByCurrency[currency] || 0) + share;</div>
+<div class="line"><span class="lineno">   96</span>    });</div>
+<div class="line"><span class="lineno">   97</span> </div>
+<div class="line"><span class="lineno">   98</span>  <span class="keyword">const</span> archivedCount = expenses.filter(e =&gt; e.status === <span class="stringliteral">&#39;archived&#39;</span>).length;</div>
+<div class="line"><span class="lineno">   99</span> </div>
+<div class="line"><span class="lineno">  100</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  101</span>    &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 dark:bg-gray-900 pb-20&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  102</span> </div>
+<div class="line"><span class="lineno">  103</span>      {<span class="comment">/* Top Bar */</span>}</div>
+<div class="line"><span class="lineno">  104</span>      &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 shadow-card sticky top-0 z-30&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  105</span>        &lt;div className=<span class="stringliteral">&quot;max-w-7xl mx-auto px-4 py-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  106</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  107</span>            &lt;button</div>
+<div class="line"><span class="lineno">  108</span>              onClick={() =&gt; navigate(<span class="stringliteral">&#39;/dashboard&#39;</span>)}</div>
+<div class="line"><span class="lineno">  109</span>              className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white md:hidden&quot;</span></div>
+<div class="line"><span class="lineno">  110</span>              aria-label=<span class="stringliteral">&quot;Back to dashboard&quot;</span></div>
+<div class="line"><span class="lineno">  111</span>            &gt;</div>
+<div class="line"><span class="lineno">  112</span>              &lt;ArrowLeft size={24} /&gt;</div>
+<div class="line"><span class="lineno">  113</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  114</span>            &lt;div className=<span class="stringliteral">&quot;flex-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  115</span>              &lt;h1 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;<a class="code hl_variable" href="_app_8js.html#a20021ff7782037160fe0d41692a232aa">Activity</a>&lt;/h1&gt;</div>
+<div class="line"><span class="lineno">  116</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Activities across groups&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  117</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  118</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  119</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  120</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  121</span> </div>
+<div class="line"><span class="lineno">  122</span>      &lt;div className=<span class="stringliteral">&quot;max-w-7xl mx-auto px-4 py-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  123</span> </div>
+<div class="line"><span class="lineno">  124</span>        {<span class="comment">/* Stats Cards */</span>}</div>
+<div class="line"><span class="lineno">  125</span>        &lt;div className=<span class="stringliteral">&quot;grid grid-cols-2 gap-4 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  126</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl shadow-card dark:shadow-gray-900/50 p-4 border border-green-200 dark:border-green-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  127</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  128</span>              &lt;TrendingUp size={20} className=<span class="stringliteral">&quot;text-green-600 dark:text-green-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  129</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-green-700 dark:text-green-300 font-medium&quot;</span>&gt;You Paid&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  130</span>              &lt;div className=<span class="stringliteral">&quot;relative group ml-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  131</span>                &lt;Info size={13} className=<span class="stringliteral">&quot;text-green-400 dark:text-green-600 cursor-pointer&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  132</span>                &lt;div className=<span class="stringliteral">&quot;absolute right-0 top-5 w-48 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 shadow-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  133</span>                  Total you have fronted <span class="keywordflow">for</span> group expenses across all groups. Settlements not included.</div>
+<div class="line"><span class="lineno">  134</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  135</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  136</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  137</span>            &lt;div className=<span class="stringliteral">&quot;space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  138</span>              {Object.entries(paidByCurrency).length === 0 ? (</div>
+<div class="line"><span class="lineno">  139</span>                &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold text-green-900 dark:text-green-100&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  140</span>              ) : (</div>
+<div class="line"><span class="lineno">  141</span>                Object.entries(paidByCurrency).map(([currency, amount]) =&gt; (</div>
+<div class="line"><span class="lineno">  142</span>                  &lt;div key={currency} className=<span class="stringliteral">&quot;flex items-center justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  143</span>                    &lt;span className=<span class="stringliteral">&quot;text-2xl font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-1.5 py-0.5 rounded&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  144</span>                      {currency}</div>
+<div class="line"><span class="lineno">  145</span>                    &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  146</span>                    &lt;span className=<span class="stringliteral">&quot;text-2xl font-bold text-green-900 dark:text-green-100&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  147</span>                      {amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  148</span>                    &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  149</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  150</span>                ))</div>
+<div class="line"><span class="lineno">  151</span>              )}</div>
+<div class="line"><span class="lineno">  152</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  153</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  154</span> </div>
+<div class="line"><span class="lineno">  155</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 rounded-xl shadow-card dark:shadow-gray-900/50 p-4 border border-orange-200 dark:border-orange-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  156</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  157</span>              &lt;TrendingDown size={20} className=<span class="stringliteral">&quot;text-orange-600 dark:text-orange-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  158</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-orange-700 dark:text-orange-300 font-medium&quot;</span>&gt;You Owe&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  159</span>              &lt;div className=<span class="stringliteral">&quot;relative group ml-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  160</span>                &lt;Info size={13} className=<span class="stringliteral">&quot;text-orange-400 dark:text-orange-600 cursor-pointer&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  161</span>                &lt;div className=<span class="stringliteral">&quot;absolute right-0 top-5 w-48 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 shadow-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  162</span>                  Your share of expenses paid by others across all groups. Settlements not included.</div>
+<div class="line"><span class="lineno">  163</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  164</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  165</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  166</span>            &lt;div className=<span class="stringliteral">&quot;space-y-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  167</span>              {Object.entries(owedByCurrency).length === 0 ? (</div>
+<div class="line"><span class="lineno">  168</span>                &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold text-orange-900 dark:text-orange-100&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  169</span>              ) : (</div>
+<div class="line"><span class="lineno">  170</span>                Object.entries(owedByCurrency).map(([currency, amount]) =&gt; (</div>
+<div class="line"><span class="lineno">  171</span>                  &lt;div key={currency} className=<span class="stringliteral">&quot;flex items-center justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  172</span>                    &lt;span className=<span class="stringliteral">&quot;text-2xl font-medium text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/40 px-1.5 py-0.5 rounded&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  173</span>                      {currency}</div>
+<div class="line"><span class="lineno">  174</span>                    &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  175</span>                    &lt;span className=<span class="stringliteral">&quot;text-2xl font-bold text-orange-900 dark:text-orange-100&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  176</span>                      {amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  177</span>                    &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  178</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  179</span>                ))</div>
+<div class="line"><span class="lineno">  180</span>              )}</div>
+<div class="line"><span class="lineno">  181</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  182</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  183</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  184</span> </div>
+<div class="line"><span class="lineno">  185</span>        {<span class="comment">/* Status Filter — Active / Archived */</span>}</div>
+<div class="line"><span class="lineno">  186</span>        &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  187</span>          &lt;button</div>
+<div class="line"><span class="lineno">  188</span>            onClick={() =&gt; setStatusFilter(<span class="stringliteral">&#39;active&#39;</span>)}</div>
+<div class="line"><span class="lineno">  189</span>            className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${</div>
+<div class="line"><span class="lineno">  190</span>              statusFilter === <span class="stringliteral">&#39;active&#39;</span></div>
+<div class="line"><span class="lineno">  191</span>                ? <span class="stringliteral">&#39;bg-indigo-600 dark:bg-indigo-500 text-white&#39;</span></div>
+<div class="line"><span class="lineno">  192</span>                : <span class="stringliteral">&#39;bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600&#39;</span></div>
+<div class="line"><span class="lineno">  193</span>            }`}</div>
+<div class="line"><span class="lineno">  194</span>          &gt;</div>
+<div class="line"><span class="lineno">  195</span>            Active</div>
+<div class="line"><span class="lineno">  196</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  197</span>          &lt;button</div>
+<div class="line"><span class="lineno">  198</span>            onClick={() =&gt; setStatusFilter(<span class="stringliteral">&#39;archived&#39;</span>)}</div>
+<div class="line"><span class="lineno">  199</span>            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition ${</div>
+<div class="line"><span class="lineno">  200</span>              statusFilter === <span class="stringliteral">&#39;archived&#39;</span></div>
+<div class="line"><span class="lineno">  201</span>                ? <span class="stringliteral">&#39;bg-gray-600 dark:bg-gray-500 text-white&#39;</span></div>
+<div class="line"><span class="lineno">  202</span>                : <span class="stringliteral">&#39;bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500&#39;</span></div>
+<div class="line"><span class="lineno">  203</span>            }`}</div>
+<div class="line"><span class="lineno">  204</span>          &gt;</div>
+<div class="line"><span class="lineno">  205</span>            &lt;Archive size={11} /&gt;</div>
+<div class="line"><span class="lineno">  206</span>            Archived</div>
+<div class="line"><span class="lineno">  207</span>            {archivedCount &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  208</span>              &lt;span className={`ml-0.5 px-1.5 py-0.5 rounded-full text-xs ${</div>
+<div class="line"><span class="lineno">  209</span>                statusFilter === <span class="stringliteral">&#39;archived&#39;</span></div>
+<div class="line"><span class="lineno">  210</span>                  ? <span class="stringliteral">&#39;bg-white/20 text-white&#39;</span></div>
+<div class="line"><span class="lineno">  211</span>                  : <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300&#39;</span></div>
+<div class="line"><span class="lineno">  212</span>              }`}&gt;</div>
+<div class="line"><span class="lineno">  213</span>                {archivedCount}</div>
+<div class="line"><span class="lineno">  214</span>              &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  215</span>            )}</div>
+<div class="line"><span class="lineno">  216</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  217</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  218</span> </div>
+<div class="line"><span class="lineno">  219</span>        {<span class="comment">/* Role Filter Tabs */</span>}</div>
+<div class="line"><span class="lineno">  220</span>        &lt;div className=<span class="stringliteral">&quot;flex gap-2 mb-6 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-card dark:shadow-gray-900/50&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  221</span>          {[</div>
+<div class="line"><span class="lineno">  222</span>            { key: <span class="stringliteral">&#39;all&#39;</span>,  label: <span class="stringliteral">&#39;All&#39;</span>,    active: <span class="stringliteral">&#39;bg-primary dark:bg-indigo-600 text-white shadow-card&#39;</span> },</div>
+<div class="line"><span class="lineno">  223</span>            { key: <span class="stringliteral">&#39;paid&#39;</span>, label: <span class="stringliteral">&#39;I Paid&#39;</span>, active: <span class="stringliteral">&#39;bg-green-600 dark:bg-green-500 text-white shadow-card&#39;</span> },</div>
+<div class="line"><span class="lineno">  224</span>            { key: <span class="stringliteral">&#39;owe&#39;</span>,  label: <span class="stringliteral">&#39;I Owe&#39;</span>,  active: <span class="stringliteral">&#39;bg-orange-600 dark:bg-orange-500 text-white shadow-card&#39;</span> },</div>
+<div class="line"><span class="lineno">  225</span>          ].map(tab =&gt; (</div>
+<div class="line"><span class="lineno">  226</span>            &lt;button</div>
+<div class="line"><span class="lineno">  227</span>              key={tab.key}</div>
+<div class="line"><span class="lineno">  228</span>              onClick={() =&gt; setFilter(tab.key)}</div>
+<div class="line"><span class="lineno">  229</span>              className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-300 ${</div>
+<div class="line"><span class="lineno">  230</span>                filter === tab.key</div>
+<div class="line"><span class="lineno">  231</span>                  ? tab.active</div>
+<div class="line"><span class="lineno">  232</span>                  : <span class="stringliteral">&#39;text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700&#39;</span></div>
+<div class="line"><span class="lineno">  233</span>              }`}</div>
+<div class="line"><span class="lineno">  234</span>            &gt;</div>
+<div class="line"><span class="lineno">  235</span>              {tab.label}</div>
+<div class="line"><span class="lineno">  236</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  237</span>          ))}</div>
+<div class="line"><span class="lineno">  238</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  239</span> </div>
+<div class="line"><span class="lineno">  240</span>        {<span class="comment">/* Expenses List */</span>}</div>
+<div class="line"><span class="lineno">  241</span>        {loading ? (</div>
+<div class="line"><span class="lineno">  242</span>          &lt;div className=<span class="stringliteral">&quot;text-center py-12&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  243</span>            &lt;div className=<span class="stringliteral">&quot;animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  244</span>            &lt;p className=<span class="stringliteral">&quot;mt-4 text-gray-600 dark:text-gray-300&quot;</span>&gt;Loading activity...&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  245</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  246</span>        ) : filteredExpenses.length === 0 ? (</div>
+<div class="line"><span class="lineno">  247</span>          &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-12 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  248</span>            {statusFilter === <span class="stringliteral">&#39;archived&#39;</span> ? (</div>
+<div class="line"><span class="lineno">  249</span>              &lt;&gt;</div>
+<div class="line"><span class="lineno">  250</span>                &lt;Archive size={48} className=<span class="stringliteral">&quot;mx-auto text-gray-400 dark:text-gray-500 mb-4&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  251</span>                &lt;h3 className=<span class="stringliteral">&quot;text-lg font-semibold text-gray-900 dark:text-white mb-2&quot;</span>&gt;No archived expenses&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  252</span>                &lt;p className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  253</span>                  Archived expenses are hidden from your active list but still count toward group balances.</div>
+<div class="line"><span class="lineno">  254</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  255</span>              &lt;/&gt;</div>
+<div class="line"><span class="lineno">  256</span>            ) : (</div>
+<div class="line"><span class="lineno">  257</span>              &lt;&gt;</div>
+<div class="line"><span class="lineno">  258</span>                &lt;Calendar size={48} className=<span class="stringliteral">&quot;mx-auto text-gray-400 dark:text-gray-500 mb-4&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  259</span>                &lt;h3 className=<span class="stringliteral">&quot;text-lg font-semibold text-gray-900 dark:text-white mb-2&quot;</span>&gt;No activity yet&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  260</span>                &lt;p className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  261</span>                  {filter === <span class="stringliteral">&#39;all&#39;</span>  ? <span class="stringliteral">&#39;Start adding expenses to see activity here&#39;</span> :</div>
+<div class="line"><span class="lineno">  262</span>                   filter === <span class="stringliteral">&#39;paid&#39;</span> ? <span class="stringliteral">&quot;You haven&#39;t paid for any expenses yet&quot;</span> :</div>
+<div class="line"><span class="lineno">  263</span>                   <span class="stringliteral">&quot;You don&#39;t owe anyone yet&quot;</span>}</div>
+<div class="line"><span class="lineno">  264</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  265</span>              &lt;/&gt;</div>
+<div class="line"><span class="lineno">  266</span>            )}</div>
+<div class="line"><span class="lineno">  267</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  268</span>        ) : (</div>
+<div class="line"><span class="lineno">  269</span>          &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  270</span>            {filteredExpenses.map((expense) =&gt; {</div>
+<div class="line"><span class="lineno">  271</span>              <span class="keyword">const</span> group       = getGroupForExpense(expense.groupId);</div>
+<div class="line"><span class="lineno">  272</span>              <span class="keyword">const</span> expenseDate = expense.date?.toDate ? expense.date.toDate() : <span class="keyword">new</span> Date(expense.date);</div>
+<div class="line"><span class="lineno">  273</span>              <span class="keyword">const</span> isPayer     = expense.paidBy === user.uid;</div>
+<div class="line"><span class="lineno">  274</span>              <span class="keyword">const</span> yourShare   = expense.splits?.[user.uid] || 0;</div>
+<div class="line"><span class="lineno">  275</span>              <span class="keyword">const</span> isArchived  = expense.status === <span class="stringliteral">&#39;archived&#39;</span>;</div>
+<div class="line"><span class="lineno">  276</span> </div>
+<div class="line"><span class="lineno">  277</span>              <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  278</span>                &lt;div</div>
+<div class="line"><span class="lineno">  279</span>                  key={expense.id}</div>
+<div class="line"><span class="lineno">  280</span>                  onClick={() =&gt; setSelectedExpense(expense)}</div>
+<div class="line"><span class="lineno">  281</span>                  className={`rounded-lg shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer p-4 border ${</div>
+<div class="line"><span class="lineno">  282</span>                    isArchived</div>
+<div class="line"><span class="lineno">  283</span>                      ? <span class="stringliteral">&#39;bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 opacity-75&#39;</span></div>
+<div class="line"><span class="lineno">  284</span>                      : <span class="stringliteral">&#39;bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700&#39;</span></div>
+<div class="line"><span class="lineno">  285</span>                  }`}</div>
+<div class="line"><span class="lineno">  286</span>                &gt;</div>
+<div class="line"><span class="lineno">  287</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-start justify-between mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  288</span>                    &lt;div className=<span class="stringliteral">&quot;flex-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  289</span>                      &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  290</span>                        {isArchived &amp;&amp; (</div>
+<div class="line"><span class="lineno">  291</span>                          &lt;Archive size={12} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  292</span>                        )}</div>
+<div class="line"><span class="lineno">  293</span>                        &lt;h4 className={`font-semibold mb-1 ${</div>
+<div class="line"><span class="lineno">  294</span>                          isArchived</div>
+<div class="line"><span class="lineno">  295</span>                            ? <span class="stringliteral">&#39;text-gray-500 dark:text-gray-400&#39;</span></div>
+<div class="line"><span class="lineno">  296</span>                            : <span class="stringliteral">&#39;text-gray-900 dark:text-white&#39;</span></div>
+<div class="line"><span class="lineno">  297</span>                        }`}&gt;</div>
+<div class="line"><span class="lineno">  298</span>                          {getDisplayTitle(expense, group)}</div>
+<div class="line"><span class="lineno">  299</span>                        &lt;/h4&gt;</div>
+<div class="line"><span class="lineno">  300</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  301</span>                      &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  302</span>                        &lt;Users size={14} /&gt;</div>
+<div class="line"><span class="lineno">  303</span>                        &lt;span&gt;{group?.name || <span class="stringliteral">&#39;Unknown Group&#39;</span>}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  304</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  305</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  306</span>                    &lt;div className=<span class="stringliteral">&quot;text-right&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  307</span>                      &lt;p className={`text-lg font-bold ${</div>
+<div class="line"><span class="lineno">  308</span>                        isArchived</div>
+<div class="line"><span class="lineno">  309</span>                          ? <span class="stringliteral">&#39;text-gray-400 dark:text-gray-500&#39;</span></div>
+<div class="line"><span class="lineno">  310</span>                          : <span class="stringliteral">&#39;text-gray-900 dark:text-white&#39;</span></div>
+<div class="line"><span class="lineno">  311</span>                      }`}&gt;</div>
+<div class="line"><span class="lineno">  312</span>                        {expense.currency} {expense.amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  313</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  314</span>                      {isPayer ? (</div>
+<div class="line"><span class="lineno">  315</span>                        &lt;span className=<span class="stringliteral">&quot;text-xs text-green-600 dark:text-green-400 font-medium&quot;</span>&gt;You paid&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  316</span>                      ) : (</div>
+<div class="line"><span class="lineno">  317</span>                        &lt;span className=<span class="stringliteral">&quot;text-xs text-orange-600 dark:text-orange-400 font-medium&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  318</span>                          You owe {group?.currency || <span class="stringliteral">&#39;&#39;</span>} {yourShare.toFixed(2)}</div>
+<div class="line"><span class="lineno">  319</span>                        &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  320</span>                      )}</div>
+<div class="line"><span class="lineno">  321</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  322</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  323</span> </div>
+<div class="line"><span class="lineno">  324</span>                  &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  325</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  326</span>                      &lt;Calendar size={12} /&gt;</div>
+<div class="line"><span class="lineno">  327</span>                      &lt;span&gt;{expenseDate.toLocaleDateString()}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  328</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  329</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  330</span>                      {expense.isSettlement &amp;&amp; (</div>
+<div class="line"><span class="lineno">  331</span>                        &lt;span className=<span class="stringliteral">&quot;text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded border border-green-200 dark:border-green-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  332</span>                          Settlement</div>
+<div class="line"><span class="lineno">  333</span>                        &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  334</span>                      )}</div>
+<div class="line"><span class="lineno">  335</span>                      {isArchived &amp;&amp; (</div>
+<div class="line"><span class="lineno">  336</span>                        &lt;span className=<span class="stringliteral">&quot;text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-1 rounded border border-gray-200 dark:border-gray-600&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  337</span>                          Archived</div>
+<div class="line"><span class="lineno">  338</span>                        &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  339</span>                      )}</div>
+<div class="line"><span class="lineno">  340</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  341</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  342</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  343</span>              );</div>
+<div class="line"><span class="lineno">  344</span>            })}</div>
+<div class="line"><span class="lineno">  345</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  346</span>        )}</div>
+<div class="line"><span class="lineno">  347</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  348</span> </div>
+<div class="line"><span class="lineno">  349</span>      {<span class="comment">/* Expense Details Modal */</span>}</div>
+<div class="line"><span class="lineno">  350</span>      &lt;<a class="code hl_variable" href="_expense_details_modal_8test_8jsx.html#a63076eb2eda3957ddb7f8a607ab5886d">ExpenseDetailsModal</a></div>
+<div class="line"><span class="lineno">  351</span>        isOpen={!!selectedExpense}</div>
+<div class="line"><span class="lineno">  352</span>        onClose={() =&gt; setSelectedExpense(<span class="keyword">null</span>)}</div>
+<div class="line"><span class="lineno">  353</span>        expense={selectedExpense}</div>
+<div class="line"><span class="lineno">  354</span>        group={selectedExpense ? getGroupForExpense(selectedExpense.groupId) : null}</div>
+<div class="line"><span class="lineno">  355</span>        currentUserId={user?.uid}</div>
+<div class="line"><span class="lineno">  356</span>        groupExpenses={selectedExpense</div>
+<div class="line"><span class="lineno">  357</span>          ? expenses.filter(e =&gt; e.groupId === selectedExpense.groupId)</div>
+<div class="line"><span class="lineno">  358</span>          : []</div>
+<div class="line"><span class="lineno">  359</span>        }</div>
+<div class="line"><span class="lineno">  360</span>        onDeleted={() =&gt; setSelectedExpense(<span class="keyword">null</span>)}</div>
+<div class="line"><span class="lineno">  361</span>        onStatusChanged={() =&gt; setSelectedExpense(<span class="keyword">null</span>)}</div>
+<div class="line"><span class="lineno">  362</span>      /&gt;</div>
+<div class="line"><span class="lineno">  363</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  364</span>  );</div>
+<div class="line"><span class="lineno">  365</span>}</div>
+<div class="ttc" id="a_app_8js_html_a20021ff7782037160fe0d41692a232aa"><div class="ttname"><a href="_app_8js.html#a20021ff7782037160fe0d41692a232aa">Activity</a></div><div class="ttdeci">import Activity from pages Activity</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00013">App.js:13</a></div></div>
+<div class="ttc" id="a_expense_details_modal_8test_8jsx_html_a63076eb2eda3957ddb7f8a607ab5886d"><div class="ttname"><a href="_expense_details_modal_8test_8jsx.html#a63076eb2eda3957ddb7f8a607ab5886d">ExpenseDetailsModal</a></div><div class="ttdeci">import ExpenseDetailsModal from ExpenseDetailsModal</div><div class="ttdef"><b>Definition</b> <a href="_expense_details_modal_8test_8jsx_source.html#l00009">ExpenseDetailsModal.test.jsx:9</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="aauth_store_8test_8js_html_ade3950acfbce45eb72f40d461349f6fc"><div class="ttname"><a href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a></div><div class="ttdeci">delete window location</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8test_8js_source.html#l00033">authStore.test.js:33</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a5fdb89ebdc78c2cdcd9653313e89224d"><div class="ttname"><a href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a></div><div class="ttdeci">export const where</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00024">firebaseFirestore.js:24</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a737ca0f23063ed37c6115359d6a9548b"><div class="ttname"><a href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a></div><div class="ttdeci">export const onSnapshot</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00043">firebaseFirestore.js:43</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a39f31427712d32956bea93ee68b371c3"><div class="ttname"><a href="react_router_8js.html#a39f31427712d32956bea93ee68b371c3">useLocation</a></div><div class="ttdeci">export const useLocation</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00010">reactRouter.js:10</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a4947180774e286f07f31d4ac939f3f89" name="a4947180774e286f07f31d4ac939f3f89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4947180774e286f07f31d4ac939f3f89">&#9670;&#160;</a></span>ExpenseDetailsModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> ExpenseDetailsModal from components ExpenseDetailsModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_activity_8jsx_source.html#l00009">9</a> of file <a class="el" href="_activity_8jsx_source.html">Activity.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_activity_8jsx_source.html#l00003">3</a> of file <a class="el" href="_activity_8jsx_source.html">Activity.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    3</span>{ useState, useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

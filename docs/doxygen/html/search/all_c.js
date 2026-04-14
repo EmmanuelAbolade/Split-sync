@@ -1,14 +1,12 @@
 var searchData=
 [
-  ['passwordstrength_2ejsx_0',['PasswordStrength.jsx',['../_password_strength_8jsx.html',1,'']]],
-  ['passwordstrength_2etest_2ejsx_1',['PasswordStrength.test.jsx',['../_password_strength_8test_8jsx.html',1,'']]],
-  ['paymentinfomodal_2ejsx_2',['PaymentInfoModal.jsx',['../_payment_info_modal_8jsx.html',1,'']]],
-  ['paymentinfomodal_2etest_2ejsx_3',['PaymentInfoModal.test.jsx',['../_payment_info_modal_8test_8jsx.html',1,'']]],
-  ['paymentlinks_2ejs_4',['paymentLinks.js',['../payment_links_8js.html',1,'']]],
-  ['paymentlinks_2etest_2ejs_5',['paymentLinks.test.js',['../payment_links_8test_8js.html',1,'']]],
-  ['profile_2ejsx_6',['Profile.jsx',['../_profile_8jsx.html',1,'']]],
-  ['profile_2etest_2ejsx_7',['Profile.test.jsx',['../_profile_8test_8jsx.html',1,'']]],
-  ['profile_5fextra_2etest_2ejsx_8',['Profile_extra.test.jsx',['../_profile__extra_8test_8jsx.html',1,'']]],
-  ['profilephotoupload_2ejsx_9',['ProfilePhotoUpload.jsx',['../_profile_photo_upload_8jsx.html',1,'']]],
-  ['profilephotoupload_2etest_2ejsx_10',['ProfilePhotoUpload.test.jsx',['../_profile_photo_upload_8test_8jsx.html',1,'']]]
+  ['nav_5fitems_0',['NAV_ITEMS',['../_taskmaster_8jsx.html#a959f313cf4d6b869f30da9ad90bc4193',1,'Taskmaster.jsx']]],
+  ['navigate_1',['Navigate',['../react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82',1,'reactRouter.js']]],
+  ['notification_5ficons_2',['NOTIFICATION_ICONS',['../_notifications_dropdown_8jsx.html#afcb7011bfcbfab397866f38d1dec481d',1,'NotificationsDropdown.jsx']]],
+  ['notificationsdropdown_3',['NotificationsDropdown',['../_notifications_dropdown_8test_8jsx.html#ab735004b3d837cf675806b686851276f',1,'NotificationsDropdown:&#160;NotificationsDropdown.test.jsx'],['../_dashboard_8jsx.html#a140b7900f5e6cb44d64d4fcaca490003',1,'NotificationsDropdown:&#160;Dashboard.jsx'],['../_notifications_dropdown_8jsx.html#a9c2cce98c1ae98ad2f89d6c59778ede0',1,'NotificationsDropdown({ isOpen, onClose }):&#160;NotificationsDropdown.jsx']]],
+  ['notificationsdropdown_2ejsx_4',['NotificationsDropdown.jsx',['../_notifications_dropdown_8jsx.html',1,'']]],
+  ['notificationsdropdown_2etest_2ejsx_5',['NotificationsDropdown.test.jsx',['../_notifications_dropdown_8test_8jsx.html',1,'']]],
+  ['notificationsstore_2ejs_6',['notificationsStore.js',['../notifications_store_8js.html',1,'']]],
+  ['notificationsstore_2etest_2ejs_7',['notificationsStore.test.js',['../notifications_store_8test_8js.html',1,'']]],
+  ['notificationsstore_5fhelpers_2etest_2ejs_8',['notificationsStore_helpers.test.js',['../notifications_store__helpers_8test_8js.html',1,'']]]
 ];

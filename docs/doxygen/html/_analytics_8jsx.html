@@ -103,11 +103,792 @@ $(function(){initNavTree('_analytics_8jsx.html',''); initResizable(true); });
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Analytics.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_analytics_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a1f7d0cbfe9bdf816b6535bca1321c179" id="r_a1f7d0cbfe9bdf816b6535bca1321c179"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1f7d0cbfe9bdf816b6535bca1321c179">monthKey</a> (ts)</td></tr>
+<tr class="separator:a1f7d0cbfe9bdf816b6535bca1321c179"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81f51249f48c42e539b0af6a5fdf2c0b" id="r_a81f51249f48c42e539b0af6a5fdf2c0b"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81f51249f48c42e539b0af6a5fdf2c0b">CustomTooltip</a> ({ active, payload, label })</td></tr>
+<tr class="separator:a81f51249f48c42e539b0af6a5fdf2c0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36f204bd605bc954d31b54c5d65f5cc7" id="r_a36f204bd605bc954d31b54c5d65f5cc7"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a> ({ title, icon:Icon, children, delay=0 })</td></tr>
+<tr class="separator:a36f204bd605bc954d31b54c5d65f5cc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94dae0b1df4e549563c251b25b460a61" id="r_a94dae0b1df4e549563c251b25b460a61"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94dae0b1df4e549563c251b25b460a61">Analytics</a> ()</td></tr>
+<tr class="separator:a94dae0b1df4e549563c251b25b460a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect, useMemo } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9fcdab887d2b0228b001ded6bb69e54" id="r_ac9fcdab887d2b0228b001ded6bb69e54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9fcdab887d2b0228b001ded6bb69e54">CATEGORY_COLORS</a></td></tr>
+<tr class="separator:ac9fcdab887d2b0228b001ded6bb69e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a603c03323e451eeb9a885156dc25539c" id="r_a603c03323e451eeb9a885156dc25539c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a603c03323e451eeb9a885156dc25539c">fmt</a> = (n, currency = '') =&gt; currency ? `${currency} ${Number(n).toFixed(2)}` : Number(n).toFixed(2)</td></tr>
+<tr class="separator:a603c03323e451eeb9a885156dc25539c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b2968765a186fe8b2cebf5c80479203" id="r_a4b2968765a186fe8b2cebf5c80479203"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b2968765a186fe8b2cebf5c80479203">MONTHS</a> = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']</td></tr>
+<tr class="separator:a4b2968765a186fe8b2cebf5c80479203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a94dae0b1df4e549563c251b25b460a61" name="a94dae0b1df4e549563c251b25b460a61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94dae0b1df4e549563c251b25b460a61">&#9670;&#160;</a></span>Analytics()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default Analytics </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00093">93</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   93</span>                                    {</div>
+<div class="line"><span class="lineno">   94</span>  <span class="keyword">const</span> { user } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><span class="lineno">   95</span>  <span class="keyword">const</span> navigate  = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">   96</span> </div>
+<div class="line"><span class="lineno">   97</span>  <span class="keyword">const</span> [loading,  setLoading]  = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   98</span>  <span class="keyword">const</span> [expenses, setExpenses] = useState([]);   <span class="comment">// all expenses across all groups</span></div>
+<div class="line"><span class="lineno">   99</span>  <span class="keyword">const</span> [groups,   setGroups]   = useState([]);   <span class="comment">// all user groups</span></div>
+<div class="line"><span class="lineno">  100</span>  <span class="keyword">const</span> [members,  setMembers]  = useState({});   <span class="comment">// userId → displayName</span></div>
+<div class="line"><span class="lineno">  101</span>  <span class="keyword">const</span> [selectedGroupId, setSelectedGroupId] = useState(<span class="stringliteral">&#39;all&#39;</span>); <span class="comment">// group filter</span></div>
+<div class="line"><span class="lineno">  102</span> </div>
+<div class="line"><span class="lineno">  103</span>  <span class="comment">// ── Fetch all data ──────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  104</span> </div>
+<div class="line"><span class="lineno">  105</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  106</span>    <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>    <span class="keyword">const</span> fetchAll = async () =&gt; {</div>
+<div class="line"><span class="lineno">  109</span>      setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  110</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  111</span>        <span class="comment">// 1. Get all groups the user belongs to</span></div>
+<div class="line"><span class="lineno">  112</span>        <span class="keyword">const</span> gSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(</div>
+<div class="line"><span class="lineno">  113</span>          <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;groups&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;memberIds&#39;</span>, <span class="stringliteral">&#39;array-contains&#39;</span>, user.uid))</div>
+<div class="line"><span class="lineno">  114</span>        );</div>
+<div class="line"><span class="lineno">  115</span>        <span class="keyword">const</span> groupList = gSnap.docs.map(d =&gt; ({ id: d.id, ...d.data() }));</div>
+<div class="line"><span class="lineno">  116</span>        setGroups(groupList);</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>        <span class="comment">// 2. Build a userId→name map from all members across groups</span></div>
+<div class="line"><span class="lineno">  119</span>        <span class="keyword">const</span> nameMap = {};</div>
+<div class="line"><span class="lineno">  120</span>        groupList.forEach(g =&gt; {</div>
+<div class="line"><span class="lineno">  121</span>          (g.members || []).forEach(m =&gt; {</div>
+<div class="line"><span class="lineno">  122</span>            <span class="keywordflow">if</span> (!nameMap[m.userId]) nameMap[m.userId] = m.name || m.email || <span class="stringliteral">&#39;Unknown&#39;</span>;</div>
+<div class="line"><span class="lineno">  123</span>          });</div>
+<div class="line"><span class="lineno">  124</span>        });</div>
+<div class="line"><span class="lineno">  125</span>        <span class="comment">// Also add current user</span></div>
+<div class="line"><span class="lineno">  126</span>        nameMap[user.uid] = user.displayName || user.email || <span class="stringliteral">&#39;You&#39;</span>;</div>
+<div class="line"><span class="lineno">  127</span>        setMembers(nameMap);</div>
+<div class="line"><span class="lineno">  128</span> </div>
+<div class="line"><span class="lineno">  129</span>        <span class="comment">// 3. Fetch all expenses for those groups</span></div>
+<div class="line"><span class="lineno">  130</span>        <span class="keywordflow">if</span> (groupList.length === 0) { setLoading(<span class="keyword">false</span>); <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>        <span class="keyword">const</span> allExpenses = [];</div>
+<div class="line"><span class="lineno">  133</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> g of groupList) {</div>
+<div class="line"><span class="lineno">  134</span>          <span class="keyword">const</span> eSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(</div>
+<div class="line"><span class="lineno">  135</span>            <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;groupId&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, g.id))</div>
+<div class="line"><span class="lineno">  136</span>          );</div>
+<div class="line"><span class="lineno">  137</span>          eSnap.docs.forEach(d =&gt; allExpenses.push({ id: d.id, groupName: g.name, ...d.data() }));</div>
+<div class="line"><span class="lineno">  138</span>        }</div>
+<div class="line"><span class="lineno">  139</span>        setExpenses(allExpenses);</div>
+<div class="line"><span class="lineno">  140</span>      } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  141</span>        console.error(<span class="stringliteral">&#39;Analytics fetch error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  142</span>      } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  143</span>        setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  144</span>      }</div>
+<div class="line"><span class="lineno">  145</span>    };</div>
+<div class="line"><span class="lineno">  146</span> </div>
+<div class="line"><span class="lineno">  147</span>    fetchAll();</div>
+<div class="line"><span class="lineno">  148</span>  }, [user]);</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>  <span class="comment">// Active group and currency — null when &quot;All Groups&quot; is selected</span></div>
+<div class="line"><span class="lineno">  151</span>  <span class="keyword">const</span> activeGroup    = selectedGroupId === <span class="stringliteral">&#39;all&#39;</span> ? null : groups.find(g =&gt; g.id === selectedGroupId);</div>
+<div class="line"><span class="lineno">  152</span>  <span class="keyword">const</span> activeCurrency = activeGroup?.currency || <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span>  <span class="comment">// Filter expenses to selected group, or use all</span></div>
+<div class="line"><span class="lineno">  155</span>  <span class="keyword">const</span> filteredExpenses = selectedGroupId === <span class="stringliteral">&#39;all&#39;</span></div>
+<div class="line"><span class="lineno">  156</span>    ? expenses</div>
+<div class="line"><span class="lineno">  157</span>    : expenses.filter(e =&gt; e.groupId === selectedGroupId);</div>
+<div class="line"><span class="lineno">  158</span> </div>
+<div class="line"><span class="lineno">  159</span>  <span class="keyword">const</span> filteredGroups = selectedGroupId === <span class="stringliteral">&#39;all&#39;</span></div>
+<div class="line"><span class="lineno">  160</span>    ? groups</div>
+<div class="line"><span class="lineno">  161</span>    : groups.filter(g =&gt; g.id === selectedGroupId);</div>
+<div class="line"><span class="lineno">  162</span> </div>
+<div class="line"><span class="lineno">  163</span>  <span class="comment">// ── Derived chart data ──────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>  <span class="comment">// 1. Spending over time (last 6 months, area chart)</span></div>
+<div class="line"><span class="lineno">  166</span>  <span class="keyword">const</span> spendingOverTime = useMemo(() =&gt; {</div>
+<div class="line"><span class="lineno">  167</span>    <span class="keyword">const</span> map = {};</div>
+<div class="line"><span class="lineno">  168</span>    filteredExpenses.forEach(e =&gt; {</div>
+<div class="line"><span class="lineno">  169</span>      <span class="keyword">const</span> k = <a class="code hl_function" href="#a1f7d0cbfe9bdf816b6535bca1321c179">monthKey</a>(e.createdAt || e.date);</div>
+<div class="line"><span class="lineno">  170</span>      map[k] = (map[k] || 0) + (e.amount || 0);</div>
+<div class="line"><span class="lineno">  171</span>    });</div>
+<div class="line"><span class="lineno">  172</span>    <span class="comment">// Sort chronologically and take last 6</span></div>
+<div class="line"><span class="lineno">  173</span>    <span class="keywordflow">return</span> Object.entries(map)</div>
+<div class="line"><span class="lineno">  174</span>      .sort((a, b) =&gt; {</div>
+<div class="line"><span class="lineno">  175</span>        <span class="keyword">const</span> pa = <span class="keyword">new</span> Date(a[0]); <span class="keyword">const</span> pb = <span class="keyword">new</span> Date(b[0]);</div>
+<div class="line"><span class="lineno">  176</span>        <span class="keywordflow">return</span> pa - pb;</div>
+<div class="line"><span class="lineno">  177</span>      })</div>
+<div class="line"><span class="lineno">  178</span>      .slice(-6)</div>
+<div class="line"><span class="lineno">  179</span>      .map(([month, total]) =&gt; ({ month, total: parseFloat(total.toFixed(2)) }));</div>
+<div class="line"><span class="lineno">  180</span>  }, [filteredExpenses]);</div>
+<div class="line"><span class="lineno">  181</span> </div>
+<div class="line"><span class="lineno">  182</span>  <span class="comment">// 2. Category breakdown (pie chart)</span></div>
+<div class="line"><span class="lineno">  183</span>  <span class="keyword">const</span> categoryData = useMemo(() =&gt; {</div>
+<div class="line"><span class="lineno">  184</span>    <span class="keyword">const</span> map = {};</div>
+<div class="line"><span class="lineno">  185</span>    filteredExpenses.forEach(e =&gt; {</div>
+<div class="line"><span class="lineno">  186</span>      <span class="keyword">const</span> cat = e.category || <span class="stringliteral">&#39;other&#39;</span>;</div>
+<div class="line"><span class="lineno">  187</span>      map[cat] = (map[cat] || 0) + (e.amount || 0);</div>
+<div class="line"><span class="lineno">  188</span>    });</div>
+<div class="line"><span class="lineno">  189</span>    <span class="keywordflow">return</span> Object.entries(map).map(([name, value]) =&gt; ({</div>
+<div class="line"><span class="lineno">  190</span>      name: name.charAt(0).toUpperCase() + name.slice(1),</div>
+<div class="line"><span class="lineno">  191</span>      value: parseFloat(value.toFixed(2)),</div>
+<div class="line"><span class="lineno">  192</span>      color: <a class="code hl_variable" href="#ac9fcdab887d2b0228b001ded6bb69e54">CATEGORY_COLORS</a>[name] || <span class="stringliteral">&#39;#94a3b8&#39;</span>,</div>
+<div class="line"><span class="lineno">  193</span>    }));</div>
+<div class="line"><span class="lineno">  194</span>  }, [filteredExpenses]);</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>  <span class="comment">// 3. Monthly summary (bar chart — this year)</span></div>
+<div class="line"><span class="lineno">  197</span>  <span class="keyword">const</span> monthlySummary = useMemo(() =&gt; {</div>
+<div class="line"><span class="lineno">  198</span>    <span class="keyword">const</span> year = <span class="keyword">new</span> Date().getFullYear();</div>
+<div class="line"><span class="lineno">  199</span>    <span class="keyword">const</span> map  = {};</div>
+<div class="line"><span class="lineno">  200</span>    <a class="code hl_variable" href="#a4b2968765a186fe8b2cebf5c80479203">MONTHS</a>.forEach(m =&gt; { map[m] = 0; });</div>
+<div class="line"><span class="lineno">  201</span>    filteredExpenses.forEach(e =&gt; {</div>
+<div class="line"><span class="lineno">  202</span>      <span class="keyword">const</span> d = e.createdAt?.toDate ? e.createdAt.toDate() : <span class="keyword">new</span> Date(e.createdAt || e.date);</div>
+<div class="line"><span class="lineno">  203</span>      <span class="keywordflow">if</span> (d.getFullYear() === year) {</div>
+<div class="line"><span class="lineno">  204</span>        <span class="keyword">const</span> m = <a class="code hl_variable" href="#a4b2968765a186fe8b2cebf5c80479203">MONTHS</a>[d.getMonth()];</div>
+<div class="line"><span class="lineno">  205</span>        map[m] = (map[m] || 0) + (e.amount || 0);</div>
+<div class="line"><span class="lineno">  206</span>      }</div>
+<div class="line"><span class="lineno">  207</span>    });</div>
+<div class="line"><span class="lineno">  208</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="#a4b2968765a186fe8b2cebf5c80479203">MONTHS</a>.map(m =&gt; ({ month: m, amount: parseFloat((map[m] || 0).toFixed(2)) }));</div>
+<div class="line"><span class="lineno">  209</span>  }, [filteredExpenses]);</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>  <span class="comment">// 4. Per-person balance across all groups (bar chart)</span></div>
+<div class="line"><span class="lineno">  212</span>  <span class="keyword">const</span> perPersonData = useMemo(() =&gt; {</div>
+<div class="line"><span class="lineno">  213</span>    <span class="keyword">const</span> netBalances = {};</div>
+<div class="line"><span class="lineno">  214</span>    filteredGroups.forEach(g =&gt; {</div>
+<div class="line"><span class="lineno">  215</span>      <span class="keyword">const</span> gExpenses = filteredExpenses.filter(e =&gt; e.groupId === g.id);</div>
+<div class="line"><span class="lineno">  216</span>      <span class="keyword">const</span> balances  = <a class="code hl_function" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>(gExpenses, g.members || []);</div>
+<div class="line"><span class="lineno">  217</span>      Object.entries(balances).forEach(([uid, bal]) =&gt; {</div>
+<div class="line"><span class="lineno">  218</span>        netBalances[uid] = (netBalances[uid] || 0) + bal;</div>
+<div class="line"><span class="lineno">  219</span>      });</div>
+<div class="line"><span class="lineno">  220</span>    });</div>
+<div class="line"><span class="lineno">  221</span>    <span class="keywordflow">return</span> Object.entries(netBalances)</div>
+<div class="line"><span class="lineno">  222</span>      .map(([uid, balance]) =&gt; ({</div>
+<div class="line"><span class="lineno">  223</span>        name:    (members[uid] || uid).split(<span class="charliteral">&#39; &#39;</span>)[0], <span class="comment">// first name only</span></div>
+<div class="line"><span class="lineno">  224</span>        balance: parseFloat(balance.toFixed(2)),</div>
+<div class="line"><span class="lineno">  225</span>        isYou:   uid === user?.uid,</div>
+<div class="line"><span class="lineno">  226</span>      }))</div>
+<div class="line"><span class="lineno">  227</span>      .sort((a, b) =&gt; b.balance - a.balance);</div>
+<div class="line"><span class="lineno">  228</span>  }, [filteredGroups, filteredExpenses, members, user]);</div>
+<div class="line"><span class="lineno">  229</span> </div>
+<div class="line"><span class="lineno">  230</span>  <span class="comment">// 5. Who owes who — aggregate across all groups</span></div>
+<div class="line"><span class="lineno">  231</span>  <span class="keyword">const</span> settlements = useMemo(() =&gt; {</div>
+<div class="line"><span class="lineno">  232</span>    <span class="keyword">const</span> allSettlements = [];</div>
+<div class="line"><span class="lineno">  233</span>    filteredGroups.forEach(g =&gt; {</div>
+<div class="line"><span class="lineno">  234</span>      <span class="keyword">const</span> gExpenses = filteredExpenses.filter(e =&gt; e.groupId === g.id);</div>
+<div class="line"><span class="lineno">  235</span>      <span class="keyword">const</span> balances  = <a class="code hl_function" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>(gExpenses, g.members || []);</div>
+<div class="line"><span class="lineno">  236</span>      <span class="keyword">const</span> s         = <a class="code hl_function" href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a>(balances);</div>
+<div class="line"><span class="lineno">  237</span>      s.forEach(item =&gt; allSettlements.push({ ...item, groupName: g.name, currency: g.currency }));</div>
+<div class="line"><span class="lineno">  238</span>    });</div>
+<div class="line"><span class="lineno">  239</span>    <span class="comment">// Consolidate: merge same from→to pairs</span></div>
+<div class="line"><span class="lineno">  240</span>    <span class="keyword">const</span> consolidated = {};</div>
+<div class="line"><span class="lineno">  241</span>    allSettlements.forEach(({ from, to, amount }) =&gt; {</div>
+<div class="line"><span class="lineno">  242</span>      <span class="keyword">const</span> key = `${from}→${to}`;</div>
+<div class="line"><span class="lineno">  243</span>      consolidated[key] = { from, to, amount: (consolidated[key]?.amount || 0) + amount };</div>
+<div class="line"><span class="lineno">  244</span>    });</div>
+<div class="line"><span class="lineno">  245</span>    <span class="keywordflow">return</span> Object.values(consolidated)</div>
+<div class="line"><span class="lineno">  246</span>      .sort((a, b) =&gt; b.amount - a.amount)</div>
+<div class="line"><span class="lineno">  247</span>      .slice(0, 8);</div>
+<div class="line"><span class="lineno">  248</span>  }, [filteredGroups, filteredExpenses]);</div>
+<div class="line"><span class="lineno">  249</span> </div>
+<div class="line"><span class="lineno">  250</span>  <span class="comment">// ── Loading ─────────────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>  <span class="keywordflow">if</span> (loading) {</div>
+<div class="line"><span class="lineno">  253</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  254</span>      &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  255</span>        &lt;div className=<span class="stringliteral">&quot;text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  256</span>          &lt;Loader size={32} className=<span class="stringliteral">&quot;animate-spin text-indigo-500 mx-auto mb-3&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  257</span>          &lt;p className=<span class="stringliteral">&quot;text-gray-500 dark:text-gray-400 text-sm&quot;</span>&gt;Loading analytics...&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  258</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  259</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  260</span>    );</div>
+<div class="line"><span class="lineno">  261</span>  }</div>
+<div class="line"><span class="lineno">  262</span> </div>
+<div class="line"><span class="lineno">  263</span>  <span class="comment">// ── Empty state ─────────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  264</span> </div>
+<div class="line"><span class="lineno">  265</span>  <span class="keywordflow">if</span> (expenses.length === 0) {</div>
+<div class="line"><span class="lineno">  266</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  267</span>      &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-6 pb-24&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  268</span>        &lt;div className=<span class="stringliteral">&quot;w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  269</span>          &lt;BarChart2 size={36} className=<span class="stringliteral">&quot;text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  270</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  271</span>        &lt;h2 className=<span class="stringliteral">&quot;text-xl font-bold text-gray-800 dark:text-white mb-2&quot;</span>&gt;No data yet&lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  272</span>        &lt;p className=<span class="stringliteral">&quot;text-gray-500 dark:text-gray-400 text-sm text-center mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  273</span>          Add expenses to your groups and your analytics will appear here.</div>
+<div class="line"><span class="lineno">  274</span>        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  275</span>        &lt;button</div>
+<div class="line"><span class="lineno">  276</span>          onClick={() =&gt; navigate(<span class="stringliteral">&#39;/dashboard&#39;</span>)}</div>
+<div class="line"><span class="lineno">  277</span>          className=<span class="stringliteral">&quot;bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  278</span>        &gt;</div>
+<div class="line"><span class="lineno">  279</span>          Go to <a class="code hl_variable" href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a></div>
+<div class="line"><span class="lineno">  280</span>        &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  281</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  282</span>    );</div>
+<div class="line"><span class="lineno">  283</span>  }</div>
+<div class="line"><span class="lineno">  284</span> </div>
+<div class="line"><span class="lineno">  285</span>  <span class="comment">// ── Totals for summary cards — use filteredExpenses────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  286</span>  <span class="keyword">const</span> totalSpend = filteredExpenses.reduce((s, e) =&gt; s + (e.amount || 0), 0);</div>
+<div class="line"><span class="lineno">  287</span>  <span class="keyword">const</span> thisMonth  = (() =&gt; {</div>
+<div class="line"><span class="lineno">  288</span>    <span class="keyword">const</span> now = <span class="keyword">new</span> Date();</div>
+<div class="line"><span class="lineno">  289</span>    <span class="keywordflow">return</span> filteredExpenses</div>
+<div class="line"><span class="lineno">  290</span>      .filter(e =&gt; {</div>
+<div class="line"><span class="lineno">  291</span>        <span class="keyword">const</span> d = e.createdAt?.toDate ? e.createdAt.toDate() : <span class="keyword">new</span> Date(e.createdAt || e.date);</div>
+<div class="line"><span class="lineno">  292</span>        <span class="keywordflow">return</span> d.getMonth() === now.getMonth() &amp;&amp; d.getFullYear() === now.getFullYear();</div>
+<div class="line"><span class="lineno">  293</span>      })</div>
+<div class="line"><span class="lineno">  294</span>      .reduce((s, e) =&gt; s + (e.amount || 0), 0);</div>
+<div class="line"><span class="lineno">  295</span>  })();</div>
+<div class="line"><span class="lineno">  296</span> </div>
+<div class="line"><span class="lineno">  297</span>  <span class="comment">// Per-currency totals for the summary cards — used when All Groups is selected</span></div>
+<div class="line"><span class="lineno">  298</span>  <span class="keyword">const</span> totalSpendByCurrency = filteredExpenses.reduce((acc, e) =&gt; {</div>
+<div class="line"><span class="lineno">  299</span>    <span class="keyword">const</span> currency = groups.find(g =&gt; g.id === e.groupId)?.currency || <span class="stringliteral">&#39;EUR&#39;</span>;</div>
+<div class="line"><span class="lineno">  300</span>    acc[currency] = (acc[currency] || 0) + (e.amount || 0);</div>
+<div class="line"><span class="lineno">  301</span>    <span class="keywordflow">return</span> acc;</div>
+<div class="line"><span class="lineno">  302</span>  }, {});</div>
+<div class="line"><span class="lineno">  303</span> </div>
+<div class="line"><span class="lineno">  304</span>  <span class="keyword">const</span> thisMonthByCurrency = filteredExpenses</div>
+<div class="line"><span class="lineno">  305</span>    .filter(e =&gt; {</div>
+<div class="line"><span class="lineno">  306</span>      <span class="keyword">const</span> d = e.createdAt?.toDate ? e.createdAt.toDate() : <span class="keyword">new</span> Date(e.createdAt || e.date);</div>
+<div class="line"><span class="lineno">  307</span>      <span class="keyword">const</span> now = <span class="keyword">new</span> Date();</div>
+<div class="line"><span class="lineno">  308</span>      <span class="keywordflow">return</span> d.getMonth() === now.getMonth() &amp;&amp; d.getFullYear() === now.getFullYear();</div>
+<div class="line"><span class="lineno">  309</span>    })</div>
+<div class="line"><span class="lineno">  310</span>    .reduce((acc, e) =&gt; {</div>
+<div class="line"><span class="lineno">  311</span>      <span class="keyword">const</span> currency = groups.find(g =&gt; g.id === e.groupId)?.currency || <span class="stringliteral">&#39;EUR&#39;</span>;</div>
+<div class="line"><span class="lineno">  312</span>      acc[currency] = (acc[currency] || 0) + (e.amount || 0);</div>
+<div class="line"><span class="lineno">  313</span>      <span class="keywordflow">return</span> acc;</div>
+<div class="line"><span class="lineno">  314</span>    }, {});</div>
+<div class="line"><span class="lineno">  315</span> </div>
+<div class="line"><span class="lineno">  316</span>  <span class="comment">// ── Render ──────────────────────────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  317</span> </div>
+<div class="line"><span class="lineno">  318</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  319</span>    &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 dark:bg-gray-900 pb-28&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  320</span> </div>
+<div class="line"><span class="lineno">  321</span>      {<span class="comment">/* ── Header ── */</span>}</div>
+<div class="line"><span class="lineno">  322</span>      &lt;div className=<span class="stringliteral">&quot;sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  323</span>        &lt;div className=<span class="stringliteral">&quot;max-w-2xl mx-auto flex items-center gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  324</span>          &lt;button</div>
+<div class="line"><span class="lineno">  325</span>            onClick={() =&gt; navigate(<span class="stringliteral">&#39;/dashboard&#39;</span>)}</div>
+<div class="line"><span class="lineno">  326</span>            className=<span class="stringliteral">&quot;p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  327</span>          &gt;</div>
+<div class="line"><span class="lineno">  328</span>            &lt;ArrowLeft size={20} className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  329</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  330</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno">  331</span>            &lt;h1 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;<a class="code hl_variable" href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a>&lt;/h1&gt;</div>
+<div class="line"><span class="lineno">  332</span>            &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Spending insights across all groups&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  333</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  334</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  335</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  336</span> </div>
+<div class="line"><span class="lineno">  337</span>      {<span class="comment">/* Group selector — filters all charts to a single currency */</span>}</div>
+<div class="line"><span class="lineno">  338</span>      &lt;div className=<span class="stringliteral">&quot;max-w-2xl mx-auto px-4 pt-3 pb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  339</span>        &lt;select</div>
+<div class="line"><span class="lineno">  340</span>          value={selectedGroupId}</div>
+<div class="line"><span class="lineno">  341</span>          onChange={e =&gt; setSelectedGroupId(e.target.value)}</div>
+<div class="line"><span class="lineno">  342</span>          className=<span class="stringliteral">&quot;w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500&quot;</span></div>
+<div class="line"><span class="lineno">  343</span>        &gt;</div>
+<div class="line"><span class="lineno">  344</span>          &lt;option value=<span class="stringliteral">&quot;all&quot;</span>&gt;All Groups (mixed currencies)&lt;/option&gt;</div>
+<div class="line"><span class="lineno">  345</span>          {groups.map(g =&gt; (</div>
+<div class="line"><span class="lineno">  346</span>            &lt;option key={g.id} value={g.id}&gt;{g.name} — {g.currency}&lt;/option&gt;</div>
+<div class="line"><span class="lineno">  347</span>          ))}</div>
+<div class="line"><span class="lineno">  348</span>        &lt;/select&gt;</div>
+<div class="line"><span class="lineno">  349</span>        {!activeCurrency &amp;&amp; (</div>
+<div class="line"><span class="lineno">  350</span>          &lt;p className=<span class="stringliteral">&quot;text-xs text-amber-600 dark:text-amber-400 mt-1.5 px-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  351</span>            Amounts across groups may be of different currencies. Select a group <span class="keywordflow">for</span> accurate totals.</div>
+<div class="line"><span class="lineno">  352</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  353</span>        )}</div>
+<div class="line"><span class="lineno">  354</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  355</span> </div>
+<div class="line"><span class="lineno">  356</span>      &lt;div className=<span class="stringliteral">&quot;max-w-2xl mx-auto px-4 pt-5 space-y-5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  357</span> </div>
+<div class="line"><span class="lineno">  358</span>        {<span class="comment">/* ── Summary cards ── */</span>}</div>
+<div class="line"><span class="lineno">  359</span>        &lt;div className=<span class="stringliteral">&quot;grid grid-cols-2 gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  360</span> </div>
+<div class="line"><span class="lineno">  361</span>          {<span class="comment">/* Total Spent — stacked per currency when all groups selected */</span>}</div>
+<div class="line"><span class="lineno">  362</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-4 text-white animate-fade-in&quot;</span></div>
+<div class="line"><span class="lineno">  363</span>              style={{ animationDelay: <span class="stringliteral">&#39;0ms&#39;</span>, animationFillMode: <span class="stringliteral">&#39;both&#39;</span> }}&gt;</div>
+<div class="line"><span class="lineno">  364</span>            &lt;p className=<span class="stringliteral">&quot;text-xs font-medium text-white/80 mb-1&quot;</span>&gt;Total Spent&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  365</span>            {activeCurrency ? (</div>
+<div class="line"><span class="lineno">  366</span>              &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold&quot;</span>&gt;{<a class="code hl_variable" href="#a603c03323e451eeb9a885156dc25539c">fmt</a>(totalSpend, activeCurrency)}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  367</span>            ) : (</div>
+<div class="line"><span class="lineno">  368</span>              &lt;div className=<span class="stringliteral">&quot;space-y-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  369</span>                {Object.entries(totalSpendByCurrency).length === 0 ? (</div>
+<div class="line"><span class="lineno">  370</span>                  &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  371</span>                ) : (</div>
+<div class="line"><span class="lineno">  372</span>                  Object.entries(totalSpendByCurrency).map(([currency, amount]) =&gt; (</div>
+<div class="line"><span class="lineno">  373</span>                    &lt;p key={currency} className=<span class="stringliteral">&quot;text-lg font-bold leading-tight&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  374</span>                      {currency} {amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  375</span>                    &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  376</span>                  ))</div>
+<div class="line"><span class="lineno">  377</span>                )}</div>
+<div class="line"><span class="lineno">  378</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  379</span>            )}</div>
+<div class="line"><span class="lineno">  380</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  381</span> </div>
+<div class="line"><span class="lineno">  382</span>          {<span class="comment">/* This Month — stacked per currency when all groups selected */</span>}</div>
+<div class="line"><span class="lineno">  383</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-4 text-white animate-fade-in&quot;</span></div>
+<div class="line"><span class="lineno">  384</span>              style={{ animationDelay: <span class="stringliteral">&#39;80ms&#39;</span>, animationFillMode: <span class="stringliteral">&#39;both&#39;</span> }}&gt;</div>
+<div class="line"><span class="lineno">  385</span>            &lt;p className=<span class="stringliteral">&quot;text-xs font-medium text-white/80 mb-1&quot;</span>&gt;This Month&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  386</span>            {activeCurrency ? (</div>
+<div class="line"><span class="lineno">  387</span>              &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold&quot;</span>&gt;{<a class="code hl_variable" href="#a603c03323e451eeb9a885156dc25539c">fmt</a>(thisMonth, activeCurrency)}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  388</span>            ) : (</div>
+<div class="line"><span class="lineno">  389</span>              &lt;div className=<span class="stringliteral">&quot;space-y-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  390</span>                {Object.entries(thisMonthByCurrency).length === 0 ? (</div>
+<div class="line"><span class="lineno">  391</span>                  &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  392</span>                ) : (</div>
+<div class="line"><span class="lineno">  393</span>                  Object.entries(thisMonthByCurrency).map(([currency, amount]) =&gt; (</div>
+<div class="line"><span class="lineno">  394</span>                    &lt;p key={currency} className=<span class="stringliteral">&quot;text-lg font-bold leading-tight&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  395</span>                      {currency} {amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  396</span>                    &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  397</span>                  ))</div>
+<div class="line"><span class="lineno">  398</span>                )}</div>
+<div class="line"><span class="lineno">  399</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  400</span>            )}</div>
+<div class="line"><span class="lineno">  401</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  402</span> </div>
+<div class="line"><span class="lineno">  403</span>          {<span class="comment">/* Total Expenses — count */</span>}</div>
+<div class="line"><span class="lineno">  404</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-4 text-white animate-fade-in&quot;</span></div>
+<div class="line"><span class="lineno">  405</span>              style={{ animationDelay: <span class="stringliteral">&#39;160ms&#39;</span>, animationFillMode: <span class="stringliteral">&#39;both&#39;</span> }}&gt;</div>
+<div class="line"><span class="lineno">  406</span>            &lt;p className=<span class="stringliteral">&quot;text-xs font-medium text-white/80 mb-1&quot;</span>&gt;Total Expenses&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  407</span>            &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold&quot;</span>&gt;{filteredExpenses.length}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  408</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  409</span> </div>
+<div class="line"><span class="lineno">  410</span>          {<span class="comment">/* Groups */</span>}</div>
+<div class="line"><span class="lineno">  411</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 text-white animate-fade-in&quot;</span></div>
+<div class="line"><span class="lineno">  412</span>              style={{ animationDelay: <span class="stringliteral">&#39;240ms&#39;</span>, animationFillMode: <span class="stringliteral">&#39;both&#39;</span> }}&gt;</div>
+<div class="line"><span class="lineno">  413</span>            &lt;p className=<span class="stringliteral">&quot;text-xs font-medium text-white/80 mb-1&quot;</span>&gt;Groups&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  414</span>            &lt;p className=<span class="stringliteral">&quot;text-2xl font-bold&quot;</span>&gt;{filteredGroups.length}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  415</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  416</span> </div>
+<div class="line"><span class="lineno">  417</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  418</span> </div>
+<div class="line"><span class="lineno">  419</span>        {<span class="comment">/* ── 1. Spending Over Time ── */</span>}</div>
+<div class="line"><span class="lineno">  420</span>        &lt;<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a> title=<span class="stringliteral">&quot;Spending Over Time&quot;</span> icon={TrendingUp} delay={100}&gt;</div>
+<div class="line"><span class="lineno">  421</span>          &lt;ResponsiveContainer width=<span class="stringliteral">&quot;100%&quot;</span> height={220}&gt;</div>
+<div class="line"><span class="lineno">  422</span>            &lt;AreaChart data={spendingOverTime} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}&gt;</div>
+<div class="line"><span class="lineno">  423</span>              &lt;defs&gt;</div>
+<div class="line"><span class="lineno">  424</span>                &lt;linearGradient <span class="keywordtype">id</span>=<span class="stringliteral">&quot;colorSpend&quot;</span> x1=<span class="stringliteral">&quot;0&quot;</span> y1=<span class="stringliteral">&quot;0&quot;</span> x2=<span class="stringliteral">&quot;0&quot;</span> y2=<span class="stringliteral">&quot;1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  425</span>                  &lt;stop offset=<span class="stringliteral">&quot;5%&quot;</span>  stopColor=<span class="stringliteral">&quot;#6366f1&quot;</span> stopOpacity={0.3} /&gt;</div>
+<div class="line"><span class="lineno">  426</span>                  &lt;stop offset=<span class="stringliteral">&quot;95%&quot;</span> stopColor=<span class="stringliteral">&quot;#6366f1&quot;</span> stopOpacity={0} /&gt;</div>
+<div class="line"><span class="lineno">  427</span>                &lt;/linearGradient&gt;</div>
+<div class="line"><span class="lineno">  428</span>              &lt;/defs&gt;</div>
+<div class="line"><span class="lineno">  429</span>              &lt;CartesianGrid strokeDasharray=<span class="stringliteral">&quot;3 3&quot;</span> stroke=<span class="stringliteral">&quot;#e5e7eb&quot;</span> className=<span class="stringliteral">&quot;dark:opacity-20&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  430</span>              &lt;XAxis dataKey=<span class="stringliteral">&quot;month&quot;</span> tick={{ fontSize: 11, fill: <span class="stringliteral">&#39;#9ca3af&#39;</span> }} axisLine={<span class="keyword">false</span>} tickLine={<span class="keyword">false</span>} /&gt;</div>
+<div class="line"><span class="lineno">  431</span>              &lt;YAxis tick={{ fontSize: 11, fill: <span class="stringliteral">&#39;#9ca3af&#39;</span> }} axisLine={<span class="keyword">false</span>} tickLine={<span class="keyword">false</span>} tickFormatter={v =&gt; activeCurrency ? `${activeCurrency} ${v}` : `${v}`} /&gt;</div>
+<div class="line"><span class="lineno">  432</span>              &lt;<a class="code hl_variable" href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a> content={&lt;<a class="code hl_function" href="#a81f51249f48c42e539b0af6a5fdf2c0b">CustomTooltip</a> /&gt;} /&gt;</div>
+<div class="line"><span class="lineno">  433</span>              &lt;Area</div>
+<div class="line"><span class="lineno">  434</span>                type=<span class="stringliteral">&quot;monotone&quot;</span></div>
+<div class="line"><span class="lineno">  435</span>                dataKey=<span class="stringliteral">&quot;total&quot;</span></div>
+<div class="line"><span class="lineno">  436</span>                name=<span class="stringliteral">&quot;Total&quot;</span></div>
+<div class="line"><span class="lineno">  437</span>                stroke=<span class="stringliteral">&quot;#6366f1&quot;</span></div>
+<div class="line"><span class="lineno">  438</span>                strokeWidth={2.5}</div>
+<div class="line"><span class="lineno">  439</span>                fill=<span class="stringliteral">&quot;url(#colorSpend)&quot;</span></div>
+<div class="line"><span class="lineno">  440</span>                dot={{ fill: <span class="stringliteral">&#39;#6366f1&#39;</span>, r: 4, strokeWidth: 0 }}</div>
+<div class="line"><span class="lineno">  441</span>                activeDot={{ r: 6, strokeWidth: 0 }}</div>
+<div class="line"><span class="lineno">  442</span>                animationDuration={1200}</div>
+<div class="line"><span class="lineno">  443</span>                animationEasing=<span class="stringliteral">&quot;ease-out&quot;</span></div>
+<div class="line"><span class="lineno">  444</span>              /&gt;</div>
+<div class="line"><span class="lineno">  445</span>            &lt;/AreaChart&gt;</div>
+<div class="line"><span class="lineno">  446</span>          &lt;/ResponsiveContainer&gt;</div>
+<div class="line"><span class="lineno">  447</span>        &lt;/<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a>&gt;</div>
+<div class="line"><span class="lineno">  448</span> </div>
+<div class="line"><span class="lineno">  449</span>        {<span class="comment">/* ── 2. Monthly Summary ── */</span>}</div>
+<div class="line"><span class="lineno">  450</span>        &lt;<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a> title=<span class="stringliteral">&quot;Monthly Summary&quot;</span> icon={Calendar} delay={200}&gt;</div>
+<div class="line"><span class="lineno">  451</span>          &lt;ResponsiveContainer width=<span class="stringliteral">&quot;100%&quot;</span> height={220}&gt;</div>
+<div class="line"><span class="lineno">  452</span>            &lt;BarChart data={monthlySummary} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}&gt;</div>
+<div class="line"><span class="lineno">  453</span>              &lt;CartesianGrid strokeDasharray=<span class="stringliteral">&quot;3 3&quot;</span> stroke=<span class="stringliteral">&quot;#e5e7eb&quot;</span> className=<span class="stringliteral">&quot;dark:opacity-20&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  454</span>              &lt;XAxis dataKey=<span class="stringliteral">&quot;month&quot;</span> tick={{ fontSize: 11, fill: <span class="stringliteral">&#39;#9ca3af&#39;</span> }} axisLine={<span class="keyword">false</span>} tickLine={<span class="keyword">false</span>} /&gt;</div>
+<div class="line"><span class="lineno">  455</span>              &lt;YAxis tick={{ fontSize: 11, fill: <span class="stringliteral">&#39;#9ca3af&#39;</span> }} axisLine={<span class="keyword">false</span>} tickLine={<span class="keyword">false</span>} tickFormatter={v =&gt; activeCurrency ? `${activeCurrency} ${v}` : `${v}`} /&gt;</div>
+<div class="line"><span class="lineno">  456</span>              &lt;<a class="code hl_variable" href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a> content={&lt;<a class="code hl_function" href="#a81f51249f48c42e539b0af6a5fdf2c0b">CustomTooltip</a> /&gt;} /&gt;</div>
+<div class="line"><span class="lineno">  457</span>              &lt;Bar</div>
+<div class="line"><span class="lineno">  458</span>                dataKey=<span class="stringliteral">&quot;amount&quot;</span></div>
+<div class="line"><span class="lineno">  459</span>                name=<span class="stringliteral">&quot;Spent&quot;</span></div>
+<div class="line"><span class="lineno">  460</span>                radius={[6, 6, 0, 0]}</div>
+<div class="line"><span class="lineno">  461</span>                animationDuration={1000}</div>
+<div class="line"><span class="lineno">  462</span>                animationEasing=<span class="stringliteral">&quot;ease-out&quot;</span></div>
+<div class="line"><span class="lineno">  463</span>              &gt;</div>
+<div class="line"><span class="lineno">  464</span>                {monthlySummary.map((_, i) =&gt; (</div>
+<div class="line"><span class="lineno">  465</span>                  &lt;Cell</div>
+<div class="line"><span class="lineno">  466</span>                    key={i}</div>
+<div class="line"><span class="lineno">  467</span>                    fill={<span class="keyword">new</span> Date().getMonth() === i ? <span class="stringliteral">&#39;#6366f1&#39;</span> : <span class="stringliteral">&#39;#e0e7ff&#39;</span>}</div>
+<div class="line"><span class="lineno">  468</span>                    className=<span class="stringliteral">&quot;dark:fill-indigo-900&quot;</span></div>
+<div class="line"><span class="lineno">  469</span>                  /&gt;</div>
+<div class="line"><span class="lineno">  470</span>                ))}</div>
+<div class="line"><span class="lineno">  471</span>              &lt;/Bar&gt;</div>
+<div class="line"><span class="lineno">  472</span>            &lt;/BarChart&gt;</div>
+<div class="line"><span class="lineno">  473</span>          &lt;/ResponsiveContainer&gt;</div>
+<div class="line"><span class="lineno">  474</span>          &lt;p className=<span class="stringliteral">&quot;text-xs text-center text-gray-400 dark:text-gray-500 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  475</span>            Current month highlighted in purple</div>
+<div class="line"><span class="lineno">  476</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  477</span>        &lt;/<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a>&gt;</div>
+<div class="line"><span class="lineno">  478</span> </div>
+<div class="line"><span class="lineno">  479</span>        {<span class="comment">/* ── 3. Category Breakdown ── */</span>}</div>
+<div class="line"><span class="lineno">  480</span>        &lt;<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a> title=<span class="stringliteral">&quot;Category Breakdown&quot;</span> icon={PieIcon} delay={300}&gt;</div>
+<div class="line"><span class="lineno">  481</span>          {categoryData.length === 0 ? (</div>
+<div class="line"><span class="lineno">  482</span>            &lt;p className=<span class="stringliteral">&quot;text-center text-gray-400 text-sm py-8&quot;</span>&gt;No category data yet&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  483</span>          ) : (</div>
+<div class="line"><span class="lineno">  484</span>            &lt;&gt;</div>
+<div class="line"><span class="lineno">  485</span>              &lt;ResponsiveContainer width=<span class="stringliteral">&quot;100%&quot;</span> height={220}&gt;</div>
+<div class="line"><span class="lineno">  486</span>                &lt;PieChart&gt;</div>
+<div class="line"><span class="lineno">  487</span>                  &lt;Pie</div>
+<div class="line"><span class="lineno">  488</span>                    data={categoryData}</div>
+<div class="line"><span class="lineno">  489</span>                    cx=<span class="stringliteral">&quot;50%&quot;</span></div>
+<div class="line"><span class="lineno">  490</span>                    cy=<span class="stringliteral">&quot;50%&quot;</span></div>
+<div class="line"><span class="lineno">  491</span>                    innerRadius={55}</div>
+<div class="line"><span class="lineno">  492</span>                    outerRadius={90}</div>
+<div class="line"><span class="lineno">  493</span>                    paddingAngle={3}</div>
+<div class="line"><span class="lineno">  494</span>                    dataKey=<span class="stringliteral">&quot;value&quot;</span></div>
+<div class="line"><span class="lineno">  495</span>                    animationDuration={1200}</div>
+<div class="line"><span class="lineno">  496</span>                    animationEasing=<span class="stringliteral">&quot;ease-out&quot;</span></div>
+<div class="line"><span class="lineno">  497</span>                  &gt;</div>
+<div class="line"><span class="lineno">  498</span>                    {categoryData.map((entry, i) =&gt; (</div>
+<div class="line"><span class="lineno">  499</span>                      &lt;Cell key={i} fill={entry.color} /&gt;</div>
+<div class="line"><span class="lineno">  500</span>                    ))}</div>
+<div class="line"><span class="lineno">  501</span>                  &lt;/Pie&gt;</div>
+<div class="line"><span class="lineno">  502</span>                  &lt;<a class="code hl_variable" href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a></div>
+<div class="line"><span class="lineno">  503</span>                    formatter={(value, name) =&gt; [<a class="code hl_variable" href="#a603c03323e451eeb9a885156dc25539c">fmt</a>(value), name]}</div>
+<div class="line"><span class="lineno">  504</span>                    content={&lt;<a class="code hl_function" href="#a81f51249f48c42e539b0af6a5fdf2c0b">CustomTooltip</a> /&gt;}</div>
+<div class="line"><span class="lineno">  505</span>                  /&gt;</div>
+<div class="line"><span class="lineno">  506</span>                  &lt;Legend</div>
+<div class="line"><span class="lineno">  507</span>                    iconType=<span class="stringliteral">&quot;circle&quot;</span></div>
+<div class="line"><span class="lineno">  508</span>                    iconSize={8}</div>
+<div class="line"><span class="lineno">  509</span>                    formatter={(v) =&gt; &lt;span className=<span class="stringliteral">&quot;text-xs text-gray-600 dark:text-gray-200&quot;</span>&gt;{v}&lt;/span&gt;}</div>
+<div class="line"><span class="lineno">  510</span>                  /&gt;</div>
+<div class="line"><span class="lineno">  511</span>                &lt;/PieChart&gt;</div>
+<div class="line"><span class="lineno">  512</span>              &lt;/ResponsiveContainer&gt;</div>
+<div class="line"><span class="lineno">  513</span>            &lt;/&gt;</div>
+<div class="line"><span class="lineno">  514</span>          )}</div>
+<div class="line"><span class="lineno">  515</span>        &lt;/<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a>&gt;</div>
+<div class="line"><span class="lineno">  516</span> </div>
+<div class="line"><span class="lineno">  517</span>        {<span class="comment">/* ── 4. Per-Person Balance ── */</span>}</div>
+<div class="line"><span class="lineno">  518</span>        &lt;<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a> title=<span class="stringliteral">&quot;Per-Person Balance&quot;</span> icon={BarChart2} delay={400}&gt;</div>
+<div class="line"><span class="lineno">  519</span>          {perPersonData.length === 0 ? (</div>
+<div class="line"><span class="lineno">  520</span>            &lt;p className=<span class="stringliteral">&quot;text-center text-gray-400 text-sm py-8&quot;</span>&gt;No balance data yet&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  521</span>          ) : (</div>
+<div class="line"><span class="lineno">  522</span>            &lt;&gt;</div>
+<div class="line"><span class="lineno">  523</span>              &lt;ResponsiveContainer width=<span class="stringliteral">&quot;100%&quot;</span> height={Math.max(180, perPersonData.length * 44)}&gt;</div>
+<div class="line"><span class="lineno">  524</span>                &lt;BarChart</div>
+<div class="line"><span class="lineno">  525</span>                  data={perPersonData}</div>
+<div class="line"><span class="lineno">  526</span>                  layout=<span class="stringliteral">&quot;vertical&quot;</span></div>
+<div class="line"><span class="lineno">  527</span>                  margin={{ top: 0, right: 10, left: 10, bottom: 0 }}</div>
+<div class="line"><span class="lineno">  528</span>                &gt;</div>
+<div class="line"><span class="lineno">  529</span>                  &lt;CartesianGrid strokeDasharray=<span class="stringliteral">&quot;3 3&quot;</span> stroke=<span class="stringliteral">&quot;#e5e7eb&quot;</span> horizontal={<span class="keyword">false</span>} className=<span class="stringliteral">&quot;dark:opacity-20&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  530</span>                  &lt;XAxis type=<span class="stringliteral">&quot;number&quot;</span> tick={{ fontSize: 11, fill: <span class="stringliteral">&#39;#9ca3af&#39;</span> }} axisLine={<span class="keyword">false</span>} tickLine={<span class="keyword">false</span>} tickFormatter={v =&gt; activeCurrency ? `${activeCurrency} ${v}` : `${v}`} /&gt;</div>
+<div class="line"><span class="lineno">  531</span>                  &lt;YAxis type=<span class="stringliteral">&quot;category&quot;</span> dataKey=<span class="stringliteral">&quot;name&quot;</span> tick={{ fontSize: 12, fill: <span class="stringliteral">&#39;#6b7280&#39;</span> }} axisLine={<span class="keyword">false</span>} tickLine={<span class="keyword">false</span>} width={55} /&gt;</div>
+<div class="line"><span class="lineno">  532</span>                  &lt;<a class="code hl_variable" href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a> content={&lt;<a class="code hl_function" href="#a81f51249f48c42e539b0af6a5fdf2c0b">CustomTooltip</a> /&gt;} /&gt;</div>
+<div class="line"><span class="lineno">  533</span>                  &lt;Bar</div>
+<div class="line"><span class="lineno">  534</span>                    dataKey=<span class="stringliteral">&quot;balance&quot;</span></div>
+<div class="line"><span class="lineno">  535</span>                    name=<span class="stringliteral">&quot;Balance&quot;</span></div>
+<div class="line"><span class="lineno">  536</span>                    radius={[0, 6, 6, 0]}</div>
+<div class="line"><span class="lineno">  537</span>                    animationDuration={1000}</div>
+<div class="line"><span class="lineno">  538</span>                    animationEasing=<span class="stringliteral">&quot;ease-out&quot;</span></div>
+<div class="line"><span class="lineno">  539</span>                  &gt;</div>
+<div class="line"><span class="lineno">  540</span>                    {perPersonData.map((entry, i) =&gt; (</div>
+<div class="line"><span class="lineno">  541</span>                      &lt;Cell</div>
+<div class="line"><span class="lineno">  542</span>                        key={i}</div>
+<div class="line"><span class="lineno">  543</span>                        fill={entry.balance &gt;= 0 ? <span class="stringliteral">&#39;#10b981&#39;</span> : <span class="stringliteral">&#39;#f43f5e&#39;</span>}</div>
+<div class="line"><span class="lineno">  544</span>                        opacity={entry.isYou ? 1 : 0.75}</div>
+<div class="line"><span class="lineno">  545</span>                      /&gt;</div>
+<div class="line"><span class="lineno">  546</span>                    ))}</div>
+<div class="line"><span class="lineno">  547</span>                  &lt;/Bar&gt;</div>
+<div class="line"><span class="lineno">  548</span>                &lt;/BarChart&gt;</div>
+<div class="line"><span class="lineno">  549</span>              &lt;/ResponsiveContainer&gt;</div>
+<div class="line"><span class="lineno">  550</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center gap-4 mt-2 justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  551</span>                &lt;span className=<span class="stringliteral">&quot;flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  552</span>                  &lt;span className=<span class="stringliteral">&quot;w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block&quot;</span> /&gt; Owed money</div>
+<div class="line"><span class="lineno">  553</span>                &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  554</span>                &lt;span className=<span class="stringliteral">&quot;flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  555</span>                  &lt;span className=<span class="stringliteral">&quot;w-2.5 h-2.5 rounded-full bg-rose-500 inline-block&quot;</span> /&gt; Owes money</div>
+<div class="line"><span class="lineno">  556</span>                &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  557</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  558</span>            &lt;/&gt;</div>
+<div class="line"><span class="lineno">  559</span>          )}</div>
+<div class="line"><span class="lineno">  560</span>        &lt;/<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a>&gt;</div>
+<div class="line"><span class="lineno">  561</span> </div>
+<div class="line"><span class="lineno">  562</span>        {<span class="comment">/* ── 5. Who Owes Who ── */</span>}</div>
+<div class="line"><span class="lineno">  563</span>        &lt;<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a> title=<span class="stringliteral">&quot;Who Owes Who&quot;</span> icon={ArrowLeftRight} delay={500}&gt;</div>
+<div class="line"><span class="lineno">  564</span>          {settlements.length === 0 ? (</div>
+<div class="line"><span class="lineno">  565</span>            &lt;p className=<span class="stringliteral">&quot;text-center text-gray-400 text-sm py-8&quot;</span>&gt;All settled up!&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  566</span>          ) : (</div>
+<div class="line"><span class="lineno">  567</span>            &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  568</span>              {settlements.map((s, i) =&gt; {</div>
+<div class="line"><span class="lineno">  569</span>                <span class="keyword">const</span> fromName = (members[s.from] || s.from).split(<span class="charliteral">&#39; &#39;</span>)[0];</div>
+<div class="line"><span class="lineno">  570</span>                <span class="keyword">const</span> toName   = (members[s.to]   || s.to).split(<span class="charliteral">&#39; &#39;</span>)[0];</div>
+<div class="line"><span class="lineno">  571</span>                <span class="keyword">const</span> pct      = Math.min(100, (s.amount / settlements[0].amount) * 100);</div>
+<div class="line"><span class="lineno">  572</span>                <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  573</span>                  &lt;div</div>
+<div class="line"><span class="lineno">  574</span>                    key={i}</div>
+<div class="line"><span class="lineno">  575</span>                    className=<span class="stringliteral">&quot;animate-fade-in&quot;</span></div>
+<div class="line"><span class="lineno">  576</span>                    style={{ animationDelay: `${500 + i * 60}ms`, animationFillMode: <span class="stringliteral">&#39;both&#39;</span> }}</div>
+<div class="line"><span class="lineno">  577</span>                  &gt;</div>
+<div class="line"><span class="lineno">  578</span>                    &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between mb-1.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  579</span>                      &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  580</span>                        {<span class="comment">/* From avatar */</span>}</div>
+<div class="line"><span class="lineno">  581</span>                        &lt;span className=<span class="stringliteral">&quot;w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  582</span>                          {fromName[0]?.toUpperCase()}</div>
+<div class="line"><span class="lineno">  583</span>                        &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  584</span>                        &lt;span className=<span class="stringliteral">&quot;font-medium text-gray-700 dark:text-gray-200&quot;</span>&gt;{fromName}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  585</span>                        &lt;ArrowLeftRight size={13} className=<span class="stringliteral">&quot;text-gray-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  586</span>                        &lt;span className=<span class="stringliteral">&quot;font-medium text-gray-700 dark:text-gray-200&quot;</span>&gt;{toName}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  587</span>                        {<span class="comment">/* To avatar */</span>}</div>
+<div class="line"><span class="lineno">  588</span>                        &lt;span className=<span class="stringliteral">&quot;w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  589</span>                          {toName[0]?.toUpperCase()}</div>
+<div class="line"><span class="lineno">  590</span>                        &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  591</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  592</span>                      &lt;span className=<span class="stringliteral">&quot;font-bold text-gray-800 dark:text-white text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  593</span>                        {<a class="code hl_variable" href="#a603c03323e451eeb9a885156dc25539c">fmt</a>(s.amount, s.currency || activeCurrency || <span class="stringliteral">&#39;&#39;</span>)}</div>
+<div class="line"><span class="lineno">  594</span>                      &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  595</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  596</span>                    {<span class="comment">/* Progress bar */</span>}</div>
+<div class="line"><span class="lineno">  597</span>                    &lt;div className=<span class="stringliteral">&quot;h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  598</span>                      &lt;div</div>
+<div class="line"><span class="lineno">  599</span>                        className=<span class="stringliteral">&quot;h-full bg-gradient-to-r from-rose-400 to-indigo-500 rounded-full transition-all duration-1000&quot;</span></div>
+<div class="line"><span class="lineno">  600</span>                        style={{ width: `${pct}%` }}</div>
+<div class="line"><span class="lineno">  601</span>                      /&gt;</div>
+<div class="line"><span class="lineno">  602</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  603</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  604</span>                );</div>
+<div class="line"><span class="lineno">  605</span>              })}</div>
+<div class="line"><span class="lineno">  606</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  607</span>          )}</div>
+<div class="line"><span class="lineno">  608</span>        &lt;/<a class="code hl_function" href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a>&gt;</div>
+<div class="line"><span class="lineno">  609</span> </div>
+<div class="line"><span class="lineno">  610</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  611</span> </div>
+<div class="line"><span class="lineno">  612</span>      {<span class="comment">/* ── Fade-in animation keyframes ── */</span>}</div>
+<div class="line"><span class="lineno">  613</span>      &lt;style&gt;{`</div>
+<div class="line"><span class="lineno">  614</span>        @keyframes fade-in {</div>
+<div class="line"><span class="lineno">  615</span>          from { opacity: 0; transform: translateY(16px); }</div>
+<div class="line"><span class="lineno">  616</span>          to   { opacity: 1; transform: translateY(0); }</div>
+<div class="line"><span class="lineno">  617</span>        }</div>
+<div class="line"><span class="lineno">  618</span>        .animate-fade-in {</div>
+<div class="line"><span class="lineno">  619</span>          animation: fade-in 0.45s ease-out both;</div>
+<div class="line"><span class="lineno">  620</span>        }</div>
+<div class="line"><span class="lineno">  621</span>      `}&lt;/style&gt;</div>
+<div class="line"><span class="lineno">  622</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  623</span>  );</div>
+<div class="line"><span class="lineno">  624</span>}</div>
+<div class="ttc" id="a_add_expense_modal_8jsx_html_a46a1d9066aac2aa6d7c907c66390c527"><div class="ttname"><a href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a></div><div class="ttdeci">import Tooltip from Tooltip</div><div class="ttdef"><b>Definition</b> <a href="_add_expense_modal_8jsx_source.html#l00008">AddExpenseModal.jsx:8</a></div></div>
+<div class="ttc" id="a_analytics_8jsx_html_a1f7d0cbfe9bdf816b6535bca1321c179"><div class="ttname"><a href="#a1f7d0cbfe9bdf816b6535bca1321c179">monthKey</a></div><div class="ttdeci">function monthKey(ts)</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8jsx_source.html#l00041">Analytics.jsx:41</a></div></div>
+<div class="ttc" id="a_analytics_8jsx_html_a36f204bd605bc954d31b54c5d65f5cc7"><div class="ttname"><a href="#a36f204bd605bc954d31b54c5d65f5cc7">ChartCard</a></div><div class="ttdeci">function ChartCard({ title, icon:Icon, children, delay=0 })</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8jsx_source.html#l00074">Analytics.jsx:74</a></div></div>
+<div class="ttc" id="a_analytics_8jsx_html_a4b2968765a186fe8b2cebf5c80479203"><div class="ttname"><a href="#a4b2968765a186fe8b2cebf5c80479203">MONTHS</a></div><div class="ttdeci">const MONTHS</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8jsx_source.html#l00039">Analytics.jsx:39</a></div></div>
+<div class="ttc" id="a_analytics_8jsx_html_a603c03323e451eeb9a885156dc25539c"><div class="ttname"><a href="#a603c03323e451eeb9a885156dc25539c">fmt</a></div><div class="ttdeci">const fmt</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8jsx_source.html#l00037">Analytics.jsx:37</a></div></div>
+<div class="ttc" id="a_analytics_8jsx_html_a81f51249f48c42e539b0af6a5fdf2c0b"><div class="ttname"><a href="#a81f51249f48c42e539b0af6a5fdf2c0b">CustomTooltip</a></div><div class="ttdeci">function CustomTooltip({ active, payload, label })</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8jsx_source.html#l00048">Analytics.jsx:48</a></div></div>
+<div class="ttc" id="a_analytics_8jsx_html_ac9fcdab887d2b0228b001ded6bb69e54"><div class="ttname"><a href="#ac9fcdab887d2b0228b001ded6bb69e54">CATEGORY_COLORS</a></div><div class="ttdeci">const CATEGORY_COLORS</div><div class="ttdef"><b>Definition</b> <a href="_analytics_8jsx_source.html#l00024">Analytics.jsx:24</a></div></div>
+<div class="ttc" id="a_app_8js_html_aa7b1d8321579f7e582fbebd6b6896563"><div class="ttname"><a href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a></div><div class="ttdeci">import Analytics from pages Analytics</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00014">App.js:14</a></div></div>
+<div class="ttc" id="a_app_8js_html_ad72e9f462127c95003c740935476668b"><div class="ttname"><a href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a></div><div class="ttdeci">import Dashboard from pages Dashboard</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00011">App.js:11</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="abalance_calculator_8js_html_a12d4d92470fb2616edbe37a6b38ae563"><div class="ttname"><a href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a></div><div class="ttdeci">function export calculateBalances(expenses, members)</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00041">balanceCalculator.js:41</a></div></div>
+<div class="ttc" id="abalance_calculator_8js_html_ad9ce0d28e75245a2382760ce60db72b2"><div class="ttname"><a href="balance_calculator_8js.html#ad9ce0d28e75245a2382760ce60db72b2">calculateSettlements</a></div><div class="ttdeci">function export calculateSettlements(balances)</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00085">balanceCalculator.js:85</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a3259366f21a7fc0c2b72a4b024568536"><div class="ttname"><a href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a></div><div class="ttdeci">export const getDocs</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00026">firebaseFirestore.js:26</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a5fdb89ebdc78c2cdcd9653313e89224d"><div class="ttname"><a href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a></div><div class="ttdeci">export const where</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00024">firebaseFirestore.js:24</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a36f204bd605bc954d31b54c5d65f5cc7" name="a36f204bd605bc954d31b54c5d65f5cc7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36f204bd605bc954d31b54c5d65f5cc7">&#9670;&#160;</a></span>ChartCard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function ChartCard </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ title, icon:Icon, children, delay=0 }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00074">74</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   74</span>                   { title, icon: Icon, children, delay = 0 }) {</div>
+<div class="line"><span class="lineno">   75</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   76</span>    &lt;div</div>
+<div class="line"><span class="lineno">   77</span>      className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 animate-fade-in&quot;</span></div>
+<div class="line"><span class="lineno">   78</span>      style={{ animationDelay: `${delay}ms`, animationFillMode: <span class="stringliteral">&#39;both&#39;</span> }}</div>
+<div class="line"><span class="lineno">   79</span>    &gt;</div>
+<div class="line"><span class="lineno">   80</span>      &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   81</span>        &lt;div className=<span class="stringliteral">&quot;w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   82</span>          &lt;Icon size={16} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">   83</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   84</span>        &lt;h2 className=<span class="stringliteral">&quot;text-base font-semibold text-gray-800 dark:text-gray-100&quot;</span>&gt;{title}&lt;/h2&gt;</div>
+<div class="line"><span class="lineno">   85</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   86</span>      {children}</div>
+<div class="line"><span class="lineno">   87</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   88</span>  );</div>
+<div class="line"><span class="lineno">   89</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a81f51249f48c42e539b0af6a5fdf2c0b" name="a81f51249f48c42e539b0af6a5fdf2c0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81f51249f48c42e539b0af6a5fdf2c0b">&#9670;&#160;</a></span>CustomTooltip()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function CustomTooltip </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ active, payload, label }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00048">48</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   48</span>                       { active, payload, label }) {</div>
+<div class="line"><span class="lineno">   49</span>  <span class="keywordflow">if</span> (!active || !payload?.length) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   50</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   51</span>    &lt;div style={{</div>
+<div class="line"><span class="lineno">   52</span>      backgroundColor: <span class="stringliteral">&#39;rgba(15, 23, 42, 0.92)&#39;</span>,</div>
+<div class="line"><span class="lineno">   53</span>      border: <span class="stringliteral">&#39;1px solid rgba(255,255,255,0.1)&#39;</span>,</div>
+<div class="line"><span class="lineno">   54</span>      borderRadius: <span class="stringliteral">&#39;12px&#39;</span>,</div>
+<div class="line"><span class="lineno">   55</span>      padding: <span class="stringliteral">&#39;10px 14px&#39;</span>,</div>
+<div class="line"><span class="lineno">   56</span>      boxShadow: <span class="stringliteral">&#39;0 8px 24px rgba(0,0,0,0.3)&#39;</span>,</div>
+<div class="line"><span class="lineno">   57</span>      fontSize: <span class="stringliteral">&#39;13px&#39;</span>,</div>
+<div class="line"><span class="lineno">   58</span>      backdropFilter: <span class="stringliteral">&#39;blur(8px)&#39;</span>,</div>
+<div class="line"><span class="lineno">   59</span>    }}&gt;</div>
+<div class="line"><span class="lineno">   60</span>      &lt;p style={{ color: <span class="stringliteral">&#39;#f1f5f9&#39;</span>, fontWeight: 600, marginBottom: 4 }}&gt;</div>
+<div class="line"><span class="lineno">   61</span>        {label}</div>
+<div class="line"><span class="lineno">   62</span>      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">   63</span>      {payload.map((p, i) =&gt; (</div>
+<div class="line"><span class="lineno">   64</span>        &lt;p key={i} style={{ color: p.color || <span class="stringliteral">&#39;#94a3b8&#39;</span>, fontWeight: 500 }}&gt;</div>
+<div class="line"><span class="lineno">   65</span>          {p.name}: {<a class="code hl_variable" href="#a603c03323e451eeb9a885156dc25539c">fmt</a>(p.value)}</div>
+<div class="line"><span class="lineno">   66</span>        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">   67</span>      ))}</div>
+<div class="line"><span class="lineno">   68</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   69</span>  );</div>
+<div class="line"><span class="lineno">   70</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1f7d0cbfe9bdf816b6535bca1321c179" name="a1f7d0cbfe9bdf816b6535bca1321c179"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f7d0cbfe9bdf816b6535bca1321c179">&#9670;&#160;</a></span>monthKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function monthKey </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>ts</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00041">41</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   41</span>                      {</div>
+<div class="line"><span class="lineno">   42</span>  <span class="keyword">const</span> d = ts?.toDate ? ts.toDate() : <span class="keyword">new</span> Date(ts);</div>
+<div class="line"><span class="lineno">   43</span>  <span class="keywordflow">return</span> `${<a class="code hl_variable" href="#a4b2968765a186fe8b2cebf5c80479203">MONTHS</a>[d.getMonth()]} ${d.getFullYear()}`;</div>
+<div class="line"><span class="lineno">   44</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="ac9fcdab887d2b0228b001ded6bb69e54" name="ac9fcdab887d2b0228b001ded6bb69e54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9fcdab887d2b0228b001ded6bb69e54">&#9670;&#160;</a></span>CATEGORY_COLORS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> CATEGORY_COLORS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  food:          <span class="stringliteral">&#39;#f59e0b&#39;</span>,</div>
+<div class="line">  transport:     <span class="stringliteral">&#39;#6366f1&#39;</span>,</div>
+<div class="line">  accommodation: <span class="stringliteral">&#39;#10b981&#39;</span>,</div>
+<div class="line">  entertainment: <span class="stringliteral">&#39;#f43f5e&#39;</span>,</div>
+<div class="line">  shopping:      <span class="stringliteral">&#39;#a78bfa&#39;</span>,</div>
+<div class="line">  utilities:     <span class="stringliteral">&#39;#22d3ee&#39;</span>,</div>
+<div class="line">  other:         <span class="stringliteral">&#39;#94a3b8&#39;</span>,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00024">24</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   24</span>                        {</div>
+<div class="line"><span class="lineno">   25</span>  food:          <span class="stringliteral">&#39;#f59e0b&#39;</span>,</div>
+<div class="line"><span class="lineno">   26</span>  transport:     <span class="stringliteral">&#39;#6366f1&#39;</span>,</div>
+<div class="line"><span class="lineno">   27</span>  accommodation: <span class="stringliteral">&#39;#10b981&#39;</span>,</div>
+<div class="line"><span class="lineno">   28</span>  entertainment: <span class="stringliteral">&#39;#f43f5e&#39;</span>,</div>
+<div class="line"><span class="lineno">   29</span>  shopping:      <span class="stringliteral">&#39;#a78bfa&#39;</span>,</div>
+<div class="line"><span class="lineno">   30</span>  utilities:     <span class="stringliteral">&#39;#22d3ee&#39;</span>,</div>
+<div class="line"><span class="lineno">   31</span>  other:         <span class="stringliteral">&#39;#94a3b8&#39;</span>,</div>
+<div class="line"><span class="lineno">   32</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a603c03323e451eeb9a885156dc25539c" name="a603c03323e451eeb9a885156dc25539c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a603c03323e451eeb9a885156dc25539c">&#9670;&#160;</a></span>fmt</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> fmt = (n, currency = '') =&gt; currency ? `${currency} ${Number(n).toFixed(2)}` : Number(n).toFixed(2)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00037">37</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   37</span>{currency} ${Number(n).toFixed(2)}` : Number(n).toFixed(2);</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect, useMemo } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00006">6</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    6</span>{ useState, useEffect, useMemo } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4b2968765a186fe8b2cebf5c80479203" name="a4b2968765a186fe8b2cebf5c80479203"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b2968765a186fe8b2cebf5c80479203">&#9670;&#160;</a></span>MONTHS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_analytics_8jsx_source.html#l00039">39</a> of file <a class="el" href="_analytics_8jsx_source.html">Analytics.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

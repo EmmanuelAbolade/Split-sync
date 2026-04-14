@@ -106,35 +106,36 @@ $(function(){initNavTree('_tooltip_8jsx_source.html',''); initResizable(true); }
   <div class="headertitle"><div class="title">Tooltip.jsx</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_tooltip_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/components/Tooltip.jsx</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { useState } from &#39;react&#39;;</div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>import { Info } from &#39;lucide-react&#39;;</div>
+<a href="_tooltip_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/components/Tooltip.jsx</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="_tooltip_8jsx.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { useState } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">import</span> { Info } from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>export default function Tooltip({ text, children }) {</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  const [isVisible, setIsVisible] = useState(false);</div>
+<div class="foldopen" id="foldopen00005" data-start="{" data-end="}">
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno"><a class="line" href="_tooltip_8jsx.html#a5834cea737713d323e33c2d9c23b7e15">    5</a></span>export <span class="keywordflow">default</span> <span class="keyword">function</span> <a class="code hl_variable" href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a>({ text, children }) {</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  <span class="keyword">const</span> [isVisible, setIsVisible] = useState(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  return (</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    &lt;div className=&quot;relative inline-block&quot;&gt;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    &lt;div className=<span class="stringliteral">&quot;relative inline-block&quot;</span>&gt;</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>      &lt;button</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        type=&quot;button&quot;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        onMouseEnter={() =&gt; setIsVisible(true)}</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        onMouseLeave={() =&gt; setIsVisible(false)}</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        onMouseEnter={() =&gt; setIsVisible(<span class="keyword">true</span>)}</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        onMouseLeave={() =&gt; setIsVisible(<span class="keyword">false</span>)}</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        onClick={(e) =&gt; {</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>          e.preventDefault();</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>          setIsVisible(!isVisible);</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        }}</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        className=&quot;ml-1 text-gray-400 hover:text-primary transition&quot;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        className=<span class="stringliteral">&quot;ml-1 text-gray-400 hover:text-primary transition&quot;</span></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>      &gt;</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        {children || &lt;Info size={16} /&gt;}</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>      &lt;/button&gt;</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>      </div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      {isVisible &amp;&amp; (</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        &lt;div className=&quot;absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 animate-scale-in&quot;&gt;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>          &lt;div className=&quot;bg-gray-900 text-white text-sm rounded-lg p-3 shadow-lg&quot;&gt;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        &lt;div className=<span class="stringliteral">&quot;absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>          &lt;div className=<span class="stringliteral">&quot;bg-gray-900 text-white text-sm rounded-lg p-3 shadow-lg&quot;</span>&gt;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>            {text}</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>            {/* Arrow */}</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            &lt;div className=&quot;absolute top-full left-1/2 -translate-x-1/2 -mt-1&quot;&gt;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>              &lt;div className=&quot;border-8 border-transparent border-t-gray-900&quot;&gt;&lt;/div&gt;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>            {<span class="comment">/* Arrow */</span>}</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            &lt;div className=<span class="stringliteral">&quot;absolute top-full left-1/2 -translate-x-1/2 -mt-1&quot;</span>&gt;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>              &lt;div className=<span class="stringliteral">&quot;border-8 border-transparent border-t-gray-900&quot;</span>&gt;&lt;/div&gt;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            &lt;/div&gt;</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>          &lt;/div&gt;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        &lt;/div&gt;</div>
@@ -142,6 +143,8 @@ $(function(){initNavTree('_tooltip_8jsx_source.html',''); initResizable(true); }
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    &lt;/div&gt;</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  );</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>}</div>
+</div>
+<div class="ttc" id="a_add_expense_modal_8jsx_html_a46a1d9066aac2aa6d7c907c66390c527"><div class="ttname"><a href="_add_expense_modal_8jsx.html#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a></div><div class="ttdeci">import Tooltip from Tooltip</div><div class="ttdef"><b>Definition</b> <a href="_add_expense_modal_8jsx_source.html#l00008">AddExpenseModal.jsx:8</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

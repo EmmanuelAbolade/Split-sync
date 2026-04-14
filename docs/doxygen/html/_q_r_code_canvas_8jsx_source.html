@@ -106,15 +106,16 @@ $(function(){initNavTree('_q_r_code_canvas_8jsx_source.html',''); initResizable(
   <div class="headertitle"><div class="title">QRCodeCanvas.jsx</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_q_r_code_canvas_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/components/QRCodeCanvas.jsx</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { useEffect, useRef } from &#39;react&#39;;</div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>import QRCode from &#39;qrcode&#39;;</div>
+<a href="_q_r_code_canvas_8jsx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/components/QRCodeCanvas.jsx</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="_q_r_code_canvas_8jsx.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { useEffect, useRef } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno"><a class="line" href="_q_r_code_canvas_8jsx.html#a88ddda64d9ed4e1b473e37ac1fb23807">    3</a></span><span class="keyword">import</span> QRCode from <span class="stringliteral">&#39;qrcode&#39;</span>;</div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>export default function QRCodeCanvas({ value, size = 200 }) {</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  const canvasRef = useRef(null);</div>
+<div class="foldopen" id="foldopen00005" data-start="{" data-end="}">
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno"><a class="line" href="_q_r_code_canvas_8jsx.html#a1f46dfc196cd0869d32b3ca32fa8153e">    5</a></span>export <span class="keywordflow">default</span> <span class="keyword">function</span> <a class="code hl_variable" href="_q_r_code_canvas_8test_8jsx.html#a887c8dd2d2acad902492459c02234474">QRCodeCanvas</a>({ value, size = 200 }) {</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>  <span class="keyword">const</span> canvasRef = useRef(<span class="keyword">null</span>);</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>  useEffect(() =&gt; {</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    if (canvasRef.current &amp;&amp; value) {</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    <span class="keywordflow">if</span> (canvasRef.current &amp;&amp; value) {</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>      QRCode.toCanvas(</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        canvasRef.current,</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        value,</div>
@@ -122,23 +123,25 @@ $(function(){initNavTree('_q_r_code_canvas_8jsx_source.html',''); initResizable(
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>          width: size,</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>          margin: 2,</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>          color: {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>            dark: &#39;#3B82F6&#39;, // Primary blue</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            light: &#39;#FFFFFF&#39;, // White</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>            dark: <span class="stringliteral">&#39;#3B82F6&#39;</span>, <span class="comment">// Primary blue</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            light: <span class="stringliteral">&#39;#FFFFFF&#39;</span>, <span class="comment">// White</span></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>          },</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        },</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        (error) =&gt; {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>          if (error) console.error(&#39;QR Code generation failed:&#39;, error);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>          <span class="keywordflow">if</span> (error) console.error(<span class="stringliteral">&#39;QR Code generation failed:&#39;</span>, error);</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        }</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>      );</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    }</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  }, [value, size]);</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  return (</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    &lt;div className=&quot;inline-block bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm dark:shadow-gray-900/50&quot;&gt;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    &lt;div className=<span class="stringliteral">&quot;inline-block bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm dark:shadow-gray-900/50&quot;</span>&gt;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      &lt;canvas ref={canvasRef} /&gt;</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    &lt;/div&gt;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  );</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>}</div>
+</div>
+<div class="ttc" id="a_q_r_code_canvas_8test_8jsx_html_a887c8dd2d2acad902492459c02234474"><div class="ttname"><a href="_q_r_code_canvas_8test_8jsx.html#a887c8dd2d2acad902492459c02234474">QRCodeCanvas</a></div><div class="ttdeci">import QRCodeCanvas from QRCodeCanvas</div><div class="ttdef"><b>Definition</b> <a href="_q_r_code_canvas_8test_8jsx_source.html#l00007">QRCodeCanvas.test.jsx:7</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

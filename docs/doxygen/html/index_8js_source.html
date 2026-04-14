@@ -106,34 +106,39 @@ $(function(){initNavTree('index_8js_source.html',''); initResizable(true); });
   <div class="headertitle"><div class="title">index.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="index_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/index.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import React from &#39;react&#39;;</div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>import ReactDOM from &#39;react-dom/client&#39;;</div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>import &#39;./index.css&#39;;</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>import App from &#39;./App&#39;;</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>import reportWebVitals from &#39;./reportWebVitals&#39;;</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>import { PayPalScriptProvider } from &#39;@paypal/react-paypal-js&#39;;</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>import { DarkModeProvider } from &#39;./contexts/DarkModeContext&#39;;</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>import * as serviceWorkerRegistration from &#39;./serviceWorkerRegistration&#39;;</div>
+<a href="index_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/index.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="index_8js.html#aaed10feaf2dda4314d93c83408affea1">    2</a></span><span class="keyword">import</span> React from <span class="stringliteral">&#39;react&#39;</span>;</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno"><a class="line" href="index_8js.html#af894263ecdedf097ffb82cca6444c287">    3</a></span><span class="keyword">import</span> ReactDOM from <span class="stringliteral">&#39;react-dom/client&#39;</span>;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="index_8js.html#a39ce074942a931b6249205e207cb8af2">    4</a></span><span class="keyword">import</span> <span class="stringliteral">&#39;./index.css&#39;</span>;</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno"><a class="line" href="index_8js.html#ae00ecbae69e5fdd2da4bce4c56bde9b8">    5</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a> from <span class="stringliteral">&#39;./App&#39;</span>;</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="index_8js.html#aae0f7bc0c23931e0301d0de7ac863a55">    6</a></span><span class="keyword">import</span> <a class="code hl_variable" href="index_8js.html#aae0f7bc0c23931e0301d0de7ac863a55">reportWebVitals</a> from <span class="stringliteral">&#39;./reportWebVitals&#39;</span>;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="index_8js.html#a59be084da8908b7d77ff34b25cd84488">    7</a></span><span class="keyword">import</span> { PayPalScriptProvider } from <span class="stringliteral">&#39;@paypal/react-paypal-js&#39;</span>;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">import</span> { <a class="code hl_function" href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">DarkModeProvider</a> } from <span class="stringliteral">&#39;./contexts/DarkModeContext&#39;</span>;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="index_8js.html#ae047f36f42ae1e61448afd4c937ba3fc">    9</a></span><span class="keyword">import</span> * as <a class="code hl_variable" href="index_8js.html#ae047f36f42ae1e61448afd4c937ba3fc">serviceWorkerRegistration</a> from <span class="stringliteral">&#39;./serviceWorkerRegistration&#39;</span>;</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>const root = ReactDOM.createRoot(document.getElementById(&#39;root&#39;));</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>root.render(</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="index_8js.html#a7f9af059d5709ec492c54f245cb1da99">   11</a></span><span class="keyword">const</span> <a class="code hl_variable" href="index_8js.html#a7f9af059d5709ec492c54f245cb1da99">root</a> = ReactDOM.createRoot(document.getElementById(<span class="stringliteral">&#39;root&#39;</span>));</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><a class="code hl_variable" href="index_8js.html#a7f9af059d5709ec492c54f245cb1da99">root</a>.render(</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  &lt;React.StrictMode&gt;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    &lt;DarkModeProvider&gt;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    &lt;<a class="code hl_function" href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">DarkModeProvider</a>&gt;</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>      &lt;PayPalScriptProvider</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        options={{</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>          clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>          currency: &quot;EUR&quot;,</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>          intent: &quot;capture&quot;,</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>          currency: <span class="stringliteral">&quot;EUR&quot;</span>,</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>          intent: <span class="stringliteral">&quot;capture&quot;</span>,</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        }}</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>      &gt;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        &lt;App /&gt;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        &lt;<a class="code hl_variable" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a> /&gt;</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      &lt;/PayPalScriptProvider&gt;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    &lt;/DarkModeProvider&gt;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    &lt;/<a class="code hl_function" href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">DarkModeProvider</a>&gt;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  &lt;/React.StrictMode&gt;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>);</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>reportWebVitals();</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>serviceWorkerRegistration.register();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><a class="code hl_variable" href="index_8js.html#aae0f7bc0c23931e0301d0de7ac863a55">reportWebVitals</a>();</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><a class="code hl_variable" href="index_8js.html#ae047f36f42ae1e61448afd4c937ba3fc">serviceWorkerRegistration</a>.register();</div>
+<div class="ttc" id="a_app_8js_html_ae0d191b66cbd429e8c16cc4a4b87a81c"><div class="ttname"><a href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a></div><div class="ttdeci">export default App</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00221">App.js:221</a></div></div>
+<div class="ttc" id="a_dark_mode_context_8jsx_html_a433e9ef42bbce1132a17b71f286fdd39"><div class="ttname"><a href="_dark_mode_context_8jsx.html#a433e9ef42bbce1132a17b71f286fdd39">DarkModeProvider</a></div><div class="ttdeci">function export DarkModeProvider({ children })</div><div class="ttdef"><b>Definition</b> <a href="_dark_mode_context_8jsx_source.html#l00014">DarkModeContext.jsx:14</a></div></div>
+<div class="ttc" id="aindex_8js_html_a7f9af059d5709ec492c54f245cb1da99"><div class="ttname"><a href="index_8js.html#a7f9af059d5709ec492c54f245cb1da99">root</a></div><div class="ttdeci">const root</div><div class="ttdef"><b>Definition</b> <a href="#l00011">index.js:11</a></div></div>
+<div class="ttc" id="aindex_8js_html_aae0f7bc0c23931e0301d0de7ac863a55"><div class="ttname"><a href="index_8js.html#aae0f7bc0c23931e0301d0de7ac863a55">reportWebVitals</a></div><div class="ttdeci">import reportWebVitals from reportWebVitals</div><div class="ttdef"><b>Definition</b> <a href="#l00006">index.js:6</a></div></div>
+<div class="ttc" id="aindex_8js_html_ae047f36f42ae1e61448afd4c937ba3fc"><div class="ttname"><a href="index_8js.html#ae047f36f42ae1e61448afd4c937ba3fc">serviceWorkerRegistration</a></div><div class="ttdeci">import *as serviceWorkerRegistration from serviceWorkerRegistration</div><div class="ttdef"><b>Definition</b> <a href="#l00009">index.js:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -103,11 +103,906 @@ $(function(){initNavTree('_dashboard_8jsx.html',''); initResizable(true); });
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Dashboard.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_dashboard_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a977aaef7bfda1956e3fc149422104eab" id="r_a977aaef7bfda1956e3fc149422104eab"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a977aaef7bfda1956e3fc149422104eab">getIconComponent</a> (iconName)</td></tr>
+<tr class="separator:a977aaef7bfda1956e3fc149422104eab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7012bb91b5e340d5cbee779d41ed3aa8" id="r_a7012bb91b5e340d5cbee779d41ed3aa8"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7012bb91b5e340d5cbee779d41ed3aa8">CyclingTagline</a> ()</td></tr>
+<tr class="separator:a7012bb91b5e340d5cbee779d41ed3aa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5a5c715740b5fb868d3eefaeb029b0a" id="r_ac5a5c715740b5fb868d3eefaeb029b0a"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5a5c715740b5fb868d3eefaeb029b0a">Dashboard</a> ()</td></tr>
+<tr class="separator:ac5a5c715740b5fb868d3eefaeb029b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect, useMemo } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8990d7c1fb035cc2476b85455fd69a7a" id="r_a8990d7c1fb035cc2476b85455fd69a7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> CreateGroupModal from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8990d7c1fb035cc2476b85455fd69a7a">CreateGroupModal</a></td></tr>
+<tr class="separator:a8990d7c1fb035cc2476b85455fd69a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3168309fd6f896d6de2aa1523d92a4f0" id="r_a3168309fd6f896d6de2aa1523d92a4f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> InvitationNotification from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3168309fd6f896d6de2aa1523d92a4f0">InvitationNotification</a></td></tr>
+<tr class="separator:a3168309fd6f896d6de2aa1523d92a4f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc04649e300f5441213265f6a6be4235" id="r_adc04649e300f5441213265f6a6be4235"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> OnboardingWizard from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc04649e300f5441213265f6a6be4235">OnboardingWizard</a></td></tr>
+<tr class="separator:adc04649e300f5441213265f6a6be4235"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a140b7900f5e6cb44d64d4fcaca490003" id="r_a140b7900f5e6cb44d64d4fcaca490003"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> NotificationsDropdown from components&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a140b7900f5e6cb44d64d4fcaca490003">NotificationsDropdown</a></td></tr>
+<tr class="separator:a140b7900f5e6cb44d64d4fcaca490003"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb029c5cb6de8974ef87bd2be7ffa11b" id="r_abb029c5cb6de8974ef87bd2be7ffa11b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb029c5cb6de8974ef87bd2be7ffa11b">ICON_MAP</a></td></tr>
+<tr class="separator:abb029c5cb6de8974ef87bd2be7ffa11b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7d027df6e01a55c0a1f21c78f3bbd3e" id="r_aa7d027df6e01a55c0a1f21c78f3bbd3e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7d027df6e01a55c0a1f21c78f3bbd3e">TAGLINES</a></td></tr>
+<tr class="separator:aa7d027df6e01a55c0a1f21c78f3bbd3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a7012bb91b5e340d5cbee779d41ed3aa8" name="a7012bb91b5e340d5cbee779d41ed3aa8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7012bb91b5e340d5cbee779d41ed3aa8">&#9670;&#160;</a></span>CyclingTagline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function CyclingTagline </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00052">52</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   52</span>                          {</div>
+<div class="line"><span class="lineno">   53</span>  <span class="keyword">const</span> [index,   setIndex]   = useState(0);</div>
+<div class="line"><span class="lineno">   54</span>  <span class="keyword">const</span> [visible, setVisible] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   55</span> </div>
+<div class="line"><span class="lineno">   56</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   57</span>    <span class="keyword">const</span> interval = setInterval(() =&gt; {</div>
+<div class="line"><span class="lineno">   58</span>      <span class="comment">// Fade out</span></div>
+<div class="line"><span class="lineno">   59</span>      setVisible(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   60</span>      setTimeout(() =&gt; {</div>
+<div class="line"><span class="lineno">   61</span>        <span class="comment">// Swap text then fade back in</span></div>
+<div class="line"><span class="lineno">   62</span>        setIndex(prev =&gt; (prev + 1) % <a class="code hl_variable" href="#aa7d027df6e01a55c0a1f21c78f3bbd3e">TAGLINES</a>.length);</div>
+<div class="line"><span class="lineno">   63</span>        setVisible(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   64</span>      }, 400);</div>
+<div class="line"><span class="lineno">   65</span>    }, 4000);</div>
+<div class="line"><span class="lineno">   66</span>    <span class="keywordflow">return</span> () =&gt; clearInterval(interval);</div>
+<div class="line"><span class="lineno">   67</span>  }, []);</div>
+<div class="line"><span class="lineno">   68</span> </div>
+<div class="line"><span class="lineno">   69</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   70</span>    &lt;p</div>
+<div class="line"><span class="lineno">   71</span>      className=<span class="stringliteral">&quot;text-xs font-medium tracking-wide text-indigo-400 dark:text-indigo-500 mb-1 mt-0.5&quot;</span></div>
+<div class="line"><span class="lineno">   72</span>      style={{</div>
+<div class="line"><span class="lineno">   73</span>        opacity:    visible ? 1 : 0,</div>
+<div class="line"><span class="lineno">   74</span>        transition: <span class="stringliteral">&#39;opacity 400ms ease-in-out&#39;</span>,</div>
+<div class="line"><span class="lineno">   75</span>        minHeight:  <span class="stringliteral">&#39;1.2rem&#39;</span>,</div>
+<div class="line"><span class="lineno">   76</span>      }}</div>
+<div class="line"><span class="lineno">   77</span>    &gt;</div>
+<div class="line"><span class="lineno">   78</span>      {<a class="code hl_variable" href="#aa7d027df6e01a55c0a1f21c78f3bbd3e">TAGLINES</a>[index]}</div>
+<div class="line"><span class="lineno">   79</span>    &lt;/p&gt;</div>
+<div class="line"><span class="lineno">   80</span>  );</div>
+<div class="line"><span class="lineno">   81</span>}</div>
+<div class="ttc" id="a_dashboard_8jsx_html_aa7d027df6e01a55c0a1f21c78f3bbd3e"><div class="ttname"><a href="#aa7d027df6e01a55c0a1f21c78f3bbd3e">TAGLINES</a></div><div class="ttdeci">const TAGLINES</div><div class="ttdef"><b>Definition</b> <a href="_dashboard_8jsx_source.html#l00044">Dashboard.jsx:44</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ac5a5c715740b5fb868d3eefaeb029b0a" name="ac5a5c715740b5fb868d3eefaeb029b0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5a5c715740b5fb868d3eefaeb029b0a">&#9670;&#160;</a></span>Dashboard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default Dashboard </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00083">83</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   83</span>                                    {</div>
+<div class="line"><span class="lineno">   84</span>  <span class="keyword">const</span> { user, logout } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><span class="lineno">   85</span>  <span class="keyword">const</span> [userData, setUserData] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   86</span>  <span class="keyword">const</span> navigate = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">   87</span>  <span class="keyword">const</span> [hasPayment, setHasPayment] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   88</span> </div>
+<div class="line"><span class="lineno">   89</span>  <span class="keyword">const</span> [groups, setGroups] = useState([]);</div>
+<div class="line"><span class="lineno">   90</span>  <span class="keyword">const</span> [loading, setLoading] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">   91</span>  <span class="keyword">const</span> [showCreateModal, setShowCreateModal] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   92</span>  <span class="keyword">const</span> [showOnboarding, setShowOnboarding] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   93</span>  <span class="keyword">const</span> [groupBalances, setGroupBalances] = useState({}); <span class="comment">// groupId -&gt; { status, amount, currency }</span></div>
+<div class="line"><span class="lineno">   94</span>  <span class="keyword">const</span> [pendingConfirmation, setPendingConfirmation] = useState(<span class="keyword">null</span>); <span class="comment">// first pending payment notification</span></div>
+<div class="line"><span class="lineno">   95</span>  <span class="keyword">const</span> [isAdmin, setIsAdmin] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   96</span> </div>
+<div class="line"><span class="lineno">   97</span>  <span class="comment">// Notifications state</span></div>
+<div class="line"><span class="lineno">   98</span>  <span class="keyword">const</span> [showNotifications, setShowNotifications] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   99</span>  <span class="keyword">const</span> { unreadCount, notifications } = <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a>();</div>
+<div class="line"><span class="lineno">  100</span> </div>
+<div class="line"><span class="lineno">  101</span>  <span class="comment">// First pending payment confirmation for the banner</span></div>
+<div class="line"><span class="lineno">  102</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  103</span>    <span class="keyword">const</span> pending = notifications.find(</div>
+<div class="line"><span class="lineno">  104</span>      n =&gt; n.type === <span class="stringliteral">&#39;payment_confirmation_needed&#39;</span> &amp;&amp; n.requiresAction &amp;&amp; !n.read</div>
+<div class="line"><span class="lineno">  105</span>    );</div>
+<div class="line"><span class="lineno">  106</span>    setPendingConfirmation(pending || <span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  107</span>  }, [notifications]);</div>
+<div class="line"><span class="lineno">  108</span> </div>
+<div class="line"><span class="lineno">  109</span>  <span class="comment">// Aggregate totals across all groups</span></div>
+<div class="line"><span class="lineno">  110</span>  <span class="keyword">const</span> overviewStats = useMemo(() =&gt; {</div>
+<div class="line"><span class="lineno">  111</span>    let totalOwe = {};</div>
+<div class="line"><span class="lineno">  112</span>    let totalOwed = {};</div>
+<div class="line"><span class="lineno">  113</span>    let oweCount = 0;</div>
+<div class="line"><span class="lineno">  114</span>    let owedCount = 0;</div>
+<div class="line"><span class="lineno">  115</span>    let highestDebt = <span class="keyword">null</span>; <span class="comment">// { amount, currency, groupId, groupName }</span></div>
+<div class="line"><span class="lineno">  116</span> </div>
+<div class="line"><span class="lineno">  117</span>    Object.entries(groupBalances).forEach(([groupId, bal]) =&gt; {</div>
+<div class="line"><span class="lineno">  118</span>      <span class="keywordflow">if</span> (bal.status === <span class="stringliteral">&#39;owes&#39;</span>) {</div>
+<div class="line"><span class="lineno">  119</span>        totalOwe[bal.currency] = (totalOwe[bal.currency] || 0) + bal.amount;</div>
+<div class="line"><span class="lineno">  120</span>        oweCount++;</div>
+<div class="line"><span class="lineno">  121</span>        <span class="comment">// Track the single highest debt for the settlement suggestion</span></div>
+<div class="line"><span class="lineno">  122</span>        <span class="keywordflow">if</span> (!highestDebt || bal.amount &gt; highestDebt.amount) {</div>
+<div class="line"><span class="lineno">  123</span>          <span class="keyword">const</span> group = groups.find(g =&gt; g.id === groupId);</div>
+<div class="line"><span class="lineno">  124</span>          highestDebt = {</div>
+<div class="line"><span class="lineno">  125</span>            amount: bal.amount,</div>
+<div class="line"><span class="lineno">  126</span>            currency: bal.currency,</div>
+<div class="line"><span class="lineno">  127</span>            groupId,</div>
+<div class="line"><span class="lineno">  128</span>            groupName: group?.name || <span class="stringliteral">&#39;&#39;</span>,</div>
+<div class="line"><span class="lineno">  129</span>          };</div>
+<div class="line"><span class="lineno">  130</span>        }</div>
+<div class="line"><span class="lineno">  131</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (bal.status === <span class="stringliteral">&#39;owed&#39;</span>) {</div>
+<div class="line"><span class="lineno">  132</span>        totalOwed[bal.currency] = (totalOwed[bal.currency] || 0) + bal.amount;</div>
+<div class="line"><span class="lineno">  133</span>        owedCount++;</div>
+<div class="line"><span class="lineno">  134</span>      }</div>
+<div class="line"><span class="lineno">  135</span>    });</div>
+<div class="line"><span class="lineno">  136</span> </div>
+<div class="line"><span class="lineno">  137</span>    <span class="keywordflow">return</span> { totalOwe, totalOwed, oweCount, owedCount, highestDebt };</div>
+<div class="line"><span class="lineno">  138</span>  }, [groupBalances, groups]);</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  141</span>    <span class="keyword">const</span> checkAdmin = async () =&gt; {</div>
+<div class="line"><span class="lineno">  142</span>      <span class="keywordflow">if</span> (!<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>.currentUser) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  143</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  144</span>        <span class="keyword">const</span> token = await <a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>.currentUser.getIdTokenResult(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  145</span>        setIsAdmin(token.claims.admin === <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  146</span>      } <span class="keywordflow">catch</span> {</div>
+<div class="line"><span class="lineno">  147</span>        setIsAdmin(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  148</span>      }</div>
+<div class="line"><span class="lineno">  149</span>    };</div>
+<div class="line"><span class="lineno">  150</span>    checkAdmin();</div>
+<div class="line"><span class="lineno">  151</span>  }, []);</div>
+<div class="line"><span class="lineno">  152</span> </div>
+<div class="line"><span class="lineno">  153</span>  <span class="comment">// Fetch user data</span></div>
+<div class="line"><span class="lineno">  154</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  155</span>    <span class="keyword">const</span> fetchUserData = async () =&gt; {</div>
+<div class="line"><span class="lineno">  156</span>      <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  157</span>      </div>
+<div class="line"><span class="lineno">  158</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  159</span>        <span class="keyword">const</span> userDoc = await <a class="code hl_variable" href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;users&#39;</span>, user.uid));</div>
+<div class="line"><span class="lineno">  160</span>        <span class="keywordflow">if</span> (userDoc.exists()) {</div>
+<div class="line"><span class="lineno">  161</span>          <span class="keyword">const</span> data = userDoc.data();</div>
+<div class="line"><span class="lineno">  162</span>          setUserData(data);</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>          <span class="comment">// Check if user has at least one payment method</span></div>
+<div class="line"><span class="lineno">  165</span>          <span class="keyword">const</span> pm = data?.paymentMethods;</div>
+<div class="line"><span class="lineno">  166</span>          <span class="keyword">const</span> hasPayment =</div>
+<div class="line"><span class="lineno">  167</span>            !!pm?.paypalUsername || !!pm?.revolutUsername || !!pm?.encryptedIBAN;</div>
+<div class="line"><span class="lineno">  168</span> </div>
+<div class="line"><span class="lineno">  169</span>          setHasPayment(hasPayment);</div>
+<div class="line"><span class="lineno">  170</span> </div>
+<div class="line"><span class="lineno">  171</span> </div>
+<div class="line"><span class="lineno">  172</span>          <span class="comment">// If first login, show onboarding wizard</span></div>
+<div class="line"><span class="lineno">  173</span>          <span class="keywordflow">if</span> (data.isFirstLogin) {</div>
+<div class="line"><span class="lineno">  174</span>            setShowOnboarding(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  175</span>          }</div>
+<div class="line"><span class="lineno">  176</span> </div>
+<div class="line"><span class="lineno">  177</span>          <span class="comment">// Reopen wizard if triggered from Settings</span></div>
+<div class="line"><span class="lineno">  178</span>          <span class="keyword">const</span> shouldReopen = localStorage.getItem(<span class="stringliteral">&#39;splitsync_reopen_wizard&#39;</span>);</div>
+<div class="line"><span class="lineno">  179</span>          <span class="keywordflow">if</span> (shouldReopen) {</div>
+<div class="line"><span class="lineno">  180</span>            localStorage.removeItem(<span class="stringliteral">&#39;splitsync_reopen_wizard&#39;</span>);</div>
+<div class="line"><span class="lineno">  181</span>            setShowOnboarding(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  182</span>          }</div>
+<div class="line"><span class="lineno">  183</span> </div>
+<div class="line"><span class="lineno">  184</span>          </div>
+<div class="line"><span class="lineno">  185</span>          <span class="comment">// Mark first login as complete</span></div>
+<div class="line"><span class="lineno">  186</span>          <span class="keywordflow">if</span> (data.isFirstLogin) {</div>
+<div class="line"><span class="lineno">  187</span>            await <a class="code hl_variable" href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;users&#39;</span>, user.uid), {</div>
+<div class="line"><span class="lineno">  188</span>              isFirstLogin: false,</div>
+<div class="line"><span class="lineno">  189</span>              lastLoginAt: new Date(),</div>
+<div class="line"><span class="lineno">  190</span>            });</div>
+<div class="line"><span class="lineno">  191</span>          }</div>
+<div class="line"><span class="lineno">  192</span>        }</div>
+<div class="line"><span class="lineno">  193</span>      } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  194</span>        console.error(<span class="stringliteral">&#39;Error fetching user data:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  195</span>      }</div>
+<div class="line"><span class="lineno">  196</span>    };</div>
+<div class="line"><span class="lineno">  197</span>    </div>
+<div class="line"><span class="lineno">  198</span>    fetchUserData();</div>
+<div class="line"><span class="lineno">  199</span>  }, [user]);</div>
+<div class="line"><span class="lineno">  200</span>  </div>
+<div class="line"><span class="lineno">  201</span>  </div>
+<div class="line"><span class="lineno">  202</span>  <span class="comment">// Fetch user&#39;s groups in real-time and calculate balances</span></div>
+<div class="line"><span class="lineno">  203</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  204</span>    <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  205</span> </div>
+<div class="line"><span class="lineno">  206</span>    <span class="keyword">const</span> groupsQuery = <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(</div>
+<div class="line"><span class="lineno">  207</span>      <a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;groups&#39;</span>),</div>
+<div class="line"><span class="lineno">  208</span>      <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;memberIds&#39;</span>, <span class="stringliteral">&#39;array-contains&#39;</span>, user.uid)</div>
+<div class="line"><span class="lineno">  209</span>    );</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>    <span class="keyword">const</span> unsubscribe = <a class="code hl_variable" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a>(groupsQuery, async (snapshot) =&gt; {</div>
+<div class="line"><span class="lineno">  212</span>      <span class="keyword">const</span> groupsData = snapshot.docs.map(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a> =&gt; ({</div>
+<div class="line"><span class="lineno">  213</span>        id: <a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>.id,</div>
+<div class="line"><span class="lineno">  214</span>        ...doc.data(),</div>
+<div class="line"><span class="lineno">  215</span>      }));</div>
+<div class="line"><span class="lineno">  216</span>      setGroups(groupsData);</div>
+<div class="line"><span class="lineno">  217</span> </div>
+<div class="line"><span class="lineno">  218</span>      <span class="comment">// Fetch expenses for each group and calculate user balance</span></div>
+<div class="line"><span class="lineno">  219</span>      <span class="keyword">const</span> balanceMap = {};</div>
+<div class="line"><span class="lineno">  220</span>      await Promise.all(</div>
+<div class="line"><span class="lineno">  221</span>        groupsData.map(async (group) =&gt; {</div>
+<div class="line"><span class="lineno">  222</span>          <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  223</span>            <span class="keyword">const</span> expSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(</div>
+<div class="line"><span class="lineno">  224</span>              <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>), <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;groupId&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, group.id))</div>
+<div class="line"><span class="lineno">  225</span>            );</div>
+<div class="line"><span class="lineno">  226</span>            <span class="keyword">const</span> expenses = expSnap.docs.map(d =&gt; ({ id: d.id, ...d.data() }));</div>
+<div class="line"><span class="lineno">  227</span>            <span class="keyword">const</span> balances = <a class="code hl_function" href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a>(expenses, group.members || []);</div>
+<div class="line"><span class="lineno">  228</span>            <span class="keyword">const</span> summary = <a class="code hl_function" href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a>(balances, user.uid, group.members || []);</div>
+<div class="line"><span class="lineno">  229</span>            balanceMap[group.id] = {</div>
+<div class="line"><span class="lineno">  230</span>              status: summary.status,</div>
+<div class="line"><span class="lineno">  231</span>              amount: summary.amount,</div>
+<div class="line"><span class="lineno">  232</span>              currency: group.currency,</div>
+<div class="line"><span class="lineno">  233</span>            };</div>
+<div class="line"><span class="lineno">  234</span>          } <span class="keywordflow">catch</span> (e) {</div>
+<div class="line"><span class="lineno">  235</span>            console.error(<span class="stringliteral">&#39;[Dashboard] balance fetch error&#39;</span>, group.id, e);</div>
+<div class="line"><span class="lineno">  236</span>          }</div>
+<div class="line"><span class="lineno">  237</span>        })</div>
+<div class="line"><span class="lineno">  238</span>      );</div>
+<div class="line"><span class="lineno">  239</span>      setGroupBalances(balanceMap);</div>
+<div class="line"><span class="lineno">  240</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  241</span>    }, (error) =&gt; {</div>
+<div class="line"><span class="lineno">  242</span>      console.error(<span class="stringliteral">&#39;Error fetching groups:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">  243</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  244</span>    });</div>
+<div class="line"><span class="lineno">  245</span> </div>
+<div class="line"><span class="lineno">  246</span>    <span class="keywordflow">return</span> () =&gt; unsubscribe();</div>
+<div class="line"><span class="lineno">  247</span>  }, [user]);</div>
+<div class="line"><span class="lineno">  248</span> </div>
+<div class="line"><span class="lineno">  249</span>  <span class="keyword">const</span> handleLogout = async () =&gt; {</div>
+<div class="line"><span class="lineno">  250</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  251</span>      await <a class="code hl_variable" href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">signOut</a>(<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>);</div>
+<div class="line"><span class="lineno">  252</span>      logout();</div>
+<div class="line"><span class="lineno">  253</span>      navigate(<span class="stringliteral">&#39;/login&#39;</span>);</div>
+<div class="line"><span class="lineno">  254</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  255</span>      console.error(<span class="stringliteral">&#39;Logout error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  256</span>    }</div>
+<div class="line"><span class="lineno">  257</span>  };</div>
+<div class="line"><span class="lineno">  258</span> </div>
+<div class="line"><span class="lineno">  259</span>  <span class="keyword">const</span> handleGroupCreated = (groupId) =&gt; {</div>
+<div class="line"><span class="lineno">  260</span>    <span class="comment">// Groups will update automatically via real-time listener</span></div>
+<div class="line"><span class="lineno">  261</span>  };</div>
+<div class="line"><span class="lineno">  262</span> </div>
+<div class="line"><span class="lineno">  263</span>  <span class="keyword">const</span> [invitationCount, setInvitationCount] = useState(0);</div>
+<div class="line"><span class="lineno">  264</span>  <span class="keyword">const</span> [showInvitations, setShowInvitations] = useState(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  265</span> </div>
+<div class="line"><span class="lineno">  266</span>  <span class="comment">// Play sound or show toast when new invitations arrive</span></div>
+<div class="line"><span class="lineno">  267</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  268</span>    <span class="keywordflow">if</span> (invitationCount &gt; 0) {</div>
+<div class="line"><span class="lineno">  269</span>      <span class="comment">// Play sound</span></div>
+<div class="line"><span class="lineno">  270</span>      <span class="keyword">const</span> audio = <span class="keyword">new</span> Audio(<span class="stringliteral">&#39;/notification.mp3&#39;</span>);</div>
+<div class="line"><span class="lineno">  271</span>      audio.play().catch(err =&gt; console.log(<span class="stringliteral">&#39;Audio play failed:&#39;</span>, err));</div>
+<div class="line"><span class="lineno">  272</span>      </div>
+<div class="line"><span class="lineno">  273</span>      <span class="comment">// Or show toast</span></div>
+<div class="line"><span class="lineno">  274</span>      <a class="code hl_variable" href="_create_group_modal_8test_8jsx.html#ade82d91fa8e0278173352b9dd1797ecd">alert</a>(`🔔 You have ${invitationCount} <span class="keyword">new</span> invitation(s)!`);</div>
+<div class="line"><span class="lineno">  275</span>    }</div>
+<div class="line"><span class="lineno">  276</span>  }, [invitationCount]);</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>  <span class="comment">// Listen for real-time invitation changes/notifications</span></div>
+<div class="line"><span class="lineno">  279</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  280</span>    <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  281</span>    </div>
+<div class="line"><span class="lineno">  282</span>    <span class="comment">// Listen for real-time invitation changes</span></div>
+<div class="line"><span class="lineno">  283</span>    <span class="keyword">const</span> invitationsQuery = <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(</div>
+<div class="line"><span class="lineno">  284</span>      <a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;invitations&#39;</span>),</div>
+<div class="line"><span class="lineno">  285</span>      <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;toUserId&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, user.uid),</div>
+<div class="line"><span class="lineno">  286</span>      <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;status&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, <span class="stringliteral">&#39;pending&#39;</span>)</div>
+<div class="line"><span class="lineno">  287</span>    );</div>
+<div class="line"><span class="lineno">  288</span>    </div>
+<div class="line"><span class="lineno">  289</span>    <span class="keyword">const</span> unsubscribe = <a class="code hl_variable" href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a>(invitationsQuery, (snapshot) =&gt; {</div>
+<div class="line"><span class="lineno">  290</span>      <span class="keyword">const</span> count = snapshot.docs.length;</div>
+<div class="line"><span class="lineno">  291</span>      setInvitationCount(count);</div>
+<div class="line"><span class="lineno">  292</span>    });</div>
+<div class="line"><span class="lineno">  293</span>    </div>
+<div class="line"><span class="lineno">  294</span>    <span class="keywordflow">return</span> () =&gt; unsubscribe();</div>
+<div class="line"><span class="lineno">  295</span>  }, [user]);</div>
+<div class="line"><span class="lineno">  296</span> </div>
+<div class="line"><span class="lineno">  297</span> </div>
+<div class="line"><span class="lineno">  298</span>  <span class="comment">// Handle invitation count updates</span></div>
+<div class="line"><span class="lineno">  299</span>  <span class="keyword">const</span> handleInvitationUpdate = (count) =&gt; {</div>
+<div class="line"><span class="lineno">  300</span>    setInvitationCount(count);</div>
+<div class="line"><span class="lineno">  301</span>    </div>
+<div class="line"><span class="lineno">  302</span>    <span class="comment">// Auto-hide if no invitations</span></div>
+<div class="line"><span class="lineno">  303</span>    <span class="keywordflow">if</span> (count === 0) {</div>
+<div class="line"><span class="lineno">  304</span>      setShowInvitations(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  305</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  306</span>      setShowInvitations(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  307</span>    }</div>
+<div class="line"><span class="lineno">  308</span>  };</div>
+<div class="line"><span class="lineno">  309</span> </div>
+<div class="line"><span class="lineno">  310</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  311</span>    &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 dark:bg-gray-900 pb-20&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  312</span>      {<span class="comment">/* Invitation Notifications */</span>}</div>
+<div class="line"><span class="lineno">  313</span>      {user &amp;&amp; showInvitations &amp;&amp; invitationCount &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  314</span>        &lt;div className=<span class="stringliteral">&quot;mb-6 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  315</span>          &lt;<a class="code hl_variable" href="_invitation_notification_8test_8jsx.html#a6999043eb55d04e634144cbcd67b8ec4">InvitationNotification</a></div>
+<div class="line"><span class="lineno">  316</span>            user={user}</div>
+<div class="line"><span class="lineno">  317</span>            onInvitationUpdate={handleInvitationUpdate}</div>
+<div class="line"><span class="lineno">  318</span>          /&gt;</div>
+<div class="line"><span class="lineno">  319</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  320</span>      )}</div>
+<div class="line"><span class="lineno">  321</span> </div>
+<div class="line"><span class="lineno">  322</span>      {<span class="comment">/* payment notification banner UI */</span>}</div>
+<div class="line"><span class="lineno">  323</span>      {!hasPayment &amp;&amp; (</div>
+<div class="line"><span class="lineno">  324</span>        &lt;div className=<span class="stringliteral">&quot;mb-4 p-4 rounded-xl border border-yellow-300</span></div>
+<div class="line"><span class="lineno">  325</span><span class="stringliteral">                        bg-yellow-50 text-yellow-800</span></div>
+<div class="line"><span class="lineno">  326</span><span class="stringliteral">                        dark:bg-yellow-900/20 dark:text-yellow-300</span></div>
+<div class="line"><span class="lineno">  327</span><span class="stringliteral">                        dark:border-yellow-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  328</span> </div>
+<div class="line"><span class="lineno">  329</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  330</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  331</span>              &lt;p className=<span class="stringliteral">&quot;font-semibold text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  332</span>                Payment method not <span class="keyword">set</span></div>
+<div class="line"><span class="lineno">  333</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  334</span>              &lt;p className=<span class="stringliteral">&quot;text-xs mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  335</span>                Add at least one payment method to receive settlements faster.</div>
+<div class="line"><span class="lineno">  336</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  337</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  338</span> </div>
+<div class="line"><span class="lineno">  339</span>            &lt;button</div>
+<div class="line"><span class="lineno">  340</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  341</span>              onClick={() =&gt; navigate(<span class="stringliteral">&quot;/profile&quot;</span>)}</div>
+<div class="line"><span class="lineno">  342</span>              className=<span class="stringliteral">&quot;ml-4 px-3 py-2 rounded-lg text-sm</span></div>
+<div class="line"><span class="lineno">  343</span><span class="stringliteral">                        bg-primary text-white hover:bg-primary-hover</span></div>
+<div class="line"><span class="lineno">  344</span><span class="stringliteral">                        dark:bg-indigo-600 dark:hover:bg-indigo-700&quot;</span></div>
+<div class="line"><span class="lineno">  345</span>            &gt;</div>
+<div class="line"><span class="lineno">  346</span>              Set Up</div>
+<div class="line"><span class="lineno">  347</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  348</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  349</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  350</span>      )}</div>
+<div class="line"><span class="lineno">  351</span> </div>
+<div class="line"><span class="lineno">  352</span> </div>
+<div class="line"><span class="lineno">  353</span> </div>
+<div class="line"><span class="lineno">  354</span>      &lt;<a class="code hl_variable" href="_onboarding_wizard_8test_8jsx.html#aede7e62c4590232f3fe0e61596f12333">OnboardingWizard</a></div>
+<div class="line"><span class="lineno">  355</span>        open={showOnboarding}</div>
+<div class="line"><span class="lineno">  356</span>        navigate={navigate}</div>
+<div class="line"><span class="lineno">  357</span>        onClose={() =&gt; setShowOnboarding(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  358</span>        onFinish={async () =&gt; {</div>
+<div class="line"><span class="lineno">  359</span>          setShowOnboarding(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  360</span> </div>
+<div class="line"><span class="lineno">  361</span>          <span class="comment">// Optional: store a “tour completed” flag too (separate from isFirstLogin)</span></div>
+<div class="line"><span class="lineno">  362</span>          await <a class="code hl_variable" href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&quot;users&quot;</span>, user.uid), {</div>
+<div class="line"><span class="lineno">  363</span>            onboardingCompletedAt: new Date(),</div>
+<div class="line"><span class="lineno">  364</span>          });</div>
+<div class="line"><span class="lineno">  365</span>        }}</div>
+<div class="line"><span class="lineno">  366</span>      /&gt;</div>
+<div class="line"><span class="lineno">  367</span> </div>
+<div class="line"><span class="lineno">  368</span> </div>
+<div class="line"><span class="lineno">  369</span>      {<span class="comment">/* Top Bar */</span>}</div>
+<div class="line"><span class="lineno">  370</span>      &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 shadow&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  371</span>        &lt;div className=<span class="stringliteral">&quot;max-w-7xl mx-auto px-4 py-4 flex justify-between items-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  372</span>          &lt;img </div>
+<div class="line"><span class="lineno">  373</span>            src=<span class="stringliteral">&quot;/logo.png&quot;</span> </div>
+<div class="line"><span class="lineno">  374</span>            alt=<span class="stringliteral">&quot;Split-Sync&quot;</span> </div>
+<div class="line"><span class="lineno">  375</span>            className=<span class="stringliteral">&quot;h-10 w-auto cursor-pointer&quot;</span></div>
+<div class="line"><span class="lineno">  376</span>            onClick={() =&gt; isAdmin ? navigate(<span class="stringliteral">&#39;/taskmaster&#39;</span>) : navigate(<span class="stringliteral">&#39;/dashboard&#39;</span>)}</div>
+<div class="line"><span class="lineno">  377</span>            title={isAdmin ? <span class="stringliteral">&#39;Open Taskmaster&#39;</span> : <span class="stringliteral">&#39;Go to dashboard&#39;</span>}</div>
+<div class="line"><span class="lineno">  378</span>          /&gt;</div>
+<div class="line"><span class="lineno">  379</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  380</span>            &lt;span className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  381</span>              {user?.displayName || user?.email}</div>
+<div class="line"><span class="lineno">  382</span>            &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  383</span>            &lt;button</div>
+<div class="line"><span class="lineno">  384</span>              onClick={() =&gt; setShowNotifications(!showNotifications)}</div>
+<div class="line"><span class="lineno">  385</span>              className=<span class="stringliteral">&quot;relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition&quot;</span></div>
+<div class="line"><span class="lineno">  386</span>            &gt;</div>
+<div class="line"><span class="lineno">  387</span>              &lt;Bell size={24} /&gt;</div>
+<div class="line"><span class="lineno">  388</span>              {unreadCount &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  389</span>                &lt;span className=<span class="stringliteral">&quot;absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  390</span>                  {unreadCount}</div>
+<div class="line"><span class="lineno">  391</span>                &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  392</span>              )}</div>
+<div class="line"><span class="lineno">  393</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  394</span>            &lt;button</div>
+<div class="line"><span class="lineno">  395</span>              onClick={() =&gt; navigate(<span class="stringliteral">&#39;/settings&#39;</span>)}</div>
+<div class="line"><span class="lineno">  396</span>              className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white&quot;</span></div>
+<div class="line"><span class="lineno">  397</span>            &gt;</div>
+<div class="line"><span class="lineno">  398</span>              &lt;<a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a> size={24} /&gt;</div>
+<div class="line"><span class="lineno">  399</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  400</span>            &lt;button</div>
+<div class="line"><span class="lineno">  401</span>              onClick={handleLogout}</div>
+<div class="line"><span class="lineno">  402</span>              className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  403</span>            &gt;</div>
+<div class="line"><span class="lineno">  404</span>              Logout</div>
+<div class="line"><span class="lineno">  405</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  406</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  407</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  408</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  409</span> </div>
+<div class="line"><span class="lineno">  410</span>      {<span class="comment">/* Content */</span>}</div>
+<div class="line"><span class="lineno">  411</span>      &lt;div className=<span class="stringliteral">&quot;max-w-7xl mx-auto px-4 py-8&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  412</span>        {<span class="comment">/* Welcome */</span>}</div>
+<div class="line"><span class="lineno">  413</span>        &lt;div className=<span class="stringliteral">&quot;mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  414</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  415</span>            &lt;div</div>
+<div class="line"><span class="lineno">  416</span>              className=<span class="stringliteral">&quot;w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary-dark shadow-card-hover flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-indigo-400 dark:hover:ring-indigo-500 transition&quot;</span></div>
+<div class="line"><span class="lineno">  417</span>              onClick={() =&gt; navigate(<span class="stringliteral">&#39;/profile&#39;</span>)}</div>
+<div class="line"><span class="lineno">  418</span>              title=<span class="stringliteral">&quot;Go to your profile&quot;</span></div>
+<div class="line"><span class="lineno">  419</span>            &gt;</div>
+<div class="line"><span class="lineno">  420</span>              {userData?.photoURL ? (</div>
+<div class="line"><span class="lineno">  421</span>                &lt;img src={userData.photoURL} alt=<span class="stringliteral">&quot;Profile&quot;</span> className=<span class="stringliteral">&quot;w-full h-full object-cover&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  422</span>              ) : (</div>
+<div class="line"><span class="lineno">  423</span>                &lt;div className=<span class="stringliteral">&quot;w-full h-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  424</span>                  &lt;span className=<span class="stringliteral">&quot;text-xl font-bold text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  425</span>                    {user?.displayName?.charAt(0).toUpperCase() || <span class="charliteral">&#39;U&#39;</span>}</div>
+<div class="line"><span class="lineno">  426</span>                  &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  427</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  428</span>              )}</div>
+<div class="line"><span class="lineno">  429</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  430</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  431</span>              &lt;h2 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  432</span>                {userData?.isFirstLogin === <span class="keyword">false</span></div>
+<div class="line"><span class="lineno">  433</span>                  ? `Welcome back, ${user?.displayName?.split(<span class="charliteral">&#39; &#39;</span>)[0] || <span class="stringliteral">&#39;there&#39;</span>}!`</div>
+<div class="line"><span class="lineno">  434</span>                  : `Welcome, ${user?.displayName?.split(<span class="charliteral">&#39; &#39;</span>)[0] || <span class="stringliteral">&#39;there&#39;</span>}!`}</div>
+<div class="line"><span class="lineno">  435</span>              &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  436</span>              &lt;<a class="code hl_function" href="#a7012bb91b5e340d5cbee779d41ed3aa8">CyclingTagline</a> /&gt;</div>
+<div class="line"><span class="lineno">  437</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  438</span>                {<span class="keyword">new</span> Date().toLocaleDateString(<span class="stringliteral">&#39;en-IE&#39;</span>, { weekday: <span class="stringliteral">&#39;long&#39;</span>, day: <span class="stringliteral">&#39;numeric&#39;</span>, month: <span class="stringliteral">&#39;long&#39;</span>, year: <span class="stringliteral">&#39;numeric&#39;</span> })}</div>
+<div class="line"><span class="lineno">  439</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  440</span>              </div>
+<div class="line"><span class="lineno">  441</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  442</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  443</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  444</span> </div>
+<div class="line"><span class="lineno">  445</span>        {<span class="comment">/* Overview stat cards */</span>}</div>
+<div class="line"><span class="lineno">  446</span>        &lt;div className=<span class="stringliteral">&quot;mb-5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  447</span>          &lt;p className=<span class="stringliteral">&quot;text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3&quot;</span>&gt;Overview&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  448</span> </div>
+<div class="line"><span class="lineno">  449</span>          {<span class="comment">/* Row 1 — financial summary */</span>}</div>
+<div class="line"><span class="lineno">  450</span>          &lt;div className=<span class="stringliteral">&quot;grid grid-cols-3 gap-3 mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  451</span>            {<span class="comment">/* You owe */</span>}</div>
+<div class="line"><span class="lineno">  452</span>            &lt;div</div>
+<div class="line"><span class="lineno">  453</span>              onClick={() =&gt; navigate(<span class="stringliteral">&#39;/activity&#39;</span>, { state: { filter: <span class="stringliteral">&#39;owe&#39;</span> } })}</div>
+<div class="line"><span class="lineno">  454</span>              className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition&quot;</span></div>
+<div class="line"><span class="lineno">  455</span>            &gt;</div>
+<div class="line"><span class="lineno">  456</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  457</span>                &lt;TrendingDown size={13} className=<span class="stringliteral">&quot;text-orange-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  458</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;You owe&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  459</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  460</span>              {Object.keys(overviewStats.totalOwe).length === 0 ? (</div>
+<div class="line"><span class="lineno">  461</span>                &lt;p className=<span class="stringliteral">&quot;text-base font-semibold text-gray-400 dark:text-gray-500&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  462</span>              ) : (</div>
+<div class="line"><span class="lineno">  463</span>                Object.entries(overviewStats.totalOwe).map(([cur, amt]) =&gt; (</div>
+<div class="line"><span class="lineno">  464</span>                  &lt;p key={cur} className=<span class="stringliteral">&quot;text-base font-semibold text-orange-600 dark:text-orange-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  465</span>                    {cur} {amt.toFixed(2)}</div>
+<div class="line"><span class="lineno">  466</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  467</span>                ))</div>
+<div class="line"><span class="lineno">  468</span>              )}</div>
+<div class="line"><span class="lineno">  469</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  470</span>                {overviewStats.oweCount &gt; 0 ? `${overviewStats.oweCount} group${overviewStats.oweCount !== 1 ? <span class="charliteral">&#39;s&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}` : <span class="stringliteral">&#39;all settled&#39;</span>}</div>
+<div class="line"><span class="lineno">  471</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  472</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  473</span> </div>
+<div class="line"><span class="lineno">  474</span>            {<span class="comment">/* Owed to you */</span>}</div>
+<div class="line"><span class="lineno">  475</span>            &lt;div</div>
+<div class="line"><span class="lineno">  476</span>              onClick={() =&gt; navigate(<span class="stringliteral">&#39;/activity&#39;</span>, { state: { filter: <span class="stringliteral">&#39;paid&#39;</span> } })}</div>
+<div class="line"><span class="lineno">  477</span>              className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 cursor-pointer hover:border-green-300 dark:hover:border-green-700 hover:bg-green-50 dark:hover:bg-green-900/10 transition&quot;</span></div>
+<div class="line"><span class="lineno">  478</span>            &gt;</div>
+<div class="line"><span class="lineno">  479</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  480</span>                &lt;TrendingUp size={13} className=<span class="stringliteral">&quot;text-green-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  481</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Owed to you&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  482</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  483</span>              {Object.keys(overviewStats.totalOwed).length === 0 ? (</div>
+<div class="line"><span class="lineno">  484</span>                &lt;p className=<span class="stringliteral">&quot;text-base font-semibold text-gray-400 dark:text-gray-500&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  485</span>              ) : (</div>
+<div class="line"><span class="lineno">  486</span>                Object.entries(overviewStats.totalOwed).map(([cur, amt]) =&gt; (</div>
+<div class="line"><span class="lineno">  487</span>                  &lt;p key={cur} className=<span class="stringliteral">&quot;text-base font-semibold text-green-600 dark:text-green-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  488</span>                    {cur} {amt.toFixed(2)}</div>
+<div class="line"><span class="lineno">  489</span>                  &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  490</span>                ))</div>
+<div class="line"><span class="lineno">  491</span>              )}</div>
+<div class="line"><span class="lineno">  492</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  493</span>                {overviewStats.owedCount &gt; 0 ? `${overviewStats.owedCount} group${overviewStats.owedCount !== 1 ? <span class="charliteral">&#39;s&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}` : <span class="stringliteral">&#39;nothing yet&#39;</span>}</div>
+<div class="line"><span class="lineno">  494</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  495</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  496</span> </div>
+<div class="line"><span class="lineno">  497</span>            {<span class="comment">/* Groups count */</span>}</div>
+<div class="line"><span class="lineno">  498</span>            &lt;div</div>
+<div class="line"><span class="lineno">  499</span>              onClick={() =&gt; document.getElementById(<span class="stringliteral">&#39;groups-section&#39;</span>)?.scrollIntoView({ behavior: <span class="stringliteral">&#39;smooth&#39;</span> })}</div>
+<div class="line"><span class="lineno">  500</span>              className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-3 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition&quot;</span></div>
+<div class="line"><span class="lineno">  501</span>            &gt;</div>
+<div class="line"><span class="lineno">  502</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  503</span>                &lt;Layers size={13} className=<span class="stringliteral">&quot;text-indigo-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  504</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;Groups&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  505</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  506</span>              &lt;p className=<span class="stringliteral">&quot;text-base font-semibold text-indigo-600 dark:text-indigo-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  507</span>                {groups.length}</div>
+<div class="line"><span class="lineno">  508</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  509</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500 mt-1&quot;</span>&gt;active&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  510</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  511</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  512</span> </div>
+<div class="line"><span class="lineno">  513</span>          </div>
+<div class="line"><span class="lineno">  514</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  515</span> </div>
+<div class="line"><span class="lineno">  516</span>        {<span class="comment">/* Suggested settlement — only shown when user has a debt */</span>}</div>
+<div class="line"><span class="lineno">  517</span>        {overviewStats.highestDebt &amp;&amp; (</div>
+<div class="line"><span class="lineno">  518</span>          &lt;div className=<span class="stringliteral">&quot;mb-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  519</span>            &lt;p className=<span class="stringliteral">&quot;text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400 mb-3 flex items-center gap-1.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  520</span>              &lt;ArrowRightCircle size={12} /&gt;</div>
+<div class="line"><span class="lineno">  521</span>              Suggested settlement</div>
+<div class="line"><span class="lineno">  522</span>            &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  523</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  524</span>              &lt;div className=<span class="stringliteral">&quot;min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  525</span>                &lt;p className=<span class="stringliteral">&quot;text-sm font-semibold text-gray-900 dark:text-white truncate&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  526</span>                  {overviewStats.highestDebt.groupName}</div>
+<div class="line"><span class="lineno">  527</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  528</span>                &lt;p className=<span class="stringliteral">&quot;text-xs text-amber-700 dark:text-amber-400 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  529</span>                  Highest outstanding debt</div>
+<div class="line"><span class="lineno">  530</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  531</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  532</span>              &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 flex-shrink-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  533</span>                &lt;p className=<span class="stringliteral">&quot;text-base font-semibold text-orange-600 dark:text-orange-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  534</span>                  {overviewStats.highestDebt.currency} {overviewStats.highestDebt.amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  535</span>                &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  536</span>                &lt;button</div>
+<div class="line"><span class="lineno">  537</span>                  onClick={() =&gt; navigate(`/group/${overviewStats.highestDebt.groupId}`)}</div>
+<div class="line"><span class="lineno">  538</span>                  className=<span class="stringliteral">&quot;text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 px-3 py-1.5 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/60 transition whitespace-nowrap&quot;</span></div>
+<div class="line"><span class="lineno">  539</span>                &gt;</div>
+<div class="line"><span class="lineno">  540</span>                  Settle</div>
+<div class="line"><span class="lineno">  541</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  542</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  543</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  544</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  545</span>        )}</div>
+<div class="line"><span class="lineno">  546</span> </div>
+<div class="line"><span class="lineno">  547</span>        {<span class="comment">/* Pending payment confirmation banner */</span>}</div>
+<div class="line"><span class="lineno">  548</span>        {pendingConfirmation &amp;&amp; (</div>
+<div class="line"><span class="lineno">  549</span>          &lt;div className=<span class="stringliteral">&quot;mb-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 flex items-start gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  550</span>            &lt;AlertCircle size={16} className=<span class="stringliteral">&quot;text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  551</span>            &lt;div className=<span class="stringliteral">&quot;flex-1 min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  552</span>              &lt;p className=<span class="stringliteral">&quot;text-sm font-semibold text-amber-900 dark:text-amber-200&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  553</span>                Payment awaiting confirmation</div>
+<div class="line"><span class="lineno">  554</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  555</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-amber-700 dark:text-amber-300 mt-0.5 truncate&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  556</span>                {pendingConfirmation.message || <span class="stringliteral">&#39;Someone has sent you a payment — confirm receipt.&#39;</span>}</div>
+<div class="line"><span class="lineno">  557</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  558</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  559</span>            &lt;button</div>
+<div class="line"><span class="lineno">  560</span>              onClick={() =&gt; {</div>
+<div class="line"><span class="lineno">  561</span>                <span class="keyword">const</span> groupId = pendingConfirmation.data?.groupId;</div>
+<div class="line"><span class="lineno">  562</span>                <span class="keywordflow">if</span> (groupId) navigate(`/group/${groupId}`);</div>
+<div class="line"><span class="lineno">  563</span>              }}</div>
+<div class="line"><span class="lineno">  564</span>              className=<span class="stringliteral">&quot;text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 px-3 py-1.5 rounded-lg whitespace-nowrap hover:bg-amber-200 dark:hover:bg-amber-900/60 transition&quot;</span></div>
+<div class="line"><span class="lineno">  565</span>            &gt;</div>
+<div class="line"><span class="lineno">  566</span>              Review</div>
+<div class="line"><span class="lineno">  567</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  568</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  569</span>        )}</div>
+<div class="line"><span class="lineno">  570</span> </div>
+<div class="line"><span class="lineno">  571</span>        {<span class="comment">/* Groups section */</span>}</div>
+<div class="line"><span class="lineno">  572</span>        &lt;div <span class="keywordtype">id</span>=<span class="stringliteral">&quot;groups-section&quot;</span> className=<span class="stringliteral">&quot;mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  573</span>          &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  574</span>            &lt;h3 className=<span class="stringliteral">&quot;text-base font-semibold text-gray-900 dark:text-white&quot;</span>&gt;Your groups&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  575</span>            &lt;button</div>
+<div class="line"><span class="lineno">  576</span>              onClick={() =&gt; setShowCreateModal(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  577</span>              className=<span class="stringliteral">&quot;bg-gradient-to-r from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:shadow-card-hover transition-all duration-300 flex items-center gap-2&quot;</span></div>
+<div class="line"><span class="lineno">  578</span>            &gt;</div>
+<div class="line"><span class="lineno">  579</span>              + Create group</div>
+<div class="line"><span class="lineno">  580</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  581</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  582</span> </div>
+<div class="line"><span class="lineno">  583</span>          {loading &amp;&amp; (</div>
+<div class="line"><span class="lineno">  584</span>            &lt;div className=<span class="stringliteral">&quot;text-center py-12&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  585</span>              &lt;div className=<span class="stringliteral">&quot;animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto&quot;</span>&gt;&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  586</span>              &lt;p className=<span class="stringliteral">&quot;mt-3 text-sm text-gray-500 dark:text-gray-400&quot;</span>&gt;Loading groups...&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  587</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  588</span>          )}</div>
+<div class="line"><span class="lineno">  589</span> </div>
+<div class="line"><span class="lineno">  590</span>          {!loading &amp;&amp; groups.length === 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  591</span>            &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-10 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  592</span>              &lt;Users size={40} className=<span class="stringliteral">&quot;mx-auto mb-3 text-gray-300 dark:text-gray-600&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  593</span>              &lt;h3 className=<span class="stringliteral">&quot;text-base font-semibold text-gray-900 dark:text-white mb-1&quot;</span>&gt;No groups yet&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  594</span>              &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-500 dark:text-gray-400 mb-5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  595</span>                Create your first group to start tracking shared expenses</div>
+<div class="line"><span class="lineno">  596</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  597</span>              &lt;button</div>
+<div class="line"><span class="lineno">  598</span>                onClick={() =&gt; setShowCreateModal(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  599</span>                className=<span class="stringliteral">&quot;bg-gradient-to-r from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:shadow-card-hover transition-all duration-300&quot;</span></div>
+<div class="line"><span class="lineno">  600</span>              &gt;</div>
+<div class="line"><span class="lineno">  601</span>                Create your first group</div>
+<div class="line"><span class="lineno">  602</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  603</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  604</span>          )}</div>
+<div class="line"><span class="lineno">  605</span> </div>
+<div class="line"><span class="lineno">  606</span>          {!loading &amp;&amp; groups.length &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  607</span>            &lt;div className=<span class="stringliteral">&quot;grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  608</span>              {groups.map((group, index) =&gt; {</div>
+<div class="line"><span class="lineno">  609</span>                <span class="keyword">const</span> IconComponent = <a class="code hl_function" href="#a977aaef7bfda1956e3fc149422104eab">getIconComponent</a>(group.icon);</div>
+<div class="line"><span class="lineno">  610</span>                <span class="keyword">const</span> bal = groupBalances[group.id];</div>
+<div class="line"><span class="lineno">  611</span>                <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  612</span>                  &lt;div</div>
+<div class="line"><span class="lineno">  613</span>                    key={group.id}</div>
+<div class="line"><span class="lineno">  614</span>                    onClick={() =&gt; navigate(`/group/${group.id}`)}</div>
+<div class="line"><span class="lineno">  615</span>                    className=<span class="stringliteral">&quot;group bg-white dark:bg-gray-800 rounded-xl shadow-card hover:shadow-card-hover dark:shadow-gray-900/50 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 p-8 cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-primary dark:hover:border-indigo-500 flex items-center gap-4 animate-slide-up&quot;</span></div>
+<div class="line"><span class="lineno">  616</span>                    style={{ animationDelay: `${index * 40}ms` }}</div>
+<div class="line"><span class="lineno">  617</span>                  &gt;</div>
+<div class="line"><span class="lineno">  618</span>                    &lt;div className=<span class="stringliteral">&quot;w-11 h-11 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-card transform transition-transform group-hover:scale-110 group-hover:rotate-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  619</span>                      &lt;IconComponent className=<span class="stringliteral">&quot;text-white&quot;</span> size={34} /&gt;</div>
+<div class="line"><span class="lineno">  620</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  621</span>                    &lt;div className=<span class="stringliteral">&quot;flex-1 min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  622</span>                      &lt;p className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white truncate&quot;</span>&gt;{group.name}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  623</span>                      &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  624</span>                        &lt;Users size={18} /&gt;</div>
+<div class="line"><span class="lineno">  625</span>                        {group.members?.length || 0} member{group.members?.length !== 1 ? <span class="charliteral">&#39;s&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}</div>
+<div class="line"><span class="lineno">  626</span>                        &lt;span className=<span class="stringliteral">&quot;mx-1&quot;</span>&gt;·&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  627</span>                        {group.currency}</div>
+<div class="line"><span class="lineno">  628</span>                      &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  629</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  630</span>                    &lt;div className=<span class="stringliteral">&quot;text-right flex-shrink-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  631</span>                      {!bal ? (</div>
+<div class="line"><span class="lineno">  632</span>                        &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500&quot;</span>&gt;—&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  633</span>                      ) : bal.status === <span class="stringliteral">&#39;settled&#39;</span> ? (</div>
+<div class="line"><span class="lineno">  634</span>                        &lt;p className=<span class="stringliteral">&quot;text-sm font-medium text-green-600 dark:text-green-400&quot;</span>&gt;Settled&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  635</span>                      ) : bal.status === <span class="stringliteral">&#39;owed&#39;</span> ? (</div>
+<div class="line"><span class="lineno">  636</span>                        &lt;&gt;</div>
+<div class="line"><span class="lineno">  637</span>                          &lt;p className=<span class="stringliteral">&quot;text-sm font-semibold text-green-600 dark:text-green-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  638</span>                            +{group.currency} {bal.amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  639</span>                          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  640</span>                          &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500&quot;</span>&gt;owed to you&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  641</span>                        &lt;/&gt;</div>
+<div class="line"><span class="lineno">  642</span>                      ) : (</div>
+<div class="line"><span class="lineno">  643</span>                        &lt;&gt;</div>
+<div class="line"><span class="lineno">  644</span>                          &lt;p className=<span class="stringliteral">&quot;text-sm font-semibold text-orange-600 dark:text-orange-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  645</span>                            -{group.currency} {bal.amount.toFixed(2)}</div>
+<div class="line"><span class="lineno">  646</span>                          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  647</span>                          &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500&quot;</span>&gt;you owe&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  648</span>                        &lt;/&gt;</div>
+<div class="line"><span class="lineno">  649</span>                      )}</div>
+<div class="line"><span class="lineno">  650</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  651</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  652</span>                );</div>
+<div class="line"><span class="lineno">  653</span>              })}</div>
+<div class="line"><span class="lineno">  654</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  655</span>          )}</div>
+<div class="line"><span class="lineno">  656</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  657</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  658</span> </div>
+<div class="line"><span class="lineno">  659</span>      {<span class="comment">/* Create Group Modal */</span>}</div>
+<div class="line"><span class="lineno">  660</span>      &lt;<a class="code hl_variable" href="_create_group_modal_8test_8jsx.html#abc300c6a9f25d1056fedd24c360d34cb">CreateGroupModal</a></div>
+<div class="line"><span class="lineno">  661</span>        isOpen={showCreateModal}</div>
+<div class="line"><span class="lineno">  662</span>        onClose={() =&gt; setShowCreateModal(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  663</span>        onGroupCreated={handleGroupCreated}</div>
+<div class="line"><span class="lineno">  664</span>      /&gt;</div>
+<div class="line"><span class="lineno">  665</span> </div>
+<div class="line"><span class="lineno">  666</span>      {<span class="comment">/* Notifications Dropdown */</span>}</div>
+<div class="line"><span class="lineno">  667</span>      &lt;<a class="code hl_variable" href="_notifications_dropdown_8test_8jsx.html#ab735004b3d837cf675806b686851276f">NotificationsDropdown</a></div>
+<div class="line"><span class="lineno">  668</span>        isOpen={showNotifications}</div>
+<div class="line"><span class="lineno">  669</span>        onClose={() =&gt; setShowNotifications(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  670</span>      /&gt;</div>
+<div class="line"><span class="lineno">  671</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  672</span>  );</div>
+<div class="line"><span class="lineno">  673</span>}</div>
+<div class="ttc" id="a_app_8js_html_a41fced9f4a60b34be2c803b77dcada2d"><div class="ttname"><a href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a></div><div class="ttdeci">import Settings from pages Settings</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00019">App.js:19</a></div></div>
+<div class="ttc" id="a_create_group_modal_8test_8jsx_html_abc300c6a9f25d1056fedd24c360d34cb"><div class="ttname"><a href="_create_group_modal_8test_8jsx.html#abc300c6a9f25d1056fedd24c360d34cb">CreateGroupModal</a></div><div class="ttdeci">import CreateGroupModal from CreateGroupModal</div><div class="ttdef"><b>Definition</b> <a href="_create_group_modal_8test_8jsx_source.html#l00077">CreateGroupModal.test.jsx:77</a></div></div>
+<div class="ttc" id="a_create_group_modal_8test_8jsx_html_ade82d91fa8e0278173352b9dd1797ecd"><div class="ttname"><a href="_create_group_modal_8test_8jsx.html#ade82d91fa8e0278173352b9dd1797ecd">alert</a></div><div class="ttdeci">global alert</div><div class="ttdef"><b>Definition</b> <a href="_create_group_modal_8test_8jsx_source.html#l00015">CreateGroupModal.test.jsx:15</a></div></div>
+<div class="ttc" id="a_dashboard_8jsx_html_a7012bb91b5e340d5cbee779d41ed3aa8"><div class="ttname"><a href="#a7012bb91b5e340d5cbee779d41ed3aa8">CyclingTagline</a></div><div class="ttdeci">function CyclingTagline()</div><div class="ttdef"><b>Definition</b> <a href="_dashboard_8jsx_source.html#l00052">Dashboard.jsx:52</a></div></div>
+<div class="ttc" id="a_dashboard_8jsx_html_a977aaef7bfda1956e3fc149422104eab"><div class="ttname"><a href="#a977aaef7bfda1956e3fc149422104eab">getIconComponent</a></div><div class="ttdeci">function getIconComponent(iconName)</div><div class="ttdef"><b>Definition</b> <a href="_dashboard_8jsx_source.html#l00038">Dashboard.jsx:38</a></div></div>
+<div class="ttc" id="a_invitation_notification_8test_8jsx_html_a6999043eb55d04e634144cbcd67b8ec4"><div class="ttname"><a href="_invitation_notification_8test_8jsx.html#a6999043eb55d04e634144cbcd67b8ec4">InvitationNotification</a></div><div class="ttdeci">import InvitationNotification from InvitationNotification</div><div class="ttdef"><b>Definition</b> <a href="_invitation_notification_8test_8jsx_source.html#l00007">InvitationNotification.test.jsx:7</a></div></div>
+<div class="ttc" id="a_notifications_dropdown_8test_8jsx_html_ab735004b3d837cf675806b686851276f"><div class="ttname"><a href="_notifications_dropdown_8test_8jsx.html#ab735004b3d837cf675806b686851276f">NotificationsDropdown</a></div><div class="ttdeci">import NotificationsDropdown from NotificationsDropdown</div><div class="ttdef"><b>Definition</b> <a href="_notifications_dropdown_8test_8jsx_source.html#l00038">NotificationsDropdown.test.jsx:38</a></div></div>
+<div class="ttc" id="a_onboarding_wizard_8test_8jsx_html_aede7e62c4590232f3fe0e61596f12333"><div class="ttname"><a href="_onboarding_wizard_8test_8jsx.html#aede7e62c4590232f3fe0e61596f12333">OnboardingWizard</a></div><div class="ttdeci">import OnboardingWizard from OnboardingWizard</div><div class="ttdef"><b>Definition</b> <a href="_onboarding_wizard_8test_8jsx_source.html#l00009">OnboardingWizard.test.jsx:9</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="abalance_calculator_8js_html_a12d4d92470fb2616edbe37a6b38ae563"><div class="ttname"><a href="balance_calculator_8js.html#a12d4d92470fb2616edbe37a6b38ae563">calculateBalances</a></div><div class="ttdeci">function export calculateBalances(expenses, members)</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00041">balanceCalculator.js:41</a></div></div>
+<div class="ttc" id="abalance_calculator_8js_html_af5cb86abf0ddc74e01d7b9dbe9a23716"><div class="ttname"><a href="balance_calculator_8js.html#af5cb86abf0ddc74e01d7b9dbe9a23716">getUserBalanceSummary</a></div><div class="ttdeci">function export getUserBalanceSummary(balances, userId, members)</div><div class="ttdoc">Returns a human-readable balance summary for a specific user.</div><div class="ttdef"><b>Definition</b> <a href="balance_calculator_8js_source.html#l00139">balanceCalculator.js:139</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_8js_html_ab735783ec1f49c1b8740f4dba3dfbfd0"><div class="ttname"><a href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a></div><div class="ttdeci">export const auth</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00022">firebase.js:22</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_a722f586b1325e6444b61040fd4f9e277"><div class="ttname"><a href="firebase_auth_8js.html#a722f586b1325e6444b61040fd4f9e277">signOut</a></div><div class="ttdeci">export const signOut</div><div class="ttdef"><b>Definition</b> <a href="firebase_auth_8js_source.html#l00020">firebaseAuth.js:20</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a3259366f21a7fc0c2b72a4b024568536"><div class="ttname"><a href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a></div><div class="ttdeci">export const getDocs</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00026">firebaseFirestore.js:26</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a4c9f6367db9a8b9f6d64a0d27c9ff6e3"><div class="ttname"><a href="firebase_firestore_8js.html#a4c9f6367db9a8b9f6d64a0d27c9ff6e3">getDoc</a></div><div class="ttdeci">export const getDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00010">firebaseFirestore.js:10</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a5fdb89ebdc78c2cdcd9653313e89224d"><div class="ttname"><a href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a></div><div class="ttdeci">export const where</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00024">firebaseFirestore.js:24</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a66d1f375d7706c9a5a0976c507a3438e"><div class="ttname"><a href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a></div><div class="ttdeci">export const doc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00020">firebaseFirestore.js:20</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a737ca0f23063ed37c6115359d6a9548b"><div class="ttname"><a href="firebase_firestore_8js.html#a737ca0f23063ed37c6115359d6a9548b">onSnapshot</a></div><div class="ttdeci">export const onSnapshot</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00043">firebaseFirestore.js:43</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_aa2d0bd9afc4f4546b1589010db746116"><div class="ttname"><a href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a></div><div class="ttdeci">export const updateDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00014">firebaseFirestore.js:14</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_aa5462d3ef54464b95641982675a01fcb"><div class="ttname"><a href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a></div><div class="ttdeci">export const useNotificationsStore</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00010">notificationsStore.js:10</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a977aaef7bfda1956e3fc149422104eab" name="a977aaef7bfda1956e3fc149422104eab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a977aaef7bfda1956e3fc149422104eab">&#9670;&#160;</a></span>getIconComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function getIconComponent </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>iconName</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00038">38</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   38</span>                                    {</div>
+<div class="line"><span class="lineno">   39</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="#abb029c5cb6de8974ef87bd2be7ffa11b">ICON_MAP</a>[iconName] || Home;</div>
+<div class="line"><span class="lineno">   40</span>}</div>
+<div class="ttc" id="a_dashboard_8jsx_html_abb029c5cb6de8974ef87bd2be7ffa11b"><div class="ttname"><a href="#abb029c5cb6de8974ef87bd2be7ffa11b">ICON_MAP</a></div><div class="ttdeci">const ICON_MAP</div><div class="ttdef"><b>Definition</b> <a href="_dashboard_8jsx_source.html#l00018">Dashboard.jsx:18</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a8990d7c1fb035cc2476b85455fd69a7a" name="a8990d7c1fb035cc2476b85455fd69a7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8990d7c1fb035cc2476b85455fd69a7a">&#9670;&#160;</a></span>CreateGroupModal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> CreateGroupModal from components CreateGroupModal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00008">8</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+
+</div>
+</div>
+<a id="abb029c5cb6de8974ef87bd2be7ffa11b" name="abb029c5cb6de8974ef87bd2be7ffa11b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb029c5cb6de8974ef87bd2be7ffa11b">&#9670;&#160;</a></span>ICON_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> ICON_MAP</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  home: Home,</div>
+<div class="line">  plane: Plane,</div>
+<div class="line">  pizza: Pizza,</div>
+<div class="line">  party: PartyPopper,</div>
+<div class="line">  car: Car,</div>
+<div class="line">  beach: Palmtree,</div>
+<div class="line">  game: Gamepad2,</div>
+<div class="line">  heart: Heart,</div>
+<div class="line">  users: Users,</div>
+<div class="line">  shopping: ShoppingCart,</div>
+<div class="line">  coffee: Coffee,</div>
+<div class="line">  dining: Utensils,</div>
+<div class="line">  music: Music,</div>
+<div class="line">  work: Briefcase,</div>
+<div class="line">  study: GraduationCap,</div>
+<div class="line">  gift: Gift,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00018">18</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   18</span>                 {</div>
+<div class="line"><span class="lineno">   19</span>  home: Home,</div>
+<div class="line"><span class="lineno">   20</span>  plane: Plane,</div>
+<div class="line"><span class="lineno">   21</span>  pizza: Pizza,</div>
+<div class="line"><span class="lineno">   22</span>  party: PartyPopper,</div>
+<div class="line"><span class="lineno">   23</span>  car: Car,</div>
+<div class="line"><span class="lineno">   24</span>  beach: Palmtree,</div>
+<div class="line"><span class="lineno">   25</span>  game: Gamepad2,</div>
+<div class="line"><span class="lineno">   26</span>  heart: Heart,</div>
+<div class="line"><span class="lineno">   27</span>  users: Users,</div>
+<div class="line"><span class="lineno">   28</span>  shopping: ShoppingCart,</div>
+<div class="line"><span class="lineno">   29</span>  coffee: Coffee,</div>
+<div class="line"><span class="lineno">   30</span>  dining: Utensils,</div>
+<div class="line"><span class="lineno">   31</span>  music: Music,</div>
+<div class="line"><span class="lineno">   32</span>  work: Briefcase,</div>
+<div class="line"><span class="lineno">   33</span>  study: GraduationCap,</div>
+<div class="line"><span class="lineno">   34</span>  gift: Gift,</div>
+<div class="line"><span class="lineno">   35</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect, useMemo } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00002">2</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>{ useState, useEffect, useMemo } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a3168309fd6f896d6de2aa1523d92a4f0" name="a3168309fd6f896d6de2aa1523d92a4f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3168309fd6f896d6de2aa1523d92a4f0">&#9670;&#160;</a></span>InvitationNotification</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> InvitationNotification from components InvitationNotification</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00011">11</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a140b7900f5e6cb44d64d4fcaca490003" name="a140b7900f5e6cb44d64d4fcaca490003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a140b7900f5e6cb44d64d4fcaca490003">&#9670;&#160;</a></span>NotificationsDropdown</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> NotificationsDropdown from components NotificationsDropdown</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00013">13</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+
+</div>
+</div>
+<a id="adc04649e300f5441213265f6a6be4235" name="adc04649e300f5441213265f6a6be4235"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc04649e300f5441213265f6a6be4235">&#9670;&#160;</a></span>OnboardingWizard</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> OnboardingWizard from components OnboardingWizard</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00012">12</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+
+</div>
+</div>
+<a id="aa7d027df6e01a55c0a1f21c78f3bbd3e" name="aa7d027df6e01a55c0a1f21c78f3bbd3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7d027df6e01a55c0a1f21c78f3bbd3e">&#9670;&#160;</a></span>TAGLINES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> TAGLINES</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [</div>
+<div class="line">  <span class="stringliteral">&#39;Any shared expense to split?&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;Split smart. Settle fast. Stay balanced.&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;Sort out who owes what, the easy way.&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;Keep it fair, keep it simple — settle up.&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;Keep relationships sync and smooth.&#39;</span>,</div>
+<div class="line">]</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_dashboard_8jsx_source.html#l00044">44</a> of file <a class="el" href="_dashboard_8jsx_source.html">Dashboard.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

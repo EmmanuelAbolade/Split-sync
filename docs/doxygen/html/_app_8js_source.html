@@ -106,65 +106,66 @@ $(function(){initNavTree('_app_8js_source.html',''); initResizable(true); });
   <div class="headertitle"><div class="title">App.js</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_app_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>// src/App.js</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>import { useNotificationsStore } from &#39;./stores/notificationsStore&#39;;</div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>import { BrowserRouter, Routes, Route, Navigate, useLocation } from &#39;react-router-dom&#39;;</div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>import { useEffect } from &#39;react&#39;;</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>import { onAuthStateChanged } from &#39;firebase/auth&#39;;</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>import { auth } from &#39;./services/firebase&#39;;</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>import { useAuthStore } from &#39;./stores/authStore&#39;;</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>import JoinGroup          from &#39;./pages/JoinGroup&#39;;</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>import Login              from &#39;./pages/Login&#39;;</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>import Register           from &#39;./pages/Register&#39;;</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>import Dashboard          from &#39;./pages/Dashboard&#39;;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>import GroupDetails       from &#39;./pages/GroupDetails&#39;;</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>import Activity           from &#39;./pages/Activity&#39;;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>import Analytics          from &#39;./pages/Analytics&#39;;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>import Profile            from &#39;./pages/Profile&#39;;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>import QuickAdd           from &#39;./pages/QuickAdd&#39;;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>import BottomNav          from &#39;./components/BottomNav&#39;;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>import ForgotPassword     from &#39;./pages/ForgotPassword&#39;;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>import Settings           from &#39;./pages/Settings&#39;;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>import SplitSyncChat      from &#39;./components/SplitSyncChat&#39;;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>import { useSessionTimeout } from &#39;./hooks/useSessionTimeout&#39;;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>import SessionTimeoutWarning from &#39;./components/SessionTimeoutWarning&#39;;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>import Taskmaster from &#39;./pages/Taskmaster&#39;;</div>
+<a href="_app_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// src/App.js</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno"><a class="line" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">    2</a></span><span class="keyword">import</span> { <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a> } from <span class="stringliteral">&#39;./stores/notificationsStore&#39;</span>;</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">import</span> { <a class="code hl_variable" href="react_router_8js.html#aedb7ccf3f2d5a13a56d238cf4b408c0c">BrowserRouter</a>, Routes, Route, <a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a>, <a class="code hl_variable" href="react_router_8js.html#a39f31427712d32956bea93ee68b371c3">useLocation</a> } from <span class="stringliteral">&#39;react-router-dom&#39;</span>;</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">import</span> { useEffect } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">import</span> { <a class="code hl_variable" href="firebase_auth_8js.html#ae1059baaabc38eb86e89f6b0b8eba42b">onAuthStateChanged</a> } from <span class="stringliteral">&#39;firebase/auth&#39;</span>;</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">import</span> { <a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a> } from <span class="stringliteral">&#39;./services/firebase&#39;</span>;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">import</span> { <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a> } from <span class="stringliteral">&#39;./stores/authStore&#39;</span>;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="_app_8js.html#a23aa408762a1708e484ba17889c7cd2e">    8</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a23aa408762a1708e484ba17889c7cd2e">JoinGroup</a>          from <span class="stringliteral">&#39;./pages/JoinGroup&#39;</span>;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="_app_8js.html#a0af6585c301a1c12e51db6613b81af42">    9</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a0af6585c301a1c12e51db6613b81af42">Login</a>              from <span class="stringliteral">&#39;./pages/Login&#39;</span>;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="_app_8js.html#afc6908fbc2bec41fc37d0767d282e05f">   10</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#afc6908fbc2bec41fc37d0767d282e05f">Register</a>           from <span class="stringliteral">&#39;./pages/Register&#39;</span>;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="_app_8js.html#ad72e9f462127c95003c740935476668b">   11</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a>          from <span class="stringliteral">&#39;./pages/Dashboard&#39;</span>;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="_app_8js.html#a526b2ee0b67d6506646688408d06d1bb">   12</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a526b2ee0b67d6506646688408d06d1bb">GroupDetails</a>       from <span class="stringliteral">&#39;./pages/GroupDetails&#39;</span>;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="_app_8js.html#a20021ff7782037160fe0d41692a232aa">   13</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a20021ff7782037160fe0d41692a232aa">Activity</a>           from <span class="stringliteral">&#39;./pages/Activity&#39;</span>;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">   14</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a>          from <span class="stringliteral">&#39;./pages/Analytics&#39;</span>;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">   15</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a>            from <span class="stringliteral">&#39;./pages/Profile&#39;</span>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="_app_8js.html#a1354c8cb6f3260dfcd395b5d43a09a84">   16</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a1354c8cb6f3260dfcd395b5d43a09a84">QuickAdd</a>           from <span class="stringliteral">&#39;./pages/QuickAdd&#39;</span>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="_app_8js.html#a83af798f50fa6541b48222a959e232a0">   17</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a83af798f50fa6541b48222a959e232a0">BottomNav</a>          from <span class="stringliteral">&#39;./components/BottomNav&#39;</span>;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="_app_8js.html#a2bcb8265d160dd494b82774322895438">   18</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a2bcb8265d160dd494b82774322895438">ForgotPassword</a>     from <span class="stringliteral">&#39;./pages/ForgotPassword&#39;</span>;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">   19</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a>           from <span class="stringliteral">&#39;./pages/Settings&#39;</span>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="_app_8js.html#a344fb97b7a648decc0e75a5cac05f5dd">   20</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#a344fb97b7a648decc0e75a5cac05f5dd">SplitSyncChat</a>      from <span class="stringliteral">&#39;./components/SplitSyncChat&#39;</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">import</span> { <a class="code hl_variable" href="use_session_timeout_8js.html#a92579e7b1de77f51ba0917fd2670c107">useSessionTimeout</a> } from <span class="stringliteral">&#39;./hooks/useSessionTimeout&#39;</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="_app_8js.html#aef656f167a6c589e061e6c89d87c603c">   22</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#aef656f167a6c589e061e6c89d87c603c">SessionTimeoutWarning</a> from <span class="stringliteral">&#39;./components/SessionTimeoutWarning&#39;</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="_app_8js.html#aee401c867a233493db5da9630b5d10b5">   23</a></span><span class="keyword">import</span> <a class="code hl_variable" href="_app_8js.html#aee401c867a233493db5da9630b5d10b5">Taskmaster</a> from <span class="stringliteral">&#39;./pages/Taskmaster&#39;</span>;</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>// Layout wrapper for protected routes — renders bottom nav, session timeout, and AI chatbot</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>function ProtectedLayout({ children }) {</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  const location = useLocation();</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  const { user } = useAuthStore();</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  const { subscribeToNotifications } = useNotificationsStore();</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">// Layout wrapper for protected routes — renders bottom nav, session timeout, and AI chatbot</span></div>
+<div class="foldopen" id="foldopen00026" data-start="{" data-end="}">
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">   26</a></span><span class="keyword">function</span> <a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>({ children }) {</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <span class="keyword">const</span> <a class="code hl_variable" href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a> = <a class="code hl_variable" href="react_router_8js.html#a39f31427712d32956bea93ee68b371c3">useLocation</a>();</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="keyword">const</span> { user } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  <span class="keyword">const</span> { subscribeToNotifications } = <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a>();</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  // Subscribe to notifications at the app level — not just on Dashboard.</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  // Ensures payment_log and other notifications update in real time</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  // on any page, without needing a refresh.</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  <span class="comment">// Subscribe to notifications at the app level — not just on Dashboard.</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <span class="comment">// Ensures payment_log and other notifications update in real time</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  <span class="comment">// on any page, without needing a refresh.</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  useEffect(() =&gt; {</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    if (!user?.uid) return;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    const unsubscribe = subscribeToNotifications(user.uid);</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    return () =&gt; unsubscribe();</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">if</span> (!user?.uid) <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keyword">const</span> unsubscribe = subscribeToNotifications(user.uid);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordflow">return</span> () =&gt; unsubscribe();</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  }, [user?.uid, subscribeToNotifications]);</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  // Session timeout hook — drives the auto-logout warning modal</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  const {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <span class="comment">// Session timeout hook — drives the auto-logout warning modal</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  <span class="keyword">const</span> {</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    showWarning,</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    countdown,</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    stayLoggedIn,</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    logoutNow,</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  } = useSessionTimeout();</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  } = <a class="code hl_variable" href="use_session_timeout_8js.html#a92579e7b1de77f51ba0917fd2670c107">useSessionTimeout</a>();</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  // Hide bottom nav on group details and invite pages</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  const hideBottomNav = location.pathname.startsWith(&#39;/group/&#39;) ||</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                        location.pathname.startsWith(&#39;/invite/&#39;);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <span class="comment">// Hide bottom nav on group details and invite pages</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  <span class="keyword">const</span> hideBottomNav = <a class="code hl_variable" href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a>.pathname.startsWith(<span class="stringliteral">&#39;/group/&#39;</span>) ||</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                        <a class="code hl_variable" href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a>.pathname.startsWith(<span class="stringliteral">&#39;/invite/&#39;</span>);</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  return (</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  <span class="keywordflow">return</span> (</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    &lt;&gt;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>      {children}</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>      {!hideBottomNav &amp;&amp; &lt;BottomNav /&gt;}</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>      &lt;SplitSyncChat /&gt;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>      {/* Session timeout warning modal */}</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>      {!hideBottomNav &amp;&amp; &lt;<a class="code hl_variable" href="_app_8js.html#a83af798f50fa6541b48222a959e232a0">BottomNav</a> /&gt;}</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>      &lt;<a class="code hl_variable" href="_app_8js.html#a344fb97b7a648decc0e75a5cac05f5dd">SplitSyncChat</a> /&gt;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>      {<span class="comment">/* Session timeout warning modal */</span>}</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>      {showWarning &amp;&amp; (</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        &lt;SessionTimeoutWarning</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        &lt;<a class="code hl_variable" href="_app_8js.html#aef656f167a6c589e061e6c89d87c603c">SessionTimeoutWarning</a></div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>          countdown={countdown}</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>          onStayLoggedIn={stayLoggedIn}</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>          onLogout={logoutNow}</div>
@@ -173,160 +174,187 @@ $(function(){initNavTree('_app_8js_source.html',''); initResizable(true); });
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    &lt;/&gt;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>  );</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>}</div>
+</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>function App() {</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  const { setUser, setLoading, isAuthenticated, loading } = useAuthStore();</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keyword">function</span> <a class="code hl_variable" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a>() {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  <span class="keyword">const</span> { setUser, setLoading, isAuthenticated, loading } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  useEffect(() =&gt; {</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    // Listen for Firebase auth state changes</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    const unsubscribe = onAuthStateChanged(auth, (user) =&gt; {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="comment">// Listen for Firebase auth state changes</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keyword">const</span> unsubscribe = <a class="code hl_variable" href="firebase_auth_8js.html#ae1059baaabc38eb86e89f6b0b8eba42b">onAuthStateChanged</a>(<a class="code hl_variable" href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a>, (user) =&gt; {</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      setUser(user);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      setLoading(false);</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      setLoading(<span class="keyword">false</span>);</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    });</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    return unsubscribe;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keywordflow">return</span> unsubscribe;</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  }, [setUser, setLoading]);</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  // Show loading spinner while checking auth state</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  if (loading) {</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    return (</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      &lt;div className=&quot;min-h-screen bg-gray-50 flex items-center justify-center&quot;&gt;</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        &lt;div className=&quot;text-center&quot;&gt;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>          &lt;div className=&quot;animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto&quot;&gt;&lt;/div&gt;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>          &lt;p className=&quot;mt-4 text-gray-600&quot;&gt;Loading...&lt;/p&gt;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="comment">// Show loading spinner while checking auth state</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="keywordflow">if</span> (loading) {</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      &lt;div className=<span class="stringliteral">&quot;min-h-screen bg-gray-50 flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        &lt;div className=<span class="stringliteral">&quot;text-center&quot;</span>&gt;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>          &lt;div className=<span class="stringliteral">&quot;animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto&quot;</span>&gt;&lt;/div&gt;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>          &lt;p className=<span class="stringliteral">&quot;mt-4 text-gray-600&quot;</span>&gt;Loading...&lt;/p&gt;</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        &lt;/div&gt;</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      &lt;/div&gt;</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    );</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  }</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>  return (</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    &lt;BrowserRouter&gt;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    &lt;<a class="code hl_variable" href="react_router_8js.html#aedb7ccf3f2d5a13a56d238cf4b408c0c">BrowserRouter</a>&gt;</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      &lt;Routes&gt;</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        {/* Public routes */}</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        {<span class="comment">/* Public routes */</span>}</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        &lt;Route</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>          path=&quot;/login&quot;</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>          element={!isAuthenticated ? &lt;Login /&gt; : &lt;Navigate to=&quot;/dashboard&quot; /&gt;}</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>          path=<span class="stringliteral">&quot;/login&quot;</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>          element={!isAuthenticated ? &lt;<a class="code hl_variable" href="_app_8js.html#a0af6585c301a1c12e51db6613b81af42">Login</a> /&gt; : &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/dashboard&quot;</span> /&gt;}</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        /&gt;</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        &lt;Route</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          path=&quot;/register&quot;</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          element={!isAuthenticated ? &lt;Register /&gt; : &lt;Navigate to=&quot;/dashboard&quot; /&gt;}</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          path=<span class="stringliteral">&quot;/register&quot;</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          element={!isAuthenticated ? &lt;<a class="code hl_variable" href="_app_8js.html#afc6908fbc2bec41fc37d0767d282e05f">Register</a> /&gt; : &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/dashboard&quot;</span> /&gt;}</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        /&gt;</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        &lt;Route</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>          path=&quot;/forgot-password&quot;</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>          element={!isAuthenticated ? &lt;ForgotPassword /&gt; : &lt;Navigate to=&quot;/dashboard&quot; /&gt;}</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>          path=<span class="stringliteral">&quot;/forgot-password&quot;</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>          element={!isAuthenticated ? &lt;<a class="code hl_variable" href="_app_8js.html#a2bcb8265d160dd494b82774322895438">ForgotPassword</a> /&gt; : &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/dashboard&quot;</span> /&gt;}</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        /&gt;</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        {/* Protected routes with bottom nav, session timeout, and chatbot */}</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        {<span class="comment">/* Protected routes with bottom nav, session timeout, and chatbot */</span>}</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        &lt;Route</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>          path=&quot;/dashboard&quot;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>          path=<span class="stringliteral">&quot;/dashboard&quot;</span></div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>          element={</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>              &lt;ProtectedLayout&gt;&lt;Dashboard /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>            ) : (</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>            )</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>          }</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        /&gt;</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        &lt;Route</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          path=&quot;/activity&quot;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          path=<span class="stringliteral">&quot;/activity&quot;</span></div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>          element={</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>              &lt;ProtectedLayout&gt;&lt;Activity /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#a20021ff7782037160fe0d41692a232aa">Activity</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>            ) : (</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>            )</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>          }</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        /&gt;</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        &lt;Route</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>          path=&quot;/analytics&quot;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>          path=<span class="stringliteral">&quot;/analytics&quot;</span></div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>          element={</div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>              &lt;ProtectedLayout&gt;&lt;Analytics /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>            ) : (</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>            )</div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>          }</div>
 <div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        /&gt;</div>
 <div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        &lt;Route</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>          path=&quot;/add&quot;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>          path=<span class="stringliteral">&quot;/add&quot;</span></div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>          element={</div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>              &lt;ProtectedLayout&gt;&lt;QuickAdd /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#a1354c8cb6f3260dfcd395b5d43a09a84">QuickAdd</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>            ) : (</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>            )</div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>          }</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        /&gt;</div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        &lt;Route</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>          path=&quot;/profile&quot;</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>          path=<span class="stringliteral">&quot;/profile&quot;</span></div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>          element={</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>              &lt;ProtectedLayout&gt;&lt;Profile /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>            ) : (</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>            )</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>          }</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        /&gt;</div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        &lt;Route</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>          path=&quot;/settings&quot;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>          path=<span class="stringliteral">&quot;/settings&quot;</span></div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>          element={</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>              &lt;ProtectedLayout&gt;&lt;Settings /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>            ) : (</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>            )</div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>          }</div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        /&gt;</div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span> </div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        {/* Group details - bottom nav hidden via ProtectedLayout logic */}</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        {<span class="comment">/* Group details - bottom nav hidden via ProtectedLayout logic */</span>}</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        &lt;Route</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>          path=&quot;/group/:groupId&quot;</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>          path=<span class="stringliteral">&quot;/group/:groupId&quot;</span></div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>          element={</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>              &lt;ProtectedLayout&gt;&lt;GroupDetails /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#a526b2ee0b67d6506646688408d06d1bb">GroupDetails</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>            ) : (</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>            )</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>          }</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        /&gt;</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
 <div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        &lt;Route</div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>          path=&quot;/invite/:groupId&quot;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>          path=<span class="stringliteral">&quot;/invite/:groupId&quot;</span></div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>          element={</div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>            isAuthenticated ? (</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>              &lt;ProtectedLayout&gt;&lt;JoinGroup /&gt;&lt;/ProtectedLayout&gt;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>              &lt;<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;&lt;<a class="code hl_variable" href="_app_8js.html#a23aa408762a1708e484ba17889c7cd2e">JoinGroup</a> /&gt;&lt;/<a class="code hl_function" href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a>&gt;</div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            ) : (</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>              &lt;Navigate to=&quot;/login&quot; /&gt;</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>              &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;</div>
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            )</div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>          }</div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        /&gt;</div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        {/* Default and 404 routes */}</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        {<span class="comment">/* Default and 404 routes */</span>}</div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        &lt;Route</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>          path=&quot;/&quot;</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>          element={&lt;Navigate to={isAuthenticated ? &quot;/dashboard&quot; : &quot;/login&quot;} /&gt;}</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>          path=<span class="stringliteral">&quot;/&quot;</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>          element={&lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to={isAuthenticated ? <span class="stringliteral">&quot;/dashboard&quot;</span> : <span class="stringliteral">&quot;/login&quot;</span>} /&gt;}</div>
 <div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        /&gt;</div>
 <div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        &lt;Route</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>          path=&quot;*&quot;</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>          element={&lt;Navigate to={isAuthenticated ? &quot;/dashboard&quot; : &quot;/login&quot;} /&gt;}</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>          path=<span class="stringliteral">&quot;*&quot;</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>          element={&lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to={isAuthenticated ? <span class="stringliteral">&quot;/dashboard&quot;</span> : <span class="stringliteral">&quot;/login&quot;</span>} /&gt;}</div>
 <div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        /&gt;</div>
 <div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        &lt;Route</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>        path=&quot;/taskmaster&quot;</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        element={isAuthenticated ? &lt;Taskmaster /&gt; : &lt;Navigate to=&quot;/login&quot; /&gt;}</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>        path=<span class="stringliteral">&quot;/taskmaster&quot;</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        element={isAuthenticated ? &lt;<a class="code hl_variable" href="_app_8js.html#aee401c867a233493db5da9630b5d10b5">Taskmaster</a> /&gt; : &lt;<a class="code hl_variable" href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a> to=<span class="stringliteral">&quot;/login&quot;</span> /&gt;}</div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>      /&gt;</div>
 <div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
 <div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>      &lt;/Routes&gt;</div>
 <div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>      </div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    &lt;/BrowserRouter&gt;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    &lt;/<a class="code hl_variable" href="react_router_8js.html#aedb7ccf3f2d5a13a56d238cf4b408c0c">BrowserRouter</a>&gt;</div>
 <div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>  );</div>
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>}</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>export default App;</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno"><a class="line" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">  221</a></span>export <span class="keywordflow">default</span> <a class="code hl_variable" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a>;</div>
+<div class="ttc" id="a_app_8js_html_a0af6585c301a1c12e51db6613b81af42"><div class="ttname"><a href="_app_8js.html#a0af6585c301a1c12e51db6613b81af42">Login</a></div><div class="ttdeci">import Login from pages Login</div><div class="ttdef"><b>Definition</b> <a href="#l00009">App.js:9</a></div></div>
+<div class="ttc" id="a_app_8js_html_a1354c8cb6f3260dfcd395b5d43a09a84"><div class="ttname"><a href="_app_8js.html#a1354c8cb6f3260dfcd395b5d43a09a84">QuickAdd</a></div><div class="ttdeci">import QuickAdd from pages QuickAdd</div><div class="ttdef"><b>Definition</b> <a href="#l00016">App.js:16</a></div></div>
+<div class="ttc" id="a_app_8js_html_a20021ff7782037160fe0d41692a232aa"><div class="ttname"><a href="_app_8js.html#a20021ff7782037160fe0d41692a232aa">Activity</a></div><div class="ttdeci">import Activity from pages Activity</div><div class="ttdef"><b>Definition</b> <a href="#l00013">App.js:13</a></div></div>
+<div class="ttc" id="a_app_8js_html_a23aa408762a1708e484ba17889c7cd2e"><div class="ttname"><a href="_app_8js.html#a23aa408762a1708e484ba17889c7cd2e">JoinGroup</a></div><div class="ttdeci">import JoinGroup from pages JoinGroup</div><div class="ttdef"><b>Definition</b> <a href="#l00008">App.js:8</a></div></div>
+<div class="ttc" id="a_app_8js_html_a23bc3037e97340565a21629f9bd83937"><div class="ttname"><a href="_app_8js.html#a23bc3037e97340565a21629f9bd83937">ProtectedLayout</a></div><div class="ttdeci">function ProtectedLayout({ children })</div><div class="ttdef"><b>Definition</b> <a href="#l00026">App.js:26</a></div></div>
+<div class="ttc" id="a_app_8js_html_a2bcb8265d160dd494b82774322895438"><div class="ttname"><a href="_app_8js.html#a2bcb8265d160dd494b82774322895438">ForgotPassword</a></div><div class="ttdeci">import ForgotPassword from pages ForgotPassword</div><div class="ttdef"><b>Definition</b> <a href="#l00018">App.js:18</a></div></div>
+<div class="ttc" id="a_app_8js_html_a344fb97b7a648decc0e75a5cac05f5dd"><div class="ttname"><a href="_app_8js.html#a344fb97b7a648decc0e75a5cac05f5dd">SplitSyncChat</a></div><div class="ttdeci">import SplitSyncChat from components SplitSyncChat</div><div class="ttdef"><b>Definition</b> <a href="#l00020">App.js:20</a></div></div>
+<div class="ttc" id="a_app_8js_html_a41fced9f4a60b34be2c803b77dcada2d"><div class="ttname"><a href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a></div><div class="ttdeci">import Settings from pages Settings</div><div class="ttdef"><b>Definition</b> <a href="#l00019">App.js:19</a></div></div>
+<div class="ttc" id="a_app_8js_html_a526b2ee0b67d6506646688408d06d1bb"><div class="ttname"><a href="_app_8js.html#a526b2ee0b67d6506646688408d06d1bb">GroupDetails</a></div><div class="ttdeci">import GroupDetails from pages GroupDetails</div><div class="ttdef"><b>Definition</b> <a href="#l00012">App.js:12</a></div></div>
+<div class="ttc" id="a_app_8js_html_a5aa8005d6278eb7eecc1b3cd3f87aad6"><div class="ttname"><a href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a></div><div class="ttdeci">import Profile from pages Profile</div><div class="ttdef"><b>Definition</b> <a href="#l00015">App.js:15</a></div></div>
+<div class="ttc" id="a_app_8js_html_a83af798f50fa6541b48222a959e232a0"><div class="ttname"><a href="_app_8js.html#a83af798f50fa6541b48222a959e232a0">BottomNav</a></div><div class="ttdeci">import BottomNav from components BottomNav</div><div class="ttdef"><b>Definition</b> <a href="#l00017">App.js:17</a></div></div>
+<div class="ttc" id="a_app_8js_html_aa7b1d8321579f7e582fbebd6b6896563"><div class="ttname"><a href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a></div><div class="ttdeci">import Analytics from pages Analytics</div><div class="ttdef"><b>Definition</b> <a href="#l00014">App.js:14</a></div></div>
+<div class="ttc" id="a_app_8js_html_ad72e9f462127c95003c740935476668b"><div class="ttname"><a href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a></div><div class="ttdeci">import Dashboard from pages Dashboard</div><div class="ttdef"><b>Definition</b> <a href="#l00011">App.js:11</a></div></div>
+<div class="ttc" id="a_app_8js_html_ae0d191b66cbd429e8c16cc4a4b87a81c"><div class="ttname"><a href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a></div><div class="ttdeci">export default App</div><div class="ttdef"><b>Definition</b> <a href="#l00221">App.js:221</a></div></div>
+<div class="ttc" id="a_app_8js_html_aee401c867a233493db5da9630b5d10b5"><div class="ttname"><a href="_app_8js.html#aee401c867a233493db5da9630b5d10b5">Taskmaster</a></div><div class="ttdeci">import Taskmaster from pages Taskmaster</div><div class="ttdef"><b>Definition</b> <a href="#l00023">App.js:23</a></div></div>
+<div class="ttc" id="a_app_8js_html_aef656f167a6c589e061e6c89d87c603c"><div class="ttname"><a href="_app_8js.html#aef656f167a6c589e061e6c89d87c603c">SessionTimeoutWarning</a></div><div class="ttdeci">import SessionTimeoutWarning from components SessionTimeoutWarning</div><div class="ttdef"><b>Definition</b> <a href="#l00022">App.js:22</a></div></div>
+<div class="ttc" id="a_app_8js_html_afc6908fbc2bec41fc37d0767d282e05f"><div class="ttname"><a href="_app_8js.html#afc6908fbc2bec41fc37d0767d282e05f">Register</a></div><div class="ttdeci">import Register from pages Register</div><div class="ttdef"><b>Definition</b> <a href="#l00010">App.js:10</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="aauth_store_8test_8js_html_ade3950acfbce45eb72f40d461349f6fc"><div class="ttname"><a href="auth_store_8test_8js.html#ade3950acfbce45eb72f40d461349f6fc">location</a></div><div class="ttdeci">delete window location</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8test_8js_source.html#l00033">authStore.test.js:33</a></div></div>
+<div class="ttc" id="afirebase_8js_html_ab735783ec1f49c1b8740f4dba3dfbfd0"><div class="ttname"><a href="firebase_8js.html#ab735783ec1f49c1b8740f4dba3dfbfd0">auth</a></div><div class="ttdeci">export const auth</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00022">firebase.js:22</a></div></div>
+<div class="ttc" id="afirebase_auth_8js_html_ae1059baaabc38eb86e89f6b0b8eba42b"><div class="ttname"><a href="firebase_auth_8js.html#ae1059baaabc38eb86e89f6b0b8eba42b">onAuthStateChanged</a></div><div class="ttdeci">export const onAuthStateChanged</div><div class="ttdef"><b>Definition</b> <a href="firebase_auth_8js_source.html#l00022">firebaseAuth.js:22</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_aa5462d3ef54464b95641982675a01fcb"><div class="ttname"><a href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a></div><div class="ttdeci">export const useNotificationsStore</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00010">notificationsStore.js:10</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a39f31427712d32956bea93ee68b371c3"><div class="ttname"><a href="react_router_8js.html#a39f31427712d32956bea93ee68b371c3">useLocation</a></div><div class="ttdeci">export const useLocation</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00010">reactRouter.js:10</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a81a37bde3d9e4f910c079a402b2f8e82"><div class="ttname"><a href="react_router_8js.html#a81a37bde3d9e4f910c079a402b2f8e82">Navigate</a></div><div class="ttdeci">export const Navigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00021">reactRouter.js:21</a></div></div>
+<div class="ttc" id="areact_router_8js_html_aedb7ccf3f2d5a13a56d238cf4b408c0c"><div class="ttname"><a href="react_router_8js.html#aedb7ccf3f2d5a13a56d238cf4b408c0c">BrowserRouter</a></div><div class="ttdeci">export const BrowserRouter</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00019">reactRouter.js:19</a></div></div>
+<div class="ttc" id="ause_session_timeout_8js_html_a92579e7b1de77f51ba0917fd2670c107"><div class="ttname"><a href="use_session_timeout_8js.html#a92579e7b1de77f51ba0917fd2670c107">useSessionTimeout</a></div><div class="ttdeci">export const useSessionTimeout</div><div class="ttdef"><b>Definition</b> <a href="use_session_timeout_8js_source.html#l00017">useSessionTimeout.js:17</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

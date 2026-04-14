@@ -103,11 +103,548 @@ $(function(){initNavTree('_onboarding_wizard_8jsx.html',''); initResizable(true)
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">OnboardingWizard.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_onboarding_wizard_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a88aab8402c4245dbd1fb3cb6f949b260" id="r_a88aab8402c4245dbd1fb3cb6f949b260"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88aab8402c4245dbd1fb3cb6f949b260">StepBadge</a> ({ type })</td></tr>
+<tr class="separator:a88aab8402c4245dbd1fb3cb6f949b260"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a01f3c94f99222abe2350650f711d51" id="r_a6a01f3c94f99222abe2350650f711d51"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a> ({ onClick, icon:Icon, label })</td></tr>
+<tr class="separator:a6a01f3c94f99222abe2350650f711d51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cf84e1c764ed93c09c5feb05aa9ec11" id="r_a7cf84e1c764ed93c09c5feb05aa9ec11"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cf84e1c764ed93c09c5feb05aa9ec11">SecondaryButton</a> ({ onClick, label })</td></tr>
+<tr class="separator:a7cf84e1c764ed93c09c5feb05aa9ec11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae098af6737f610230dbcc4a228a5203" id="r_aae098af6737f610230dbcc4a228a5203"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae098af6737f610230dbcc4a228a5203">OnboardingWizard</a> ({ open, onClose, onFinish, navigate })</td></tr>
+<tr class="separator:aae098af6737f610230dbcc4a228a5203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useMemo, useState } from &quot;react&quot;</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a6a01f3c94f99222abe2350650f711d51" name="a6a01f3c94f99222abe2350650f711d51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a01f3c94f99222abe2350650f711d51">&#9670;&#160;</a></span>ActionButton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function ActionButton </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ onClick, icon:Icon, label }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_onboarding_wizard_8jsx_source.html#l00044">44</a> of file <a class="el" href="_onboarding_wizard_8jsx_source.html">OnboardingWizard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   44</span>                      { onClick, icon: Icon, label }) {</div>
+<div class="line"><span class="lineno">   45</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   46</span>    &lt;button</div>
+<div class="line"><span class="lineno">   47</span>      type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">   48</span>      onClick={onClick}</div>
+<div class="line"><span class="lineno">   49</span>      className=<span class="stringliteral">&quot;inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium</span></div>
+<div class="line"><span class="lineno">   50</span><span class="stringliteral">                 bg-primary text-white hover:bg-primary-hover</span></div>
+<div class="line"><span class="lineno">   51</span><span class="stringliteral">                 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">   52</span>    &gt;</div>
+<div class="line"><span class="lineno">   53</span>      {Icon &amp;&amp; &lt;Icon size={15} /&gt;}</div>
+<div class="line"><span class="lineno">   54</span>      {label}</div>
+<div class="line"><span class="lineno">   55</span>    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   56</span>  );</div>
+<div class="line"><span class="lineno">   57</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aae098af6737f610230dbcc4a228a5203" name="aae098af6737f610230dbcc4a228a5203"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae098af6737f610230dbcc4a228a5203">&#9670;&#160;</a></span>OnboardingWizard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default OnboardingWizard </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ open, onClose, onFinish, navigate }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_onboarding_wizard_8jsx_source.html#l00074">74</a> of file <a class="el" href="_onboarding_wizard_8jsx_source.html">OnboardingWizard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   74</span>                                         { open, onClose, onFinish, navigate }) {</div>
+<div class="line"><span class="lineno">   75</span> </div>
+<div class="line"><span class="lineno">   76</span>  <span class="keyword">const</span> steps = useMemo(() =&gt; [</div>
+<div class="line"><span class="lineno">   77</span> </div>
+<div class="line"><span class="lineno">   78</span>    <span class="comment">// ── Step 0: Welcome ───────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">   79</span>    {</div>
+<div class="line"><span class="lineno">   80</span>      icon:  Compass,</div>
+<div class="line"><span class="lineno">   81</span>      badge: <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">   82</span>      title: <span class="stringliteral">&quot;Welcome to Split-Sync&quot;</span>,</div>
+<div class="line"><span class="lineno">   83</span>      body: (</div>
+<div class="line"><span class="lineno">   84</span>        &lt;div className=<span class="stringliteral">&quot;space-y-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   85</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   86</span>            Split-Sync helps you track shared expenses, settle debts fairly,</div>
+<div class="line"><span class="lineno">   87</span>            and keep everyone in your group on the same page — whether it is</div>
+<div class="line"><span class="lineno">   88</span>            a trip, rent, dining, or any <span class="keyword">event</span> with shared cost.</div>
+<div class="line"><span class="lineno">   89</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">   90</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   91</span>            This guide walks you through the steps in the order that matters.</div>
+<div class="line"><span class="lineno">   92</span>            Steps marked &lt;strong className=<span class="stringliteral">&quot;text-red-600 dark:text-red-400&quot;</span>&gt;Required&lt;/strong&gt; should</div>
+<div class="line"><span class="lineno">   93</span>            be done now. Steps marked &lt;strong className=<span class="stringliteral">&quot;text-amber-600 dark:text-amber-400&quot;</span>&gt;Recommended&lt;/strong&gt; are</div>
+<div class="line"><span class="lineno">   94</span>            strongly advised. Everything <span class="keywordflow">else</span> is optional and can be explored later.</div>
+<div class="line"><span class="lineno">   95</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">   96</span>          &lt;div className=<span class="stringliteral">&quot;rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-4 py-3 text-sm text-blue-800 dark:text-blue-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   97</span>            You can use the chat bubble by the bottom right of <span class="keyword">this</span> screen to <span class="keyword">get</span> help or visit the Help &amp; Support in the &lt;strong&gt;<a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a>&lt;/strong&gt; at any time <span class="keywordflow">for</span> more information.</div>
+<div class="line"><span class="lineno">   98</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   99</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  100</span>      ),</div>
+<div class="line"><span class="lineno">  101</span>    },</div>
+<div class="line"><span class="lineno">  102</span> </div>
+<div class="line"><span class="lineno">  103</span>   </div>
+<div class="line"><span class="lineno">  104</span> </div>
+<div class="line"><span class="lineno">  105</span>    <span class="comment">// ── Step 1: Set Up a Payment Method ──────────────────────────────</span></div>
+<div class="line"><span class="lineno">  106</span>    {</div>
+<div class="line"><span class="lineno">  107</span>      icon:  CreditCard,</div>
+<div class="line"><span class="lineno">  108</span>      badge: <span class="stringliteral">&quot;required&quot;</span>,</div>
+<div class="line"><span class="lineno">  109</span>      title: <span class="stringliteral">&quot;Set up a payment method&quot;</span>,</div>
+<div class="line"><span class="lineno">  110</span>      body: (</div>
+<div class="line"><span class="lineno">  111</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  112</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  113</span>            Before you can settle a debt, you need at least one payment method</div>
+<div class="line"><span class="lineno">  114</span>            saved to your profile. Without <span class="keyword">this</span>, other members cannot send you</div>
+<div class="line"><span class="lineno">  115</span>            money directly through the <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>.</div>
+<div class="line"><span class="lineno">  116</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  117</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  118</span>            &lt;li&gt;&lt;strong&gt;PayPal&lt;/strong&gt; — your PayPal.me @username&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  119</span>            &lt;li&gt;&lt;strong&gt;Revolut&lt;/strong&gt; — your Revolut @username&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  120</span>            &lt;li&gt;&lt;strong&gt;SEPA&lt;/strong&gt; — your IBAN (stored encrypted) and optional BIC&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  121</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  122</span>          &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  123</span>            You only need one. Add more <span class="keywordflow">if</span> you want to give others options.</div>
+<div class="line"><span class="lineno">  124</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  125</span>          &lt;<a class="code hl_function" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div>
+<div class="line"><span class="lineno">  126</span>            onClick={() =&gt; navigate(<span class="stringliteral">&quot;/profile&quot;</span>)}</div>
+<div class="line"><span class="lineno">  127</span>            icon={CreditCard}</div>
+<div class="line"><span class="lineno">  128</span>            label=<span class="stringliteral">&quot;Open Payment Settings&quot;</span></div>
+<div class="line"><span class="lineno">  129</span>          /&gt;</div>
+<div class="line"><span class="lineno">  130</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  131</span>      ),</div>
+<div class="line"><span class="lineno">  132</span>    },</div>
+<div class="line"><span class="lineno">  133</span> </div>
+<div class="line"><span class="lineno">  134</span>    <span class="comment">// ── Step 2: Enable Biometric Login ───────────────────────────────</span></div>
+<div class="line"><span class="lineno">  135</span>    {</div>
+<div class="line"><span class="lineno">  136</span>      icon:  Fingerprint,</div>
+<div class="line"><span class="lineno">  137</span>      badge: <span class="stringliteral">&quot;required&quot;</span>,</div>
+<div class="line"><span class="lineno">  138</span>      title: <span class="stringliteral">&quot;Enable biometric login&quot;</span>,</div>
+<div class="line"><span class="lineno">  139</span>      body: (</div>
+<div class="line"><span class="lineno">  140</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  141</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  142</span>            Protect your account with fingerprint or Face ID on <span class="keyword">this</span> device.</div>
+<div class="line"><span class="lineno">  143</span>            Biometric login is faster and more secure than typing your password</div>
+<div class="line"><span class="lineno">  144</span>            every time.</div>
+<div class="line"><span class="lineno">  145</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  146</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  147</span>            &lt;li&gt;Enabled per device — you can <span class="keyword">set</span> it up on each device you use&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  148</span>            &lt;li&gt;If biometric fails, your password is always the fallback&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  149</span>            &lt;li&gt;You can disable it at any time from <a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a>&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  150</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  151</span>          &lt;<a class="code hl_function" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div>
+<div class="line"><span class="lineno">  152</span>            onClick={() =&gt; navigate(<span class="stringliteral">&quot;/settings&quot;</span>)}</div>
+<div class="line"><span class="lineno">  153</span>            icon={Fingerprint}</div>
+<div class="line"><span class="lineno">  154</span>            label=<span class="stringliteral">&quot;Go to Settings to Enable&quot;</span></div>
+<div class="line"><span class="lineno">  155</span>          /&gt;</div>
+<div class="line"><span class="lineno">  156</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  157</span>      ),</div>
+<div class="line"><span class="lineno">  158</span>    },</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>    <span class="comment">// ── Step 3: Add Phone Number ───────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  161</span> </div>
+<div class="line"><span class="lineno">  162</span>     {</div>
+<div class="line"><span class="lineno">  163</span>      icon:  Phone,</div>
+<div class="line"><span class="lineno">  164</span>      badge: <span class="stringliteral">&quot;recommended&quot;</span>,</div>
+<div class="line"><span class="lineno">  165</span>      title: <span class="stringliteral">&quot;Add Phone number&quot;</span>,</div>
+<div class="line"><span class="lineno">  166</span>      body: (</div>
+<div class="line"><span class="lineno">  167</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  168</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  169</span>            Add your phone number to enable others find you more quickly.</div>
+<div class="line"><span class="lineno">  170</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  171</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  172</span>            &lt;li&gt;Go to your <a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> page&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  173</span>            &lt;li&gt;Click Contact Discovery&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  174</span>            &lt;li&gt;Enter your phone number&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  175</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  176</span>          &lt;<a class="code hl_function" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div>
+<div class="line"><span class="lineno">  177</span>            onClick={() =&gt; navigate(<span class="stringliteral">&quot;/profile&quot;</span>)}</div>
+<div class="line"><span class="lineno">  178</span>            icon={Phone}</div>
+<div class="line"><span class="lineno">  179</span>            label=<span class="stringliteral">&quot;Add Phone Number&quot;</span></div>
+<div class="line"><span class="lineno">  180</span>          /&gt;</div>
+<div class="line"><span class="lineno">  181</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  182</span>      ),</div>
+<div class="line"><span class="lineno">  183</span>    },</div>
+<div class="line"><span class="lineno">  184</span> </div>
+<div class="line"><span class="lineno">  185</span>    <span class="comment">// ── Step 4: Create or Join a Group ───────────────────────────────</span></div>
+<div class="line"><span class="lineno">  186</span>    {</div>
+<div class="line"><span class="lineno">  187</span>      icon:  Users,</div>
+<div class="line"><span class="lineno">  188</span>      badge: <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">  189</span>      title: <span class="stringliteral">&quot;Create or join a group&quot;</span>,</div>
+<div class="line"><span class="lineno">  190</span>      body: (</div>
+<div class="line"><span class="lineno">  191</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  192</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  193</span>            All expense tracking happens inside a group. A group represents a</div>
+<div class="line"><span class="lineno">  194</span>            shared context — a trip, a household, a dinner, or any shared cost</div>
+<div class="line"><span class="lineno">  195</span>            between people.</div>
+<div class="line"><span class="lineno">  196</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  197</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  198</span>            &lt;li&gt;Tap the &lt;strong&gt;+&lt;/strong&gt; button on the <a class="code hl_variable" href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a> to create a group&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  199</span>            &lt;li&gt;Give it a name, pick an icon, and <span class="keyword">set</span> the currency&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  200</span>            &lt;li&gt;Or join an existing group <span class="keyword">using </span>an invite link someone shared with you&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  201</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  202</span>          &lt;div className=<span class="stringliteral">&quot;flex flex-wrap gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  203</span>            &lt;<a class="code hl_function" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div>
+<div class="line"><span class="lineno">  204</span>              onClick={() =&gt; navigate(<span class="stringliteral">&quot;/dashboard&quot;</span>)}</div>
+<div class="line"><span class="lineno">  205</span>              icon={Users}</div>
+<div class="line"><span class="lineno">  206</span>              label=<span class="stringliteral">&quot;Go to Dashboard&quot;</span></div>
+<div class="line"><span class="lineno">  207</span>            /&gt;</div>
+<div class="line"><span class="lineno">  208</span>            &lt;<a class="code hl_function" href="#a7cf84e1c764ed93c09c5feb05aa9ec11">SecondaryButton</a></div>
+<div class="line"><span class="lineno">  209</span>              onClick={() =&gt; navigate(<span class="stringliteral">&quot;/join-group&quot;</span>)}</div>
+<div class="line"><span class="lineno">  210</span>              label=<span class="stringliteral">&quot;Join a Group&quot;</span></div>
+<div class="line"><span class="lineno">  211</span>            /&gt;</div>
+<div class="line"><span class="lineno">  212</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  213</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  214</span>      ),</div>
+<div class="line"><span class="lineno">  215</span>    },</div>
+<div class="line"><span class="lineno">  216</span> </div>
+<div class="line"><span class="lineno">  217</span>    <span class="comment">// ── Step 5: Invite Members ───────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  218</span>    {</div>
+<div class="line"><span class="lineno">  219</span>      icon:  UserPlus,</div>
+<div class="line"><span class="lineno">  220</span>      badge: <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">  221</span>      title: <span class="stringliteral">&quot;Invite members before adding expenses&quot;</span>,</div>
+<div class="line"><span class="lineno">  222</span>      body: (</div>
+<div class="line"><span class="lineno">  223</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  224</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  225</span>            This is the most important flow to understand. You must have at</div>
+<div class="line"><span class="lineno">  226</span>            least one other member in your group before you can add and split</div>
+<div class="line"><span class="lineno">  227</span>            an expense.</div>
+<div class="line"><span class="lineno">  228</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  229</span>          &lt;div className=<span class="stringliteral">&quot;rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  230</span>            Adding expenses to a group with only yourself in it simply means — there is no one to split with. Always invite first and when they join, you can add expenses.</div>
+<div class="line"><span class="lineno">  231</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  232</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  233</span>            &lt;li&gt;Open your group and tap &lt;strong&gt;Invite <a class="code hl_variable" href="react_router_8js.html#afbfc703e9efa1388b93aa7122878081b">Link</a>&lt;/strong&gt;&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  234</span>            &lt;li&gt;Share the link via WhatsApp, email, or QR code&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  235</span>            &lt;li&gt;Members appear instantly once they join&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  236</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  237</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  238</span>      ),</div>
+<div class="line"><span class="lineno">  239</span>    },</div>
+<div class="line"><span class="lineno">  240</span> </div>
+<div class="line"><span class="lineno">  241</span>    <span class="comment">// ── Step 6: Add an Expense ───────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  242</span>    {</div>
+<div class="line"><span class="lineno">  243</span>      icon:  PlusCircle,</div>
+<div class="line"><span class="lineno">  244</span>      badge: <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">  245</span>      title: <span class="stringliteral">&quot;Add an expense&quot;</span>,</div>
+<div class="line"><span class="lineno">  246</span>      body: (</div>
+<div class="line"><span class="lineno">  247</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  248</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  249</span>            Once your group has members, tap &lt;strong&gt;Add Expense&lt;/strong&gt; inside the group.</div>
+<div class="line"><span class="lineno">  250</span>            You can enter details of what is paid <span class="keywordflow">for</span> manually or scan a receipt <span class="keyword">using </span>the camera. Choose how to split among members:</div>
+<div class="line"><span class="lineno">  251</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  252</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  253</span>            &lt;li&gt;&lt;strong&gt;Equal&lt;/strong&gt; — split the total evenly across members&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  254</span>            &lt;li&gt;&lt;strong&gt;Percentage&lt;/strong&gt; — assign a custom percentage to each person&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  255</span>            &lt;li&gt;&lt;strong&gt;Exact&lt;/strong&gt; — specify the exact amount each person owes&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  256</span>            &lt;li&gt;&lt;strong&gt;Shares&lt;/strong&gt; — assign weighted shares (e.g. 2 shares vs 1 share)&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  257</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  258</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;Members are notified of <span class="keyword">new</span> expenses and can view details and their share in the <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>.&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  259</span>          &lt;<a class="code hl_function" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div>
+<div class="line"><span class="lineno">  260</span>            onClick={() =&gt; navigate(<span class="stringliteral">&quot;/quick-add&quot;</span>)}</div>
+<div class="line"><span class="lineno">  261</span>            icon={PlusCircle}</div>
+<div class="line"><span class="lineno">  262</span>            label=<span class="stringliteral">&quot;Quick Add&quot;</span></div>
+<div class="line"><span class="lineno">  263</span>          /&gt;</div>
+<div class="line"><span class="lineno">  264</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  265</span>      ),</div>
+<div class="line"><span class="lineno">  266</span>    },</div>
+<div class="line"><span class="lineno">  267</span> </div>
+<div class="line"><span class="lineno">  268</span>    <span class="comment">// ── Step 7: Settle Up ────────────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  269</span>    {</div>
+<div class="line"><span class="lineno">  270</span>      icon:  HandCoins,</div>
+<div class="line"><span class="lineno">  271</span>      badge: <span class="keyword">null</span>,</div>
+<div class="line"><span class="lineno">  272</span>      title: <span class="stringliteral">&quot;Review balances and settle up&quot;</span>,</div>
+<div class="line"><span class="lineno">  273</span>      body: (</div>
+<div class="line"><span class="lineno">  274</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  275</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  276</span>            Open any group to see the Settlement Summary — a clear breakdown</div>
+<div class="line"><span class="lineno">  277</span>            of who owes who and how much. Tap &lt;strong&gt;Pay (Amount)&lt;/strong&gt; to</div>
+<div class="line"><span class="lineno">  278</span>            send payment through your chosen method. And you can confirm a payment is made by tapping &lt;strong&gt;Mark as Paid&lt;/strong&gt; to update balances.</div>
+<div class="line"><span class="lineno">  279</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  280</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  281</span>            &lt;li&gt;PayPal and Revolut open a direct payment link&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  282</span>            &lt;li&gt;SEPA generates bank transfer details&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  283</span>            &lt;li&gt;Balances update in real-time as expenses and payments are recorded&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  284</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  285</span>          &lt;<a class="code hl_function" href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div>
+<div class="line"><span class="lineno">  286</span>            onClick={() =&gt; navigate(<span class="stringliteral">&quot;/activity&quot;</span>)}</div>
+<div class="line"><span class="lineno">  287</span>            icon={HandCoins}</div>
+<div class="line"><span class="lineno">  288</span>            label=<span class="stringliteral">&quot;View Activity&quot;</span></div>
+<div class="line"><span class="lineno">  289</span>          /&gt;</div>
+<div class="line"><span class="lineno">  290</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  291</span>      ),</div>
+<div class="line"><span class="lineno">  292</span>    },</div>
+<div class="line"><span class="lineno">  293</span> </div>
+<div class="line"><span class="lineno">  294</span>    <span class="comment">// ── Step 8: Optional Features ────────────────────────────────────</span></div>
+<div class="line"><span class="lineno">  295</span>    {</div>
+<div class="line"><span class="lineno">  296</span>      icon:  Sparkles,</div>
+<div class="line"><span class="lineno">  297</span>      badge: <span class="stringliteral">&quot;optional&quot;</span>,</div>
+<div class="line"><span class="lineno">  298</span>      title: <span class="stringliteral">&quot;Optional features to explore&quot;</span>,</div>
+<div class="line"><span class="lineno">  299</span>      body: (</div>
+<div class="line"><span class="lineno">  300</span>        &lt;div className=<span class="stringliteral">&quot;space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  301</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  302</span>            Improve your experience once you are comfortable with the basics.</div>
+<div class="line"><span class="lineno">  303</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  304</span>          &lt;ul className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  305</span>            &lt;li&gt;&lt;strong&gt;<a class="code hl_variable" href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a> Photo&lt;/strong&gt; — Add a photo to your profile&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  306</span>            &lt;li&gt;&lt;strong&gt;<a class="code hl_variable" href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a>&lt;/strong&gt; — view spending breakdowns and charts per group&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  307</span>            &lt;li&gt;&lt;strong&gt;Dark Mode&lt;/strong&gt; — toggle in <a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a> under Appearance&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  308</span>            &lt;li&gt;&lt;strong&gt;QR Code Sharing&lt;/strong&gt; — share your group invite as a scannable QR code&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  309</span>            &lt;li&gt;&lt;strong&gt;Receipt Scanner&lt;/strong&gt; — scan a receipt to pre-fill expense details&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  310</span>            &lt;li&gt;&lt;strong&gt;Click Details to settle up&lt;/strong&gt; — view and manage your settlement details from your profile dashboard&lt;/li&gt;</div>
+<div class="line"><span class="lineno">  311</span>          &lt;/ul&gt;</div>
+<div class="line"><span class="lineno">  312</span>          &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  313</span>            You can watch the video guide in the Support <a class="code hl_function" href="_settings_8jsx.html#a593e200fcaba27a036078a4bf16900e4">Section</a> from <a class="code hl_variable" href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a> <a class="code hl_variable" href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a>.</div>
+<div class="line"><span class="lineno">  314</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  315</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  316</span>      ),</div>
+<div class="line"><span class="lineno">  317</span>    },</div>
+<div class="line"><span class="lineno">  318</span> </div>
+<div class="line"><span class="lineno">  319</span>  ], [navigate]);</div>
+<div class="line"><span class="lineno">  320</span> </div>
+<div class="line"><span class="lineno">  321</span>  <span class="keyword">const</span> [idx, setIdx] = useState(0);</div>
+<div class="line"><span class="lineno">  322</span> </div>
+<div class="line"><span class="lineno">  323</span>  <span class="keywordflow">if</span> (!open) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">  324</span> </div>
+<div class="line"><span class="lineno">  325</span>  <span class="keyword">const</span> StepIcon  = steps[idx].icon;</div>
+<div class="line"><span class="lineno">  326</span>  <span class="keyword">const</span> stepBadge = steps[idx].badge;</div>
+<div class="line"><span class="lineno">  327</span>  <span class="keyword">const</span> isLast    = idx === steps.length - 1;</div>
+<div class="line"><span class="lineno">  328</span>  <span class="keyword">const</span> isFirst   = idx === 0;</div>
+<div class="line"><span class="lineno">  329</span> </div>
+<div class="line"><span class="lineno">  330</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  331</span>    &lt;div className=<span class="stringliteral">&quot;fixed inset-0 z-50&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  332</span>      {<span class="comment">/* Backdrop */</span>}</div>
+<div class="line"><span class="lineno">  333</span>      &lt;div</div>
+<div class="line"><span class="lineno">  334</span>        className=<span class="stringliteral">&quot;absolute inset-0 bg-black/50&quot;</span></div>
+<div class="line"><span class="lineno">  335</span>        onClick={onClose}</div>
+<div class="line"><span class="lineno">  336</span>        aria-hidden=<span class="stringliteral">&quot;true&quot;</span></div>
+<div class="line"><span class="lineno">  337</span>      /&gt;</div>
+<div class="line"><span class="lineno">  338</span> </div>
+<div class="line"><span class="lineno">  339</span>      {<span class="comment">/* Modal */</span>}</div>
+<div class="line"><span class="lineno">  340</span>      &lt;div className=<span class="stringliteral">&quot;absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  341</span>        &lt;div className=<span class="stringliteral">&quot;w-full sm:max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  342</span> </div>
+<div class="line"><span class="lineno">  343</span>          {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">  344</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  345</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-3 min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  346</span>              &lt;div className=<span class="stringliteral">&quot;shrink-0 p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  347</span>                &lt;StepIcon size={18} className=<span class="stringliteral">&quot;text-indigo-600 dark:text-indigo-400&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  348</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  349</span>              &lt;div className=<span class="stringliteral">&quot;min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  350</span>                &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 flex-wrap&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  351</span>                  &lt;h2 className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white text-sm leading-tight&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  352</span>                    {steps[idx].title}</div>
+<div class="line"><span class="lineno">  353</span>                  &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  354</span>                  &lt;<a class="code hl_function" href="#a88aab8402c4245dbd1fb3cb6f949b260">StepBadge</a> type={stepBadge} /&gt;</div>
+<div class="line"><span class="lineno">  355</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  356</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  357</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  358</span>            &lt;button</div>
+<div class="line"><span class="lineno">  359</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  360</span>              onClick={onClose}</div>
+<div class="line"><span class="lineno">  361</span>              className=<span class="stringliteral">&quot;shrink-0 ml-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition&quot;</span></div>
+<div class="line"><span class="lineno">  362</span>              aria-label=<span class="stringliteral">&quot;Close onboarding wizard&quot;</span></div>
+<div class="line"><span class="lineno">  363</span>            &gt;</div>
+<div class="line"><span class="lineno">  364</span>              &lt;X size={18} /&gt;</div>
+<div class="line"><span class="lineno">  365</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  366</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  367</span> </div>
+<div class="line"><span class="lineno">  368</span>          {<span class="comment">/* Scrollable Body */</span>}</div>
+<div class="line"><span class="lineno">  369</span>          &lt;div className=<span class="stringliteral">&quot;px-5 py-5 max-h-[55vh] overflow-y-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  370</span>            {steps[idx].body}</div>
+<div class="line"><span class="lineno">  371</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  372</span> </div>
+<div class="line"><span class="lineno">  373</span>          {<span class="comment">/* Footer */</span>}</div>
+<div class="line"><span class="lineno">  374</span>          &lt;div className=<span class="stringliteral">&quot;px-5 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  375</span> </div>
+<div class="line"><span class="lineno">  376</span>            {<span class="comment">/* Back button */</span>}</div>
+<div class="line"><span class="lineno">  377</span>            &lt;button</div>
+<div class="line"><span class="lineno">  378</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  379</span>              onClick={() =&gt; setIdx((p) =&gt; Math.max(0, p - 1))}</div>
+<div class="line"><span class="lineno">  380</span>              disabled={isFirst}</div>
+<div class="line"><span class="lineno">  381</span>              className=<span class="stringliteral">&quot;inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm</span></div>
+<div class="line"><span class="lineno">  382</span><span class="stringliteral">                         bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700</span></div>
+<div class="line"><span class="lineno">  383</span><span class="stringliteral">                         text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700</span></div>
+<div class="line"><span class="lineno">  384</span><span class="stringliteral">                         disabled:opacity-40 disabled:cursor-not-allowed transition&quot;</span></div>
+<div class="line"><span class="lineno">  385</span>            &gt;</div>
+<div class="line"><span class="lineno">  386</span>              &lt;ChevronLeft size={16} /&gt;</div>
+<div class="line"><span class="lineno">  387</span>              Back</div>
+<div class="line"><span class="lineno">  388</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  389</span> </div>
+<div class="line"><span class="lineno">  390</span>            {<span class="comment">/* Step indicators */</span>}</div>
+<div class="line"><span class="lineno">  391</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  392</span>              {steps.map((_, i) =&gt; (</div>
+<div class="line"><span class="lineno">  393</span>                &lt;button</div>
+<div class="line"><span class="lineno">  394</span>                  key={i}</div>
+<div class="line"><span class="lineno">  395</span>                  type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  396</span>                  onClick={() =&gt; setIdx(i)}</div>
+<div class="line"><span class="lineno">  397</span>                  aria-label={`Go to step ${i + 1}`}</div>
+<div class="line"><span class="lineno">  398</span>                  className={`rounded-full transition-all duration-200 ${</div>
+<div class="line"><span class="lineno">  399</span>                    i === idx</div>
+<div class="line"><span class="lineno">  400</span>                      ? <span class="stringliteral">&quot;w-5 h-2 bg-indigo-600 dark:bg-indigo-400&quot;</span></div>
+<div class="line"><span class="lineno">  401</span>                      : i &lt; idx</div>
+<div class="line"><span class="lineno">  402</span>                      ? <span class="stringliteral">&quot;w-2 h-2 bg-indigo-300 dark:bg-indigo-600&quot;</span></div>
+<div class="line"><span class="lineno">  403</span>                      : <span class="stringliteral">&quot;w-2 h-2 bg-gray-200 dark:bg-gray-700&quot;</span></div>
+<div class="line"><span class="lineno">  404</span>                  }`}</div>
+<div class="line"><span class="lineno">  405</span>                /&gt;</div>
+<div class="line"><span class="lineno">  406</span>              ))}</div>
+<div class="line"><span class="lineno">  407</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  408</span> </div>
+<div class="line"><span class="lineno">  409</span>            {<span class="comment">/* Next / Finish button */</span>}</div>
+<div class="line"><span class="lineno">  410</span>            {isLast ? (</div>
+<div class="line"><span class="lineno">  411</span>              &lt;button</div>
+<div class="line"><span class="lineno">  412</span>                type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  413</span>                onClick={onFinish}</div>
+<div class="line"><span class="lineno">  414</span>                className=<span class="stringliteral">&quot;inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium</span></div>
+<div class="line"><span class="lineno">  415</span><span class="stringliteral">                           bg-primary text-white hover:bg-primary-hover</span></div>
+<div class="line"><span class="lineno">  416</span><span class="stringliteral">                           dark:bg-indigo-600 dark:hover:bg-indigo-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  417</span>              &gt;</div>
+<div class="line"><span class="lineno">  418</span>                &lt;CheckCircle2 size={16} /&gt;</div>
+<div class="line"><span class="lineno">  419</span>                Get Started</div>
+<div class="line"><span class="lineno">  420</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  421</span>            ) : (</div>
+<div class="line"><span class="lineno">  422</span>              &lt;button</div>
+<div class="line"><span class="lineno">  423</span>                type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  424</span>                onClick={() =&gt; setIdx((p) =&gt; Math.min(steps.length - 1, p + 1))}</div>
+<div class="line"><span class="lineno">  425</span>                className=<span class="stringliteral">&quot;inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium</span></div>
+<div class="line"><span class="lineno">  426</span><span class="stringliteral">                           bg-primary text-white hover:bg-primary-hover</span></div>
+<div class="line"><span class="lineno">  427</span><span class="stringliteral">                           dark:bg-indigo-600 dark:hover:bg-indigo-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  428</span>              &gt;</div>
+<div class="line"><span class="lineno">  429</span>                Next</div>
+<div class="line"><span class="lineno">  430</span>                &lt;ChevronRight size={16} /&gt;</div>
+<div class="line"><span class="lineno">  431</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  432</span>            )}</div>
+<div class="line"><span class="lineno">  433</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  434</span> </div>
+<div class="line"><span class="lineno">  435</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  436</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  437</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  438</span>  );</div>
+<div class="line"><span class="lineno">  439</span>}</div>
+<div class="ttc" id="a_app_8js_html_a41fced9f4a60b34be2c803b77dcada2d"><div class="ttname"><a href="_app_8js.html#a41fced9f4a60b34be2c803b77dcada2d">Settings</a></div><div class="ttdeci">import Settings from pages Settings</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00019">App.js:19</a></div></div>
+<div class="ttc" id="a_app_8js_html_a5aa8005d6278eb7eecc1b3cd3f87aad6"><div class="ttname"><a href="_app_8js.html#a5aa8005d6278eb7eecc1b3cd3f87aad6">Profile</a></div><div class="ttdeci">import Profile from pages Profile</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00015">App.js:15</a></div></div>
+<div class="ttc" id="a_app_8js_html_aa7b1d8321579f7e582fbebd6b6896563"><div class="ttname"><a href="_app_8js.html#aa7b1d8321579f7e582fbebd6b6896563">Analytics</a></div><div class="ttdeci">import Analytics from pages Analytics</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00014">App.js:14</a></div></div>
+<div class="ttc" id="a_app_8js_html_ad72e9f462127c95003c740935476668b"><div class="ttname"><a href="_app_8js.html#ad72e9f462127c95003c740935476668b">Dashboard</a></div><div class="ttdeci">import Dashboard from pages Dashboard</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00011">App.js:11</a></div></div>
+<div class="ttc" id="a_app_8js_html_ae0d191b66cbd429e8c16cc4a4b87a81c"><div class="ttname"><a href="_app_8js.html#ae0d191b66cbd429e8c16cc4a4b87a81c">App</a></div><div class="ttdeci">export default App</div><div class="ttdef"><b>Definition</b> <a href="_app_8js_source.html#l00221">App.js:221</a></div></div>
+<div class="ttc" id="a_onboarding_wizard_8jsx_html_a6a01f3c94f99222abe2350650f711d51"><div class="ttname"><a href="#a6a01f3c94f99222abe2350650f711d51">ActionButton</a></div><div class="ttdeci">function ActionButton({ onClick, icon:Icon, label })</div><div class="ttdef"><b>Definition</b> <a href="_onboarding_wizard_8jsx_source.html#l00044">OnboardingWizard.jsx:44</a></div></div>
+<div class="ttc" id="a_onboarding_wizard_8jsx_html_a7cf84e1c764ed93c09c5feb05aa9ec11"><div class="ttname"><a href="#a7cf84e1c764ed93c09c5feb05aa9ec11">SecondaryButton</a></div><div class="ttdeci">function SecondaryButton({ onClick, label })</div><div class="ttdef"><b>Definition</b> <a href="_onboarding_wizard_8jsx_source.html#l00060">OnboardingWizard.jsx:60</a></div></div>
+<div class="ttc" id="a_onboarding_wizard_8jsx_html_a88aab8402c4245dbd1fb3cb6f949b260"><div class="ttname"><a href="#a88aab8402c4245dbd1fb3cb6f949b260">StepBadge</a></div><div class="ttdeci">function StepBadge({ type })</div><div class="ttdef"><b>Definition</b> <a href="_onboarding_wizard_8jsx_source.html#l00024">OnboardingWizard.jsx:24</a></div></div>
+<div class="ttc" id="a_settings_8jsx_html_a593e200fcaba27a036078a4bf16900e4"><div class="ttname"><a href="_settings_8jsx.html#a593e200fcaba27a036078a4bf16900e4">Section</a></div><div class="ttdeci">function Section({ title, icon:Icon, iconColor=&#39;text-indigo-600 dark:text-indigo-400&#39;, iconBg=&#39;bg-indigo-50 dark:bg-indigo-900/30&#39;, defaultOpen=false, children })</div><div class="ttdef"><b>Definition</b> <a href="_settings_8jsx_source.html#l00036">Settings.jsx:36</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a979397bcd61476f20722e963203a16ed"><div class="ttname"><a href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a></div><div class="ttdeci">const app</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00019">firebase.js:19</a></div></div>
+<div class="ttc" id="areact_router_8js_html_afbfc703e9efa1388b93aa7122878081b"><div class="ttname"><a href="react_router_8js.html#afbfc703e9efa1388b93aa7122878081b">Link</a></div><div class="ttdeci">export const Link</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00017">reactRouter.js:17</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a7cf84e1c764ed93c09c5feb05aa9ec11" name="a7cf84e1c764ed93c09c5feb05aa9ec11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cf84e1c764ed93c09c5feb05aa9ec11">&#9670;&#160;</a></span>SecondaryButton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function SecondaryButton </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ onClick, label }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_onboarding_wizard_8jsx_source.html#l00060">60</a> of file <a class="el" href="_onboarding_wizard_8jsx_source.html">OnboardingWizard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   60</span>                         { onClick, label }) {</div>
+<div class="line"><span class="lineno">   61</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   62</span>    &lt;button</div>
+<div class="line"><span class="lineno">   63</span>      type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">   64</span>      onClick={onClick}</div>
+<div class="line"><span class="lineno">   65</span>      className=<span class="stringliteral">&quot;inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium</span></div>
+<div class="line"><span class="lineno">   66</span><span class="stringliteral">                 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700</span></div>
+<div class="line"><span class="lineno">   67</span><span class="stringliteral">                 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">   68</span>    &gt;</div>
+<div class="line"><span class="lineno">   69</span>      {label}</div>
+<div class="line"><span class="lineno">   70</span>    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   71</span>  );</div>
+<div class="line"><span class="lineno">   72</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a88aab8402c4245dbd1fb3cb6f949b260" name="a88aab8402c4245dbd1fb3cb6f949b260"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88aab8402c4245dbd1fb3cb6f949b260">&#9670;&#160;</a></span>StepBadge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function StepBadge </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ type }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_onboarding_wizard_8jsx_source.html#l00024">24</a> of file <a class="el" href="_onboarding_wizard_8jsx_source.html">OnboardingWizard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   24</span>                   { type }) {</div>
+<div class="line"><span class="lineno">   25</span>  <span class="keyword">const</span> styles = {</div>
+<div class="line"><span class="lineno">   26</span>    required:    <span class="stringliteral">&quot;bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800&quot;</span>,</div>
+<div class="line"><span class="lineno">   27</span>    recommended: <span class="stringliteral">&quot;bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800&quot;</span>,</div>
+<div class="line"><span class="lineno">   28</span>    optional:    <span class="stringliteral">&quot;bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700&quot;</span>,</div>
+<div class="line"><span class="lineno">   29</span>  };</div>
+<div class="line"><span class="lineno">   30</span>  <span class="keyword">const</span> labels = {</div>
+<div class="line"><span class="lineno">   31</span>    required:    <span class="stringliteral">&quot;Required&quot;</span>,</div>
+<div class="line"><span class="lineno">   32</span>    recommended: <span class="stringliteral">&quot;Recommended&quot;</span>,</div>
+<div class="line"><span class="lineno">   33</span>    optional:    <span class="stringliteral">&quot;Optional&quot;</span>,</div>
+<div class="line"><span class="lineno">   34</span>  };</div>
+<div class="line"><span class="lineno">   35</span>  <span class="keywordflow">if</span> (!type) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   36</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   37</span>    &lt;span className={`text-xs font-medium px-2 py-0.5 rounded-full ${styles[type]}`}&gt;</div>
+<div class="line"><span class="lineno">   38</span>      {labels[type]}</div>
+<div class="line"><span class="lineno">   39</span>    &lt;/span&gt;</div>
+<div class="line"><span class="lineno">   40</span>  );</div>
+<div class="line"><span class="lineno">   41</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useMemo, useState } from &quot;react&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_onboarding_wizard_8jsx_source.html#l00006">6</a> of file <a class="el" href="_onboarding_wizard_8jsx_source.html">OnboardingWizard.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    6</span>{ useMemo, useState } from <span class="stringliteral">&quot;react&quot;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

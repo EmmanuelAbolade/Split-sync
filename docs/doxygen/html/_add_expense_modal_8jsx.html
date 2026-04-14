@@ -103,11 +103,1058 @@ $(function(){initNavTree('_add_expense_modal_8jsx.html',''); initResizable(true)
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">AddExpenseModal.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_add_expense_modal_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a2118d579a666bef893d44ca350fdb494" id="r_a2118d579a666bef893d44ca350fdb494"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2118d579a666bef893d44ca350fdb494">AddExpenseModal</a> ({ isOpen, onClose, group, initialExpense=null })</td></tr>
+<tr class="separator:a2118d579a666bef893d44ca350fdb494"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a2b4041a737969bc97eba1b700e1b947c" id="r_a2b4041a737969bc97eba1b700e1b947c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> ReceiptScanner from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b4041a737969bc97eba1b700e1b947c">ReceiptScanner</a></td></tr>
+<tr class="separator:a2b4041a737969bc97eba1b700e1b947c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { Camera } from 'lucide-<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46a1d9066aac2aa6d7c907c66390c527" id="r_a46a1d9066aac2aa6d7c907c66390c527"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> Tooltip from&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a></td></tr>
+<tr class="separator:a46a1d9066aac2aa6d7c907c66390c527"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c18ec57f78dddc34070c2ef40fd25ad" id="r_a8c18ec57f78dddc34070c2ef40fd25ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c18ec57f78dddc34070c2ef40fd25ad">CATEGORIES</a></td></tr>
+<tr class="separator:a8c18ec57f78dddc34070c2ef40fd25ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8682160e1e9eb2e68303e8e45cf17455" id="r_a8682160e1e9eb2e68303e8e45cf17455"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8682160e1e9eb2e68303e8e45cf17455">SPLIT_METHODS</a></td></tr>
+<tr class="separator:a8682160e1e9eb2e68303e8e45cf17455"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a2118d579a666bef893d44ca350fdb494" name="a2118d579a666bef893d44ca350fdb494"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2118d579a666bef893d44ca350fdb494">&#9670;&#160;</a></span>AddExpenseModal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default AddExpenseModal </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ isOpen, onClose, group, initialExpense=null }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_add_expense_modal_8jsx_source.html#l00028">28</a> of file <a class="el" href="_add_expense_modal_8jsx_source.html">AddExpenseModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   28</span>                                        { isOpen, onClose, group, initialExpense = <span class="keyword">null</span> }) {</div>
+<div class="line"><span class="lineno">   29</span>  <span class="comment">// isEditing drives all conditional labels and the submit path</span></div>
+<div class="line"><span class="lineno">   30</span>  <span class="keyword">const</span> isEditing = !!initialExpense;</div>
+<div class="line"><span class="lineno">   31</span>  <span class="keyword">const</span> { user } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><span class="lineno">   32</span>  </div>
+<div class="line"><span class="lineno">   33</span>  <span class="keyword">const</span> [title, setTitle] = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   34</span>  <span class="keyword">const</span> [amount, setAmount] = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   35</span>  <span class="keyword">const</span> [paidBy, setPaidBy] = useState(user?.uid || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   36</span>  <span class="keyword">const</span> [category, setCategory] = useState(<span class="stringliteral">&#39;food&#39;</span>);</div>
+<div class="line"><span class="lineno">   37</span>  <span class="keyword">const</span> [description, setDescription] = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   38</span>  <span class="keyword">const</span> [date, setDate] = useState(<span class="keyword">new</span> Date().toISOString().split(<span class="charliteral">&#39;T&#39;</span>)[0]);</div>
+<div class="line"><span class="lineno">   39</span>  <span class="keyword">const</span> [splitMethod, setSplitMethod] = useState(<span class="stringliteral">&#39;equal&#39;</span>);</div>
+<div class="line"><span class="lineno">   40</span>  <span class="keyword">const</span> [selectedMembers, setSelectedMembers] = useState({});</div>
+<div class="line"><span class="lineno">   41</span>  <span class="keyword">const</span> [splits, setSplits] = useState({});</div>
+<div class="line"><span class="lineno">   42</span>  <span class="keyword">const</span> [loading, setLoading] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   43</span>  <span class="keyword">const</span> [error, setError] = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   44</span>  <span class="keyword">const</span> [showConfirmation, setShowConfirmation] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   45</span>  <span class="keyword">const</span> [showReceiptScanner, setShowReceiptScanner] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   46</span>  <span class="keyword">const</span> [scannedData, setScannedData] = useState(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   47</span> </div>
+<div class="line"><span class="lineno">   48</span>      <span class="comment">// Initialize members when modal opens</span></div>
+<div class="line"><span class="lineno">   49</span>      <span class="comment">// eslint-disable-next-line react-hooks/exhaustive-deps</span></div>
+<div class="line"><span class="lineno">   50</span>      useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   51</span>      <span class="keywordflow">if</span> (isOpen &amp;&amp; group?.members) {</div>
+<div class="line"><span class="lineno">   52</span>        <span class="keyword">const</span> initial = {};</div>
+<div class="line"><span class="lineno">   53</span>        group.members.forEach(member =&gt; {</div>
+<div class="line"><span class="lineno">   54</span>          initial[member.userId] = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   55</span>        });</div>
+<div class="line"><span class="lineno">   56</span>        setSelectedMembers(initial);</div>
+<div class="line"><span class="lineno">   57</span>        </div>
+<div class="line"><span class="lineno">   58</span>        <span class="comment">// Initialize splits based on split method</span></div>
+<div class="line"><span class="lineno">   59</span>        <span class="keyword">const</span> initialSplits = {};</div>
+<div class="line"><span class="lineno">   60</span>        <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;percentage&#39;</span>) {</div>
+<div class="line"><span class="lineno">   61</span>          <span class="comment">// First member gets 100%, rest get 0%</span></div>
+<div class="line"><span class="lineno">   62</span>          group.members.forEach((member, index) =&gt; {</div>
+<div class="line"><span class="lineno">   63</span>            initialSplits[member.userId] = index === 0 ? <span class="stringliteral">&#39;100.0&#39;</span> : <span class="stringliteral">&#39;0.0&#39;</span>;</div>
+<div class="line"><span class="lineno">   64</span>          });</div>
+<div class="line"><span class="lineno">   65</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;shares&#39;</span>) {</div>
+<div class="line"><span class="lineno">   66</span>          group.members.forEach(member =&gt; {</div>
+<div class="line"><span class="lineno">   67</span>            initialSplits[member.userId] = <span class="charliteral">&#39;1&#39;</span>;</div>
+<div class="line"><span class="lineno">   68</span>          });</div>
+<div class="line"><span class="lineno">   69</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   70</span>          group.members.forEach(member =&gt; {</div>
+<div class="line"><span class="lineno">   71</span>            initialSplits[member.userId] = <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line"><span class="lineno">   72</span>          });</div>
+<div class="line"><span class="lineno">   73</span>        }</div>
+<div class="line"><span class="lineno">   74</span>        setSplits(initialSplits);</div>
+<div class="line"><span class="lineno">   75</span>      }</div>
+<div class="line"><span class="lineno">   76</span>    }, [isOpen, splitMethod, group?.members]);</div>
+<div class="line"><span class="lineno">   77</span>      </div>
+<div class="line"><span class="lineno">   78</span>    <span class="comment">// Reinitialize splits when split method changes</span></div>
+<div class="line"><span class="lineno">   79</span>    <span class="comment">// eslint-disable-next-line react-hooks/exhaustive-deps</span></div>
+<div class="line"><span class="lineno">   80</span>    useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   81</span>      <span class="keywordflow">if</span> (!group?.members) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   82</span>      </div>
+<div class="line"><span class="lineno">   83</span>      <span class="keyword">const</span> selected = Object.keys(selectedMembers).filter(<span class="keywordtype">id</span> =&gt; selectedMembers[<span class="keywordtype">id</span>]);</div>
+<div class="line"><span class="lineno">   84</span>      <span class="keyword">const</span> newSplits = {};</div>
+<div class="line"><span class="lineno">   85</span>      </div>
+<div class="line"><span class="lineno">   86</span>      <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;percentage&#39;</span>) {</div>
+<div class="line"><span class="lineno">   87</span>        <span class="comment">// First selected member gets 100%, rest get 0%</span></div>
+<div class="line"><span class="lineno">   88</span>        selected.forEach((userId, index) =&gt; {</div>
+<div class="line"><span class="lineno">   89</span>          newSplits[userId] = index === 0 ? <span class="stringliteral">&#39;100.0&#39;</span> : <span class="stringliteral">&#39;0.0&#39;</span>;</div>
+<div class="line"><span class="lineno">   90</span>        });</div>
+<div class="line"><span class="lineno">   91</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;shares&#39;</span>) {</div>
+<div class="line"><span class="lineno">   92</span>        selected.forEach(userId =&gt; {</div>
+<div class="line"><span class="lineno">   93</span>          newSplits[userId] = <span class="charliteral">&#39;1&#39;</span>;</div>
+<div class="line"><span class="lineno">   94</span>        });</div>
+<div class="line"><span class="lineno">   95</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   96</span>        selected.forEach(userId =&gt; {</div>
+<div class="line"><span class="lineno">   97</span>          newSplits[userId] = <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line"><span class="lineno">   98</span>        });</div>
+<div class="line"><span class="lineno">   99</span>      }</div>
+<div class="line"><span class="lineno">  100</span>      </div>
+<div class="line"><span class="lineno">  101</span>      <span class="comment">// ... reinitialize splits based on new method</span></div>
+<div class="line"><span class="lineno">  102</span>      setSplits(newSplits);</div>
+<div class="line"><span class="lineno">  103</span>    }, [splitMethod]);</div>
+<div class="line"><span class="lineno">  104</span> </div>
+<div class="line"><span class="lineno">  105</span>    <span class="comment">// Pre-populate form fields when opening in edit mode.</span></div>
+<div class="line"><span class="lineno">  106</span>    <span class="comment">// Runs whenever the modal opens with an initialExpense provided.</span></div>
+<div class="line"><span class="lineno">  107</span>    <span class="comment">// eslint-disable-next-line react-hooks/exhaustive-deps</span></div>
+<div class="line"><span class="lineno">  108</span>    useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">  109</span>      <span class="keywordflow">if</span> (!isOpen || !initialExpense) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  110</span> </div>
+<div class="line"><span class="lineno">  111</span>      setTitle(initialExpense.title || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  112</span>      setAmount(String(initialExpense.amount || <span class="stringliteral">&#39;&#39;</span>));</div>
+<div class="line"><span class="lineno">  113</span>      setPaidBy(initialExpense.paidBy || user?.uid || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  114</span>      setCategory(initialExpense.category || <span class="stringliteral">&#39;food&#39;</span>);</div>
+<div class="line"><span class="lineno">  115</span>      setDescription(initialExpense.description || <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  116</span> </div>
+<div class="line"><span class="lineno">  117</span>      <span class="comment">// Convert Firestore Timestamp or JS Date to YYYY-MM-DD for the date input</span></div>
+<div class="line"><span class="lineno">  118</span>      <span class="keyword">const</span> d = initialExpense.date?.toDate</div>
+<div class="line"><span class="lineno">  119</span>        ? initialExpense.date.toDate()</div>
+<div class="line"><span class="lineno">  120</span>        : <span class="keyword">new</span> Date(initialExpense.date);</div>
+<div class="line"><span class="lineno">  121</span>      setDate(d.toISOString().split(<span class="charliteral">&#39;T&#39;</span>)[0]);</div>
+<div class="line"><span class="lineno">  122</span> </div>
+<div class="line"><span class="lineno">  123</span>      setSplitMethod(initialExpense.splitMethod || <span class="stringliteral">&#39;equal&#39;</span>);</div>
+<div class="line"><span class="lineno">  124</span> </div>
+<div class="line"><span class="lineno">  125</span>      <span class="comment">// Restore participant checkbox selections</span></div>
+<div class="line"><span class="lineno">  126</span>      <span class="keywordflow">if</span> (initialExpense.participants &amp;&amp; group?.members) {</div>
+<div class="line"><span class="lineno">  127</span>        <span class="keyword">const</span> memberSelection = {};</div>
+<div class="line"><span class="lineno">  128</span>        group.members.forEach(m =&gt; {</div>
+<div class="line"><span class="lineno">  129</span>          memberSelection[m.userId] = initialExpense.participants.includes(m.userId);</div>
+<div class="line"><span class="lineno">  130</span>        });</div>
+<div class="line"><span class="lineno">  131</span>        setSelectedMembers(memberSelection);</div>
+<div class="line"><span class="lineno">  132</span>      }</div>
+<div class="line"><span class="lineno">  133</span> </div>
+<div class="line"><span class="lineno">  134</span>      <span class="comment">// Restore split input values (back-calculate percentages from amounts)</span></div>
+<div class="line"><span class="lineno">  135</span>      <span class="keywordflow">if</span> (initialExpense.splits &amp;&amp; initialExpense.splitMethod !== <span class="stringliteral">&#39;equal&#39;</span>) {</div>
+<div class="line"><span class="lineno">  136</span>        <span class="keyword">const</span> rawSplits = {};</div>
+<div class="line"><span class="lineno">  137</span>        Object.entries(initialExpense.splits).forEach(([uid, val]) =&gt; {</div>
+<div class="line"><span class="lineno">  138</span>          <span class="keywordflow">if</span> (initialExpense.splitMethod === <span class="stringliteral">&#39;percentage&#39;</span>) {</div>
+<div class="line"><span class="lineno">  139</span>            rawSplits[uid] = ((val / initialExpense.amount) * 100).toFixed(1);</div>
+<div class="line"><span class="lineno">  140</span>          } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (initialExpense.splitMethod === <span class="stringliteral">&#39;exact&#39;</span>) {</div>
+<div class="line"><span class="lineno">  141</span>            rawSplits[uid] = val.toFixed(2);</div>
+<div class="line"><span class="lineno">  142</span>          } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  143</span>            rawSplits[uid] = String(val);</div>
+<div class="line"><span class="lineno">  144</span>          }</div>
+<div class="line"><span class="lineno">  145</span>        });</div>
+<div class="line"><span class="lineno">  146</span>        setSplits(rawSplits);</div>
+<div class="line"><span class="lineno">  147</span>      }</div>
+<div class="line"><span class="lineno">  148</span>    }, [isOpen, initialExpense]);</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>    <span class="comment">// toggleMember function</span></div>
+<div class="line"><span class="lineno">  151</span>    <span class="keyword">const</span> toggleMember = (userId) =&gt; {</div>
+<div class="line"><span class="lineno">  152</span>        setSelectedMembers(prev =&gt; ({</div>
+<div class="line"><span class="lineno">  153</span>          ...prev,</div>
+<div class="line"><span class="lineno">  154</span>          [userId]: !prev[userId]</div>
+<div class="line"><span class="lineno">  155</span>        }));</div>
+<div class="line"><span class="lineno">  156</span>      };</div>
+<div class="line"><span class="lineno">  157</span>      </div>
+<div class="line"><span class="lineno">  158</span>      <span class="comment">// updateSplit function (the one we just fixed)</span></div>
+<div class="line"><span class="lineno">  159</span>      <span class="keyword">const</span> updateSplit = (userId, value) =&gt; {</div>
+<div class="line"><span class="lineno">  160</span>  <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;percentage&#39;</span>) {</div>
+<div class="line"><span class="lineno">  161</span>    <span class="comment">// Allow free typing - don&#39;t format yet!</span></div>
+<div class="line"><span class="lineno">  162</span>    <span class="keyword">const</span> numValue = value === <span class="stringliteral">&#39;&#39;</span> ? 0 : parseFloat(value);</div>
+<div class="line"><span class="lineno">  163</span>    </div>
+<div class="line"><span class="lineno">  164</span>    <span class="comment">// Don&#39;t restrict typing - let them type any number</span></div>
+<div class="line"><span class="lineno">  165</span>    <span class="comment">// We&#39;ll validate on blur or submit</span></div>
+<div class="line"><span class="lineno">  166</span>    <span class="keyword">const</span> selected = Object.keys(selectedMembers).filter(<span class="keywordtype">id</span> =&gt; selectedMembers[<span class="keywordtype">id</span>]);</div>
+<div class="line"><span class="lineno">  167</span>    </div>
+<div class="line"><span class="lineno">  168</span>    <span class="comment">// Update this user&#39;s value (keep as string, no formatting!)</span></div>
+<div class="line"><span class="lineno">  169</span>    <span class="keyword">const</span> newSplits = { ...splits };</div>
+<div class="line"><span class="lineno">  170</span>    newSplits[userId] = value; <span class="comment">// Keep exact typed value</span></div>
+<div class="line"><span class="lineno">  171</span>    </div>
+<div class="line"><span class="lineno">  172</span>    <span class="comment">// Calculate remaining for last member (only if value is valid)</span></div>
+<div class="line"><span class="lineno">  173</span>    <span class="keywordflow">if</span> (!isNaN(numValue)) {</div>
+<div class="line"><span class="lineno">  174</span>      <span class="keyword">const</span> lastMember = selected[selected.length - 1];</div>
+<div class="line"><span class="lineno">  175</span>      <span class="keyword">const</span> otherMembers = selected.filter(<span class="keywordtype">id</span> =&gt; <span class="keywordtype">id</span> !== userId &amp;&amp; <span class="keywordtype">id</span> !== lastMember);</div>
+<div class="line"><span class="lineno">  176</span>      </div>
+<div class="line"><span class="lineno">  177</span>      <span class="keyword">const</span> othersTotal = otherMembers.reduce((sum, <span class="keywordtype">id</span>) =&gt; {</div>
+<div class="line"><span class="lineno">  178</span>        <span class="keywordflow">return</span> sum + (parseFloat(newSplits[<span class="keywordtype">id</span>]) || 0);</div>
+<div class="line"><span class="lineno">  179</span>      }, 0);</div>
+<div class="line"><span class="lineno">  180</span>      </div>
+<div class="line"><span class="lineno">  181</span>      <span class="comment">// Calculate remaining</span></div>
+<div class="line"><span class="lineno">  182</span>      let remaining = 100 - numValue - othersTotal;</div>
+<div class="line"><span class="lineno">  183</span>      remaining = Math.max(0, Math.min(100, remaining));</div>
+<div class="line"><span class="lineno">  184</span>      </div>
+<div class="line"><span class="lineno">  185</span>      <span class="comment">// Update last member (unless this IS the last member)</span></div>
+<div class="line"><span class="lineno">  186</span>      <span class="keywordflow">if</span> (userId !== lastMember &amp;&amp; selected.length &gt; 1) {</div>
+<div class="line"><span class="lineno">  187</span>        newSplits[lastMember] = remaining.toFixed(1);</div>
+<div class="line"><span class="lineno">  188</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (userId === lastMember &amp;&amp; selected.length &gt; 1) {</div>
+<div class="line"><span class="lineno">  189</span>        <span class="comment">// If editing last member, adjust first member</span></div>
+<div class="line"><span class="lineno">  190</span>        <span class="keyword">const</span> firstMember = selected[0];</div>
+<div class="line"><span class="lineno">  191</span>        <span class="keywordflow">if</span> (userId !== firstMember) {</div>
+<div class="line"><span class="lineno">  192</span>          newSplits[firstMember] = remaining.toFixed(1);</div>
+<div class="line"><span class="lineno">  193</span>        }</div>
+<div class="line"><span class="lineno">  194</span>      }</div>
+<div class="line"><span class="lineno">  195</span>    }</div>
+<div class="line"><span class="lineno">  196</span>    </div>
+<div class="line"><span class="lineno">  197</span>    setSplits(newSplits);</div>
+<div class="line"><span class="lineno">  198</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  199</span>    <span class="comment">// Other split methods</span></div>
+<div class="line"><span class="lineno">  200</span>    setSplits(prev =&gt; ({</div>
+<div class="line"><span class="lineno">  201</span>      ...prev,</div>
+<div class="line"><span class="lineno">  202</span>      [userId]: value</div>
+<div class="line"><span class="lineno">  203</span>    }));</div>
+<div class="line"><span class="lineno">  204</span>  }</div>
+<div class="line"><span class="lineno">  205</span>};</div>
+<div class="line"><span class="lineno">  206</span> </div>
+<div class="line"><span class="lineno">  207</span>  <span class="comment">// Function to calculate splits based on current method and inputs</span></div>
+<div class="line"><span class="lineno">  208</span>  <span class="keyword">const</span> calculateSplits = () =&gt; {</div>
+<div class="line"><span class="lineno">  209</span>    <span class="keyword">const</span> amountNum = parseFloat(amount) || 0;</div>
+<div class="line"><span class="lineno">  210</span>    <span class="keyword">const</span> selected = Object.keys(selectedMembers).filter(<span class="keywordtype">id</span> =&gt; selectedMembers[<span class="keywordtype">id</span>]);</div>
+<div class="line"><span class="lineno">  211</span>    </div>
+<div class="line"><span class="lineno">  212</span>    <span class="comment">// If no members selected, return empty splits</span></div>
+<div class="line"><span class="lineno">  213</span>    <span class="keywordflow">if</span> (selected.length === 0) <span class="keywordflow">return</span> {};</div>
+<div class="line"><span class="lineno">  214</span> </div>
+<div class="line"><span class="lineno">  215</span>    <span class="keyword">const</span> result = {};</div>
+<div class="line"><span class="lineno">  216</span>    <span class="comment">// Calculate splits based on method</span></div>
+<div class="line"><span class="lineno">  217</span>    <span class="keywordflow">switch</span> (splitMethod) {</div>
+<div class="line"><span class="lineno">  218</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;equal&#39;</span>:</div>
+<div class="line"><span class="lineno">  219</span>        <span class="keyword">const</span> equalAmount = amountNum / selected.length;</div>
+<div class="line"><span class="lineno">  220</span>        selected.forEach(<span class="keywordtype">id</span> =&gt; {</div>
+<div class="line"><span class="lineno">  221</span>          result[id] = equalAmount;</div>
+<div class="line"><span class="lineno">  222</span>        });</div>
+<div class="line"><span class="lineno">  223</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;percentage&#39;</span>:</div>
+<div class="line"><span class="lineno">  226</span>        selected.forEach(<span class="keywordtype">id</span> =&gt; {</div>
+<div class="line"><span class="lineno">  227</span>          <span class="keyword">const</span> percent = parseFloat(splits[<span class="keywordtype">id</span>]) || 0;</div>
+<div class="line"><span class="lineno">  228</span>          result[id] = (amountNum * percent) / 100;</div>
+<div class="line"><span class="lineno">  229</span>        });</div>
+<div class="line"><span class="lineno">  230</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  231</span> </div>
+<div class="line"><span class="lineno">  232</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;exact&#39;</span>:</div>
+<div class="line"><span class="lineno">  233</span>        selected.forEach(<span class="keywordtype">id</span> =&gt; {</div>
+<div class="line"><span class="lineno">  234</span>          result[id] = parseFloat(splits[<span class="keywordtype">id</span>]) || 0;</div>
+<div class="line"><span class="lineno">  235</span>        });</div>
+<div class="line"><span class="lineno">  236</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  237</span> </div>
+<div class="line"><span class="lineno">  238</span>      <span class="keywordflow">case</span> <span class="stringliteral">&#39;shares&#39;</span>:</div>
+<div class="line"><span class="lineno">  239</span>        <span class="keyword">const</span> totalShares = selected.reduce((sum, <span class="keywordtype">id</span>) =&gt; {</div>
+<div class="line"><span class="lineno">  240</span>          <span class="keywordflow">return</span> sum + (parseFloat(splits[<span class="keywordtype">id</span>]) || 1);</div>
+<div class="line"><span class="lineno">  241</span>        }, 0);</div>
+<div class="line"><span class="lineno">  242</span>        <span class="keyword">const</span> perShare = amountNum / totalShares;</div>
+<div class="line"><span class="lineno">  243</span>        selected.forEach(<span class="keywordtype">id</span> =&gt; {</div>
+<div class="line"><span class="lineno">  244</span>          <span class="keyword">const</span> shares = parseFloat(splits[<span class="keywordtype">id</span>]) || 1;</div>
+<div class="line"><span class="lineno">  245</span>          result[id] = perShare * shares;</div>
+<div class="line"><span class="lineno">  246</span>        });</div>
+<div class="line"><span class="lineno">  247</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  248</span>    }</div>
+<div class="line"><span class="lineno">  249</span> </div>
+<div class="line"><span class="lineno">  250</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><span class="lineno">  251</span>  };</div>
+<div class="line"><span class="lineno">  252</span> </div>
+<div class="line"><span class="lineno">  253</span>  <span class="comment">// Validation function to check splits before submission</span></div>
+<div class="line"><span class="lineno">  254</span>  <span class="keyword">const</span> validateSplits = () =&gt; {</div>
+<div class="line"><span class="lineno">  255</span>    <span class="keyword">const</span> amountNum = parseFloat(amount) || 0;</div>
+<div class="line"><span class="lineno">  256</span>    <span class="keyword">const</span> calculated = calculateSplits();</div>
+<div class="line"><span class="lineno">  257</span>    <span class="keyword">const</span> total = Object.values(calculated).reduce((sum, val) =&gt; sum + val, 0);</div>
+<div class="line"><span class="lineno">  258</span> </div>
+<div class="line"><span class="lineno">  259</span>    <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;percentage&#39;</span>) {</div>
+<div class="line"><span class="lineno">  260</span>      <span class="keyword">const</span> totalPercent = Object.keys(selectedMembers)</div>
+<div class="line"><span class="lineno">  261</span>        .filter(<span class="keywordtype">id</span> =&gt; selectedMembers[<span class="keywordtype">id</span>])</div>
+<div class="line"><span class="lineno">  262</span>        .reduce((sum, <span class="keywordtype">id</span>) =&gt; sum + (parseFloat(splits[<span class="keywordtype">id</span>]) || 0), 0);</div>
+<div class="line"><span class="lineno">  263</span>      </div>
+<div class="line"><span class="lineno">  264</span>      <span class="keywordflow">if</span> (Math.abs(totalPercent - 100) &gt; 0.01) {</div>
+<div class="line"><span class="lineno">  265</span>        <span class="keywordflow">return</span> `Percentages must add up to exactly100% (currently ${totalPercent.toFixed(1)}%)`;</div>
+<div class="line"><span class="lineno">  266</span>      }</div>
+<div class="line"><span class="lineno">  267</span>    }</div>
+<div class="line"><span class="lineno">  268</span> </div>
+<div class="line"><span class="lineno">  269</span>    <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;exact&#39;</span>) {</div>
+<div class="line"><span class="lineno">  270</span>      <span class="keywordflow">if</span> (Math.abs(total - amountNum) &gt; 0.01) {</div>
+<div class="line"><span class="lineno">  271</span>        <span class="keywordflow">return</span> `Split amounts must equal total (currently ${total.toFixed(2)} vs ${amountNum.toFixed(2)})`;</div>
+<div class="line"><span class="lineno">  272</span>      }</div>
+<div class="line"><span class="lineno">  273</span>    }</div>
+<div class="line"><span class="lineno">  274</span> </div>
+<div class="line"><span class="lineno">  275</span>    <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">  276</span>  };</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>  <span class="comment">// Main submit handler</span></div>
+<div class="line"><span class="lineno">  279</span>  <span class="keyword">const</span> handleSubmit = async (e) =&gt; {</div>
+<div class="line"><span class="lineno">  280</span>    e.preventDefault();</div>
+<div class="line"><span class="lineno">  281</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  282</span> </div>
+<div class="line"><span class="lineno">  283</span>    <span class="comment">// Validation</span></div>
+<div class="line"><span class="lineno">  284</span>    <span class="keywordflow">if</span> (!title.trim()) {</div>
+<div class="line"><span class="lineno">  285</span>      setError(<span class="stringliteral">&#39;Expense title is required&#39;</span>);</div>
+<div class="line"><span class="lineno">  286</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  287</span>    }</div>
+<div class="line"><span class="lineno">  288</span> </div>
+<div class="line"><span class="lineno">  289</span>    <span class="comment">//</span></div>
+<div class="line"><span class="lineno">  290</span>    <span class="keyword">const</span> amountNum = parseFloat(amount);</div>
+<div class="line"><span class="lineno">  291</span>    <span class="keywordflow">if</span> (!amountNum || amountNum &lt;= 0) {</div>
+<div class="line"><span class="lineno">  292</span>      setError(<span class="stringliteral">&#39;Please enter a valid amount greater than 0&#39;</span>);</div>
+<div class="line"><span class="lineno">  293</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  294</span>    }</div>
+<div class="line"><span class="lineno">  295</span> </div>
+<div class="line"><span class="lineno">  296</span>    <span class="comment">// New validation for maximum amount</span></div>
+<div class="line"><span class="lineno">  297</span>    <span class="keywordflow">if</span> (amountNum &gt; 1000000) {</div>
+<div class="line"><span class="lineno">  298</span>      setError(`Amount cannot exceed ${group?.currency || <span class="stringliteral">&#39;&#39;</span>} 1,000,000`);</div>
+<div class="line"><span class="lineno">  299</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  300</span>    }</div>
+<div class="line"><span class="lineno">  301</span> </div>
+<div class="line"><span class="lineno">  302</span>    <span class="comment">// Ensure at least one member is selected</span></div>
+<div class="line"><span class="lineno">  303</span>    <span class="keyword">const</span> selected = Object.keys(selectedMembers).filter(<span class="keywordtype">id</span> =&gt; selectedMembers[<span class="keywordtype">id</span>]);</div>
+<div class="line"><span class="lineno">  304</span>    <span class="keywordflow">if</span> (selected.length === 0) {</div>
+<div class="line"><span class="lineno">  305</span>      setError(<span class="stringliteral">&#39;Select at least one member&#39;</span>);</div>
+<div class="line"><span class="lineno">  306</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  307</span>    }</div>
+<div class="line"><span class="lineno">  308</span> </div>
+<div class="line"><span class="lineno">  309</span>    <span class="comment">// Validate splits based on method</span></div>
+<div class="line"><span class="lineno">  310</span>    <span class="keyword">const</span> validationError = validateSplits();</div>
+<div class="line"><span class="lineno">  311</span>    <span class="keywordflow">if</span> (validationError) {</div>
+<div class="line"><span class="lineno">  312</span>      setError(validationError);</div>
+<div class="line"><span class="lineno">  313</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  314</span>    }</div>
+<div class="line"><span class="lineno">  315</span> </div>
+<div class="line"><span class="lineno">  316</span>    <span class="comment">// Rule 1 — Block payee from adding expense while they have an unconfirmed</span></div>
+<div class="line"><span class="lineno">  317</span>    <span class="comment">// incoming payment. Forces them to resolve it first to keep balances accurate.</span></div>
+<div class="line"><span class="lineno">  318</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  319</span>      <span class="keyword">const</span> incomingQuery = <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(</div>
+<div class="line"><span class="lineno">  320</span>        <a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;pendingPayments&#39;</span>),</div>
+<div class="line"><span class="lineno">  321</span>        <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;groupId&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, group.id),</div>
+<div class="line"><span class="lineno">  322</span>        <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;toUserId&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, user.uid)</div>
+<div class="line"><span class="lineno">  323</span>      );</div>
+<div class="line"><span class="lineno">  324</span>      <span class="keyword">const</span> incomingSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(incomingQuery);</div>
+<div class="line"><span class="lineno">  325</span>      <span class="keywordflow">if</span> (!incomingSnap.empty) {</div>
+<div class="line"><span class="lineno">  326</span>        <span class="keyword">const</span> pd = incomingSnap.docs[0].data();</div>
+<div class="line"><span class="lineno">  327</span>        setError(</div>
+<div class="line"><span class="lineno">  328</span>          `You have a payment from ${pd.fromName || <span class="stringliteral">&#39;a group member&#39;</span>} awaiting your confirmation. ` +</div>
+<div class="line"><span class="lineno">  329</span>          `Please confirm or decline it in the group before adding a <span class="keyword">new</span> expense.`</div>
+<div class="line"><span class="lineno">  330</span>        );</div>
+<div class="line"><span class="lineno">  331</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  332</span>      }</div>
+<div class="line"><span class="lineno">  333</span>    } <span class="keywordflow">catch</span> {</div>
+<div class="line"><span class="lineno">  334</span>      <span class="comment">// Non-blocking — if the check fails, allow the expense to proceed</span></div>
+<div class="line"><span class="lineno">  335</span>    }</div>
+<div class="line"><span class="lineno">  336</span> </div>
+<div class="line"><span class="lineno">  337</span>    <span class="comment">// Show confirmation instead of submitting immediately</span></div>
+<div class="line"><span class="lineno">  338</span>    setShowConfirmation(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  339</span>  };</div>
+<div class="line"><span class="lineno">  340</span> </div>
+<div class="line"><span class="lineno">  341</span>  <span class="comment">// Final submission after confirmation</span></div>
+<div class="line"><span class="lineno">  342</span>  <span class="keyword">const</span> handleConfirmSubmit = async () =&gt; {</div>
+<div class="line"><span class="lineno">  343</span>    setShowConfirmation(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  344</span>    setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  345</span> </div>
+<div class="line"><span class="lineno">  346</span>    <span class="comment">// Re-validate splits before final submission</span></div>
+<div class="line"><span class="lineno">  347</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  348</span>      <span class="keyword">const</span> calculated = calculateSplits();</div>
+<div class="line"><span class="lineno">  349</span>      </div>
+<div class="line"><span class="lineno">  350</span>      <span class="keyword">const</span> expenseData = {</div>
+<div class="line"><span class="lineno">  351</span>        groupId: group.id,</div>
+<div class="line"><span class="lineno">  352</span>        title: title.trim(),</div>
+<div class="line"><span class="lineno">  353</span>        amount: parseFloat(amount),</div>
+<div class="line"><span class="lineno">  354</span>        currency: group.currency,</div>
+<div class="line"><span class="lineno">  355</span>        paidBy,</div>
+<div class="line"><span class="lineno">  356</span>        category,</div>
+<div class="line"><span class="lineno">  357</span>        description: description.trim(),</div>
+<div class="line"><span class="lineno">  358</span>        date: <span class="keyword">new</span> Date(`${date}T${<span class="keyword">new</span> Date().toTimeString().slice(0, 8)}`),</div>
+<div class="line"><span class="lineno">  359</span>        splitMethod,</div>
+<div class="line"><span class="lineno">  360</span>        splits: calculated,</div>
+<div class="line"><span class="lineno">  361</span>        participants: Object.keys(selectedMembers).filter(id =&gt; selectedMembers[id]),</div>
+<div class="line"><span class="lineno">  362</span>        createdAt: <a class="code hl_variable" href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a>(),</div>
+<div class="line"><span class="lineno">  363</span>        createdBy: user.uid,</div>
+<div class="line"><span class="lineno">  364</span>        ...(scannedData?.receiptURL &amp;&amp; { receiptURL: scannedData.receiptURL })</div>
+<div class="line"><span class="lineno">  365</span>      };</div>
+<div class="line"><span class="lineno">  366</span> </div>
+<div class="line"><span class="lineno">  367</span>       <span class="keywordflow">if</span> (isEditing) {</div>
+<div class="line"><span class="lineno">  368</span>        <span class="comment">// Update existing document — do not overwrite groupId, createdAt, or createdBy</span></div>
+<div class="line"><span class="lineno">  369</span>        await <a class="code hl_variable" href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>, initialExpense.id), expenseData);</div>
+<div class="line"><span class="lineno">  370</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  371</span>        <span class="comment">// Create a new expense document</span></div>
+<div class="line"><span class="lineno">  372</span>        <span class="keyword">const</span> newExpense = {</div>
+<div class="line"><span class="lineno">  373</span>          ...expenseData,</div>
+<div class="line"><span class="lineno">  374</span>          groupId: group.id,</div>
+<div class="line"><span class="lineno">  375</span>          createdAt: <a class="code hl_variable" href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a>(),</div>
+<div class="line"><span class="lineno">  376</span>          createdBy: user.uid,</div>
+<div class="line"><span class="lineno">  377</span>        };</div>
+<div class="line"><span class="lineno">  378</span>        await <a class="code hl_variable" href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">addDoc</a>(<a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;expenses&#39;</span>), newExpense);</div>
+<div class="line"><span class="lineno">  379</span> </div>
+<div class="line"><span class="lineno">  380</span>        <span class="comment">// Notify other group members of the new expense</span></div>
+<div class="line"><span class="lineno">  381</span>        <span class="keyword">const</span> memberIds = group.members</div>
+<div class="line"><span class="lineno">  382</span>          .map(m =&gt; m.userId)</div>
+<div class="line"><span class="lineno">  383</span>          .filter(<span class="keywordtype">id</span> =&gt; <span class="keywordtype">id</span> !== user.uid);</div>
+<div class="line"><span class="lineno">  384</span> </div>
+<div class="line"><span class="lineno">  385</span>        <span class="keywordflow">if</span> (memberIds.length &gt; 0) {</div>
+<div class="line"><span class="lineno">  386</span>          <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  387</span>            await Promise.all(</div>
+<div class="line"><span class="lineno">  388</span>              memberIds.map(memberId =&gt;</div>
+<div class="line"><span class="lineno">  389</span>                <a class="code hl_variable" href="notifications_store_8js.html#a22f128f9a7c7f3837e9acb70e57033b4">createNotification</a>({</div>
+<div class="line"><span class="lineno">  390</span>                  userId: memberId,</div>
+<div class="line"><span class="lineno">  391</span>                  type: <span class="stringliteral">&#39;expense&#39;</span>,</div>
+<div class="line"><span class="lineno">  392</span>                  title: <span class="stringliteral">&#39;New Expense Added&#39;</span>,</div>
+<div class="line"><span class="lineno">  393</span>                  message: `${user.displayName || <span class="stringliteral">&#39;Someone&#39;</span>} added <span class="stringliteral">&quot;${title.trim()}&quot;</span> (${group.currency} ${parseFloat(amount).toFixed(2)}) in ${group.name}`,</div>
+<div class="line"><span class="lineno">  394</span>                  data: {</div>
+<div class="line"><span class="lineno">  395</span>                    groupId: group.id,</div>
+<div class="line"><span class="lineno">  396</span>                    expenseTitle: title.trim(),</div>
+<div class="line"><span class="lineno">  397</span>                    amount: parseFloat(amount),</div>
+<div class="line"><span class="lineno">  398</span>                    currency: group.currency,</div>
+<div class="line"><span class="lineno">  399</span>                    addedBy: user.uid,</div>
+<div class="line"><span class="lineno">  400</span>                    addedByName: user.displayName,</div>
+<div class="line"><span class="lineno">  401</span>                  },</div>
+<div class="line"><span class="lineno">  402</span>                })</div>
+<div class="line"><span class="lineno">  403</span>              )</div>
+<div class="line"><span class="lineno">  404</span>            );</div>
+<div class="line"><span class="lineno">  405</span>          } <span class="keywordflow">catch</span> (notifyErr) {</div>
+<div class="line"><span class="lineno">  406</span>            console.error(<span class="stringliteral">&#39;[AddExpenseModal] Notification failed:&#39;</span>, notifyErr);</div>
+<div class="line"><span class="lineno">  407</span>          }</div>
+<div class="line"><span class="lineno">  408</span>        }</div>
+<div class="line"><span class="lineno">  409</span>      }</div>
+<div class="line"><span class="lineno">  410</span> </div>
+<div class="line"><span class="lineno">  411</span>      <span class="comment">// Reset form state</span></div>
+<div class="line"><span class="lineno">  412</span>      setTitle(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  413</span>      setAmount(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  414</span>      setDescription(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  415</span>      setDate(<span class="keyword">new</span> Date().toISOString().split(<span class="charliteral">&#39;T&#39;</span>)[0]);</div>
+<div class="line"><span class="lineno">  416</span>      setSplitMethod(<span class="stringliteral">&#39;equal&#39;</span>);</div>
+<div class="line"><span class="lineno">  417</span>      setScannedData(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">  418</span> </div>
+<div class="line"><span class="lineno">  419</span>      <span class="comment">// Rule 2 — Auto-cancel any pending payments in this group because</span></div>
+<div class="line"><span class="lineno">  420</span>      <span class="comment">// the new expense changes the balances, making pending amounts stale.</span></div>
+<div class="line"><span class="lineno">  421</span>      <span class="comment">// Both payer and payee are notified via the existing Firestore listener.</span></div>
+<div class="line"><span class="lineno">  422</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  423</span>        <span class="keyword">const</span> pendingQuery = <a class="code hl_variable" href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a>(</div>
+<div class="line"><span class="lineno">  424</span>          <a class="code hl_variable" href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a>(<a class="code hl_variable" href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a>, <span class="stringliteral">&#39;pendingPayments&#39;</span>),</div>
+<div class="line"><span class="lineno">  425</span>          <a class="code hl_variable" href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a>(<span class="stringliteral">&#39;groupId&#39;</span>, <span class="stringliteral">&#39;==&#39;</span>, group.id)</div>
+<div class="line"><span class="lineno">  426</span>        );</div>
+<div class="line"><span class="lineno">  427</span>        <span class="keyword">const</span> pendingSnap = await <a class="code hl_variable" href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a>(pendingQuery);</div>
+<div class="line"><span class="lineno">  428</span>        await Promise.all(</div>
+<div class="line"><span class="lineno">  429</span>          pendingSnap.docs.map(d =&gt; <a class="code hl_variable" href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a>(d.ref))</div>
+<div class="line"><span class="lineno">  430</span>        );</div>
+<div class="line"><span class="lineno">  431</span>      } <span class="keywordflow">catch</span> {</div>
+<div class="line"><span class="lineno">  432</span>        <span class="comment">// Non-blocking — balance accuracy takes priority but do not fail the expense save</span></div>
+<div class="line"><span class="lineno">  433</span>      }</div>
+<div class="line"><span class="lineno">  434</span> </div>
+<div class="line"><span class="lineno">  435</span>      onClose();</div>
+<div class="line"><span class="lineno">  436</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  437</span>      console.error(<span class="stringliteral">&#39;[AddExpenseModal] Submit failed:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  438</span>      setError(<span class="stringliteral">&#39;Failed to save expense. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  439</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  440</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  441</span>    }</div>
+<div class="line"><span class="lineno">  442</span>  };</div>
+<div class="line"><span class="lineno">  443</span> </div>
+<div class="line"><span class="lineno">  444</span> </div>
+<div class="line"><span class="lineno">  445</span> </div>
+<div class="line"><span class="lineno">  446</span>  <span class="keyword">const</span> handleReceiptData = (data) =&gt; {</div>
+<div class="line"><span class="lineno">  447</span>    <span class="comment">// Store ALL scanned data including receiptURL</span></div>
+<div class="line"><span class="lineno">  448</span>    setScannedData(data);</div>
+<div class="line"><span class="lineno">  449</span>    <span class="comment">// Pre-fill form with extracted data</span></div>
+<div class="line"><span class="lineno">  450</span>    <span class="keywordflow">if</span> (data.title) setTitle(data.title);</div>
+<div class="line"><span class="lineno">  451</span>    <span class="keywordflow">if</span> (data.amount) setAmount(data.amount);</div>
+<div class="line"><span class="lineno">  452</span>    <span class="keywordflow">if</span> (data.date) setDate(data.date);</div>
+<div class="line"><span class="lineno">  453</span>    </div>
+<div class="line"><span class="lineno">  454</span>    <span class="comment">// Close scanner</span></div>
+<div class="line"><span class="lineno">  455</span>    setShowReceiptScanner(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  456</span>  };</div>
+<div class="line"><span class="lineno">  457</span> </div>
+<div class="line"><span class="lineno">  458</span> </div>
+<div class="line"><span class="lineno">  459</span>  <span class="keywordflow">if</span> (!isOpen) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">  460</span> </div>
+<div class="line"><span class="lineno">  461</span>  <span class="keyword">const</span> calculated = calculateSplits();</div>
+<div class="line"><span class="lineno">  462</span>  <span class="keyword">const</span> selected = Object.keys(selectedMembers).filter(<span class="keywordtype">id</span> =&gt; selectedMembers[<span class="keywordtype">id</span>]);</div>
+<div class="line"><span class="lineno">  463</span> </div>
+<div class="line"><span class="lineno">  464</span>  <span class="comment">// Confirmation view</span></div>
+<div class="line"><span class="lineno">  465</span>  <span class="keywordflow">if</span> (showConfirmation) {</div>
+<div class="line"><span class="lineno">  466</span>    <span class="keyword">const</span> payer = group?.members?.find(m =&gt; m.userId === paidBy);</div>
+<div class="line"><span class="lineno">  467</span>    </div>
+<div class="line"><span class="lineno">  468</span>    <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  469</span>      &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  470</span>        &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  471</span>          &lt;h2 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  472</span>            {isEditing ? <span class="stringliteral">&#39;Confirm Edit&#39;</span> : <span class="stringliteral">&#39;Confirm Expense&#39;</span>}</div>
+<div class="line"><span class="lineno">  473</span>          &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  474</span>          </div>
+<div class="line"><span class="lineno">  475</span>          &lt;div className=<span class="stringliteral">&quot;space-y-3 mb-6&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  476</span>            &lt;div className=<span class="stringliteral">&quot;bg-gray-50 dark:bg-gray-700 p-4 rounded-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  477</span>              &lt;h3 className=<span class="stringliteral">&quot;font-semibold text-lg text-gray-900 dark:text-white mb-2&quot;</span>&gt;{title}&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  478</span>              &lt;div className=<span class="stringliteral">&quot;space-y-2 text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  479</span>                &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  480</span>                  &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Amount:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  481</span>                  &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;{group?.currency} {parseFloat(amount).toFixed(2)}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  482</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  483</span>                &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  484</span>                  &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Paid by:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  485</span>                  &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;{payer?.name}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  486</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  487</span>                &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  488</span>                  &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Category:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  489</span>                  &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white capitalize&quot;</span>&gt;{category}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  490</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  491</span>                {description &amp;&amp; (</div>
+<div class="line"><span class="lineno">  492</span>                  &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  493</span>                    &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Description:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  494</span>                    &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;{description}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  495</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  496</span>                )}</div>
+<div class="line"><span class="lineno">  497</span>                &lt;div className=<span class="stringliteral">&quot;flex justify-between&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  498</span>                  &lt;span className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400&quot;</span>&gt;Split method:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  499</span>                  &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white capitalize&quot;</span>&gt;{splitMethod}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  500</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  501</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  502</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  503</span> </div>
+<div class="line"><span class="lineno">  504</span>            &lt;div className=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  505</span>              &lt;h4 className=<span class="stringliteral">&quot;font-medium text-gray-900 dark:text-white mb-2&quot;</span>&gt;Split Details:&lt;/h4&gt;</div>
+<div class="line"><span class="lineno">  506</span>              &lt;div className=<span class="stringliteral">&quot;space-y-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  507</span>                {selected.map(userId =&gt; {</div>
+<div class="line"><span class="lineno">  508</span>                  <span class="keyword">const</span> member = group?.members?.find(m =&gt; m.userId === userId);</div>
+<div class="line"><span class="lineno">  509</span>                  <span class="keyword">const</span> amount = calculated[userId];</div>
+<div class="line"><span class="lineno">  510</span>                  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  511</span>                    &lt;div key={userId} className=<span class="stringliteral">&quot;flex justify-between text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  512</span>                      &lt;span className=<span class="stringliteral">&quot;text-gray-700 dark:text-gray-300&quot;</span>&gt;{member?.name}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  513</span>                      &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  514</span>                        {group?.currency} {amount?.toFixed(2)}</div>
+<div class="line"><span class="lineno">  515</span>                      &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  516</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  517</span>                  );</div>
+<div class="line"><span class="lineno">  518</span>                })}</div>
+<div class="line"><span class="lineno">  519</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  520</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  521</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  522</span> </div>
+<div class="line"><span class="lineno">  523</span>          &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 mb-6 text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  524</span>            {isEditing ? <span class="stringliteral">&#39;Confirm changes to this expense?&#39;</span> : <span class="stringliteral">&#39;Are you sure you want to add this expense?&#39;</span>}</div>
+<div class="line"><span class="lineno">  525</span>          &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  526</span> </div>
+<div class="line"><span class="lineno">  527</span>          &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  528</span>            &lt;button</div>
+<div class="line"><span class="lineno">  529</span>              onClick={() =&gt; setShowConfirmation(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  530</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  531</span>            &gt;</div>
+<div class="line"><span class="lineno">  532</span>              Go Back</div>
+<div class="line"><span class="lineno">  533</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  534</span>            &lt;button</div>
+<div class="line"><span class="lineno">  535</span>              onClick={handleConfirmSubmit}</div>
+<div class="line"><span class="lineno">  536</span>              disabled={loading}</div>
+<div class="line"><span class="lineno">  537</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition disabled:opacity-50&quot;</span></div>
+<div class="line"><span class="lineno">  538</span>            &gt;</div>
+<div class="line"><span class="lineno">  539</span>              {loading</div>
+<div class="line"><span class="lineno">  540</span>                ? (isEditing ? <span class="stringliteral">&#39;Saving...&#39;</span> : <span class="stringliteral">&#39;Adding...&#39;</span>)</div>
+<div class="line"><span class="lineno">  541</span>                : (isEditing ? <span class="stringliteral">&#39;Confirm &amp; Save&#39;</span> : <span class="stringliteral">&#39;Confirm &amp; Add&#39;</span>)}</div>
+<div class="line"><span class="lineno">  542</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  543</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  544</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  545</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  546</span>    );</div>
+<div class="line"><span class="lineno">  547</span>  }</div>
+<div class="line"><span class="lineno">  548</span> </div>
+<div class="line"><span class="lineno">  549</span>  </div>
+<div class="line"><span class="lineno">  550</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  551</span>    &lt;&gt;</div>
+<div class="line"><span class="lineno">  552</span>    {<span class="comment">/* Receipt Scanner - NOW PROPERLY INSIDE RETURN */</span>}</div>
+<div class="line"><span class="lineno">  553</span>    &lt;<a class="code hl_variable" href="#a2b4041a737969bc97eba1b700e1b947c">ReceiptScanner</a></div>
+<div class="line"><span class="lineno">  554</span>      isOpen={showReceiptScanner}</div>
+<div class="line"><span class="lineno">  555</span>      onClose={() =&gt; setShowReceiptScanner(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  556</span>      onDataExtracted={handleReceiptData}</div>
+<div class="line"><span class="lineno">  557</span>    /&gt;</div>
+<div class="line"><span class="lineno">  558</span> </div>
+<div class="line"><span class="lineno">  559</span>        &lt;div className=<span class="stringliteral">&quot;fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  560</span>          &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  561</span>            {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">  562</span>            &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center mb-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  563</span>              &lt;h2 className=<span class="stringliteral">&quot;text-2xl font-bold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  564</span>                {isEditing ? <span class="stringliteral">&#39;Edit Expense&#39;</span> : <span class="stringliteral">&#39;Add Expense&#39;</span>}</div>
+<div class="line"><span class="lineno">  565</span>              &lt;/h2&gt;</div>
+<div class="line"><span class="lineno">  566</span>              &lt;button</div>
+<div class="line"><span class="lineno">  567</span>                onClick={onClose}</div>
+<div class="line"><span class="lineno">  568</span>                className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300&quot;</span></div>
+<div class="line"><span class="lineno">  569</span>              &gt;</div>
+<div class="line"><span class="lineno">  570</span>                ✕</div>
+<div class="line"><span class="lineno">  571</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  572</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  573</span>           {<span class="comment">/* Scan Receipt Button */</span>}</div>
+<div class="line"><span class="lineno">  574</span>            {!isEditing &amp;&amp; (</div>
+<div class="line"><span class="lineno">  575</span>              &lt;button</div>
+<div class="line"><span class="lineno">  576</span>                type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  577</span>                onClick={() =&gt; setShowReceiptScanner(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">  578</span>                className=<span class="stringliteral">&quot;w-full mb-4 px-4 py-3 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition flex items-center justify-center gap-2 font-medium&quot;</span></div>
+<div class="line"><span class="lineno">  579</span>              &gt;</div>
+<div class="line"><span class="lineno">  580</span>                &lt;Camera size={20} /&gt;</div>
+<div class="line"><span class="lineno">  581</span>                Scan Receipt (Auto-fill)</div>
+<div class="line"><span class="lineno">  582</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  583</span>            )}</div>
+<div class="line"><span class="lineno">  584</span> </div>
+<div class="line"><span class="lineno">  585</span>          {<span class="comment">/* Scrollable Content */</span>}</div>
+<div class="line"><span class="lineno">  586</span>      &lt;div className=<span class="stringliteral">&quot;overflow-y-auto p-6 pt-4&quot;</span>&gt;&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  587</span>        {<span class="comment">/* Error */</span>}</div>
+<div class="line"><span class="lineno">  588</span>        {error &amp;&amp; (</div>
+<div class="line"><span class="lineno">  589</span>          &lt;div className=<span class="stringliteral">&quot;bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  590</span>            {error}</div>
+<div class="line"><span class="lineno">  591</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  592</span>        )}</div>
+<div class="line"><span class="lineno">  593</span> </div>
+<div class="line"><span class="lineno">  594</span>        {<span class="comment">/* Form */</span>}</div>
+<div class="line"><span class="lineno">  595</span>        &lt;form onSubmit={handleSubmit} className=<span class="stringliteral">&quot;space-y-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  596</span>          {<span class="comment">/* Title &amp; Amount */</span>}</div>
+<div class="line"><span class="lineno">  597</span>          &lt;div className=<span class="stringliteral">&quot;grid grid-cols-2 gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  598</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  599</span>              &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  600</span>                Expense Title *</div>
+<div class="line"><span class="lineno">  601</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  602</span>              &lt;input</div>
+<div class="line"><span class="lineno">  603</span>                type=<span class="stringliteral">&quot;text&quot;</span></div>
+<div class="line"><span class="lineno">  604</span>                value={title}</div>
+<div class="line"><span class="lineno">  605</span>                onChange={(e) =&gt; setTitle(e.target.value)}</div>
+<div class="line"><span class="lineno">  606</span>                onBlur={(e) =&gt; setTitle(e.target.value.trim())}</div>
+<div class="line"><span class="lineno">  607</span>                placeholder=<span class="stringliteral">&quot;e.g., Dinner at Restaurant&quot;</span></div>
+<div class="line"><span class="lineno">  608</span>                maxLength=<span class="stringliteral">&quot;100&quot;</span></div>
+<div class="line"><span class="lineno">  609</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  610</span>                required</div>
+<div class="line"><span class="lineno">  611</span>              /&gt;</div>
+<div class="line"><span class="lineno">  612</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  613</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  614</span>              &lt;label className=<span class="stringliteral">&quot;flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  615</span>                Amount ({group.currency})</div>
+<div class="line"><span class="lineno">  616</span>                &lt;<a class="code hl_variable" href="#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a> text=<span class="stringliteral">&quot;Enter the total amount that was paid for this expense. This will be divided among the selected members based on the split method.&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  617</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  618</span>              &lt;input</div>
+<div class="line"><span class="lineno">  619</span>                type=<span class="stringliteral">&quot;number&quot;</span></div>
+<div class="line"><span class="lineno">  620</span>                step=<span class="stringliteral">&quot;0.01&quot;</span></div>
+<div class="line"><span class="lineno">  621</span>                min=<span class="stringliteral">&quot;0.01&quot;</span></div>
+<div class="line"><span class="lineno">  622</span>                value={amount}</div>
+<div class="line"><span class="lineno">  623</span>                onChange={(e) =&gt; {</div>
+<div class="line"><span class="lineno">  624</span>                  <span class="keyword">const</span> value = e.target.value;</div>
+<div class="line"><span class="lineno">  625</span> </div>
+<div class="line"><span class="lineno">  626</span>                  <span class="comment">// Check if amount exceeds limit</span></div>
+<div class="line"><span class="lineno">  627</span>                  <span class="keywordflow">if</span> (value &amp;&amp; parseFloat(value) &gt; 1000000) {</div>
+<div class="line"><span class="lineno">  628</span>                    setError(<span class="stringliteral">&#39;Amount cannot exceed 1,000,000&#39;</span>);</div>
+<div class="line"><span class="lineno">  629</span>                    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  630</span>                  }</div>
+<div class="line"><span class="lineno">  631</span> </div>
+<div class="line"><span class="lineno">  632</span>                  <span class="comment">// Allow empty or valid numbers with max 2 decimals</span></div>
+<div class="line"><span class="lineno">  633</span>                  <span class="keywordflow">if</span> (value === <span class="stringliteral">&#39;&#39;</span> || /^\d*\.?\d{0,2}$/.test(value)) {</div>
+<div class="line"><span class="lineno">  634</span>                    setAmount(value);</div>
+<div class="line"><span class="lineno">  635</span>                    <span class="keywordflow">if</span> (error &amp;&amp; error.includes(<span class="stringliteral">&#39;Amount cannot exceed&#39;</span>)) {</div>
+<div class="line"><span class="lineno">  636</span>                      setError(<span class="stringliteral">&#39;&#39;</span>); <span class="comment">// Clear error when user fixes amount</span></div>
+<div class="line"><span class="lineno">  637</span>                    }</div>
+<div class="line"><span class="lineno">  638</span>                  }</div>
+<div class="line"><span class="lineno">  639</span>                }}</div>
+<div class="line"><span class="lineno">  640</span>                onBlur={(e) =&gt; {</div>
+<div class="line"><span class="lineno">  641</span>                  <span class="comment">// Format to 2 decimals when user leaves field</span></div>
+<div class="line"><span class="lineno">  642</span>                  <span class="keywordflow">if</span> (e.target.value &amp;&amp; !isNaN(e.target.value)) {</div>
+<div class="line"><span class="lineno">  643</span>                    <span class="keyword">const</span> formatted = parseFloat(e.target.value).toFixed(2);</div>
+<div class="line"><span class="lineno">  644</span>                    setAmount(formatted);</div>
+<div class="line"><span class="lineno">  645</span>                  }</div>
+<div class="line"><span class="lineno">  646</span>                }}</div>
+<div class="line"><span class="lineno">  647</span>                placeholder=<span class="stringliteral">&quot;0.00&quot;</span></div>
+<div class="line"><span class="lineno">  648</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  649</span>                required</div>
+<div class="line"><span class="lineno">  650</span>              /&gt;</div>
+<div class="line"><span class="lineno">  651</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-400 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  652</span>                Maximum: {group.currency} 1,000,000.00</div>
+<div class="line"><span class="lineno">  653</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  654</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  655</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  656</span> </div>
+<div class="line"><span class="lineno">  657</span>          {<span class="comment">/* Paid By &amp; Category */</span>}</div>
+<div class="line"><span class="lineno">  658</span>          &lt;div className=<span class="stringliteral">&quot;grid grid-cols-2 gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  659</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  660</span>              &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  661</span>                Paid By *</div>
+<div class="line"><span class="lineno">  662</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  663</span>              &lt;select</div>
+<div class="line"><span class="lineno">  664</span>                value={paidBy}</div>
+<div class="line"><span class="lineno">  665</span>                onChange={(e) =&gt; setPaidBy(e.target.value)}</div>
+<div class="line"><span class="lineno">  666</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  667</span>                required</div>
+<div class="line"><span class="lineno">  668</span>              &gt;</div>
+<div class="line"><span class="lineno">  669</span>                {group?.members?.map((member) =&gt; (</div>
+<div class="line"><span class="lineno">  670</span>                  &lt;option key={member.userId} value={member.userId}&gt;</div>
+<div class="line"><span class="lineno">  671</span>                    {member.name}</div>
+<div class="line"><span class="lineno">  672</span>                  &lt;/option&gt;</div>
+<div class="line"><span class="lineno">  673</span>                ))}</div>
+<div class="line"><span class="lineno">  674</span>              &lt;/select&gt;</div>
+<div class="line"><span class="lineno">  675</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  676</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  677</span>              &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  678</span>                Category</div>
+<div class="line"><span class="lineno">  679</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  680</span>              &lt;select</div>
+<div class="line"><span class="lineno">  681</span>                value={category}</div>
+<div class="line"><span class="lineno">  682</span>                onChange={(e) =&gt; setCategory(e.target.value)}</div>
+<div class="line"><span class="lineno">  683</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  684</span>              &gt;</div>
+<div class="line"><span class="lineno">  685</span>                {<a class="code hl_variable" href="#a8c18ec57f78dddc34070c2ef40fd25ad">CATEGORIES</a>.map((cat) =&gt; (</div>
+<div class="line"><span class="lineno">  686</span>                  &lt;option key={cat.id} value={cat.id}&gt;</div>
+<div class="line"><span class="lineno">  687</span>                    {cat.name}</div>
+<div class="line"><span class="lineno">  688</span>                  &lt;/option&gt;</div>
+<div class="line"><span class="lineno">  689</span>                ))}</div>
+<div class="line"><span class="lineno">  690</span>              &lt;/select&gt;</div>
+<div class="line"><span class="lineno">  691</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  692</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  693</span> </div>
+<div class="line"><span class="lineno">  694</span>          {<span class="comment">/* Description &amp; Date */</span>}</div>
+<div class="line"><span class="lineno">  695</span>          &lt;div className=<span class="stringliteral">&quot;grid grid-cols-2 gap-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  696</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  697</span>              &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  698</span>                Description</div>
+<div class="line"><span class="lineno">  699</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  700</span>              &lt;input</div>
+<div class="line"><span class="lineno">  701</span>                type=<span class="stringliteral">&quot;text&quot;</span></div>
+<div class="line"><span class="lineno">  702</span>                value={description}</div>
+<div class="line"><span class="lineno">  703</span>                onChange={(e) =&gt; setDescription(e.target.value)}</div>
+<div class="line"><span class="lineno">  704</span>                placeholder=<span class="stringliteral">&quot;Optional notes...&quot;</span></div>
+<div class="line"><span class="lineno">  705</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  706</span>              /&gt;</div>
+<div class="line"><span class="lineno">  707</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  708</span>            &lt;div&gt;</div>
+<div class="line"><span class="lineno">  709</span>              &lt;label className=<span class="stringliteral">&quot;block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  710</span>                Date</div>
+<div class="line"><span class="lineno">  711</span>              &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  712</span>              &lt;input</div>
+<div class="line"><span class="lineno">  713</span>                type=<span class="stringliteral">&quot;date&quot;</span></div>
+<div class="line"><span class="lineno">  714</span>                value={date}</div>
+<div class="line"><span class="lineno">  715</span>                onChange={(e) =&gt; setDate(e.target.value)}</div>
+<div class="line"><span class="lineno">  716</span>                className=<span class="stringliteral">&quot;w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none&quot;</span></div>
+<div class="line"><span class="lineno">  717</span>              /&gt;</div>
+<div class="line"><span class="lineno">  718</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  719</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  720</span> </div>
+<div class="line"><span class="lineno">  721</span>          {<span class="comment">/* Split Method */</span>}</div>
+<div class="line"><span class="lineno">  722</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno">  723</span>            &lt;label className=<span class="stringliteral">&quot;flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  724</span>              Split Method</div>
+<div class="line"><span class="lineno">  725</span>              &lt;<a class="code hl_variable" href="#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a> text=<span class="stringliteral">&quot;Choose how to divide: Equally (split evenly among all), Percentage (by %), Exact amounts (specific amounts per person), or Shares (by ratio like 1:2:3).&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  726</span>            &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  727</span>            &lt;div className=<span class="stringliteral">&quot;grid grid-cols-2 gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  728</span>              {<a class="code hl_variable" href="#a8682160e1e9eb2e68303e8e45cf17455">SPLIT_METHODS</a>.map((method) =&gt; (</div>
+<div class="line"><span class="lineno">  729</span>                &lt;button</div>
+<div class="line"><span class="lineno">  730</span>                  key={method.id}</div>
+<div class="line"><span class="lineno">  731</span>                  type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  732</span>                  onClick={() =&gt; setSplitMethod(method.id)}</div>
+<div class="line"><span class="lineno">  733</span>                  className={`p-3 rounded-lg border-2 text-left transition ${</div>
+<div class="line"><span class="lineno">  734</span>                    splitMethod === method.id</div>
+<div class="line"><span class="lineno">  735</span>                      ? <span class="stringliteral">&#39;border-primary dark:border-indigo-500 bg-primary-light dark:bg-indigo-900/30&#39;</span></div>
+<div class="line"><span class="lineno">  736</span>                      : <span class="stringliteral">&#39;border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500&#39;</span></div>
+<div class="line"><span class="lineno">  737</span>                  }`}</div>
+<div class="line"><span class="lineno">  738</span>                &gt;</div>
+<div class="line"><span class="lineno">  739</span>                  &lt;div className=<span class="stringliteral">&quot;font-semibold text-sm dark:text-white&quot;</span>&gt;{method.name}&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  740</span>                  &lt;div className=<span class="stringliteral">&quot;text-xs text-gray-600 dark:text-gray-400&quot;</span>&gt;{method.description}&lt;/div&gt;</div>
+<div class="line"><span class="lineno">  741</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  742</span>              ))}</div>
+<div class="line"><span class="lineno">  743</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  744</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  745</span> </div>
+<div class="line"><span class="lineno">  746</span>          {<span class="comment">/* Member Selection */</span>}</div>
+<div class="line"><span class="lineno">  747</span>          &lt;div&gt;</div>
+<div class="line"><span class="lineno">  748</span>            &lt;label className=<span class="stringliteral">&quot;flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  749</span>              Split Between</div>
+<div class="line"><span class="lineno">  750</span>              &lt;<a class="code hl_variable" href="#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a> text=<span class="stringliteral">&quot;Select which group members should pay their share. You can choose everyone or just specific people who participated in this expense.&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  751</span>            &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  752</span>            &lt;div className=<span class="stringliteral">&quot;space-y-2 max-h-40 overflow-y-auto bg-gray-50 dark:bg-gray-700 p-3 rounded-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  753</span>              {group?.members?.map((member) =&gt; (</div>
+<div class="line"><span class="lineno">  754</span>                &lt;label</div>
+<div class="line"><span class="lineno">  755</span>                  key={member.userId}</div>
+<div class="line"><span class="lineno">  756</span>                  className=<span class="stringliteral">&quot;flex items-center gap-3 p-2 hover:bg-white dark:hover:bg-gray-600 rounded cursor-pointer&quot;</span></div>
+<div class="line"><span class="lineno">  757</span>                &gt;</div>
+<div class="line"><span class="lineno">  758</span>                  &lt;input</div>
+<div class="line"><span class="lineno">  759</span>                    type=<span class="stringliteral">&quot;checkbox&quot;</span></div>
+<div class="line"><span class="lineno">  760</span>                    checked={selectedMembers[member.userId] || <span class="keyword">false</span>}</div>
+<div class="line"><span class="lineno">  761</span>                    onChange={() =&gt; toggleMember(member.userId)}</div>
+<div class="line"><span class="lineno">  762</span>                    className=<span class="stringliteral">&quot;w-4 h-4 text-primary&quot;</span></div>
+<div class="line"><span class="lineno">  763</span>                  /&gt;</div>
+<div class="line"><span class="lineno">  764</span>                  &lt;span className=<span class="stringliteral">&quot;flex-1 dark:text-white&quot;</span>&gt;{member.name}&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  765</span>                  </div>
+<div class="line"><span class="lineno">  766</span>                  {selectedMembers[member.userId] &amp;&amp; splitMethod !== <span class="stringliteral">&#39;equal&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  767</span>                    &lt;input</div>
+<div class="line"><span class="lineno">  768</span>                      type=<span class="stringliteral">&quot;number&quot;</span></div>
+<div class="line"><span class="lineno">  769</span>                      step={splitMethod === <span class="stringliteral">&#39;percentage&#39;</span> ? <span class="stringliteral">&#39;0.01&#39;</span> : splitMethod === <span class="stringliteral">&#39;shares&#39;</span> ? <span class="charliteral">&#39;1&#39;</span> : <span class="stringliteral">&#39;0.01&#39;</span>}</div>
+<div class="line"><span class="lineno">  770</span>                      value={splits[member.userId] || <span class="stringliteral">&#39;&#39;</span>}</div>
+<div class="line"><span class="lineno">  771</span>                      onChange={(e) =&gt; {</div>
+<div class="line"><span class="lineno">  772</span>                        <span class="keyword">const</span> value = e.target.value;</div>
+<div class="line"><span class="lineno">  773</span>                        </div>
+<div class="line"><span class="lineno">  774</span>                        <span class="comment">// Validation based on split method</span></div>
+<div class="line"><span class="lineno">  775</span>                        <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;shares&#39;</span>) {</div>
+<div class="line"><span class="lineno">  776</span>                          <span class="comment">// Shares: only positive integers</span></div>
+<div class="line"><span class="lineno">  777</span>                          <span class="keywordflow">if</span> (value === <span class="stringliteral">&#39;&#39;</span> || /^\d+$/.test(value)) {</div>
+<div class="line"><span class="lineno">  778</span>                            <span class="keyword">const</span> num = parseInt(value);</div>
+<div class="line"><span class="lineno">  779</span>                            <span class="keywordflow">if</span> (value === <span class="stringliteral">&#39;&#39;</span> || (num &gt; 0 &amp;&amp; num &lt;= 100)) {</div>
+<div class="line"><span class="lineno">  780</span>                              updateSplit(member.userId, value);</div>
+<div class="line"><span class="lineno">  781</span>                            }</div>
+<div class="line"><span class="lineno">  782</span>                          }</div>
+<div class="line"><span class="lineno">  783</span>                        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;exact&#39;</span>) {</div>
+<div class="line"><span class="lineno">  784</span>                          <span class="comment">// Exact amounts: max 2 decimals, positive only</span></div>
+<div class="line"><span class="lineno">  785</span>                          <span class="keywordflow">if</span> (value === <span class="stringliteral">&#39;&#39;</span> || /^\d*\.?\d{0,2}$/.test(value)) {</div>
+<div class="line"><span class="lineno">  786</span>                            updateSplit(member.userId, value);</div>
+<div class="line"><span class="lineno">  787</span>                          }</div>
+<div class="line"><span class="lineno">  788</span>                        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  789</span>                          <span class="comment">// Percentage: handled by updateSplit function</span></div>
+<div class="line"><span class="lineno">  790</span>                          updateSplit(member.userId, value);</div>
+<div class="line"><span class="lineno">  791</span>                        }</div>
+<div class="line"><span class="lineno">  792</span>                      }}</div>
+<div class="line"><span class="lineno">  793</span>                      onBlur={(e) =&gt; {</div>
+<div class="line"><span class="lineno">  794</span>                        <span class="keyword">const</span> value = e.target.value;</div>
+<div class="line"><span class="lineno">  795</span>                        </div>
+<div class="line"><span class="lineno">  796</span>                        <span class="comment">// Format on blur</span></div>
+<div class="line"><span class="lineno">  797</span>                        <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;percentage&#39;</span> &amp;&amp; value) {</div>
+<div class="line"><span class="lineno">  798</span>                          <span class="keyword">const</span> num = parseFloat(value);</div>
+<div class="line"><span class="lineno">  799</span>                          <span class="keywordflow">if</span> (!isNaN(num)) {</div>
+<div class="line"><span class="lineno">  800</span>                            <span class="keyword">const</span> formatted = Math.max(0, Math.min(100, num)).toFixed(1);</div>
+<div class="line"><span class="lineno">  801</span>                            updateSplit(member.userId, formatted);</div>
+<div class="line"><span class="lineno">  802</span>                          }</div>
+<div class="line"><span class="lineno">  803</span>                        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;exact&#39;</span> &amp;&amp; value) {</div>
+<div class="line"><span class="lineno">  804</span>                          <span class="keyword">const</span> num = parseFloat(value);</div>
+<div class="line"><span class="lineno">  805</span>                          <span class="keywordflow">if</span> (!isNaN(num) &amp;&amp; num &gt; 0) {</div>
+<div class="line"><span class="lineno">  806</span>                            <span class="keyword">const</span> formatted = num.toFixed(2);</div>
+<div class="line"><span class="lineno">  807</span>                            updateSplit(member.userId, formatted);</div>
+<div class="line"><span class="lineno">  808</span>                          }</div>
+<div class="line"><span class="lineno">  809</span>                        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (splitMethod === <span class="stringliteral">&#39;shares&#39;</span> &amp;&amp; value) {</div>
+<div class="line"><span class="lineno">  810</span>                          <span class="keyword">const</span> num = parseInt(value);</div>
+<div class="line"><span class="lineno">  811</span>                          <span class="keywordflow">if</span> (!isNaN(num) &amp;&amp; num &gt; 0) {</div>
+<div class="line"><span class="lineno">  812</span>                            updateSplit(member.userId, num.toString());</div>
+<div class="line"><span class="lineno">  813</span>                          }</div>
+<div class="line"><span class="lineno">  814</span>                        }</div>
+<div class="line"><span class="lineno">  815</span>                      }}</div>
+<div class="line"><span class="lineno">  816</span>                      placeholder={</div>
+<div class="line"><span class="lineno">  817</span>                        splitMethod === <span class="stringliteral">&#39;percentage&#39;</span> ? <span class="charliteral">&#39;%&#39;</span> :</div>
+<div class="line"><span class="lineno">  818</span>                        splitMethod === <span class="stringliteral">&#39;shares&#39;</span> ? <span class="stringliteral">&#39;shares&#39;</span> : </div>
+<div class="line"><span class="lineno">  819</span>                        group?.currency</div>
+<div class="line"><span class="lineno">  820</span>                      }</div>
+<div class="line"><span class="lineno">  821</span>                      min={</div>
+<div class="line"><span class="lineno">  822</span>                        splitMethod === <span class="stringliteral">&#39;percentage&#39;</span> ? <span class="charliteral">&#39;0&#39;</span> :</div>
+<div class="line"><span class="lineno">  823</span>                        splitMethod === <span class="stringliteral">&#39;shares&#39;</span> ? <span class="charliteral">&#39;1&#39;</span> :</div>
+<div class="line"><span class="lineno">  824</span>                        <span class="stringliteral">&#39;0.01&#39;</span></div>
+<div class="line"><span class="lineno">  825</span>                      }</div>
+<div class="line"><span class="lineno">  826</span>                      max={</div>
+<div class="line"><span class="lineno">  827</span>                        splitMethod === <span class="stringliteral">&#39;percentage&#39;</span> ? <span class="stringliteral">&#39;100&#39;</span> :</div>
+<div class="line"><span class="lineno">  828</span>                        splitMethod === <span class="stringliteral">&#39;shares&#39;</span> ? <span class="stringliteral">&#39;100&#39;</span> :</div>
+<div class="line"><span class="lineno">  829</span>                        undefined</div>
+<div class="line"><span class="lineno">  830</span>                      }</div>
+<div class="line"><span class="lineno">  831</span>                      className=<span class="stringliteral">&quot;w-24 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500&quot;</span></div>
+<div class="line"><span class="lineno">  832</span>                      onClick={(e) =&gt; e.stopPropagation()}</div>
+<div class="line"><span class="lineno">  833</span>                    /&gt;</div>
+<div class="line"><span class="lineno">  834</span>                  )}</div>
+<div class="line"><span class="lineno">  835</span>                  </div>
+<div class="line"><span class="lineno">  836</span>                  {selectedMembers[member.userId] &amp;&amp; calculated[member.userId] !== undefined &amp;&amp; (</div>
+<div class="line"><span class="lineno">  837</span>                    &lt;span className=<span class="stringliteral">&quot;text-sm font-semibold text-gray-700 dark:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  838</span>                      {group?.currency} {calculated[member.userId].toFixed(2)}</div>
+<div class="line"><span class="lineno">  839</span>                    &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  840</span>                  )}</div>
+<div class="line"><span class="lineno">  841</span>                &lt;/label&gt;</div>
+<div class="line"><span class="lineno">  842</span>              ))}</div>
+<div class="line"><span class="lineno">  843</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  844</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  845</span> </div>
+<div class="line"><span class="lineno">  846</span>          {<span class="comment">/* Percentage Total Indicator */</span>}</div>
+<div class="line"><span class="lineno">  847</span>        {splitMethod === <span class="stringliteral">&#39;percentage&#39;</span> &amp;&amp; selected.length &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  848</span>          &lt;div className={`mt-2 p-2 rounded text-sm text-center font-medium ${</div>
+<div class="line"><span class="lineno">  849</span>            (() =&gt; {</div>
+<div class="line"><span class="lineno">  850</span>              <span class="keyword">const</span> total = selected.reduce((sum, <span class="keywordtype">id</span>) =&gt; sum + (parseFloat(splits[<span class="keywordtype">id</span>]) || 0), 0);</div>
+<div class="line"><span class="lineno">  851</span>              <span class="keyword">const</span> isValid = Math.abs(total - 100) &lt; 0.01;</div>
+<div class="line"><span class="lineno">  852</span>              <span class="keywordflow">return</span> isValid ? <span class="stringliteral">&#39;bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800&#39;</span> : <span class="stringliteral">&#39;bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800&#39;</span>;</div>
+<div class="line"><span class="lineno">  853</span>            })()</div>
+<div class="line"><span class="lineno">  854</span>          }`}&gt;</div>
+<div class="line"><span class="lineno">  855</span>            {(() =&gt; {</div>
+<div class="line"><span class="lineno">  856</span>              <span class="keyword">const</span> total = selected.reduce((sum, <span class="keywordtype">id</span>) =&gt; sum + (parseFloat(splits[<span class="keywordtype">id</span>]) || 0), 0);</div>
+<div class="line"><span class="lineno">  857</span>              <span class="keyword">const</span> isValid = Math.abs(total - 100) &lt; 0.01;</div>
+<div class="line"><span class="lineno">  858</span>              <span class="keywordflow">return</span> isValid </div>
+<div class="line"><span class="lineno">  859</span>                ? `✓ Total: ${total.toFixed(1)}% (Perfect!)` </div>
+<div class="line"><span class="lineno">  860</span>                : `Total: ${total.toFixed(1)}% (Must equal 100%)`;</div>
+<div class="line"><span class="lineno">  861</span>            })()}</div>
+<div class="line"><span class="lineno">  862</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  863</span>        )}</div>
+<div class="line"><span class="lineno">  864</span>     </div>
+<div class="line"><span class="lineno">  865</span> </div>
+<div class="line"><span class="lineno">  866</span>          {<span class="comment">/* Summary */</span>}</div>
+<div class="line"><span class="lineno">  867</span>          {amount &amp;&amp; selected.length &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  868</span>            &lt;div className=<span class="stringliteral">&quot;bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  869</span>              &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center text-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  870</span>                &lt;span className=<span class="stringliteral">&quot;text-gray-700 dark:text-gray-300&quot;</span>&gt;Total Amount:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  871</span>                &lt;span className=<span class="stringliteral">&quot;font-bold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  872</span>                  {group?.currency} {parseFloat(amount).toFixed(2)}</div>
+<div class="line"><span class="lineno">  873</span>                &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  874</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  875</span>              &lt;div className=<span class="stringliteral">&quot;flex justify-between items-center text-sm mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  876</span>                &lt;span className=<span class="stringliteral">&quot;text-gray-700 dark:text-gray-300&quot;</span>&gt;Split among:&lt;/span&gt;</div>
+<div class="line"><span class="lineno">  877</span>                &lt;span className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  878</span>                  {selected.length} member{selected.length !== 1 ? <span class="charliteral">&#39;s&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}</div>
+<div class="line"><span class="lineno">  879</span>                &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  880</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  881</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  882</span>          )}</div>
+<div class="line"><span class="lineno">  883</span> </div>
+<div class="line"><span class="lineno">  884</span>          {<span class="comment">/* Buttons */</span>}</div>
+<div class="line"><span class="lineno">  885</span>          &lt;div className=<span class="stringliteral">&quot;flex gap-3 pt-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  886</span>            &lt;button</div>
+<div class="line"><span class="lineno">  887</span>              type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">  888</span>              onClick={onClose}</div>
+<div class="line"><span class="lineno">  889</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition&quot;</span></div>
+<div class="line"><span class="lineno">  890</span>            &gt;</div>
+<div class="line"><span class="lineno">  891</span>              Cancel</div>
+<div class="line"><span class="lineno">  892</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  893</span>            &lt;button</div>
+<div class="line"><span class="lineno">  894</span>              type=<span class="stringliteral">&quot;submit&quot;</span></div>
+<div class="line"><span class="lineno">  895</span>              disabled={loading}</div>
+<div class="line"><span class="lineno">  896</span>              className=<span class="stringliteral">&quot;flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition disabled:opacity-50&quot;</span></div>
+<div class="line"><span class="lineno">  897</span>            &gt;</div>
+<div class="line"><span class="lineno">  898</span>              {loading</div>
+<div class="line"><span class="lineno">  899</span>                ? (isEditing ? <span class="stringliteral">&#39;Saving...&#39;</span> : <span class="stringliteral">&#39;Adding...&#39;</span>)</div>
+<div class="line"><span class="lineno">  900</span>                : (isEditing ? <span class="stringliteral">&#39;Save Changes&#39;</span> : <span class="stringliteral">&#39;Add Expense&#39;</span>)}</div>
+<div class="line"><span class="lineno">  901</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  902</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  903</span>        &lt;/form&gt;</div>
+<div class="line"><span class="lineno">  904</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  905</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  906</span>    &lt;/&gt;</div>
+<div class="line"><span class="lineno">  907</span>  );</div>
+<div class="line"><span class="lineno">  908</span>}</div>
+<div class="ttc" id="a_add_expense_modal_8jsx_html_a2b4041a737969bc97eba1b700e1b947c"><div class="ttname"><a href="#a2b4041a737969bc97eba1b700e1b947c">ReceiptScanner</a></div><div class="ttdeci">import ReceiptScanner from ReceiptScanner</div><div class="ttdef"><b>Definition</b> <a href="_add_expense_modal_8jsx_source.html#l00002">AddExpenseModal.jsx:2</a></div></div>
+<div class="ttc" id="a_add_expense_modal_8jsx_html_a46a1d9066aac2aa6d7c907c66390c527"><div class="ttname"><a href="#a46a1d9066aac2aa6d7c907c66390c527">Tooltip</a></div><div class="ttdeci">import Tooltip from Tooltip</div><div class="ttdef"><b>Definition</b> <a href="_add_expense_modal_8jsx_source.html#l00008">AddExpenseModal.jsx:8</a></div></div>
+<div class="ttc" id="a_add_expense_modal_8jsx_html_a8682160e1e9eb2e68303e8e45cf17455"><div class="ttname"><a href="#a8682160e1e9eb2e68303e8e45cf17455">SPLIT_METHODS</a></div><div class="ttdeci">const SPLIT_METHODS</div><div class="ttdef"><b>Definition</b> <a href="_add_expense_modal_8jsx_source.html#l00021">AddExpenseModal.jsx:21</a></div></div>
+<div class="ttc" id="a_add_expense_modal_8jsx_html_a8c18ec57f78dddc34070c2ef40fd25ad"><div class="ttname"><a href="#a8c18ec57f78dddc34070c2ef40fd25ad">CATEGORIES</a></div><div class="ttdeci">const CATEGORIES</div><div class="ttdef"><b>Definition</b> <a href="_add_expense_modal_8jsx_source.html#l00011">AddExpenseModal.jsx:11</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a4a785497072ed7feaa10dc21f1795341"><div class="ttname"><a href="firebase_8js.html#a4a785497072ed7feaa10dc21f1795341">db</a></div><div class="ttdeci">export const db</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00023">firebase.js:23</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a13ad744fba2fa725454157c61f84ea79"><div class="ttname"><a href="firebase_firestore_8js.html#a13ad744fba2fa725454157c61f84ea79">deleteDoc</a></div><div class="ttdeci">export const deleteDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00016">firebaseFirestore.js:16</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a3259366f21a7fc0c2b72a4b024568536"><div class="ttname"><a href="firebase_firestore_8js.html#a3259366f21a7fc0c2b72a4b024568536">getDocs</a></div><div class="ttdeci">export const getDocs</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00026">firebaseFirestore.js:26</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a5fdb89ebdc78c2cdcd9653313e89224d"><div class="ttname"><a href="firebase_firestore_8js.html#a5fdb89ebdc78c2cdcd9653313e89224d">where</a></div><div class="ttdeci">export const where</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00024">firebaseFirestore.js:24</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a66d1f375d7706c9a5a0976c507a3438e"><div class="ttname"><a href="firebase_firestore_8js.html#a66d1f375d7706c9a5a0976c507a3438e">doc</a></div><div class="ttdeci">export const doc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00020">firebaseFirestore.js:20</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_a9801e4ebcb689f00edf1a8b0ef4ea2d8"><div class="ttname"><a href="firebase_firestore_8js.html#a9801e4ebcb689f00edf1a8b0ef4ea2d8">addDoc</a></div><div class="ttdeci">export const addDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00033">firebaseFirestore.js:33</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_aa2d0bd9afc4f4546b1589010db746116"><div class="ttname"><a href="firebase_firestore_8js.html#aa2d0bd9afc4f4546b1589010db746116">updateDoc</a></div><div class="ttdeci">export const updateDoc</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00014">firebaseFirestore.js:14</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ab9b6ac5b32a2665e69e59e5c943d4864"><div class="ttname"><a href="firebase_firestore_8js.html#ab9b6ac5b32a2665e69e59e5c943d4864">query</a></div><div class="ttdeci">export const query</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00022">firebaseFirestore.js:22</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_ad91b99036fb11671e4ef5d9b6a670142"><div class="ttname"><a href="firebase_firestore_8js.html#ad91b99036fb11671e4ef5d9b6a670142">serverTimestamp</a></div><div class="ttdeci">export const serverTimestamp</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00037">firebaseFirestore.js:37</a></div></div>
+<div class="ttc" id="afirebase_firestore_8js_html_af2d550cc87184e72492b0ea01f9bb903"><div class="ttname"><a href="firebase_firestore_8js.html#af2d550cc87184e72492b0ea01f9bb903">collection</a></div><div class="ttdeci">export const collection</div><div class="ttdef"><b>Definition</b> <a href="firebase_firestore_8js_source.html#l00018">firebaseFirestore.js:18</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_a22f128f9a7c7f3837e9acb70e57033b4"><div class="ttname"><a href="notifications_store_8js.html#a22f128f9a7c7f3837e9acb70e57033b4">createNotification</a></div><div class="ttdeci">export const createNotification</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00091">notificationsStore.js:91</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a8c18ec57f78dddc34070c2ef40fd25ad" name="a8c18ec57f78dddc34070c2ef40fd25ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c18ec57f78dddc34070c2ef40fd25ad">&#9670;&#160;</a></span>CATEGORIES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> CATEGORIES</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [</div>
+<div class="line">  { id: <span class="stringliteral">&#39;food&#39;</span>, name: <span class="stringliteral">&#39;Food &amp; Dining&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;transport&#39;</span>, name: <span class="stringliteral">&#39;Transport&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;accommodation&#39;</span>, name: <span class="stringliteral">&#39;Accommodation&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;entertainment&#39;</span>, name: <span class="stringliteral">&#39;Entertainment&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;shopping&#39;</span>, name: <span class="stringliteral">&#39;Shopping&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;utilities&#39;</span>, name: <span class="stringliteral">&#39;Utilities&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;other&#39;</span>, name: <span class="stringliteral">&#39;Other&#39;</span> },</div>
+<div class="line">]</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_add_expense_modal_8jsx_source.html#l00011">11</a> of file <a class="el" href="_add_expense_modal_8jsx_source.html">AddExpenseModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   12</span>  { id: <span class="stringliteral">&#39;food&#39;</span>, name: <span class="stringliteral">&#39;Food &amp; Dining&#39;</span> },</div>
+<div class="line"><span class="lineno">   13</span>  { id: <span class="stringliteral">&#39;transport&#39;</span>, name: <span class="stringliteral">&#39;Transport&#39;</span> },</div>
+<div class="line"><span class="lineno">   14</span>  { id: <span class="stringliteral">&#39;accommodation&#39;</span>, name: <span class="stringliteral">&#39;Accommodation&#39;</span> },</div>
+<div class="line"><span class="lineno">   15</span>  { id: <span class="stringliteral">&#39;entertainment&#39;</span>, name: <span class="stringliteral">&#39;Entertainment&#39;</span> },</div>
+<div class="line"><span class="lineno">   16</span>  { id: <span class="stringliteral">&#39;shopping&#39;</span>, name: <span class="stringliteral">&#39;Shopping&#39;</span> },</div>
+<div class="line"><span class="lineno">   17</span>  { id: <span class="stringliteral">&#39;utilities&#39;</span>, name: <span class="stringliteral">&#39;Utilities&#39;</span> },</div>
+<div class="line"><span class="lineno">   18</span>  { id: <span class="stringliteral">&#39;other&#39;</span>, name: <span class="stringliteral">&#39;Other&#39;</span> },</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { Camera } from 'lucide-<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_add_expense_modal_8jsx_source.html#l00003">3</a> of file <a class="el" href="_add_expense_modal_8jsx_source.html">AddExpenseModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    3</span>{ Camera } from <span class="stringliteral">&#39;lucide-react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a2b4041a737969bc97eba1b700e1b947c" name="a2b4041a737969bc97eba1b700e1b947c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b4041a737969bc97eba1b700e1b947c">&#9670;&#160;</a></span>ReceiptScanner</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> ReceiptScanner from ReceiptScanner</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_add_expense_modal_8jsx_source.html#l00002">2</a> of file <a class="el" href="_add_expense_modal_8jsx_source.html">AddExpenseModal.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a8682160e1e9eb2e68303e8e45cf17455" name="a8682160e1e9eb2e68303e8e45cf17455"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8682160e1e9eb2e68303e8e45cf17455">&#9670;&#160;</a></span>SPLIT_METHODS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> SPLIT_METHODS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [</div>
+<div class="line">  { id: <span class="stringliteral">&#39;equal&#39;</span>, name: <span class="stringliteral">&#39;Equal Split&#39;</span>, description: <span class="stringliteral">&#39;Split equally among members&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;percentage&#39;</span>, name: <span class="stringliteral">&#39;By Percentage&#39;</span>, description: <span class="stringliteral">&#39;Custom percentage per person&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;exact&#39;</span>, name: <span class="stringliteral">&#39;Exact Amounts&#39;</span>, description: <span class="stringliteral">&#39;Specific amount per person&#39;</span> },</div>
+<div class="line">  { id: <span class="stringliteral">&#39;shares&#39;</span>, name: <span class="stringliteral">&#39;By Shares&#39;</span>, description: <span class="stringliteral">&#39;Proportional shares (e.g., 2x, 1x)&#39;</span> },</div>
+<div class="line">]</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_add_expense_modal_8jsx_source.html#l00021">21</a> of file <a class="el" href="_add_expense_modal_8jsx_source.html">AddExpenseModal.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   22</span>  { id: <span class="stringliteral">&#39;equal&#39;</span>, name: <span class="stringliteral">&#39;Equal Split&#39;</span>, description: <span class="stringliteral">&#39;Split equally among members&#39;</span> },</div>
+<div class="line"><span class="lineno">   23</span>  { id: <span class="stringliteral">&#39;percentage&#39;</span>, name: <span class="stringliteral">&#39;By Percentage&#39;</span>, description: <span class="stringliteral">&#39;Custom percentage per person&#39;</span> },</div>
+<div class="line"><span class="lineno">   24</span>  { id: <span class="stringliteral">&#39;exact&#39;</span>, name: <span class="stringliteral">&#39;Exact Amounts&#39;</span>, description: <span class="stringliteral">&#39;Specific amount per person&#39;</span> },</div>
+<div class="line"><span class="lineno">   25</span>  { id: <span class="stringliteral">&#39;shares&#39;</span>, name: <span class="stringliteral">&#39;By Shares&#39;</span>, description: <span class="stringliteral">&#39;Proportional shares (e.g., 2x, 1x)&#39;</span> },</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a46a1d9066aac2aa6d7c907c66390c527" name="a46a1d9066aac2aa6d7c907c66390c527"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46a1d9066aac2aa6d7c907c66390c527">&#9670;&#160;</a></span>Tooltip</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> Tooltip from Tooltip</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_add_expense_modal_8jsx_source.html#l00008">8</a> of file <a class="el" href="_add_expense_modal_8jsx_source.html">AddExpenseModal.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

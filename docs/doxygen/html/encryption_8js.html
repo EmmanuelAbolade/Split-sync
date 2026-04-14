@@ -103,11 +103,237 @@ $(function(){initNavTree('encryption_8js.html',''); initResizable(true); });
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">encryption.js File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
+<p>AES-256 encryption and IBAN formatting utilities for secure data storage.  
+<a href="#details">More...</a></p>
+
 <p><a href="encryption_8js_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:abc0eb21488a6ee224eb55d08628ab593" id="r_abc0eb21488a6ee224eb55d08628ab593"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> CryptoJS from <a class="el" href="_profile_8test_8jsx.html#a496db461b289390268efa9d652c2e4db">crypto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc0eb21488a6ee224eb55d08628ab593">js</a></td></tr>
+<tr class="separator:abc0eb21488a6ee224eb55d08628ab593"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74b47131ca43ea84ec2c47b4df86387b" id="r_a74b47131ca43ea84ec2c47b4df86387b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74b47131ca43ea84ec2c47b4df86387b">ENCRYPTION_KEY</a> = process.env.REACT_APP_ENCRYPTION_KEY || 'split-sync-secure-key-2026'</td></tr>
+<tr class="separator:a74b47131ca43ea84ec2c47b4df86387b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16e6a145861882bc01c946d81dee0428" id="r_a16e6a145861882bc01c946d81dee0428"><td class="memItemLeft" align="right" valign="top">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a16e6a145861882bc01c946d81dee0428">encryptData</a></td></tr>
+<tr class="separator:a16e6a145861882bc01c946d81dee0428"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd25c31ee6552cf9bb8cd9468b84ba4b" id="r_afd25c31ee6552cf9bb8cd9468b84ba4b"><td class="memItemLeft" align="right" valign="top">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd25c31ee6552cf9bb8cd9468b84ba4b">decryptData</a></td></tr>
+<tr class="separator:afd25c31ee6552cf9bb8cd9468b84ba4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7aaa0405c8b77ce91ee2c705464fda74" id="r_a7aaa0405c8b77ce91ee2c705464fda74"><td class="memItemLeft" align="right" valign="top">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7aaa0405c8b77ce91ee2c705464fda74">validateIBAN</a></td></tr>
+<tr class="separator:a7aaa0405c8b77ce91ee2c705464fda74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab26c0e4bcb6f69b3a16f69b5490ec4ea" id="r_ab26c0e4bcb6f69b3a16f69b5490ec4ea"><td class="memItemLeft" align="right" valign="top">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab26c0e4bcb6f69b3a16f69b5490ec4ea">formatIBANDisplay</a></td></tr>
+<tr class="separator:ab26c0e4bcb6f69b3a16f69b5490ec4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2490809d009a05695360a2663d260bf" id="r_ae2490809d009a05695360a2663d260bf"><td class="memItemLeft" align="right" valign="top">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2490809d009a05695360a2663d260bf">maskIBAN</a></td></tr>
+<tr class="separator:ae2490809d009a05695360a2663d260bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>AES-256 encryption and IBAN formatting utilities for secure data storage. </p>
+<p>This module handles client-side encryption of sensitive financial data (specifically IBAN numbers) before they are written to Firestore. Encryption uses AES-256 via the CryptoJS library. The encryption key is read from an environment variable so it is never hard-coded in the production bundle.</p>
+<p>IBAN display helpers (formatting and masking) are also provided for the Payment Settings UI.</p>
+<dl class="section author"><dt>Author</dt><dd>Emmanuel Abolade (C00288657) </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2025-2026 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>1.0.0 </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>SETU Carlow — Final Year Project 2025/2026</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>The encryption key must be stored in REACT_APP_ENCRYPTION_KEY environment variable. Never commit the key to version control. </dd></dl>
+
+<p class="definition">Definition in file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+</div><h2 class="groupheader">Variable Documentation</h2>
+<a id="afd25c31ee6552cf9bb8cd9468b84ba4b" name="afd25c31ee6552cf9bb8cd9468b84ba4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd25c31ee6552cf9bb8cd9468b84ba4b">&#9670;&#160;</a></span>decryptData</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> decryptData</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= (encryptedData) =&gt; {</div>
+<div class="line">  <span class="keywordflow">if</span> (!encryptedData || encryptedData.trim() === <span class="stringliteral">&#39;&#39;</span>) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line">  <span class="keywordflow">try</span> {</div>
+<div class="line">    <span class="keyword">const</span> bytes = CryptoJS.AES.decrypt(encryptedData, <a class="code hl_variable" href="#a74b47131ca43ea84ec2c47b4df86387b">ENCRYPTION_KEY</a>);</div>
+<div class="line">    <span class="keywordflow">return</span> bytes.toString(CryptoJS.enc.Utf8);</div>
+<div class="line">  } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line">    console.error(<span class="stringliteral">&#39;Decryption error:&#39;</span>, error);</div>
+<div class="line">    <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;Failed to decrypt data&#39;</span>);</div>
+<div class="line">  }</div>
+<div class="line">}</div>
+<div class="ttc" id="aencryption_8js_html_a74b47131ca43ea84ec2c47b4df86387b"><div class="ttname"><a href="#a74b47131ca43ea84ec2c47b4df86387b">ENCRYPTION_KEY</a></div><div class="ttdeci">const ENCRYPTION_KEY</div><div class="ttdef"><b>Definition</b> <a href="encryption_8js_source.html#l00025">encryption.js:25</a></div></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00072">72</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   72</span>                                              {</div>
+<div class="line"><span class="lineno">   73</span>  <span class="keywordflow">if</span> (!encryptedData || encryptedData.trim() === <span class="stringliteral">&#39;&#39;</span>) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line"><span class="lineno">   74</span>  <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   75</span>    <span class="keyword">const</span> bytes = CryptoJS.AES.decrypt(encryptedData, <a class="code hl_variable" href="#a74b47131ca43ea84ec2c47b4df86387b">ENCRYPTION_KEY</a>);</div>
+<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">return</span> bytes.toString(CryptoJS.enc.Utf8);</div>
+<div class="line"><span class="lineno">   77</span>  } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line"><span class="lineno">   78</span>    console.error(<span class="stringliteral">&#39;Decryption error:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;Failed to decrypt data&#39;</span>);</div>
+<div class="line"><span class="lineno">   80</span>  }</div>
+<div class="line"><span class="lineno">   81</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a16e6a145861882bc01c946d81dee0428" name="a16e6a145861882bc01c946d81dee0428"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16e6a145861882bc01c946d81dee0428">&#9670;&#160;</a></span>encryptData</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> encryptData</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= (data) =&gt; {</div>
+<div class="line">  <span class="keywordflow">if</span> (!data || data.trim() === <span class="stringliteral">&#39;&#39;</span>) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line">  <span class="keywordflow">try</span> {</div>
+<div class="line">    <span class="keywordflow">return</span> CryptoJS.AES.encrypt(data.trim(), <a class="code hl_variable" href="#a74b47131ca43ea84ec2c47b4df86387b">ENCRYPTION_KEY</a>).toString();</div>
+<div class="line">  } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line">    console.error(<span class="stringliteral">&#39;Encryption error:&#39;</span>, error);</div>
+<div class="line">    <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;Failed to encrypt data&#39;</span>);</div>
+<div class="line">  }</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00044">44</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   44</span>                                     {</div>
+<div class="line"><span class="lineno">   45</span>  <span class="keywordflow">if</span> (!data || data.trim() === <span class="stringliteral">&#39;&#39;</span>) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line"><span class="lineno">   46</span>  <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">return</span> CryptoJS.AES.encrypt(data.trim(), <a class="code hl_variable" href="#a74b47131ca43ea84ec2c47b4df86387b">ENCRYPTION_KEY</a>).toString();</div>
+<div class="line"><span class="lineno">   48</span>  } <span class="keywordflow">catch</span> (error) {</div>
+<div class="line"><span class="lineno">   49</span>    console.error(<span class="stringliteral">&#39;Encryption error:&#39;</span>, error);</div>
+<div class="line"><span class="lineno">   50</span>    <span class="keywordflow">throw</span> <span class="keyword">new</span> Error(<span class="stringliteral">&#39;Failed to encrypt data&#39;</span>);</div>
+<div class="line"><span class="lineno">   51</span>  }</div>
+<div class="line"><span class="lineno">   52</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a74b47131ca43ea84ec2c47b4df86387b" name="a74b47131ca43ea84ec2c47b4df86387b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74b47131ca43ea84ec2c47b4df86387b">&#9670;&#160;</a></span>ENCRYPTION_KEY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> ENCRYPTION_KEY = process.env.REACT_APP_ENCRYPTION_KEY || 'split-sync-secure-key-2026'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00025">25</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+
+</div>
+</div>
+<a id="ab26c0e4bcb6f69b3a16f69b5490ec4ea" name="ab26c0e4bcb6f69b3a16f69b5490ec4ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab26c0e4bcb6f69b3a16f69b5490ec4ea">&#9670;&#160;</a></span>formatIBANDisplay</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> formatIBANDisplay</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= (iban) =&gt; {</div>
+<div class="line">  <span class="keywordflow">if</span> (!iban) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line">  <span class="keyword">const</span> cleanIBAN = iban.replace(/\s/g, <span class="stringliteral">&#39;&#39;</span>).toUpperCase();</div>
+<div class="line">  <span class="keywordflow">return</span> cleanIBAN.match(/.{1,4}/g)?.join(<span class="charliteral">&#39; &#39;</span>) || cleanIBAN;</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00120">120</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  120</span>                                           {</div>
+<div class="line"><span class="lineno">  121</span>  <span class="keywordflow">if</span> (!iban) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line"><span class="lineno">  122</span>  <span class="keyword">const</span> cleanIBAN = iban.replace(/\s/g, <span class="stringliteral">&#39;&#39;</span>).toUpperCase();</div>
+<div class="line"><span class="lineno">  123</span>  <span class="keywordflow">return</span> cleanIBAN.match(/.{1,4}/g)?.join(<span class="charliteral">&#39; &#39;</span>) || cleanIBAN;</div>
+<div class="line"><span class="lineno">  124</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abc0eb21488a6ee224eb55d08628ab593" name="abc0eb21488a6ee224eb55d08628ab593"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc0eb21488a6ee224eb55d08628ab593">&#9670;&#160;</a></span>js</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> CryptoJS from <a class="el" href="_profile_8test_8jsx.html#a496db461b289390268efa9d652c2e4db">crypto</a> js</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00023">23</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+
+</div>
+</div>
+<a id="ae2490809d009a05695360a2663d260bf" name="ae2490809d009a05695360a2663d260bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2490809d009a05695360a2663d260bf">&#9670;&#160;</a></span>maskIBAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> maskIBAN</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= (iban) =&gt; {</div>
+<div class="line">  <span class="keywordflow">if</span> (!iban) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line">  <span class="keyword">const</span> cleanIBAN = iban.replace(/\s/g, <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line">  <span class="keywordflow">if</span> (cleanIBAN.length &lt;= 4) <span class="keywordflow">return</span> cleanIBAN;</div>
+<div class="line">  <span class="keyword">const</span> countryCode = cleanIBAN.substring(0, 2);</div>
+<div class="line">  <span class="keyword">const</span> lastFour = cleanIBAN.substring(cleanIBAN.length - 4);</div>
+<div class="line">  <span class="keyword">const</span> middleMask = <span class="charliteral">&#39;*&#39;</span>.repeat(Math.min(cleanIBAN.length - 6, 12));</div>
+<div class="line">  <span class="keywordflow">return</span> `${countryCode}${middleMask}${lastFour}`;</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00140">140</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  140</span>                                  {</div>
+<div class="line"><span class="lineno">  141</span>  <span class="keywordflow">if</span> (!iban) <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span>;</div>
+<div class="line"><span class="lineno">  142</span>  <span class="keyword">const</span> cleanIBAN = iban.replace(/\s/g, <span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  143</span>  <span class="keywordflow">if</span> (cleanIBAN.length &lt;= 4) <span class="keywordflow">return</span> cleanIBAN;</div>
+<div class="line"><span class="lineno">  144</span>  <span class="keyword">const</span> countryCode = cleanIBAN.substring(0, 2);</div>
+<div class="line"><span class="lineno">  145</span>  <span class="keyword">const</span> lastFour = cleanIBAN.substring(cleanIBAN.length - 4);</div>
+<div class="line"><span class="lineno">  146</span>  <span class="keyword">const</span> middleMask = <span class="charliteral">&#39;*&#39;</span>.repeat(Math.min(cleanIBAN.length - 6, 12));</div>
+<div class="line"><span class="lineno">  147</span>  <span class="keywordflow">return</span> `${countryCode}${middleMask}${lastFour}`;</div>
+<div class="line"><span class="lineno">  148</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a7aaa0405c8b77ce91ee2c705464fda74" name="a7aaa0405c8b77ce91ee2c705464fda74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7aaa0405c8b77ce91ee2c705464fda74">&#9670;&#160;</a></span>validateIBAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">export <a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> validateIBAN</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= (iban) =&gt; {</div>
+<div class="line">  <span class="keywordflow">if</span> (!iban) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">  <span class="keyword">const</span> cleanIBAN = iban.replace(/\s/g, <span class="stringliteral">&#39;&#39;</span>).toUpperCase();</div>
+<div class="line">  <span class="keyword">const</span> ibanRegex = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/;</div>
+<div class="line">  <span class="keywordflow">return</span> ibanRegex.test(cleanIBAN);</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="encryption_8js_source.html#l00102">102</a> of file <a class="el" href="encryption_8js_source.html">encryption.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  102</span>                                      {</div>
+<div class="line"><span class="lineno">  103</span>  <span class="keywordflow">if</span> (!iban) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  104</span>  <span class="keyword">const</span> cleanIBAN = iban.replace(/\s/g, <span class="stringliteral">&#39;&#39;</span>).toUpperCase();</div>
+<div class="line"><span class="lineno">  105</span>  <span class="keyword">const</span> ibanRegex = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/;</div>
+<div class="line"><span class="lineno">  106</span>  <span class="keywordflow">return</span> ibanRegex.test(cleanIBAN);</div>
+<div class="line"><span class="lineno">  107</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

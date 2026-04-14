@@ -103,11 +103,370 @@ $(function(){initNavTree('_notifications_dropdown_8jsx.html',''); initResizable(
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">NotificationsDropdown.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_notifications_dropdown_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a9c2cce98c1ae98ad2f89d6c59778ede0" id="r_a9c2cce98c1ae98ad2f89d6c59778ede0"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c2cce98c1ae98ad2f89d6c59778ede0">NotificationsDropdown</a> ({ isOpen, onClose })</td></tr>
+<tr class="separator:a9c2cce98c1ae98ad2f89d6c59778ede0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcb7011bfcbfab397866f38d1dec481d" id="r_afcb7011bfcbfab397866f38d1dec481d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afcb7011bfcbfab397866f38d1dec481d">NOTIFICATION_ICONS</a></td></tr>
+<tr class="separator:afcb7011bfcbfab397866f38d1dec481d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a9c2cce98c1ae98ad2f89d6c59778ede0" name="a9c2cce98c1ae98ad2f89d6c59778ede0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c2cce98c1ae98ad2f89d6c59778ede0">&#9670;&#160;</a></span>NotificationsDropdown()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default NotificationsDropdown </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ isOpen, onClose }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_notifications_dropdown_8jsx_source.html#l00019">19</a> of file <a class="el" href="_notifications_dropdown_8jsx_source.html">NotificationsDropdown.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   19</span>                                              { isOpen, onClose }) {</div>
+<div class="line"><span class="lineno">   20</span>  <span class="keyword">const</span> navigate = <a class="code hl_variable" href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a>();</div>
+<div class="line"><span class="lineno">   21</span>  <span class="keyword">const</span> { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = <a class="code hl_variable" href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a>();</div>
+<div class="line"><span class="lineno">   22</span> </div>
+<div class="line"><span class="lineno">   23</span>  <span class="comment">// Per-notification loading, error, and done state</span></div>
+<div class="line"><span class="lineno">   24</span>  <span class="keyword">const</span> [actionLoading, setActionLoading] = useState({});</div>
+<div class="line"><span class="lineno">   25</span>  <span class="keyword">const</span> [actionError, setActionError] = useState({});</div>
+<div class="line"><span class="lineno">   26</span>  <span class="keyword">const</span> [actionDone, setActionDone] = useState({});</div>
+<div class="line"><span class="lineno">   27</span> </div>
+<div class="line"><span class="lineno">   28</span>  <span class="keyword">const</span> handleNotificationClick = (notification) =&gt; {</div>
+<div class="line"><span class="lineno">   29</span>    <span class="comment">// Do not navigate on action-required notifications — buttons handle those</span></div>
+<div class="line"><span class="lineno">   30</span>    <span class="keywordflow">if</span> (notification.requiresAction) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   31</span>    <span class="keywordflow">if</span> (!notification.read) markAsRead(notification.id);</div>
+<div class="line"><span class="lineno">   32</span>    <span class="keywordflow">if</span> (notification.data?.groupId) {</div>
+<div class="line"><span class="lineno">   33</span>      navigate(`/group/${notification.data.groupId}`);</div>
+<div class="line"><span class="lineno">   34</span>    }</div>
+<div class="line"><span class="lineno">   35</span>    onClose();</div>
+<div class="line"><span class="lineno">   36</span>  };</div>
+<div class="line"><span class="lineno">   37</span> </div>
+<div class="line"><span class="lineno">   38</span>  <span class="comment">// Payee confirms they received the payment.</span></div>
+<div class="line"><span class="lineno">   39</span>  <span class="comment">// notification.id IS the payeeNotifId that confirmPaymentReceived expects.</span></div>
+<div class="line"><span class="lineno">   40</span>  <span class="keyword">const</span> handleConfirmPayment = async (e, notification) =&gt; {</div>
+<div class="line"><span class="lineno">   41</span>    e.stopPropagation();</div>
+<div class="line"><span class="lineno">   42</span>    setActionError(prev =&gt; ({ ...prev, [notification.id]: <span class="keyword">null</span> }));</div>
+<div class="line"><span class="lineno">   43</span>    setActionLoading(prev =&gt; ({ ...prev, [notification.id]: <span class="stringliteral">&#39;confirming&#39;</span> }));</div>
+<div class="line"><span class="lineno">   44</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   45</span>      await <a class="code hl_variable" href="notifications_store_8js.html#a05e447ec0d3ad7ffc492cdd1f539f64b">confirmPaymentReceived</a>(notification.id);</div>
+<div class="line"><span class="lineno">   46</span>      setActionDone(prev =&gt; ({ ...prev, [notification.id]: <span class="stringliteral">&#39;confirmed&#39;</span> }));</div>
+<div class="line"><span class="lineno">   47</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">   48</span>      console.error(<span class="stringliteral">&#39;Error confirming payment:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">   49</span>      <span class="keyword">const</span> msg = err?.code === <span class="stringliteral">&#39;permission-denied&#39;</span></div>
+<div class="line"><span class="lineno">   50</span>        ? <span class="stringliteral">&#39;Permission denied. Please ensure Firestore rules are deployed.&#39;</span></div>
+<div class="line"><span class="lineno">   51</span>        : (err?.message || <span class="stringliteral">&#39;Failed to confirm. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">   52</span>      setActionError(prev =&gt; ({ ...prev, [notification.id]: msg }));</div>
+<div class="line"><span class="lineno">   53</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">   54</span>      setActionLoading(prev =&gt; ({ ...prev, [notification.id]: <span class="keyword">null</span> }));</div>
+<div class="line"><span class="lineno">   55</span>    }</div>
+<div class="line"><span class="lineno">   56</span>  };</div>
+<div class="line"><span class="lineno">   57</span> </div>
+<div class="line"><span class="lineno">   58</span>  <span class="comment">// Payee declines — balance unchanged, payer is notified to retry.</span></div>
+<div class="line"><span class="lineno">   59</span>  <span class="keyword">const</span> handleDeclinePayment = async (e, notification) =&gt; {</div>
+<div class="line"><span class="lineno">   60</span>    e.stopPropagation();</div>
+<div class="line"><span class="lineno">   61</span>    setActionError(prev =&gt; ({ ...prev, [notification.id]: <span class="keyword">null</span> }));</div>
+<div class="line"><span class="lineno">   62</span>    setActionLoading(prev =&gt; ({ ...prev, [notification.id]: <span class="stringliteral">&#39;declining&#39;</span> }));</div>
+<div class="line"><span class="lineno">   63</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   64</span>      await <a class="code hl_variable" href="notifications_store_8js.html#a1a31dcc63952e497c6316c7a0f71ac8d">declinePaymentReceived</a>(notification.id);</div>
+<div class="line"><span class="lineno">   65</span>      setActionDone(prev =&gt; ({ ...prev, [notification.id]: <span class="stringliteral">&#39;declined&#39;</span> }));</div>
+<div class="line"><span class="lineno">   66</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">   67</span>      console.error(<span class="stringliteral">&#39;Error declining payment:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">   68</span>      <span class="keyword">const</span> msg = err?.code === <span class="stringliteral">&#39;permission-denied&#39;</span></div>
+<div class="line"><span class="lineno">   69</span>        ? <span class="stringliteral">&#39;Permission denied. Please ensure Firestore rules are deployed.&#39;</span></div>
+<div class="line"><span class="lineno">   70</span>        : (err?.message || <span class="stringliteral">&#39;Failed to decline. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">   71</span>      setActionError(prev =&gt; ({ ...prev, [notification.id]: msg }));</div>
+<div class="line"><span class="lineno">   72</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">   73</span>      setActionLoading(prev =&gt; ({ ...prev, [notification.id]: <span class="keyword">null</span> }));</div>
+<div class="line"><span class="lineno">   74</span>    }</div>
+<div class="line"><span class="lineno">   75</span>  };</div>
+<div class="line"><span class="lineno">   76</span> </div>
+<div class="line"><span class="lineno">   77</span>  <span class="keyword">const</span> formatTime = (timestamp) =&gt; {</div>
+<div class="line"><span class="lineno">   78</span>    <span class="keywordflow">if</span> (!timestamp) <span class="keywordflow">return</span> <span class="stringliteral">&#39;Just now&#39;</span>;</div>
+<div class="line"><span class="lineno">   79</span>    <span class="keyword">const</span> date = timestamp?.toDate ? timestamp.toDate() : <span class="keyword">new</span> Date(timestamp);</div>
+<div class="line"><span class="lineno">   80</span>    <span class="keyword">const</span> now = <span class="keyword">new</span> Date();</div>
+<div class="line"><span class="lineno">   81</span>    <span class="keyword">const</span> diffMs = now - date;</div>
+<div class="line"><span class="lineno">   82</span>    <span class="keyword">const</span> diffMins = Math.floor(diffMs / 60000);</div>
+<div class="line"><span class="lineno">   83</span>    <span class="keyword">const</span> diffHours = Math.floor(diffMs / 3600000);</div>
+<div class="line"><span class="lineno">   84</span>    <span class="keyword">const</span> diffDays = Math.floor(diffMs / 86400000);</div>
+<div class="line"><span class="lineno">   85</span>    <span class="keywordflow">if</span> (diffMins &lt; 1) <span class="keywordflow">return</span> <span class="stringliteral">&#39;Just now&#39;</span>;</div>
+<div class="line"><span class="lineno">   86</span>    <span class="keywordflow">if</span> (diffMins &lt; 60) <span class="keywordflow">return</span> `${diffMins}m ago`;</div>
+<div class="line"><span class="lineno">   87</span>    <span class="keywordflow">if</span> (diffHours &lt; 24) <span class="keywordflow">return</span> `${diffHours}h ago`;</div>
+<div class="line"><span class="lineno">   88</span>    <span class="keywordflow">if</span> (diffDays &lt; 7) <span class="keywordflow">return</span> `${diffDays}d ago`;</div>
+<div class="line"><span class="lineno">   89</span>    <span class="keywordflow">return</span> date.toLocaleDateString();</div>
+<div class="line"><span class="lineno">   90</span>  };</div>
+<div class="line"><span class="lineno">   91</span> </div>
+<div class="line"><span class="lineno">   92</span>  <span class="keywordflow">if</span> (!isOpen) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">   93</span> </div>
+<div class="line"><span class="lineno">   94</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   95</span>    &lt;&gt;</div>
+<div class="line"><span class="lineno">   96</span>      {<span class="comment">/* Backdrop — sits behind the dropdown, closes on click */</span>}</div>
+<div class="line"><span class="lineno">   97</span>      &lt;div className=<span class="stringliteral">&quot;fixed inset-0 z-40&quot;</span> onClick={onClose} /&gt;</div>
+<div class="line"><span class="lineno">   98</span> </div>
+<div class="line"><span class="lineno">   99</span>      {<span class="comment">/* Dropdown panel */</span>}</div>
+<div class="line"><span class="lineno">  100</span>      &lt;div className=<span class="stringliteral">&quot;fixed top-16 right-4 w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-xl shadow-card-3d dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-700 z-50 max-h-[80vh] flex flex-col animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  101</span> </div>
+<div class="line"><span class="lineno">  102</span>        {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">  103</span>        &lt;div className=<span class="stringliteral">&quot;flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  104</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  105</span>            &lt;Bell size={20} className=<span class="stringliteral">&quot;text-gray-700 dark:text-gray-300&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  106</span>            &lt;h3 className=<span class="stringliteral">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>&gt;Notifications&lt;/h3&gt;</div>
+<div class="line"><span class="lineno">  107</span>            {unreadCount &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  108</span>              &lt;span className=<span class="stringliteral">&quot;px-2 py-0.5 bg-primary dark:bg-indigo-600 text-white text-xs rounded-full&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  109</span>                {unreadCount}</div>
+<div class="line"><span class="lineno">  110</span>              &lt;/span&gt;</div>
+<div class="line"><span class="lineno">  111</span>            )}</div>
+<div class="line"><span class="lineno">  112</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  113</span>          &lt;button onClick={onClose} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  114</span>            &lt;X size={20} /&gt;</div>
+<div class="line"><span class="lineno">  115</span>          &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  116</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>        {<span class="comment">/* Bulk actions */</span>}</div>
+<div class="line"><span class="lineno">  119</span>        {notifications.length &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  120</span>          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  121</span>            {unreadCount &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  122</span>              &lt;button</div>
+<div class="line"><span class="lineno">  123</span>                onClick={() =&gt; markAllAsRead()}</div>
+<div class="line"><span class="lineno">  124</span>                className=<span class="stringliteral">&quot;text-xs text-primary dark:text-indigo-400 hover:underline flex items-center gap-1&quot;</span></div>
+<div class="line"><span class="lineno">  125</span>              &gt;</div>
+<div class="line"><span class="lineno">  126</span>                &lt;Check size={14} /&gt;</div>
+<div class="line"><span class="lineno">  127</span>                Mark all read</div>
+<div class="line"><span class="lineno">  128</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  129</span>            )}</div>
+<div class="line"><span class="lineno">  130</span>            &lt;button</div>
+<div class="line"><span class="lineno">  131</span>              onClick={() =&gt; { <span class="keywordflow">if</span> (window.confirm(<span class="stringliteral">&#39;Clear all notifications?&#39;</span>)) clearAll(); }}</div>
+<div class="line"><span class="lineno">  132</span>              className=<span class="stringliteral">&quot;text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1 ml-auto&quot;</span></div>
+<div class="line"><span class="lineno">  133</span>            &gt;</div>
+<div class="line"><span class="lineno">  134</span>              &lt;Trash2 size={14} /&gt;</div>
+<div class="line"><span class="lineno">  135</span>              Clear all</div>
+<div class="line"><span class="lineno">  136</span>            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  137</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  138</span>        )}</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>        {<span class="comment">/* Notifications list */</span>}</div>
+<div class="line"><span class="lineno">  141</span>        &lt;div className=<span class="stringliteral">&quot;flex-1 overflow-y-auto&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  142</span>          {notifications.length === 0 ? (</div>
+<div class="line"><span class="lineno">  143</span>            &lt;div className=<span class="stringliteral">&quot;flex flex-col items-center justify-center py-12 px-4&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  144</span>              &lt;div className=<span class="stringliteral">&quot;w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  145</span>                &lt;Bell size={32} className=<span class="stringliteral">&quot;text-gray-400 dark:text-gray-500&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  146</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  147</span>              &lt;p className=<span class="stringliteral">&quot;text-gray-600 dark:text-gray-400 text-sm font-medium mb-1&quot;</span>&gt;No notifications yet&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  148</span>              &lt;p className=<span class="stringliteral">&quot;text-gray-500 dark:text-gray-500 text-xs text-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  149</span>                You will see notifications here when there is activity in your groups.</div>
+<div class="line"><span class="lineno">  150</span>              &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  151</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  152</span>          ) : (</div>
+<div class="line"><span class="lineno">  153</span>            &lt;div className=<span class="stringliteral">&quot;divide-y divide-gray-200 dark:divide-gray-700&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  154</span>              {notifications.map((notification) =&gt; {</div>
+<div class="line"><span class="lineno">  155</span>                <span class="keyword">const</span> Icon = <a class="code hl_variable" href="#afcb7011bfcbfab397866f38d1dec481d">NOTIFICATION_ICONS</a>[notification.type] || <a class="code hl_variable" href="#afcb7011bfcbfab397866f38d1dec481d">NOTIFICATION_ICONS</a>.default;</div>
+<div class="line"><span class="lineno">  156</span> </div>
+<div class="line"><span class="lineno">  157</span>                <span class="comment">// Show action buttons only while requiresAction is true AND user has not</span></div>
+<div class="line"><span class="lineno">  158</span>                <span class="comment">// yet actioned it in this session. The Firestore update will eventually</span></div>
+<div class="line"><span class="lineno">  159</span>                <span class="comment">// remove requiresAction, hiding the buttons permanently.</span></div>
+<div class="line"><span class="lineno">  160</span>                <span class="keyword">const</span> isActionable = notification.requiresAction === <span class="keyword">true</span> &amp;&amp; !actionDone[notification.id];</div>
+<div class="line"><span class="lineno">  161</span>                <span class="keyword">const</span> loadingState = actionLoading[notification.id];</div>
+<div class="line"><span class="lineno">  162</span>                <span class="keyword">const</span> errorMsg = actionError[notification.id];</div>
+<div class="line"><span class="lineno">  163</span>                <span class="keyword">const</span> doneState = actionDone[notification.id];</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>                <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  166</span>                  &lt;div</div>
+<div class="line"><span class="lineno">  167</span>                    key={notification.id}</div>
+<div class="line"><span class="lineno">  168</span>                    onClick={() =&gt; handleNotificationClick(notification)}</div>
+<div class="line"><span class="lineno">  169</span>                    className={`p-4 transition-colors ${</div>
+<div class="line"><span class="lineno">  170</span>                      isActionable ? <span class="stringliteral">&#39;cursor-default&#39;</span> : <span class="stringliteral">&#39;cursor-pointer&#39;</span></div>
+<div class="line"><span class="lineno">  171</span>                    } ${</div>
+<div class="line"><span class="lineno">  172</span>                      notification.read</div>
+<div class="line"><span class="lineno">  173</span>                        ? <span class="stringliteral">&#39;bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750&#39;</span></div>
+<div class="line"><span class="lineno">  174</span>                        : notification.type === <span class="stringliteral">&#39;payment_confirmation_needed&#39;</span></div>
+<div class="line"><span class="lineno">  175</span>                          ? <span class="stringliteral">&#39;bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30&#39;</span></div>
+<div class="line"><span class="lineno">  176</span>                          : <span class="stringliteral">&#39;bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30&#39;</span></div>
+<div class="line"><span class="lineno">  177</span>                    }`}</div>
+<div class="line"><span class="lineno">  178</span>                  &gt;</div>
+<div class="line"><span class="lineno">  179</span>                    &lt;div className=<span class="stringliteral">&quot;flex gap-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  180</span>                      {<span class="comment">/* Notification icon */</span>}</div>
+<div class="line"><span class="lineno">  181</span>                      &lt;div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${</div>
+<div class="line"><span class="lineno">  182</span>                        notification.type === <span class="stringliteral">&#39;payment_confirmation_needed&#39;</span> ? <span class="stringliteral">&#39;bg-amber-100 dark:bg-amber-900/30&#39;</span> :</div>
+<div class="line"><span class="lineno">  183</span>                        notification.type === <span class="stringliteral">&#39;payment_confirmed&#39;</span>           ? <span class="stringliteral">&#39;bg-green-100 dark:bg-green-900/30&#39;</span> :</div>
+<div class="line"><span class="lineno">  184</span>                        notification.type === <span class="stringliteral">&#39;payment_declined&#39;</span>            ? <span class="stringliteral">&#39;bg-red-100 dark:bg-red-900/30&#39;</span> :</div>
+<div class="line"><span class="lineno">  185</span>                        notification.type === <span class="stringliteral">&#39;expense&#39;</span>                     ? <span class="stringliteral">&#39;bg-blue-100 dark:bg-blue-900/30&#39;</span> :</div>
+<div class="line"><span class="lineno">  186</span>                        notification.type === <span class="stringliteral">&#39;settlement&#39;</span>                  ? <span class="stringliteral">&#39;bg-orange-100 dark:bg-orange-900/30&#39;</span> :</div>
+<div class="line"><span class="lineno">  187</span>                        notification.type === <span class="stringliteral">&#39;invitation&#39;</span>                  ? <span class="stringliteral">&#39;bg-purple-100 dark:bg-purple-900/30&#39;</span> :</div>
+<div class="line"><span class="lineno">  188</span>                        <span class="stringliteral">&#39;bg-gray-100 dark:bg-gray-700&#39;</span></div>
+<div class="line"><span class="lineno">  189</span>                      }`}&gt;</div>
+<div class="line"><span class="lineno">  190</span>                        &lt;Icon size={20} className={`${</div>
+<div class="line"><span class="lineno">  191</span>                          notification.type === <span class="stringliteral">&#39;payment_confirmation_needed&#39;</span> ? <span class="stringliteral">&#39;text-amber-600 dark:text-amber-400&#39;</span> :</div>
+<div class="line"><span class="lineno">  192</span>                          notification.type === <span class="stringliteral">&#39;payment_confirmed&#39;</span>           ? <span class="stringliteral">&#39;text-green-600 dark:text-green-400&#39;</span> :</div>
+<div class="line"><span class="lineno">  193</span>                          notification.type === <span class="stringliteral">&#39;payment_declined&#39;</span>            ? <span class="stringliteral">&#39;text-red-600 dark:text-red-400&#39;</span> :</div>
+<div class="line"><span class="lineno">  194</span>                          notification.type === <span class="stringliteral">&#39;expense&#39;</span>                     ? <span class="stringliteral">&#39;text-blue-600 dark:text-blue-400&#39;</span> :</div>
+<div class="line"><span class="lineno">  195</span>                          notification.type === <span class="stringliteral">&#39;settlement&#39;</span>                  ? <span class="stringliteral">&#39;text-orange-600 dark:text-orange-400&#39;</span> :</div>
+<div class="line"><span class="lineno">  196</span>                          notification.type === <span class="stringliteral">&#39;invitation&#39;</span>                  ? <span class="stringliteral">&#39;text-purple-600 dark:text-purple-400&#39;</span> :</div>
+<div class="line"><span class="lineno">  197</span>                          <span class="stringliteral">&#39;text-gray-500 dark:text-gray-400&#39;</span></div>
+<div class="line"><span class="lineno">  198</span>                        }`} /&gt;</div>
+<div class="line"><span class="lineno">  199</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  200</span> </div>
+<div class="line"><span class="lineno">  201</span>                      {<span class="comment">/* Content */</span>}</div>
+<div class="line"><span class="lineno">  202</span>                      &lt;div className=<span class="stringliteral">&quot;flex-1 min-w-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  203</span>                        &lt;p className={`text-sm font-semibold mb-0.5 ${</div>
+<div class="line"><span class="lineno">  204</span>                          notification.type === <span class="stringliteral">&#39;payment_confirmation_needed&#39;</span></div>
+<div class="line"><span class="lineno">  205</span>                            ? <span class="stringliteral">&#39;text-amber-800 dark:text-amber-200&#39;</span></div>
+<div class="line"><span class="lineno">  206</span>                            : <span class="stringliteral">&#39;text-gray-900 dark:text-white&#39;</span></div>
+<div class="line"><span class="lineno">  207</span>                        }`}&gt;</div>
+<div class="line"><span class="lineno">  208</span>                          {notification.title}</div>
+<div class="line"><span class="lineno">  209</span>                        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  210</span>                        &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-600 dark:text-gray-400 mb-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  211</span>                          {notification.message}</div>
+<div class="line"><span class="lineno">  212</span>                        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  213</span>                        &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-500 dark:text-gray-500 mb-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  214</span>                          {formatTime(notification.createdAt)}</div>
+<div class="line"><span class="lineno">  215</span>                        &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  216</span> </div>
+<div class="line"><span class="lineno">  217</span>                        {<span class="comment">/* Inline success feedback — shown immediately after action */</span>}</div>
+<div class="line"><span class="lineno">  218</span>                        {doneState === <span class="stringliteral">&#39;confirmed&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  219</span>                          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5 text-xs text-green-700 dark:text-green-400 font-medium mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  220</span>                            &lt;CheckCircle2 size={13} /&gt;</div>
+<div class="line"><span class="lineno">  221</span>                            Payment confirmed. Balance updated.</div>
+<div class="line"><span class="lineno">  222</span>                          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  223</span>                        )}</div>
+<div class="line"><span class="lineno">  224</span>                        {doneState === <span class="stringliteral">&#39;declined&#39;</span> &amp;&amp; (</div>
+<div class="line"><span class="lineno">  225</span>                          &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  226</span>                            &lt;XCircle size={13} /&gt;</div>
+<div class="line"><span class="lineno">  227</span>                            Marked as not received. Payer has been notified.</div>
+<div class="line"><span class="lineno">  228</span>                          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  229</span>                        )}</div>
+<div class="line"><span class="lineno">  230</span> </div>
+<div class="line"><span class="lineno">  231</span>                        {<span class="comment">/* Inline error feedback — shown when Firestore operation fails */</span>}</div>
+<div class="line"><span class="lineno">  232</span>                        {errorMsg &amp;&amp; (</div>
+<div class="line"><span class="lineno">  233</span>                          &lt;div className=<span class="stringliteral">&quot;flex items-start gap-1.5 mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  234</span>                            &lt;AlertCircle size={13} className=<span class="stringliteral">&quot;text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  235</span>                            &lt;p className=<span class="stringliteral">&quot;text-xs text-red-700 dark:text-red-300&quot;</span>&gt;{errorMsg}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  236</span>                          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  237</span>                        )}</div>
+<div class="line"><span class="lineno">  238</span> </div>
+<div class="line"><span class="lineno">  239</span>                        {<span class="comment">/* Action buttons — visible only while payment is pending confirmation */</span>}</div>
+<div class="line"><span class="lineno">  240</span>                        {isActionable &amp;&amp; (</div>
+<div class="line"><span class="lineno">  241</span>                          &lt;div className=<span class="stringliteral">&quot;flex gap-2 mt-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  242</span>                            &lt;button</div>
+<div class="line"><span class="lineno">  243</span>                              onClick={(e) =&gt; handleConfirmPayment(e, notification)}</div>
+<div class="line"><span class="lineno">  244</span>                              disabled={!!loadingState}</div>
+<div class="line"><span class="lineno">  245</span>                              className=<span class="stringliteral">&quot;flex items-center gap-1.5 px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white text-xs font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition disabled:opacity-60&quot;</span></div>
+<div class="line"><span class="lineno">  246</span>                            &gt;</div>
+<div class="line"><span class="lineno">  247</span>                              {loadingState === <span class="stringliteral">&#39;confirming&#39;</span></div>
+<div class="line"><span class="lineno">  248</span>                                ? &lt;Clock size={13} className=<span class="stringliteral">&quot;animate-spin&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  249</span>                                : &lt;CheckCircle2 size={13} /&gt;}</div>
+<div class="line"><span class="lineno">  250</span>                              {loadingState === <span class="stringliteral">&#39;confirming&#39;</span> ? <span class="stringliteral">&#39;Confirming...&#39;</span> : <span class="stringliteral">&#39;Confirm Received&#39;</span>}</div>
+<div class="line"><span class="lineno">  251</span>                            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  252</span>                            &lt;button</div>
+<div class="line"><span class="lineno">  253</span>                              onClick={(e) =&gt; handleDeclinePayment(e, notification)}</div>
+<div class="line"><span class="lineno">  254</span>                              disabled={!!loadingState}</div>
+<div class="line"><span class="lineno">  255</span>                              className=<span class="stringliteral">&quot;flex items-center gap-1.5 px-3 py-1.5 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 text-xs font-medium rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition disabled:opacity-60&quot;</span></div>
+<div class="line"><span class="lineno">  256</span>                            &gt;</div>
+<div class="line"><span class="lineno">  257</span>                              {loadingState === <span class="stringliteral">&#39;declining&#39;</span></div>
+<div class="line"><span class="lineno">  258</span>                                ? &lt;Clock size={13} className=<span class="stringliteral">&quot;animate-spin&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  259</span>                                : &lt;XCircle size={13} /&gt;}</div>
+<div class="line"><span class="lineno">  260</span>                              {loadingState === <span class="stringliteral">&#39;declining&#39;</span> ? <span class="stringliteral">&#39;Declining...&#39;</span> : <span class="stringliteral">&#39;Did Not Receive&#39;</span>}</div>
+<div class="line"><span class="lineno">  261</span>                            &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  262</span>                          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  263</span>                        )}</div>
+<div class="line"><span class="lineno">  264</span>                      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  265</span> </div>
+<div class="line"><span class="lineno">  266</span>                      {<span class="comment">/* Unread dot */</span>}</div>
+<div class="line"><span class="lineno">  267</span>                      {!notification.read &amp;&amp; (</div>
+<div class="line"><span class="lineno">  268</span>                        &lt;div className=<span class="stringliteral">&quot;w-2 h-2 bg-primary dark:bg-indigo-500 rounded-full flex-shrink-0 mt-2&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  269</span>                      )}</div>
+<div class="line"><span class="lineno">  270</span>                    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  271</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  272</span>                );</div>
+<div class="line"><span class="lineno">  273</span>              })}</div>
+<div class="line"><span class="lineno">  274</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  275</span>          )}</div>
+<div class="line"><span class="lineno">  276</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  277</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  278</span>    &lt;/&gt;</div>
+<div class="line"><span class="lineno">  279</span>  );</div>
+<div class="line"><span class="lineno">  280</span>}</div>
+<div class="ttc" id="a_notifications_dropdown_8jsx_html_afcb7011bfcbfab397866f38d1dec481d"><div class="ttname"><a href="#afcb7011bfcbfab397866f38d1dec481d">NOTIFICATION_ICONS</a></div><div class="ttdeci">const NOTIFICATION_ICONS</div><div class="ttdef"><b>Definition</b> <a href="_notifications_dropdown_8jsx_source.html#l00007">NotificationsDropdown.jsx:7</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_a05e447ec0d3ad7ffc492cdd1f539f64b"><div class="ttname"><a href="notifications_store_8js.html#a05e447ec0d3ad7ffc492cdd1f539f64b">confirmPaymentReceived</a></div><div class="ttdeci">export const confirmPaymentReceived</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00194">notificationsStore.js:194</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_a1a31dcc63952e497c6316c7a0f71ac8d"><div class="ttname"><a href="notifications_store_8js.html#a1a31dcc63952e497c6316c7a0f71ac8d">declinePaymentReceived</a></div><div class="ttdeci">export const declinePaymentReceived</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00252">notificationsStore.js:252</a></div></div>
+<div class="ttc" id="anotifications_store_8js_html_aa5462d3ef54464b95641982675a01fcb"><div class="ttname"><a href="notifications_store_8js.html#aa5462d3ef54464b95641982675a01fcb">useNotificationsStore</a></div><div class="ttdeci">export const useNotificationsStore</div><div class="ttdef"><b>Definition</b> <a href="notifications_store_8js_source.html#l00010">notificationsStore.js:10</a></div></div>
+<div class="ttc" id="areact_router_8js_html_a243678c653b8e704ab5423ef73d3bb0b"><div class="ttname"><a href="react_router_8js.html#a243678c653b8e704ab5423ef73d3bb0b">useNavigate</a></div><div class="ttdeci">export const useNavigate</div><div class="ttdef"><b>Definition</b> <a href="react_router_8js_source.html#l00006">reactRouter.js:6</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_notifications_dropdown_8jsx_source.html#l00002">2</a> of file <a class="el" href="_notifications_dropdown_8jsx_source.html">NotificationsDropdown.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>{ useState } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="afcb7011bfcbfab397866f38d1dec481d" name="afcb7011bfcbfab397866f38d1dec481d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcb7011bfcbfab397866f38d1dec481d">&#9670;&#160;</a></span>NOTIFICATION_ICONS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> NOTIFICATION_ICONS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  payment: DollarSign,</div>
+<div class="line">  expense: Receipt,</div>
+<div class="line">  settlement: DollarSign,</div>
+<div class="line">  invitation: Users,</div>
+<div class="line">  payment_confirmation_needed: AlertCircle,</div>
+<div class="line">  payment_confirmed: CheckCircle2,</div>
+<div class="line">  payment_declined: XCircle,</div>
+<div class="line">  payment_log: DollarSign,</div>
+<div class="line">  <span class="keywordflow">default</span>: Bell,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_notifications_dropdown_8jsx_source.html#l00007">7</a> of file <a class="el" href="_notifications_dropdown_8jsx_source.html">NotificationsDropdown.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    7</span>                           {</div>
+<div class="line"><span class="lineno">    8</span>  payment: DollarSign,</div>
+<div class="line"><span class="lineno">    9</span>  expense: Receipt,</div>
+<div class="line"><span class="lineno">   10</span>  settlement: DollarSign,</div>
+<div class="line"><span class="lineno">   11</span>  invitation: Users,</div>
+<div class="line"><span class="lineno">   12</span>  payment_confirmation_needed: AlertCircle,</div>
+<div class="line"><span class="lineno">   13</span>  payment_confirmed: CheckCircle2,</div>
+<div class="line"><span class="lineno">   14</span>  payment_declined: XCircle,</div>
+<div class="line"><span class="lineno">   15</span>  payment_log: DollarSign,</div>
+<div class="line"><span class="lineno">   16</span>  <span class="keywordflow">default</span>: Bell,</div>
+<div class="line"><span class="lineno">   17</span>};</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

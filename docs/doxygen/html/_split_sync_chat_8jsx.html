@@ -103,11 +103,416 @@ $(function(){initNavTree('_split_sync_chat_8jsx.html',''); initResizable(true); 
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">SplitSyncChat.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_split_sync_chat_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a486c24e45a2b66bac47229a778a7905f" id="r_a486c24e45a2b66bac47229a778a7905f"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a486c24e45a2b66bac47229a778a7905f">formatMessage</a> (text)</td></tr>
+<tr class="separator:a486c24e45a2b66bac47229a778a7905f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90e9ad9b0748d3ad8c260694b6c5303f" id="r_a90e9ad9b0748d3ad8c260694b6c5303f"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90e9ad9b0748d3ad8c260694b6c5303f">MessageBubble</a> ({ msg })</td></tr>
+<tr class="separator:a90e9ad9b0748d3ad8c260694b6c5303f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d0c5eabccca004063b72471cb7c0ace" id="r_a8d0c5eabccca004063b72471cb7c0ace"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8d0c5eabccca004063b72471cb7c0ace">SplitSyncChat</a> ({ groupCount=0, totalBalance=0 })</td></tr>
+<tr class="separator:a8d0c5eabccca004063b72471cb7c0ace"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState, useEffect, useRef } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b7303bc4951c11f587999fdd2f19e1d" id="r_a8b7303bc4951c11f587999fdd2f19e1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> <a class="el" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> from services&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b7303bc4951c11f587999fdd2f19e1d">firebase</a></td></tr>
+<tr class="separator:a8b7303bc4951c11f587999fdd2f19e1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42e4e671ede6de62fbec8ca165ac316f" id="r_a42e4e671ede6de62fbec8ca165ac316f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42e4e671ede6de62fbec8ca165ac316f">SUGGESTIONS</a></td></tr>
+<tr class="separator:a42e4e671ede6de62fbec8ca165ac316f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a486c24e45a2b66bac47229a778a7905f" name="a486c24e45a2b66bac47229a778a7905f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a486c24e45a2b66bac47229a778a7905f">&#9670;&#160;</a></span>formatMessage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function formatMessage </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>text</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_split_sync_chat_8jsx_source.html#l00020">20</a> of file <a class="el" href="_split_sync_chat_8jsx_source.html">SplitSyncChat.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   20</span>                             {</div>
+<div class="line"><span class="lineno">   21</span>  <span class="keywordflow">return</span> text</div>
+<div class="line"><span class="lineno">   22</span>    .replace(/\*\*(.*?)\*\*/g, <span class="stringliteral">&#39;$1&#39;</span>)     <span class="comment">// remove **bold**</span></div>
+<div class="line"><span class="lineno">   23</span>    .replace(/\*(.*?)\*/g, <span class="stringliteral">&#39;$1&#39;</span>)            <span class="comment">// remove *italic*</span></div>
+<div class="line"><span class="lineno">   24</span>    .replace(/^#+\s/gm, <span class="stringliteral">&#39;&#39;</span>)                  <span class="comment">// remove # headers</span></div>
+<div class="line"><span class="lineno">   25</span>    .replace(/(\s)(\d+\.\s)/g, <span class="stringliteral">&#39;\n$2&#39;</span>)  <span class="comment">// line break before &quot;2. &quot; &quot;3. &quot; etc</span></div>
+<div class="line"><span class="lineno">   26</span>    .trim();</div>
+<div class="line"><span class="lineno">   27</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a90e9ad9b0748d3ad8c260694b6c5303f" name="a90e9ad9b0748d3ad8c260694b6c5303f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90e9ad9b0748d3ad8c260694b6c5303f">&#9670;&#160;</a></span>MessageBubble()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function MessageBubble </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ msg }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_split_sync_chat_8jsx_source.html#l00030">30</a> of file <a class="el" href="_split_sync_chat_8jsx_source.html">SplitSyncChat.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   30</span>                       { msg }) {</div>
+<div class="line"><span class="lineno">   31</span>  <span class="keyword">const</span> isUser = msg.role === <span class="stringliteral">&#39;user&#39;</span>;</div>
+<div class="line"><span class="lineno">   32</span>  <span class="keyword">const</span> lines  = isUser</div>
+<div class="line"><span class="lineno">   33</span>    ? [msg.content]</div>
+<div class="line"><span class="lineno">   34</span>    : <a class="code hl_function" href="#a486c24e45a2b66bac47229a778a7905f">formatMessage</a>(msg.content).split(<span class="charliteral">&#39;\n&#39;</span>);</div>
+<div class="line"><span class="lineno">   35</span> </div>
+<div class="line"><span class="lineno">   36</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">   37</span>    &lt;div className={`flex gap-2 ${isUser ? <span class="stringliteral">&#39;flex-row-reverse&#39;</span> : <span class="stringliteral">&#39;flex-row&#39;</span>}`}&gt;</div>
+<div class="line"><span class="lineno">   38</span>      {<span class="comment">/* Avatar */</span>}</div>
+<div class="line"><span class="lineno">   39</span>      &lt;div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${</div>
+<div class="line"><span class="lineno">   40</span>        isUser</div>
+<div class="line"><span class="lineno">   41</span>          ? <span class="stringliteral">&#39;bg-indigo-600 text-white&#39;</span></div>
+<div class="line"><span class="lineno">   42</span>          : <span class="stringliteral">&#39;bg-gradient-to-br from-indigo-500 to-purple-600 text-white&#39;</span></div>
+<div class="line"><span class="lineno">   43</span>      }`}&gt;</div>
+<div class="line"><span class="lineno">   44</span>        {isUser ? &lt;User size={12} /&gt; : &lt;Bot size={12} /&gt;}</div>
+<div class="line"><span class="lineno">   45</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   46</span> </div>
+<div class="line"><span class="lineno">   47</span>      {<span class="comment">/* Bubble */</span>}</div>
+<div class="line"><span class="lineno">   48</span>      &lt;div className={`max-w-[78%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${</div>
+<div class="line"><span class="lineno">   49</span>        isUser</div>
+<div class="line"><span class="lineno">   50</span>          ? <span class="stringliteral">&#39;bg-indigo-600 text-white rounded-tr-sm&#39;</span></div>
+<div class="line"><span class="lineno">   51</span>          : <span class="stringliteral">&#39;bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-600 rounded-tl-sm shadow-sm&#39;</span></div>
+<div class="line"><span class="lineno">   52</span>      }`}&gt;</div>
+<div class="line"><span class="lineno">   53</span>        {lines.map((line, i) =&gt; (</div>
+<div class="line"><span class="lineno">   54</span>          &lt;span key={i} className={line.match(/^\d+\./) ? <span class="stringliteral">&#39;block mt-1&#39;</span> : <span class="stringliteral">&#39;&#39;</span>}&gt;</div>
+<div class="line"><span class="lineno">   55</span>            {line}</div>
+<div class="line"><span class="lineno">   56</span>            {!line.match(/^\d+\./) &amp;&amp; i &lt; lines.length - 1 &amp;&amp; &lt;br /&gt;}</div>
+<div class="line"><span class="lineno">   57</span>          &lt;/span&gt;</div>
+<div class="line"><span class="lineno">   58</span>        ))}</div>
+<div class="line"><span class="lineno">   59</span>      &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   60</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   61</span>  );</div>
+<div class="line"><span class="lineno">   62</span>}</div>
+<div class="ttc" id="a_split_sync_chat_8jsx_html_a486c24e45a2b66bac47229a778a7905f"><div class="ttname"><a href="#a486c24e45a2b66bac47229a778a7905f">formatMessage</a></div><div class="ttdeci">function formatMessage(text)</div><div class="ttdef"><b>Definition</b> <a href="_split_sync_chat_8jsx_source.html#l00020">SplitSyncChat.jsx:20</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8d0c5eabccca004063b72471cb7c0ace" name="a8d0c5eabccca004063b72471cb7c0ace"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d0c5eabccca004063b72471cb7c0ace">&#9670;&#160;</a></span>SplitSyncChat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default SplitSyncChat </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ groupCount=0, totalBalance=0 }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_split_sync_chat_8jsx_source.html#l00064">64</a> of file <a class="el" href="_split_sync_chat_8jsx_source.html">SplitSyncChat.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   64</span>                                      { groupCount = 0, totalBalance = 0 }) {</div>
+<div class="line"><span class="lineno">   65</span>  <span class="keyword">const</span> { user } = <a class="code hl_variable" href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a>();</div>
+<div class="line"><span class="lineno">   66</span> </div>
+<div class="line"><span class="lineno">   67</span>  <span class="keyword">const</span> [open,     setOpen]     = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   68</span>  <span class="keyword">const</span> [input,    setInput]    = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   69</span>  <span class="keyword">const</span> [messages, setMessages] = useState([]);</div>
+<div class="line"><span class="lineno">   70</span>  <span class="keyword">const</span> [loading,  setLoading]  = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   71</span>  <span class="keyword">const</span> [error,    setError]    = useState(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   72</span> </div>
+<div class="line"><span class="lineno">   73</span>  <span class="keyword">const</span> bottomRef = useRef(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   74</span>  <span class="keyword">const</span> inputRef  = useRef(<span class="keyword">null</span>);</div>
+<div class="line"><span class="lineno">   75</span> </div>
+<div class="line"><span class="lineno">   76</span>  <span class="comment">// Initialise Firebase Functions — connects to emulator in dev, production in prod</span></div>
+<div class="line"><span class="lineno">   77</span>  <span class="keyword">const</span> fns    = getFunctions(<a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>);</div>
+<div class="line"><span class="lineno">   78</span>  <span class="keyword">const</span> chatFn = httpsCallable(fns, <span class="stringliteral">&#39;splitSyncChat&#39;</span>);</div>
+<div class="line"><span class="lineno">   79</span> </div>
+<div class="line"><span class="lineno">   80</span>  <span class="comment">// Scroll to latest message whenever messages or loading state changes</span></div>
+<div class="line"><span class="lineno">   81</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   82</span>    bottomRef.current?.scrollIntoView({ behavior: <span class="stringliteral">&#39;smooth&#39;</span> });</div>
+<div class="line"><span class="lineno">   83</span>  }, [messages, loading]);</div>
+<div class="line"><span class="lineno">   84</span> </div>
+<div class="line"><span class="lineno">   85</span>  <span class="comment">// Focus input when chat window opens</span></div>
+<div class="line"><span class="lineno">   86</span>  useEffect(() =&gt; {</div>
+<div class="line"><span class="lineno">   87</span>    <span class="keywordflow">if</span> (open) setTimeout(() =&gt; inputRef.current?.focus(), 150);</div>
+<div class="line"><span class="lineno">   88</span>  }, [open]);</div>
+<div class="line"><span class="lineno">   89</span> </div>
+<div class="line"><span class="lineno">   90</span>  <span class="comment">// Send a message — accepts optional text override for suggestion chips</span></div>
+<div class="line"><span class="lineno">   91</span>  <span class="keyword">const</span> sendMessage = async (text) =&gt; {</div>
+<div class="line"><span class="lineno">   92</span>    <span class="keyword">const</span> content = (text || input).trim();</div>
+<div class="line"><span class="lineno">   93</span>    <span class="keywordflow">if</span> (!content || loading) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   94</span> </div>
+<div class="line"><span class="lineno">   95</span>    setInput(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   96</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">   97</span> </div>
+<div class="line"><span class="lineno">   98</span>    <span class="keyword">const</span> userMsg = { role: <span class="stringliteral">&#39;user&#39;</span>, content };</div>
+<div class="line"><span class="lineno">   99</span>    <span class="keyword">const</span> updated = [...messages, userMsg];</div>
+<div class="line"><span class="lineno">  100</span>    setMessages(updated);</div>
+<div class="line"><span class="lineno">  101</span>    setLoading(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  102</span> </div>
+<div class="line"><span class="lineno">  103</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  104</span>      <span class="keyword">const</span> result = await chatFn({</div>
+<div class="line"><span class="lineno">  105</span>        messages:    updated,</div>
+<div class="line"><span class="lineno">  106</span>        userContext: { groupCount, totalBalance },</div>
+<div class="line"><span class="lineno">  107</span>      });</div>
+<div class="line"><span class="lineno">  108</span>      setMessages(prev =&gt; [...prev, { role: <span class="stringliteral">&#39;assistant&#39;</span>, content: result.data.reply }]);</div>
+<div class="line"><span class="lineno">  109</span>    } <span class="keywordflow">catch</span> (err) {</div>
+<div class="line"><span class="lineno">  110</span>      console.error(<span class="stringliteral">&#39;Chat error:&#39;</span>, err);</div>
+<div class="line"><span class="lineno">  111</span>      setError(<span class="stringliteral">&#39;Could not reach the assistant. Please try again.&#39;</span>);</div>
+<div class="line"><span class="lineno">  112</span>      <span class="comment">// Remove the optimistic user message so they can retry</span></div>
+<div class="line"><span class="lineno">  113</span>      setMessages(prev =&gt; prev.slice(0, -1));</div>
+<div class="line"><span class="lineno">  114</span>    } <span class="keywordflow">finally</span> {</div>
+<div class="line"><span class="lineno">  115</span>      setLoading(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  116</span>    }</div>
+<div class="line"><span class="lineno">  117</span>  };</div>
+<div class="line"><span class="lineno">  118</span> </div>
+<div class="line"><span class="lineno">  119</span>  <span class="keyword">const</span> handleKeyDown = (e) =&gt; {</div>
+<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">if</span> (e.key === <span class="stringliteral">&#39;Enter&#39;</span> &amp;&amp; !e.shiftKey) {</div>
+<div class="line"><span class="lineno">  121</span>      e.preventDefault();</div>
+<div class="line"><span class="lineno">  122</span>      sendMessage();</div>
+<div class="line"><span class="lineno">  123</span>    }</div>
+<div class="line"><span class="lineno">  124</span>  };</div>
+<div class="line"><span class="lineno">  125</span> </div>
+<div class="line"><span class="lineno">  126</span>  <span class="keyword">const</span> handleReset = () =&gt; {</div>
+<div class="line"><span class="lineno">  127</span>    setMessages([]);</div>
+<div class="line"><span class="lineno">  128</span>    setError(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  129</span>    setInput(<span class="stringliteral">&#39;&#39;</span>);</div>
+<div class="line"><span class="lineno">  130</span>  };</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>  <span class="comment">// Only render for authenticated users</span></div>
+<div class="line"><span class="lineno">  133</span>  <span class="keywordflow">if</span> (!user) <span class="keywordflow">return</span> <span class="keyword">null</span>;</div>
+<div class="line"><span class="lineno">  134</span> </div>
+<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">  136</span>    &lt;&gt;</div>
+<div class="line"><span class="lineno">  137</span>      {<span class="comment">/* ── Chat window ── */</span>}</div>
+<div class="line"><span class="lineno">  138</span>      {open &amp;&amp; (</div>
+<div class="line"><span class="lineno">  139</span>        &lt;div</div>
+<div class="line"><span class="lineno">  140</span>          className=<span class="stringliteral">&quot;fixed bottom-20 right-3 z-50 w-[calc(100vw-1.5rem)] max-w-[340px] flex flex-col rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50 dark:bg-gray-900&quot;</span></div>
+<div class="line"><span class="lineno">  141</span>          style={{ height: <span class="stringliteral">&#39;460px&#39;</span> }}</div>
+<div class="line"><span class="lineno">  142</span>        &gt;</div>
+<div class="line"><span class="lineno">  143</span>          {<span class="comment">/* Header */</span>}</div>
+<div class="line"><span class="lineno">  144</span>          &lt;div className=<span class="stringliteral">&quot;bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-2.5 flex items-center justify-between shrink-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  145</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  146</span>              &lt;div className=<span class="stringliteral">&quot;w-7 h-7 bg-white/20 rounded-full flex items-center justify-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  147</span>                &lt;Bot size={14} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  148</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  149</span>              &lt;div&gt;</div>
+<div class="line"><span class="lineno">  150</span>                &lt;p className=<span class="stringliteral">&quot;text-white font-semibold text-sm leading-tight&quot;</span>&gt;Split-Sync Assistant&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  151</span>                &lt;p className=<span class="stringliteral">&quot;text-white/70 text-xs&quot;</span>&gt;Ask me anything about the <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  152</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  153</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  154</span>            {<span class="comment">/* Header action buttons — clear and close */</span>}</div>
+<div class="line"><span class="lineno">  155</span>            &lt;div className=<span class="stringliteral">&quot;flex items-center gap-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  156</span>              {messages.length &gt; 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  157</span>                &lt;button</div>
+<div class="line"><span class="lineno">  158</span>                  onClick={handleReset}</div>
+<div class="line"><span class="lineno">  159</span>                  className=<span class="stringliteral">&quot;p-1.5 rounded-lg hover:bg-white/20 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  160</span>                  title=<span class="stringliteral">&quot;Clear conversation&quot;</span></div>
+<div class="line"><span class="lineno">  161</span>                &gt;</div>
+<div class="line"><span class="lineno">  162</span>                  &lt;RotateCcw size={13} className=<span class="stringliteral">&quot;text-white/80&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  163</span>                &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  164</span>              )}</div>
+<div class="line"><span class="lineno">  165</span>              &lt;button</div>
+<div class="line"><span class="lineno">  166</span>                onClick={() =&gt; setOpen(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">  167</span>                className=<span class="stringliteral">&quot;p-1.5 rounded-lg hover:bg-white/20 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  168</span>                aria-label=<span class="stringliteral">&quot;Close chat&quot;</span></div>
+<div class="line"><span class="lineno">  169</span>              &gt;</div>
+<div class="line"><span class="lineno">  170</span>                &lt;X size={15} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  171</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  172</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  173</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  174</span> </div>
+<div class="line"><span class="lineno">  175</span>          {<span class="comment">/* Messages area */</span>}</div>
+<div class="line"><span class="lineno">  176</span>          &lt;div className=<span class="stringliteral">&quot;flex-1 overflow-y-auto px-3 py-3 space-y-3&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  177</span> </div>
+<div class="line"><span class="lineno">  178</span>            {<span class="comment">/* Welcome message and suggestion chips */</span>}</div>
+<div class="line"><span class="lineno">  179</span>            {messages.length === 0 &amp;&amp; (</div>
+<div class="line"><span class="lineno">  180</span>              &lt;div className=<span class="stringliteral">&quot;space-y-2.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  181</span>                &lt;div className=<span class="stringliteral">&quot;flex gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  182</span>                  &lt;div className=<span class="stringliteral">&quot;w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 mt-0.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  183</span>                    &lt;Bot size={12} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  184</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  185</span>                  &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl rounded-tl-sm px-3 py-2 shadow-sm max-w-[80%]&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  186</span>                    &lt;p className=<span class="stringliteral">&quot;text-sm text-gray-800 dark:text-gray-100 leading-relaxed&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  187</span>                      Hi there! I am the Split-Sync assistant. I can help you with expenses, groups, payments, and anything <span class="keywordflow">else</span> in the <a class="code hl_variable" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a>.</div>
+<div class="line"><span class="lineno">  188</span>                    &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  189</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  190</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  191</span> </div>
+<div class="line"><span class="lineno">  192</span>                {<span class="comment">/* Suggestion chips */</span>}</div>
+<div class="line"><span class="lineno">  193</span>                &lt;div className=<span class="stringliteral">&quot;pl-8 flex flex-col gap-1.5&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  194</span>                  {<a class="code hl_variable" href="#a42e4e671ede6de62fbec8ca165ac316f">SUGGESTIONS</a>.map((s, i) =&gt; (</div>
+<div class="line"><span class="lineno">  195</span>                    &lt;button</div>
+<div class="line"><span class="lineno">  196</span>                      key={i}</div>
+<div class="line"><span class="lineno">  197</span>                      onClick={() =&gt; sendMessage(s)}</div>
+<div class="line"><span class="lineno">  198</span>                      className=<span class="stringliteral">&quot;text-left text-xs px-3 py-1.5 bg-white dark:bg-gray-700 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors&quot;</span></div>
+<div class="line"><span class="lineno">  199</span>                    &gt;</div>
+<div class="line"><span class="lineno">  200</span>                      {s}</div>
+<div class="line"><span class="lineno">  201</span>                    &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  202</span>                  ))}</div>
+<div class="line"><span class="lineno">  203</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  204</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  205</span>            )}</div>
+<div class="line"><span class="lineno">  206</span> </div>
+<div class="line"><span class="lineno">  207</span>            {<span class="comment">/* Conversation messages */</span>}</div>
+<div class="line"><span class="lineno">  208</span>            {messages.map((msg, i) =&gt; (</div>
+<div class="line"><span class="lineno">  209</span>              &lt;<a class="code hl_function" href="#a90e9ad9b0748d3ad8c260694b6c5303f">MessageBubble</a> key={i} msg={msg} /&gt;</div>
+<div class="line"><span class="lineno">  210</span>            ))}</div>
+<div class="line"><span class="lineno">  211</span> </div>
+<div class="line"><span class="lineno">  212</span>            {<span class="comment">/* Typing indicator */</span>}</div>
+<div class="line"><span class="lineno">  213</span>            {loading &amp;&amp; (</div>
+<div class="line"><span class="lineno">  214</span>              &lt;div className=<span class="stringliteral">&quot;flex gap-2&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  215</span>                &lt;div className=<span class="stringliteral">&quot;w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  216</span>                  &lt;Bot size={12} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  217</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  218</span>                &lt;div className=<span class="stringliteral">&quot;bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl rounded-tl-sm px-3 py-2.5 shadow-sm&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  219</span>                  &lt;div className=<span class="stringliteral">&quot;flex gap-1 items-center&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  220</span>                    &lt;span className=<span class="stringliteral">&quot;w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce&quot;</span> style={{ animationDelay: <span class="stringliteral">&#39;0ms&#39;</span> }} /&gt;</div>
+<div class="line"><span class="lineno">  221</span>                    &lt;span className=<span class="stringliteral">&quot;w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce&quot;</span> style={{ animationDelay: <span class="stringliteral">&#39;150ms&#39;</span> }} /&gt;</div>
+<div class="line"><span class="lineno">  222</span>                    &lt;span className=<span class="stringliteral">&quot;w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce&quot;</span> style={{ animationDelay: <span class="stringliteral">&#39;300ms&#39;</span> }} /&gt;</div>
+<div class="line"><span class="lineno">  223</span>                  &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  224</span>                &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  225</span>              &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  226</span>            )}</div>
+<div class="line"><span class="lineno">  227</span> </div>
+<div class="line"><span class="lineno">  228</span>            {<span class="comment">/* Error message */</span>}</div>
+<div class="line"><span class="lineno">  229</span>            {error &amp;&amp; (</div>
+<div class="line"><span class="lineno">  230</span>              &lt;p className=<span class="stringliteral">&quot;text-xs text-red-500 dark:text-red-400 text-center px-2&quot;</span>&gt;{error}&lt;/p&gt;</div>
+<div class="line"><span class="lineno">  231</span>            )}</div>
+<div class="line"><span class="lineno">  232</span> </div>
+<div class="line"><span class="lineno">  233</span>            &lt;div ref={bottomRef} /&gt;</div>
+<div class="line"><span class="lineno">  234</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  235</span> </div>
+<div class="line"><span class="lineno">  236</span>          {<span class="comment">/* Input area */</span>}</div>
+<div class="line"><span class="lineno">  237</span>          &lt;div className=<span class="stringliteral">&quot;shrink-0 px-3 py-2.5 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  238</span>            &lt;div className=<span class="stringliteral">&quot;flex gap-2 items-end&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  239</span>              &lt;textarea</div>
+<div class="line"><span class="lineno">  240</span>                ref={inputRef}</div>
+<div class="line"><span class="lineno">  241</span>                value={input}</div>
+<div class="line"><span class="lineno">  242</span>                onChange={(e) =&gt; setInput(e.target.value)}</div>
+<div class="line"><span class="lineno">  243</span>                onKeyDown={handleKeyDown}</div>
+<div class="line"><span class="lineno">  244</span>                placeholder=<span class="stringliteral">&quot;Ask a question...&quot;</span></div>
+<div class="line"><span class="lineno">  245</span>                rows={1}</div>
+<div class="line"><span class="lineno">  246</span>                disabled={loading}</div>
+<div class="line"><span class="lineno">  247</span>                className=<span class="stringliteral">&quot;flex-1 resize-none px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none disabled:opacity-50 max-h-20 overflow-y-auto&quot;</span></div>
+<div class="line"><span class="lineno">  248</span>                style={{ minHeight: <span class="stringliteral">&#39;36px&#39;</span> }}</div>
+<div class="line"><span class="lineno">  249</span>              /&gt;</div>
+<div class="line"><span class="lineno">  250</span>              &lt;button</div>
+<div class="line"><span class="lineno">  251</span>                onClick={() =&gt; sendMessage()}</div>
+<div class="line"><span class="lineno">  252</span>                disabled={!input.trim() || loading}</div>
+<div class="line"><span class="lineno">  253</span>                className=<span class="stringliteral">&quot;w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors shrink-0 mb-0.5&quot;</span></div>
+<div class="line"><span class="lineno">  254</span>                aria-label=<span class="stringliteral">&quot;Send message&quot;</span></div>
+<div class="line"><span class="lineno">  255</span>              &gt;</div>
+<div class="line"><span class="lineno">  256</span>                {loading</div>
+<div class="line"><span class="lineno">  257</span>                  ? &lt;Loader size={13} className=<span class="stringliteral">&quot;text-white animate-spin&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  258</span>                  : &lt;Send size={13} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  259</span>                }</div>
+<div class="line"><span class="lineno">  260</span>              &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  261</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  262</span>            &lt;p className=<span class="stringliteral">&quot;text-xs text-gray-400 dark:text-gray-500 text-center mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">  263</span>              Powered by Claude AI</div>
+<div class="line"><span class="lineno">  264</span>            &lt;/p&gt;</div>
+<div class="line"><span class="lineno">  265</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  266</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">  267</span>      )}</div>
+<div class="line"><span class="lineno">  268</span> </div>
+<div class="line"><span class="lineno">  269</span>      {<span class="comment">/* ── Floating toggle button — smaller size ── */</span>}</div>
+<div class="line"><span class="lineno">  270</span>      &lt;button</div>
+<div class="line"><span class="lineno">  271</span>        onClick={() =&gt; setOpen(o =&gt; !o)}</div>
+<div class="line"><span class="lineno">  272</span>        className={`fixed bottom-20 right-3 z-40 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 ${</div>
+<div class="line"><span class="lineno">  273</span>          open</div>
+<div class="line"><span class="lineno">  274</span>            ? <span class="stringliteral">&#39;bg-gray-600 dark:bg-gray-500&#39;</span></div>
+<div class="line"><span class="lineno">  275</span>            : <span class="stringliteral">&#39;bg-gradient-to-br from-indigo-600 to-purple-600 hover:shadow-xl&#39;</span></div>
+<div class="line"><span class="lineno">  276</span>        }`}</div>
+<div class="line"><span class="lineno">  277</span>        aria-label={open ? <span class="stringliteral">&#39;Close assistant&#39;</span> : <span class="stringliteral">&#39;Open assistant&#39;</span>}</div>
+<div class="line"><span class="lineno">  278</span>      &gt;</div>
+<div class="line"><span class="lineno">  279</span>        {open</div>
+<div class="line"><span class="lineno">  280</span>          ? &lt;X size={18} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  281</span>          : &lt;MessageCircle size={18} className=<span class="stringliteral">&quot;text-white&quot;</span> /&gt;</div>
+<div class="line"><span class="lineno">  282</span>        }</div>
+<div class="line"><span class="lineno">  283</span>      &lt;/button&gt;</div>
+<div class="line"><span class="lineno">  284</span>    &lt;/&gt;</div>
+<div class="line"><span class="lineno">  285</span>  );</div>
+<div class="line"><span class="lineno">  286</span>}</div>
+<div class="ttc" id="a_split_sync_chat_8jsx_html_a42e4e671ede6de62fbec8ca165ac316f"><div class="ttname"><a href="#a42e4e671ede6de62fbec8ca165ac316f">SUGGESTIONS</a></div><div class="ttdeci">const SUGGESTIONS</div><div class="ttdef"><b>Definition</b> <a href="_split_sync_chat_8jsx_source.html#l00012">SplitSyncChat.jsx:12</a></div></div>
+<div class="ttc" id="a_split_sync_chat_8jsx_html_a90e9ad9b0748d3ad8c260694b6c5303f"><div class="ttname"><a href="#a90e9ad9b0748d3ad8c260694b6c5303f">MessageBubble</a></div><div class="ttdeci">function MessageBubble({ msg })</div><div class="ttdef"><b>Definition</b> <a href="_split_sync_chat_8jsx_source.html#l00030">SplitSyncChat.jsx:30</a></div></div>
+<div class="ttc" id="aauth_store_8js_html_a2a2677b76a744006f3d760359e2fb1f7"><div class="ttname"><a href="auth_store_8js.html#a2a2677b76a744006f3d760359e2fb1f7">useAuthStore</a></div><div class="ttdeci">export const useAuthStore</div><div class="ttdef"><b>Definition</b> <a href="auth_store_8js_source.html#l00007">authStore.js:7</a></div></div>
+<div class="ttc" id="afirebase_8js_html_a979397bcd61476f20722e963203a16ed"><div class="ttname"><a href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a></div><div class="ttdeci">const app</div><div class="ttdef"><b>Definition</b> <a href="firebase_8js_source.html#l00019">firebase.js:19</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a8b7303bc4951c11f587999fdd2f19e1d" name="a8b7303bc4951c11f587999fdd2f19e1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b7303bc4951c11f587999fdd2f19e1d">&#9670;&#160;</a></span>firebase</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_app_8js.html#a59be084da8908b7d77ff34b25cd84488">import</a> <a class="el" href="firebase_8js.html#a979397bcd61476f20722e963203a16ed">app</a> from services firebase</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_split_sync_chat_8jsx_source.html#l00009">9</a> of file <a class="el" href="_split_sync_chat_8jsx_source.html">SplitSyncChat.jsx</a>.</p>
+
+</div>
+</div>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState, useEffect, useRef } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_split_sync_chat_8jsx_source.html#l00005">5</a> of file <a class="el" href="_split_sync_chat_8jsx_source.html">SplitSyncChat.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    5</span>{ useState, useEffect, useRef } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a42e4e671ede6de62fbec8ca165ac316f" name="a42e4e671ede6de62fbec8ca165ac316f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42e4e671ede6de62fbec8ca165ac316f">&#9670;&#160;</a></span>SUGGESTIONS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> SUGGESTIONS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [</div>
+<div class="line">  <span class="stringliteral">&#39;How do I split an expense equally?&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;How do I settle up with someone?&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;How do I invite friends to a group?&#39;</span>,</div>
+<div class="line">  <span class="stringliteral">&#39;How do I set up my payment methods?&#39;</span>,</div>
+<div class="line">]</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="_split_sync_chat_8jsx_source.html#l00012">12</a> of file <a class="el" href="_split_sync_chat_8jsx_source.html">SplitSyncChat.jsx</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

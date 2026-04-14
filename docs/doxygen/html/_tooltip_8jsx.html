@@ -103,11 +103,95 @@ $(function(){initNavTree('_tooltip_8jsx.html',''); initResizable(true); });
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Tooltip.jsx File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="_tooltip_8jsx_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a5834cea737713d323e33c2d9c23b7e15" id="r_a5834cea737713d323e33c2d9c23b7e15"><td class="memItemLeft" align="right" valign="top">function default&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5834cea737713d323e33c2d9c23b7e15">Tooltip</a> ({ text, children })</td></tr>
+<tr class="separator:a5834cea737713d323e33c2d9c23b7e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a59be084da8908b7d77ff34b25cd84488" id="r_a59be084da8908b7d77ff34b25cd84488"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59be084da8908b7d77ff34b25cd84488">import</a> { useState } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td></tr>
+<tr class="separator:a59be084da8908b7d77ff34b25cd84488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a5834cea737713d323e33c2d9c23b7e15" name="a5834cea737713d323e33c2d9c23b7e15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5834cea737713d323e33c2d9c23b7e15">&#9670;&#160;</a></span>Tooltip()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function default Tooltip </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>{ text, children }</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_tooltip_8jsx_source.html#l00005">5</a> of file <a class="el" href="_tooltip_8jsx_source.html">Tooltip.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    5</span>                                { text, children }) {</div>
+<div class="line"><span class="lineno">    6</span>  <span class="keyword">const</span> [isVisible, setIsVisible] = useState(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">    7</span> </div>
+<div class="line"><span class="lineno">    8</span>  <span class="keywordflow">return</span> (</div>
+<div class="line"><span class="lineno">    9</span>    &lt;div className=<span class="stringliteral">&quot;relative inline-block&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   10</span>      &lt;button</div>
+<div class="line"><span class="lineno">   11</span>        type=<span class="stringliteral">&quot;button&quot;</span></div>
+<div class="line"><span class="lineno">   12</span>        onMouseEnter={() =&gt; setIsVisible(<span class="keyword">true</span>)}</div>
+<div class="line"><span class="lineno">   13</span>        onMouseLeave={() =&gt; setIsVisible(<span class="keyword">false</span>)}</div>
+<div class="line"><span class="lineno">   14</span>        onClick={(e) =&gt; {</div>
+<div class="line"><span class="lineno">   15</span>          e.preventDefault();</div>
+<div class="line"><span class="lineno">   16</span>          setIsVisible(!isVisible);</div>
+<div class="line"><span class="lineno">   17</span>        }}</div>
+<div class="line"><span class="lineno">   18</span>        className=<span class="stringliteral">&quot;ml-1 text-gray-400 hover:text-primary transition&quot;</span></div>
+<div class="line"><span class="lineno">   19</span>      &gt;</div>
+<div class="line"><span class="lineno">   20</span>        {children || &lt;Info size={16} /&gt;}</div>
+<div class="line"><span class="lineno">   21</span>      &lt;/button&gt;</div>
+<div class="line"><span class="lineno">   22</span>      </div>
+<div class="line"><span class="lineno">   23</span>      {isVisible &amp;&amp; (</div>
+<div class="line"><span class="lineno">   24</span>        &lt;div className=<span class="stringliteral">&quot;absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 animate-scale-in&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   25</span>          &lt;div className=<span class="stringliteral">&quot;bg-gray-900 text-white text-sm rounded-lg p-3 shadow-lg&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   26</span>            {text}</div>
+<div class="line"><span class="lineno">   27</span>            {<span class="comment">/* Arrow */</span>}</div>
+<div class="line"><span class="lineno">   28</span>            &lt;div className=<span class="stringliteral">&quot;absolute top-full left-1/2 -translate-x-1/2 -mt-1&quot;</span>&gt;</div>
+<div class="line"><span class="lineno">   29</span>              &lt;div className=<span class="stringliteral">&quot;border-8 border-transparent border-t-gray-900&quot;</span>&gt;&lt;/div&gt;</div>
+<div class="line"><span class="lineno">   30</span>            &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   31</span>          &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   32</span>        &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   33</span>      )}</div>
+<div class="line"><span class="lineno">   34</span>    &lt;/div&gt;</div>
+<div class="line"><span class="lineno">   35</span>  );</div>
+<div class="line"><span class="lineno">   36</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a59be084da8908b7d77ff34b25cd84488" name="a59be084da8908b7d77ff34b25cd84488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59be084da8908b7d77ff34b25cd84488">&#9670;&#160;</a></span>import</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">import { useState } from '<a class="el" href="_add_expense_modal_8test_8jsx.html#aaed10feaf2dda4314d93c83408affea1">react</a>'</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_tooltip_8jsx_source.html#l00002">2</a> of file <a class="el" href="_tooltip_8jsx_source.html">Tooltip.jsx</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">    2</span>{ useState } from <span class="stringliteral">&#39;react&#39;</span>;</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

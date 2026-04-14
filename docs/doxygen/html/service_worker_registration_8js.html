@@ -103,11 +103,205 @@ $(function(){initNavTree('service_worker_registration_8js.html',''); initResizab
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">serviceWorkerRegistration.js File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><a href="service_worker_registration_8js_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a8012b5e1944e77eedac89a1512018b0e" id="r_a8012b5e1944e77eedac89a1512018b0e"><td class="memItemLeft" align="right" valign="top">function export&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8012b5e1944e77eedac89a1512018b0e">register</a> (config)</td></tr>
+<tr class="separator:a8012b5e1944e77eedac89a1512018b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4990f2aedc3da1262bee93c58b630295" id="r_a4990f2aedc3da1262bee93c58b630295"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4990f2aedc3da1262bee93c58b630295">registerValidSW</a> (swUrl, config)</td></tr>
+<tr class="separator:a4990f2aedc3da1262bee93c58b630295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06fe77275aa7e200718389dc8897e51a" id="r_a06fe77275aa7e200718389dc8897e51a"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a06fe77275aa7e200718389dc8897e51a">checkValidServiceWorker</a> (swUrl, config)</td></tr>
+<tr class="separator:a06fe77275aa7e200718389dc8897e51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf481a3dbf1e6005ce4bc428ab05a614" id="r_adf481a3dbf1e6005ce4bc428ab05a614"><td class="memItemLeft" align="right" valign="top">function export&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf481a3dbf1e6005ce4bc428ab05a614">unregister</a> ()</td></tr>
+<tr class="separator:adf481a3dbf1e6005ce4bc428ab05a614"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aff18a074016fd886819a478a8c5d2020" id="r_aff18a074016fd886819a478a8c5d2020"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff18a074016fd886819a478a8c5d2020">isLocalhost</a></td></tr>
+<tr class="separator:aff18a074016fd886819a478a8c5d2020"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a06fe77275aa7e200718389dc8897e51a" name="a06fe77275aa7e200718389dc8897e51a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06fe77275aa7e200718389dc8897e51a">&#9670;&#160;</a></span>checkValidServiceWorker()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function checkValidServiceWorker </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>swUrl</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>config</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="service_worker_registration_8js_source.html#l00050">50</a> of file <a class="el" href="service_worker_registration_8js_source.html">serviceWorkerRegistration.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   50</span>                                                {</div>
+<div class="line"><span class="lineno">   51</span>  fetch(swUrl, { headers: { <span class="stringliteral">&#39;Service-Worker&#39;</span>: <span class="stringliteral">&#39;script&#39;</span> } })</div>
+<div class="line"><span class="lineno">   52</span>    .then((response) =&gt; {</div>
+<div class="line"><span class="lineno">   53</span>      <span class="keyword">const</span> contentType = response.headers.get(<span class="stringliteral">&#39;content-type&#39;</span>);</div>
+<div class="line"><span class="lineno">   54</span>      <span class="keywordflow">if</span> (</div>
+<div class="line"><span class="lineno">   55</span>        response.status === 404 ||</div>
+<div class="line"><span class="lineno">   56</span>        (contentType != <span class="keyword">null</span> &amp;&amp; contentType.indexOf(<span class="stringliteral">&#39;javascript&#39;</span>) === -1)</div>
+<div class="line"><span class="lineno">   57</span>      ) {</div>
+<div class="line"><span class="lineno">   58</span>        navigator.serviceWorker.ready.then((registration) =&gt; {</div>
+<div class="line"><span class="lineno">   59</span>          registration.unregister().then(() =&gt; window.location.reload());</div>
+<div class="line"><span class="lineno">   60</span>        });</div>
+<div class="line"><span class="lineno">   61</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   62</span>        <a class="code hl_function" href="#a4990f2aedc3da1262bee93c58b630295">registerValidSW</a>(swUrl, config);</div>
+<div class="line"><span class="lineno">   63</span>      }</div>
+<div class="line"><span class="lineno">   64</span>    })</div>
+<div class="line"><span class="lineno">   65</span>    .<span class="keywordflow">catch</span>(() =&gt; {});</div>
+<div class="line"><span class="lineno">   66</span>}</div>
+<div class="ttc" id="aservice_worker_registration_8js_html_a4990f2aedc3da1262bee93c58b630295"><div class="ttname"><a href="#a4990f2aedc3da1262bee93c58b630295">registerValidSW</a></div><div class="ttdeci">function registerValidSW(swUrl, config)</div><div class="ttdef"><b>Definition</b> <a href="service_worker_registration_8js_source.html#l00028">serviceWorkerRegistration.js:28</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8012b5e1944e77eedac89a1512018b0e" name="a8012b5e1944e77eedac89a1512018b0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8012b5e1944e77eedac89a1512018b0e">&#9670;&#160;</a></span>register()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function export register </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>config</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="service_worker_registration_8js_source.html#l00010">10</a> of file <a class="el" href="service_worker_registration_8js_source.html">serviceWorkerRegistration.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   10</span>                                 {</div>
+<div class="line"><span class="lineno">   11</span>  <span class="keywordflow">if</span> (process.env.NODE_ENV === <span class="stringliteral">&#39;production&#39;</span> &amp;&amp; <span class="stringliteral">&#39;serviceWorker&#39;</span> in navigator) {</div>
+<div class="line"><span class="lineno">   12</span>    <span class="keyword">const</span> publicUrl = <span class="keyword">new</span> URL(process.env.PUBLIC_URL, window.location.href);</div>
+<div class="line"><span class="lineno">   13</span>    <span class="keywordflow">if</span> (publicUrl.origin !== window.location.origin) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   14</span> </div>
+<div class="line"><span class="lineno">   15</span>    window.addEventListener(<span class="stringliteral">&#39;load&#39;</span>, () =&gt; {</div>
+<div class="line"><span class="lineno">   16</span>      <span class="keyword">const</span> swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;</div>
+<div class="line"><span class="lineno">   17</span> </div>
+<div class="line"><span class="lineno">   18</span>      <span class="keywordflow">if</span> (<a class="code hl_variable" href="#aff18a074016fd886819a478a8c5d2020">isLocalhost</a>) {</div>
+<div class="line"><span class="lineno">   19</span>        <a class="code hl_function" href="#a06fe77275aa7e200718389dc8897e51a">checkValidServiceWorker</a>(swUrl, config);</div>
+<div class="line"><span class="lineno">   20</span>        navigator.serviceWorker.ready.then(() =&gt; {});</div>
+<div class="line"><span class="lineno">   21</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   22</span>        <a class="code hl_function" href="#a4990f2aedc3da1262bee93c58b630295">registerValidSW</a>(swUrl, config);</div>
+<div class="line"><span class="lineno">   23</span>      }</div>
+<div class="line"><span class="lineno">   24</span>    });</div>
+<div class="line"><span class="lineno">   25</span>  }</div>
+<div class="line"><span class="lineno">   26</span>}</div>
+<div class="ttc" id="aservice_worker_registration_8js_html_a06fe77275aa7e200718389dc8897e51a"><div class="ttname"><a href="#a06fe77275aa7e200718389dc8897e51a">checkValidServiceWorker</a></div><div class="ttdeci">function checkValidServiceWorker(swUrl, config)</div><div class="ttdef"><b>Definition</b> <a href="service_worker_registration_8js_source.html#l00050">serviceWorkerRegistration.js:50</a></div></div>
+<div class="ttc" id="aservice_worker_registration_8js_html_aff18a074016fd886819a478a8c5d2020"><div class="ttname"><a href="#aff18a074016fd886819a478a8c5d2020">isLocalhost</a></div><div class="ttdeci">const isLocalhost</div><div class="ttdef"><b>Definition</b> <a href="service_worker_registration_8js_source.html#l00002">serviceWorkerRegistration.js:2</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4990f2aedc3da1262bee93c58b630295" name="a4990f2aedc3da1262bee93c58b630295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4990f2aedc3da1262bee93c58b630295">&#9670;&#160;</a></span>registerValidSW()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function registerValidSW </td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>swUrl</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>config</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="service_worker_registration_8js_source.html#l00028">28</a> of file <a class="el" href="service_worker_registration_8js_source.html">serviceWorkerRegistration.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   28</span>                                        {</div>
+<div class="line"><span class="lineno">   29</span>  navigator.serviceWorker</div>
+<div class="line"><span class="lineno">   30</span>    .register(swUrl)</div>
+<div class="line"><span class="lineno">   31</span>    .then((registration) =&gt; {</div>
+<div class="line"><span class="lineno">   32</span>      registration.onupdatefound = () =&gt; {</div>
+<div class="line"><span class="lineno">   33</span>        <span class="keyword">const</span> installingWorker = registration.installing;</div>
+<div class="line"><span class="lineno">   34</span>        <span class="keywordflow">if</span> (!installingWorker) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   35</span> </div>
+<div class="line"><span class="lineno">   36</span>        installingWorker.onstatechange = () =&gt; {</div>
+<div class="line"><span class="lineno">   37</span>          <span class="keywordflow">if</span> (installingWorker.state === <span class="stringliteral">&#39;installed&#39;</span>) {</div>
+<div class="line"><span class="lineno">   38</span>            <span class="keywordflow">if</span> (navigator.serviceWorker.controller) {</div>
+<div class="line"><span class="lineno">   39</span>              <span class="keywordflow">if</span> (config &amp;&amp; config.onUpdate) config.onUpdate(registration);</div>
+<div class="line"><span class="lineno">   40</span>            } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   41</span>              <span class="keywordflow">if</span> (config &amp;&amp; config.onSuccess) config.onSuccess(registration);</div>
+<div class="line"><span class="lineno">   42</span>            }</div>
+<div class="line"><span class="lineno">   43</span>          }</div>
+<div class="line"><span class="lineno">   44</span>        };</div>
+<div class="line"><span class="lineno">   45</span>      };</div>
+<div class="line"><span class="lineno">   46</span>    })</div>
+<div class="line"><span class="lineno">   47</span>    .<span class="keywordflow">catch</span>(() =&gt; {});</div>
+<div class="line"><span class="lineno">   48</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="adf481a3dbf1e6005ce4bc428ab05a614" name="adf481a3dbf1e6005ce4bc428ab05a614"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf481a3dbf1e6005ce4bc428ab05a614">&#9670;&#160;</a></span>unregister()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function export unregister </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="service_worker_registration_8js_source.html#l00068">68</a> of file <a class="el" href="service_worker_registration_8js_source.html">serviceWorkerRegistration.js</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   68</span>                             {</div>
+<div class="line"><span class="lineno">   69</span>  <span class="keywordflow">if</span> (<span class="stringliteral">&#39;serviceWorker&#39;</span> in navigator) {</div>
+<div class="line"><span class="lineno">   70</span>    navigator.serviceWorker.ready</div>
+<div class="line"><span class="lineno">   71</span>      .then((registration) =&gt; registration.unregister())</div>
+<div class="line"><span class="lineno">   72</span>      .catch(() =&gt; {});</div>
+<div class="line"><span class="lineno">   73</span>  }</div>
+<div class="line"><span class="lineno">   74</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aff18a074016fd886819a478a8c5d2020" name="aff18a074016fd886819a478a8c5d2020"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff18a074016fd886819a478a8c5d2020">&#9670;&#160;</a></span>isLocalhost</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_group_details_8test_8jsx.html#a92b303b76a3f942ea819498907d5e83c">const</a> isLocalhost</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= Boolean(</div>
+<div class="line">  window.location.hostname === <span class="stringliteral">&#39;localhost&#39;</span> ||</div>
+<div class="line">  window.location.hostname === <span class="stringliteral">&#39;[::1]&#39;</span> ||</div>
+<div class="line">  window.location.hostname.match(</div>
+<div class="line">    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/</div>
+<div class="line">  )</div>
+<div class="line">)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="service_worker_registration_8js_source.html#l00002">2</a> of file <a class="el" href="service_worker_registration_8js_source.html">serviceWorkerRegistration.js</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
