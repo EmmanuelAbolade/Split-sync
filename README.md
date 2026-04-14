@@ -465,6 +465,28 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 - Secure payment link generation
 
 ---
+## Documentation
+
+Doxygen-generated HTML documentation is available for all source modules.
+
+### Viewing Locally
+Open the following file in your browser:
+
+### Coverage
+Doxygen processes all `.js` and `.jsx` files across the entire `src/` directory including:
+- `src/utils/` — fully documented with JSDoc comments (balanceCalculator, encryption, paymentLinks, sepaPayment and more)
+- `src/components/` — all UI components with function signatures extracted
+- `src/pages/` — all page components with function and variable references
+- `src/stores/` — Zustand state management modules
+- `src/hooks/` — custom React hooks
+
+### Regenerating Documentation
+Ensure [Doxygen](https://www.doxygen.nl) is installed, then run:
+```bash
+doxygen Doxyfile
+```
+
+
 ## Running Tests
 
 ```bash
