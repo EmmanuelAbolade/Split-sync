@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<!--
+  feedback.html
+  Split-Sync User Feedback Questionnaire
+  Standalone shareable page - deployed to Firebase Hosting or share directly.
+  Form submissions handled via Formspree
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split-Sync — User Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS Variables ─── */
+    :root {
+      --bg:           #f5f4f0;
+      --surface:      #ffffff;
+      --surface-2:    #f0efe9;
+      --border:       #e2e0d8;
+      --text-primary: #18181b;
+      --text-secondary:#52525b;
+      --text-muted:   #a1a1aa;
+      --accent:       #2563eb;
+      --accent-light: #dbeafe;
+      --accent-dark:  #1d4ed8;
+      --success:      #16a34a;
+      --success-bg:   #dcfce7;
+      --error:        #dc2626;
+      --error-bg:     #fee2e2;
+      --radius:       12px;
+      --radius-sm:    8px;
+      --shadow:       0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-md:    0 4px 24px rgba(0,0,0,0.10);
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    /* ─── Dark Mode ─── */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:           #0f0f11;
+        --surface:      #1a1a1f;
+        --surface-2:    #242429;
+        --border:       #2e2e36;
+        --text-primary: #f4f4f5;
+        --text-secondary:#a1a1aa;
+        --text-muted:   #52525b;
+        --accent:       #3b82f6;
+        --accent-light: #1e3a5f;
+        --accent-dark:  #60a5fa;
+        --success:      #22c55e;
+        --success-bg:   #14532d;
+        --error:        #f87171;
+        --error-bg:     #450a0a;
+        --shadow:       0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.3);
+        --shadow-md:    0 4px 24px rgba(0,0,0,0.5);
+      }
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding: 32px 16px 64px;
+    }
+
+    /* ─── Layout ─── */
+    .wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 40px 32px 36px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-light) 0%, transparent 60%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Real app logo image */
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: contain;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .logo-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    /* Subtitle paragraph in header */
+    .header-sub {
+      color: var(--text-secondary);
+      font-size: 0.91rem;
+      max-width: 520px;
+      margin: 0 auto 20px;
+      font-weight: 300;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    /* Row of metadata chips below subtitle */
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 4px;
+      position: relative;
+    }
+
+    .header-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .header-meta span svg {
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    /* ─── Section Cards ─── */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title svg {
+      flex-shrink: 0;
+    }
+
+    /* ─── Form Groups ─── */
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    label .req {
+      color: var(--error);
+      margin-left: 3px;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ─── Inputs ─── */
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      appearance: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    input.invalid,
+    select.invalid,
+    textarea.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px var(--error-bg);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    /* ─── Star Rating ─── */
+    .star-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .star-group input[type="radio"] {
+      display: none;
+    }
+
+    .star-group label {
+      cursor: pointer;
+      font-size: 1.6rem;
+      color: var(--border);
+      transition: color 0.1s, transform 0.1s;
+      margin: 0;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* Highlight stars on hover and selection using CSS sibling trick */
+    .star-group:hover label { color: #fbbf24; }
+    .star-group label:hover ~ label { color: var(--border); }
+
+    .star-group input[type="radio"]:checked ~ label { color: var(--border); }
+    .star-group input[type="radio"]:checked + label,
+    .star-group input[type="radio"]:checked + label ~ label { color: var(--border); }
+
+    /* Reverse order trick */
+    .stars-wrap {
+      display: flex;
+      flex-direction: row-reverse;
+      gap: 6px;
+      width: fit-content;
+    }
+
+    .stars-wrap input[type="radio"] { display: none; }
+
+    .stars-wrap label {
+      cursor: pointer;
+      font-size: 1.7rem;
+      color: var(--border);
+      transition: color 0.12s, transform 0.1s;
+      margin: 0;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .stars-wrap label:hover,
+    .stars-wrap label:hover ~ label,
+    .stars-wrap input[type="radio"]:checked ~ label,
+    .stars-wrap input[type="radio"]:checked + label {
+      color: #fbbf24;
+    }
+
+    .stars-wrap label:hover { transform: scale(1.15); }
+
+    /* ─── Radio & Checkbox Groups ─── */
+    .radio-group,
+    .check-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .radio-group.inline,
+    .check-group.inline {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .choice-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .choice-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .choice-item input[type="radio"],
+    .choice-item input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .choice-item span {
+      font-size: 0.91rem;
+      color: var(--text-primary);
+    }
+
+    .choice-item:has(input:checked) {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    /* ─── NPS Scale ─── */
+    .nps-wrap {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nps-wrap input[type="radio"] { display: none; }
+
+    .nps-wrap label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text-secondary);
+      background: var(--surface-2);
+      margin: 0;
+    }
+
+    .nps-wrap label:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .nps-wrap input[type="radio"]:checked + label {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .nps-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    .nps-labels span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Likert Scale ─── */
+    .likert-wrap {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .likert-wrap input[type="radio"] { display: none; }
+
+    .likert-wrap label {
+      flex: 1;
+      min-width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 9px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text-secondary);
+      background: var(--surface-2);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .likert-wrap label:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .likert-wrap input[type="radio"]:checked + label {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ─── Validation Error ─── */
+    .field-error {
+      font-size: 0.78rem;
+      color: var(--error);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* ─── Submit ─── */
+    .submit-wrap {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 40px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 2px 12px rgba(37,99,235,0.25);
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .privacy-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ─── Success State ─── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 60px 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .success-screen.visible {
+      display: block;
+      animation: fadeUp 0.4s ease;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--success-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .success-icon svg { color: var(--success); }
+
+    .success-screen h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .success-screen p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    /* ─── Progress Bar ─── */
+    .progress-bar-wrap {
+      margin-bottom: 28px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .section {
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .section:nth-child(1) { animation-delay: 0.05s; }
+    .section:nth-child(2) { animation-delay: 0.10s; }
+    .section:nth-child(3) { animation-delay: 0.15s; }
+    .section:nth-child(4) { animation-delay: 0.20s; }
+    .section:nth-child(5) { animation-delay: 0.25s; }
+    .section:nth-child(6) { animation-delay: 0.30s; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 520px) {
+      .section { padding: 20px 16px; }
+      .header  { padding: 28px 16px; }
+      .nps-wrap label { width: 38px; height: 38px; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+
+    <!-- Split-Sync real app logo (base64 embedded for portability) -->
+    <div class="logo">
+      <img
+        src="data:image/png;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAIUAhQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD5/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPv+iiigAooooA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD7/ooooAKKKKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+/6KKKACiiigD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPv+iiigAooooA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD7/ooooAKKKKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+/6KKKACiiigD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPv+iiigAooooA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAFoqaG1nuCRFDJIf8AZUn+VNmglt32SxujDsy4NFguRUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB9/0UUUAFFFFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAB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FFFABRRRQAtPileGRZEYqykEEcEGmUUbCaurM6u38XLsAubdiwGN0ZHP4Gp/+Ets/wDnhP8ApXG0tdSxlVK1zilluHk72Ov/AOEts/8AnhN+lB8WWf8Azwm/SuPop/XapP8AZlDzOu/4Su0/54Tfp/jWNrGoW2oTJLDAyOBhmYjJrK4oqamKqVI8sjWlg6VKXNG5cGoSf2e9o3zISCpP8ODWzoH/AB4N/wBdD/IVzVX7XVJrO2MUSryxbcRnGf8A9Va4TE8lVSqPRI7E7M6mSaOFC8rhF9Sf85rA1HW2uFMNvlYjwW7sP8Ky5riW4ffK5dvUmoq3xOZymuWmrIbl2EoooryiQooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+/6KKKACiiigD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKMUAFFLg+hpKACiiigAoowT0oII6igAopcHGccUlABRRRQAUUYooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+/6KKKACiiigD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAcoJOAMk16Nofhy1sbRHniSW5YAsWGQpPYA8cevrXB6aFOp2oYfKZVyPxFeh+Ipp49EuWt2KyDGSvBCk84/z0zXZhYRfNOXQ8rM6tSPJSpu3M9y/NZWs8ZSW3iZCOhQfzxkV5v4hs7ax1eWC1yEXBIPOCRkj9ar2mpXllL5kFw6nuM5B+oqeOK58Q6rKV8tZpSXIJwKK1aFWNoxswwmErYabc53jYy8UVvHwrqC3kdtiMs679wbIUZxyakv/AAje2VsZ1eOdVBLBM5AHeuf2M9dDveJoppOS12JPBKq2syBlVh5LcEA9x61b8aRRi/sFAVFZSDgAcbvaqfgnjWpP+uLfzFW/HOWu7IDqYyP/AB6umC/2aT8/8jz6zf8AaMFfp/mbWuWlqvh64iESIkUeY+ANpBHf1PT3zXH6HoR1gSubgRLGQDxknOf8Ku6np2uQ6U32y6WS2iA+XfnvgfzrW8K2EtlZSSSFdtwEdNpzxz+XWrcVVqxTjbuZxlLDYec1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RRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAff9FFFABRRRQB8AUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH3/RRRQAUUUUAfAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB9/0UUUAFFFFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAff9FFFABRRRQB8AUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH3/RRRQAUUUUAfAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB9/0UUUAFFFFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAff9FFFABRRRQB8AUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH3/RRRQAUUUUAfAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB9/0UUUAFFFFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAff9FFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//Z"
+        alt="Split-Sync logo"
+        class="logo-img"
+      />
+      <span class="logo-name">Split-Sync</span>
+    </div>
+	<br>
+    <div class="badge">
+      <!-- Lucide: book-open icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5"
+           stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
+      Final Year Project &mdash; Academic Research
+    </div>
+
+    <h1>Share Your Experience</h1>
+
+    <p class="header-sub">
+      This questionnaire is part of a Final Year Project submitted in partial fulfilment
+      of the requirements for the degree of BSc in Software Development at
+      <strong>South East Technological University (SETU) Carlow, Ireland</strong>.
+      It is conducted by <strong>Emmanuel Abolade</strong> and is intended solely for
+      academic purposes.
+    </p>
+
+    <div class="header-meta">
+      <!-- Lucide: clock icon -->
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Approx. 6&ndash;10 minutes
+      </span>
+      <!-- Lucide: shield icon -->
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        Responses are anonymous and confidential
+      </span>
+      <!-- Lucide: graduation-cap icon -->
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+        </svg>
+        SETU Carlow, 2025
+      </span>
+    </div>
+
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span id="progress-text">0 of 7 sections</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <!-- NOTE: Replace YOUR_FORM_ID with your actual Formspree form ID.
+             Register free at https://formspree.io to get an ID.
+             Alternatively, replace the action with your own API endpoint. -->
+  <form id="feedback-form" action="https://formspree.io/f/mqeyogqd" method="POST" novalidate>
+
+    <!-- Hidden metadata -->
+    <input type="hidden" name="_subject" value="Split-Sync User Feedback" />
+    <input type="hidden" name="_captcha" value="true" />
+
+    <!-- ───────────────────────────────── -->
+    <!-- Section 1: About You (Optional)   -->
+    <!-- ───────────────────────────────── -->
+    <div class="section" data-section="1">
+      <div class="section-title">
+        <!-- Lucide: user icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Section 1 — About You
+      </div>
+
+      <div class="form-group">
+        <label for="name">First Name <span class="hint" style="font-weight:400;">(optional)</span></label>
+        <input type="text" id="name" name="name" placeholder="e.g. Sarah" maxlength="80" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address <span class="hint" style="font-weight:400;">(optional — only if you want a follow-up)</span></label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" />
+        <div class="field-error" id="email-error">Please enter a valid email address.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="usage-freq">How often do you use Split-Sync? <span class="req">*</span></label>
+        <select id="usage-freq" name="usage_frequency" required>
+          <option value="" disabled selected>Select an option</option>
+          <option value="daily">Daily</option>
+          <option value="few-times-week">A few times a week</option>
+          <option value="weekly">Weekly</option>
+          <option value="few-times-month">A few times a month</option>
+          <option value="rarely">Rarely</option>
+          <option value="just-started">Just started using it</option>
+        </select>
+        <div class="field-error" id="usage-freq-error">Please select how often you use the app.</div>
+      </div>
+
+      <div class="form-group">
+        <label>What best describes your use case? <span class="req">*</span></label>
+        <div class="radio-group" id="use-case-group">
+          <label class="choice-item">
+            <input type="radio" name="use_case" value="flatmates" required />
+            <span>Splitting bills with flatmates or housemates</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="use_case" value="travel" />
+            <span>Travel expenses with friends</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="use_case" value="dining" />
+            <span>Dining and social outings</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="use_case" value="couples" />
+            <span>Shared expenses with a partner</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="use_case" value="other" />
+            <span>Other</span>
+          </label>
+        </div>
+        <div class="field-error" id="use-case-error">Please select a use case.</div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
+    <!-- Section 2: Overall Experience   -->
+    <!-- ─────────────────────────────── -->
+    <div class="section" data-section="2">
+      <div class="section-title">
+        <!-- Lucide: star icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02
+                           12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        Section 2 — Overall Experience
+      </div>
+
+      <!-- Overall rating -->
+      <div class="form-group">
+        <label>How would you rate Split-Sync overall? <span class="req">*</span></label>
+        <div class="stars-wrap" id="overall-rating-group">
+          <input type="radio" id="star5" name="overall_rating" value="5" required />
+          <label for="star5" title="Excellent">&#9733;</label>
+          <input type="radio" id="star4" name="overall_rating" value="4" />
+          <label for="star4" title="Good">&#9733;</label>
+          <input type="radio" id="star3" name="overall_rating" value="3" />
+          <label for="star3" title="Average">&#9733;</label>
+          <input type="radio" id="star2" name="overall_rating" value="2" />
+          <label for="star2" title="Poor">&#9733;</label>
+          <input type="radio" id="star1" name="overall_rating" value="1" />
+          <label for="star1" title="Very Poor">&#9733;</label>
+        </div>
+        <div class="field-error" id="overall-rating-error">Please give an overall rating.</div>
+      </div>
+
+      <!-- Ease of use -->
+      <div class="form-group">
+        <label>How easy is Split-Sync to use? <span class="req">*</span></label>
+        <div class="likert-wrap" id="ease-of-use-group">
+          <input type="radio" id="eu1" name="ease_of_use" value="1" required /><label for="eu1">Very Difficult</label>
+          <input type="radio" id="eu2" name="ease_of_use" value="2" /><label for="eu2">Difficult</label>
+          <input type="radio" id="eu3" name="ease_of_use" value="3" /><label for="eu3">Neutral</label>
+          <input type="radio" id="eu4" name="ease_of_use" value="4" /><label for="eu4">Easy</label>
+          <input type="radio" id="eu5" name="ease_of_use" value="5" /><label for="eu5">Very Easy</label>
+        </div>
+        <div class="field-error" id="ease-of-use-error">Please select a rating.</div>
+      </div>
+
+      <!-- Expectations -->
+      <div class="form-group">
+        <label>Did Split-Sync meet your expectations? <span class="req">*</span></label>
+        <div class="radio-group" id="expectations-group">
+          <label class="choice-item">
+            <input type="radio" name="met_expectations" value="exceeded" required />
+            <span>Exceeded my expectations</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="met_expectations" value="met" />
+            <span>Met my expectations</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="met_expectations" value="mostly" />
+            <span>Mostly met my expectations</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="met_expectations" value="fell-short" />
+            <span>Fell short of my expectations</span>
+          </label>
+        </div>
+        <div class="field-error" id="expectations-error">Please select an option.</div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
+    <!-- Section 3: Features             -->
+    <!-- ─────────────────────────────── -->
+    <div class="section" data-section="3">
+      <div class="section-title">
+        <!-- Lucide: layers icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        Section 3 — Features
+      </div>
+
+      <!-- Features used -->
+      <div class="form-group">
+        <label>Which features have you used? <span class="hint">(Select all that apply)</span></label>
+        <div class="check-group" id="features-used">
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="expense_splitting" />
+            <span>Expense Splitting (equal, percentage, shares)</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="balance_tracking" />
+            <span>Balance Tracking and Settlement</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="receipt_scanning" />
+            <span>Receipt Scanning (OCR)</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="payment_links" />
+            <span>Payment Links (PayPal / Revolut)</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="sepa" />
+            <span>SEPA Bank Transfer</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="biometric" />
+            <span>Biometric Login</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="group_management" />
+            <span>Group Management and Invitations</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="analytics" />
+            <span>Spending Analytics</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="notifications" />
+            <span>Notifications</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="features_used" value="dark_mode" />
+            <span>Dark Mode</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Most valuable feature -->
+      <div class="form-group">
+        <label for="best-feature">What is the most valuable feature for you? <span class="req">*</span></label>
+        <select id="best-feature" name="most_valuable_feature" required>
+          <option value="" disabled selected>Select a feature</option>
+          <option value="expense_splitting">Expense Splitting</option>
+          <option value="balance_tracking">Balance Tracking</option>
+          <option value="receipt_scanning">Receipt Scanning</option>
+          <option value="payment_links">Payment Links</option>
+          <option value="sepa">SEPA Bank Transfer</option>
+          <option value="biometric">Biometric Login</option>
+          <option value="group_management">Group Management</option>
+          <option value="analytics">Analytics</option>
+          <option value="notifications">Notifications</option>
+          <option value="dark_mode">Dark Mode</option>
+        </select>
+        <div class="field-error" id="best-feature-error">Please select a feature.</div>
+      </div>
+
+      <!-- Feature ratings -->
+      <div class="form-group">
+        <label>Rate the following features: <span class="req">*</span></label>
+        <p class="hint" style="margin-bottom:14px;">1 = Poor &nbsp;&nbsp; 5 = Excellent &nbsp;&nbsp; N/A = Have not used</p>
+
+        <!-- Feature rating table -->
+        <div style="display:flex;flex-direction:column;gap:12px;" id="feature-ratings-group">
+
+          <!-- Helper: feature rating row macro -->
+          <div class="feature-row">
+            <div style="font-size:0.88rem;font-weight:500;margin-bottom:6px;color:var(--text-primary)">Expense Splitting</div>
+            <div class="likert-wrap">
+              <input type="radio" id="es-na" name="rating_expense_splitting" value="na" /><label for="es-na">N/A</label>
+              <input type="radio" id="es-1"  name="rating_expense_splitting" value="1" /><label for="es-1">1</label>
+              <input type="radio" id="es-2"  name="rating_expense_splitting" value="2" /><label for="es-2">2</label>
+              <input type="radio" id="es-3"  name="rating_expense_splitting" value="3" /><label for="es-3">3</label>
+              <input type="radio" id="es-4"  name="rating_expense_splitting" value="4" /><label for="es-4">4</label>
+              <input type="radio" id="es-5"  name="rating_expense_splitting" value="5" /><label for="es-5">5</label>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="feature-row">
+            <div style="font-size:0.88rem;font-weight:500;margin-bottom:6px;color:var(--text-primary)">Balance Tracking</div>
+            <div class="likert-wrap">
+              <input type="radio" id="bt-na" name="rating_balance" value="na" /><label for="bt-na">N/A</label>
+              <input type="radio" id="bt-1"  name="rating_balance" value="1" /><label for="bt-1">1</label>
+              <input type="radio" id="bt-2"  name="rating_balance" value="2" /><label for="bt-2">2</label>
+              <input type="radio" id="bt-3"  name="rating_balance" value="3" /><label for="bt-3">3</label>
+              <input type="radio" id="bt-4"  name="rating_balance" value="4" /><label for="bt-4">4</label>
+              <input type="radio" id="bt-5"  name="rating_balance" value="5" /><label for="bt-5">5</label>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="feature-row">
+            <div style="font-size:0.88rem;font-weight:500;margin-bottom:6px;color:var(--text-primary)">Receipt Scanning (OCR)</div>
+            <div class="likert-wrap">
+              <input type="radio" id="rs-na" name="rating_receipt_scan" value="na" /><label for="rs-na">N/A</label>
+              <input type="radio" id="rs-1"  name="rating_receipt_scan" value="1" /><label for="rs-1">1</label>
+              <input type="radio" id="rs-2"  name="rating_receipt_scan" value="2" /><label for="rs-2">2</label>
+              <input type="radio" id="rs-3"  name="rating_receipt_scan" value="3" /><label for="rs-3">3</label>
+              <input type="radio" id="rs-4"  name="rating_receipt_scan" value="4" /><label for="rs-4">4</label>
+              <input type="radio" id="rs-5"  name="rating_receipt_scan" value="5" /><label for="rs-5">5</label>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="feature-row">
+            <div style="font-size:0.88rem;font-weight:500;margin-bottom:6px;color:var(--text-primary)">Payment Links (PayPal / Revolut)</div>
+            <div class="likert-wrap">
+              <input type="radio" id="pl-na" name="rating_payment_links" value="na" /><label for="pl-na">N/A</label>
+              <input type="radio" id="pl-1"  name="rating_payment_links" value="1" /><label for="pl-1">1</label>
+              <input type="radio" id="pl-2"  name="rating_payment_links" value="2" /><label for="pl-2">2</label>
+              <input type="radio" id="pl-3"  name="rating_payment_links" value="3" /><label for="pl-3">3</label>
+              <input type="radio" id="pl-4"  name="rating_payment_links" value="4" /><label for="pl-4">4</label>
+              <input type="radio" id="pl-5"  name="rating_payment_links" value="5" /><label for="pl-5">5</label>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="feature-row">
+            <div style="font-size:0.88rem;font-weight:500;margin-bottom:6px;color:var(--text-primary)">Biometric Login</div>
+            <div class="likert-wrap">
+              <input type="radio" id="bl-na" name="rating_biometric" value="na" /><label for="bl-na">N/A</label>
+              <input type="radio" id="bl-1"  name="rating_biometric" value="1" /><label for="bl-1">1</label>
+              <input type="radio" id="bl-2"  name="rating_biometric" value="2" /><label for="bl-2">2</label>
+              <input type="radio" id="bl-3"  name="rating_biometric" value="3" /><label for="bl-3">3</label>
+              <input type="radio" id="bl-4"  name="rating_biometric" value="4" /><label for="bl-4">4</label>
+              <input type="radio" id="bl-5"  name="rating_biometric" value="5" /><label for="bl-5">5</label>
+            </div>
+          </div>
+
+        </div>
+        <div class="field-error" id="feature-ratings-error">Please rate at least the features you have used.</div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
+    <!-- Section 4: UI & Performance     -->
+    <!-- ─────────────────────────────── -->
+    <div class="section" data-section="4">
+      <div class="section-title">
+        <!-- Lucide: monitor icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        Section 4 — UI and Performance
+      </div>
+
+      <!-- Design rating -->
+      <div class="form-group">
+        <label>How would you rate the visual design? <span class="req">*</span></label>
+        <div class="likert-wrap" id="design-rating-group">
+          <input type="radio" id="dr1" name="design_rating" value="1" required /><label for="dr1">Very Poor</label>
+          <input type="radio" id="dr2" name="design_rating" value="2" /><label for="dr2">Poor</label>
+          <input type="radio" id="dr3" name="design_rating" value="3" /><label for="dr3">Average</label>
+          <input type="radio" id="dr4" name="design_rating" value="4" /><label for="dr4">Good</label>
+          <input type="radio" id="dr5" name="design_rating" value="5" /><label for="dr5">Excellent</label>
+        </div>
+        <div class="field-error" id="design-rating-error">Please select a rating.</div>
+      </div>
+
+      <!-- Performance -->
+      <div class="form-group">
+        <label>How well does the app perform? <span class="req">*</span></label>
+        <div class="likert-wrap" id="performance-group">
+          <input type="radio" id="pf1" name="performance" value="1" required /><label for="pf1">Very Slow</label>
+          <input type="radio" id="pf2" name="performance" value="2" /><label for="pf2">Slow</label>
+          <input type="radio" id="pf3" name="performance" value="3" /><label for="pf3">Acceptable</label>
+          <input type="radio" id="pf4" name="performance" value="4" /><label for="pf4">Fast</label>
+          <input type="radio" id="pf5" name="performance" value="5" /><label for="pf5">Very Fast</label>
+        </div>
+        <div class="field-error" id="performance-error">Please select a rating.</div>
+      </div>
+
+      <!-- Mobile experience -->
+      <div class="form-group">
+        <label>How would you rate the mobile experience? <span class="req">*</span></label>
+        <div class="likert-wrap" id="mobile-group">
+          <input type="radio" id="mb1" name="mobile_experience" value="1" required /><label for="mb1">Very Poor</label>
+          <input type="radio" id="mb2" name="mobile_experience" value="2" /><label for="mb2">Poor</label>
+          <input type="radio" id="mb3" name="mobile_experience" value="3" /><label for="mb3">Average</label>
+          <input type="radio" id="mb4" name="mobile_experience" value="4" /><label for="mb4">Good</label>
+          <input type="radio" id="mb5" name="mobile_experience" value="5" /><label for="mb5">Excellent</label>
+        </div>
+        <div class="field-error" id="mobile-error">Please select a rating.</div>
+      </div>
+
+      <!-- Bugs -->
+      <div class="form-group">
+        <label>Have you encountered any bugs or errors? <span class="req">*</span></label>
+        <div class="radio-group" id="bugs-group">
+          <label class="choice-item">
+            <input type="radio" name="encountered_bugs" value="none" required />
+            <span>No bugs — everything worked smoothly</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="encountered_bugs" value="minor" />
+            <span>Minor issues, did not affect my experience much</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="encountered_bugs" value="moderate" />
+            <span>Some issues that were slightly frustrating</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="encountered_bugs" value="significant" />
+            <span>Significant bugs that affected usability</span>
+          </label>
+        </div>
+        <div class="field-error" id="bugs-error">Please select an option.</div>
+      </div>
+
+      <!-- Bug description -->
+      <div class="form-group">
+        <label for="bug-desc">If you experienced any issues, please describe them:</label>
+        <textarea id="bug-desc" name="bug_description"
+                  placeholder="Describe any bugs, errors, or friction points you noticed..."></textarea>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
+    <!-- Section 5: Improvements         -->
+    <!-- ─────────────────────────────── -->
+    <div class="section" data-section="5">
+      <div class="section-title">
+        <!-- Lucide: trending-up icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+        Section 5 — What Could Be Better
+      </div>
+
+      <!-- Biggest frustration -->
+      <div class="form-group">
+        <label for="frustration">What is your biggest frustration or pain point with Split-Sync?</label>
+        <textarea id="frustration" name="biggest_frustration"
+                  placeholder="Be as specific as you like — e.g. a step that is confusing, a feature that is hard to find..."></textarea>
+      </div>
+
+      <!-- Missing features -->
+      <div class="form-group">
+        <label>Which features would you most like to see added or improved? <span class="hint">(Select all that apply)</span></label>
+        <div class="check-group" id="missing-features">
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="recurring_expenses" />
+            <span>Recurring / scheduled expenses</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="currency_conversion" />
+            <span>Multi-currency and currency conversion</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="csv_export" />
+            <span>Export to CSV / PDF</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="calendar" />
+            <span>Calendar / trip planning view</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="budgeting" />
+            <span>Group budgeting and spending limits</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="reminders" />
+            <span>Automated payment reminders</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="more_payment_methods" />
+            <span>More payment method integrations</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="requested_features" value="better_notifications" />
+            <span>Improved notifications</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Free text improvements -->
+      <div class="form-group">
+        <label for="improvements">Any other improvements or suggestions?</label>
+        <textarea id="improvements" name="other_improvements"
+                  placeholder="Any other features, changes, or ideas you would find valuable..."></textarea>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
+    <!-- Section 6: Comparison           -->
+    <!-- ─────────────────────────────── -->
+    <div class="section" data-section="6">
+      <div class="section-title">
+        <!-- Lucide: bar-chart-2 icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6"  y1="20" x2="6"  y2="14"></line>
+        </svg>
+        Section 6 — Comparison and Alternatives
+      </div>
+
+      <!-- Used alternatives -->
+      <div class="form-group">
+        <label>Have you used other expense-splitting apps? <span class="hint">(Select all that apply)</span></label>
+        <div class="check-group" id="alternatives-group">
+          <label class="choice-item">
+            <input type="checkbox" name="alternatives_used" value="splitwise" />
+            <span>Splitwise</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="alternatives_used" value="tricount" />
+            <span>Tricount</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="alternatives_used" value="monzo" />
+            <span>Monzo Shared Tabs</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="alternatives_used" value="settle_up" />
+            <span>Settle Up</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="alternatives_used" value="manual" />
+            <span>Manual tracking (spreadsheet / notes)</span>
+          </label>
+          <label class="choice-item">
+            <input type="checkbox" name="alternatives_used" value="none" />
+            <span>None — Split-Sync is my first</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Compared to alternatives -->
+      <div class="form-group">
+        <label>Compared to alternatives you have tried, Split-Sync is: <span class="req">*</span></label>
+        <div class="radio-group" id="comparison-group">
+          <label class="choice-item">
+            <input type="radio" name="comparison" value="much_better" required />
+            <span>Much better</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="comparison" value="better" />
+            <span>Somewhat better</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="comparison" value="similar" />
+            <span>About the same</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="comparison" value="worse" />
+            <span>Somewhat worse</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="comparison" value="na" />
+            <span>I have not used any alternatives</span>
+          </label>
+        </div>
+        <div class="field-error" id="comparison-error">Please select an option.</div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
+    <!-- Section 7: NPS and Final        -->
+    <!-- ─────────────────────────────── -->
+    <div class="section" data-section="7">
+      <div class="section-title">
+        <!-- Lucide: send icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Section 7 — Recommendation and Final Thoughts
+      </div>
+
+      <!-- NPS -->
+      <div class="form-group">
+        <label>
+          How likely are you to recommend Split-Sync to a friend or colleague?
+          <span class="req">*</span>
+        </label>
+        <div class="nps-wrap" id="nps-group">
+          <input type="radio" id="nps0"  name="nps" value="0"  required /><label for="nps0">0</label>
+          <input type="radio" id="nps1"  name="nps" value="1"  /><label for="nps1">1</label>
+          <input type="radio" id="nps2"  name="nps" value="2"  /><label for="nps2">2</label>
+          <input type="radio" id="nps3"  name="nps" value="3"  /><label for="nps3">3</label>
+          <input type="radio" id="nps4"  name="nps" value="4"  /><label for="nps4">4</label>
+          <input type="radio" id="nps5"  name="nps" value="5"  /><label for="nps5">5</label>
+          <input type="radio" id="nps6"  name="nps" value="6"  /><label for="nps6">6</label>
+          <input type="radio" id="nps7"  name="nps" value="7"  /><label for="nps7">7</label>
+          <input type="radio" id="nps8"  name="nps" value="8"  /><label for="nps8">8</label>
+          <input type="radio" id="nps9"  name="nps" value="9"  /><label for="nps9">9</label>
+          <input type="radio" id="nps10" name="nps" value="10" /><label for="nps10">10</label>
+        </div>
+        <div class="nps-labels">
+          <span>Not at all likely</span>
+          <span>Extremely likely</span>
+        </div>
+        <div class="field-error" id="nps-error">Please select a score from 0 to 10.</div>
+      </div>
+
+      <!-- Continue using -->
+      <div class="form-group">
+        <label>Do you plan to continue using Split-Sync? <span class="req">*</span></label>
+        <div class="radio-group" id="continue-group">
+          <label class="choice-item">
+            <input type="radio" name="will_continue" value="definitely" required />
+            <span>Definitely — it is now my go-to app</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="will_continue" value="probably" />
+            <span>Probably, once I get more used to it</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="will_continue" value="unsure" />
+            <span>Unsure — depends on improvements</span>
+          </label>
+          <label class="choice-item">
+            <input type="radio" name="will_continue" value="no" />
+            <span>Probably not</span>
+          </label>
+        </div>
+        <div class="field-error" id="continue-error">Please select an option.</div>
+      </div>
+
+      <!-- Final thoughts -->
+      <div class="form-group">
+        <label for="final-thoughts">Any final thoughts or anything else you want to share?</label>
+        <textarea id="final-thoughts" name="final_thoughts"
+                  placeholder="Anything else you would like the Split-Sync team to know..."
+                  style="min-height:110px;"></textarea>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-wrap">
+      <button type="submit" class="btn-submit" id="submit-btn">
+        <!-- Lucide: send icon inline -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Submit Feedback
+      </button>
+      <p class="privacy-note">
+        <!-- Lucide: lock icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Your responses are confidential and used only to improve Split-Sync.
+      </p>
+    </div>
+
+  </form>
+
+  <!-- Success screen (shown after submission) -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">
+      <!-- Lucide: check icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5"
+           stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <h2>Thank You for Your Feedback</h2>
+    <p>Your response has been recorded. It will directly shape how Split-Sync improves going forward.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Split-Sync &mdash; Final Year Project, South East Technological University Carlow</p>
+  </div>
+
+</div>
+
+<script>
+  // ─── Progress Tracking ───────────────────────────────────────────────────
+  // Updates the progress bar as the user fills out each section.
+
+  const TOTAL_SECTIONS = 7;
+
+  function updateProgress() {
+    const sections = document.querySelectorAll('.section[data-section]');
+    let completed = 0;
+
+    sections.forEach(section => {
+      const requiredInputs = section.querySelectorAll('[required]');
+      if (requiredInputs.length === 0) { completed++; return; }
+
+      // Check if at least one required field in the section has a value
+      const names = new Set([...requiredInputs].map(i => i.name));
+      let sectionDone = true;
+
+      names.forEach(name => {
+        const inputs = section.querySelectorAll(`[name="${name}"]`);
+        const hasValue = [...inputs].some(i => {
+          if (i.type === 'radio' || i.type === 'checkbox') return i.checked;
+          return i.value.trim() !== '';
+        });
+        if (!hasValue) sectionDone = false;
+      });
+
+      if (sectionDone) completed++;
+    });
+
+    const pct = Math.round((completed / TOTAL_SECTIONS) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent =
+      completed + ' of ' + TOTAL_SECTIONS + ' sections';
+  }
+
+  document.getElementById('feedback-form').addEventListener('change', updateProgress);
+
+  // ─── Inline Validation ───────────────────────────────────────────────────
+  // Validates required fields on submit and highlights missing ones.
+
+  function showError(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('visible', show);
+  }
+
+  function markInvalid(el, invalid) {
+    if (el) el.classList.toggle('invalid', invalid);
+  }
+
+  function getRadioValue(name) {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    return checked ? checked.value : null;
+  }
+
+  function validateForm() {
+    let valid = true;
+
+    // Email format check (optional field — only validate if filled)
+    const emailEl = document.getElementById('email');
+    const emailVal = emailEl.value.trim();
+    if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      showError('email-error', true);
+      markInvalid(emailEl, true);
+      valid = false;
+    } else {
+      showError('email-error', false);
+      markInvalid(emailEl, false);
+    }
+
+    // Section 1 required
+    const usageFreq = document.getElementById('usage-freq');
+    const usageOk = usageFreq.value !== '';
+    showError('usage-freq-error', !usageOk);
+    markInvalid(usageFreq, !usageOk);
+    if (!usageOk) valid = false;
+
+    const useCaseOk = !!getRadioValue('use_case');
+    showError('use-case-error', !useCaseOk);
+    if (!useCaseOk) valid = false;
+
+    // Section 2 required
+    const overallOk = !!getRadioValue('overall_rating');
+    showError('overall-rating-error', !overallOk);
+    if (!overallOk) valid = false;
+
+    const easeOk = !!getRadioValue('ease_of_use');
+    showError('ease-of-use-error', !easeOk);
+    if (!easeOk) valid = false;
+
+    const expectOk = !!getRadioValue('met_expectations');
+    showError('expectations-error', !expectOk);
+    if (!expectOk) valid = false;
+
+    // Section 3 required
+    const bestFeature = document.getElementById('best-feature');
+    const bfOk = bestFeature.value !== '';
+    showError('best-feature-error', !bfOk);
+    markInvalid(bestFeature, !bfOk);
+    if (!bfOk) valid = false;
+
+    // Section 4 required
+    ['design_rating', 'performance', 'mobile_experience', 'encountered_bugs'].forEach((name, i) => {
+      const ids = ['design-rating-error', 'performance-error', 'mobile-error', 'bugs-error'];
+      const ok = !!getRadioValue(name);
+      showError(ids[i], !ok);
+      if (!ok) valid = false;
+    });
+
+    // Section 6 required
+    const compOk = !!getRadioValue('comparison');
+    showError('comparison-error', !compOk);
+    if (!compOk) valid = false;
+
+    // Section 7 required
+    const npsOk = !!getRadioValue('nps');
+    showError('nps-error', !npsOk);
+    if (!npsOk) valid = false;
+
+    const continueOk = !!getRadioValue('will_continue');
+    showError('continue-error', !continueOk);
+    if (!continueOk) valid = false;
+
+    return valid;
+  }
+
+  // ─── Form Submission ─────────────────────────────────────────────────────
+  // Submits to Formspree via fetch; shows success screen on completion.
+
+  const form = document.getElementById('feedback-form');
+  const submitBtn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      // Scroll to first visible error
+      const firstError = document.querySelector('.field-error.visible');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round"
+           style="animation:spin 0.8s linear infinite">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+      </svg>
+      Submitting...`;
+
+    // NOTE: If Formspree ID is not set, this will fail.
+    // Replace YOUR_FORM_ID in the form action attribute before deploying.
+    try {
+      const data = new FormData(form);
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' }
+      });
+
+      if (response.ok) {
+        form.style.display = 'none';
+        document.getElementById('success-screen').classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error('Submission failed');
+      }
+    } catch {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Submit Feedback`;
+      alert('There was a problem submitting your response. Please try again.');
+    }
+  });
+
+  // ─── Spinner CSS ─────────────────────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+  document.head.appendChild(style);
+</script>
+</body>
+</html>
