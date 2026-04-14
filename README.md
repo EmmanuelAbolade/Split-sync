@@ -749,7 +749,7 @@ SOFTWARE.
 ## Demo
 
 ### Expense and Settlement Flow
-![Split-Sync expense and settlement flow](https://res.cloudinary.com/dpnpqw37p/image/upload/q_auto/f_auto/v1776125507/splitsync_trailer_02_ytduuk.gif)
+![Split-Sync expense and settlement flow](https://res.cloudinary.com/dpnpqw37p/image/upload/q_auto/v1776125507/splitsync_trailer_02_ytduuk.gif)
 
 ### Light Mode and Dark Mode
 ![Split-Sync light and dark mode](https://res.cloudinary.com/dpnpqw37p/image/upload/v1776125910/splitsync_trailer_03_dugygu.gif)
