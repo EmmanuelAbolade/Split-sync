@@ -9,6 +9,7 @@ import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } f
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { authenticateWithBiometric } from '../utils/biometric';
+import { decryptData } from '../utils/encryption';
 import { createNotification, recordPaymentSent } from '../stores/notificationsStore';
 import QRCodeCanvas from './QRCodeCanvas';
 
@@ -23,6 +24,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
   const [selectedPaymentLink, setSelectedPaymentLink] = useState(null);
   const [copiedIban, setCopiedIban] = useState(false);
+  const [copiedAmount, setCopiedAmount] = useState(false);
   const [showPaymentInfo, setShowPaymentInfo] = useState(false);
   const [showSepaModal, setShowSepaModal] = useState(false);
   const [sepaPaymentData, setSepaPaymentData] = useState(null);
@@ -87,7 +89,19 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         const recipientDoc = await getDoc(doc(db, 'users', settlement.to));
         if (recipientDoc.exists()) {
           const data = recipientDoc.data();
-          setRecipientPaymentMethods(data.paymentMethods || null);
+          // Spread into a new object so we never mutate Firestore data directly.
+          // getAvailablePaymentMethods checks for paymentMethods.iban (plain text).
+          // The IBAN is stored encrypted as encryptedIBAN, so decrypt it here and
+          // expose it under the iban key so the Bank Transfer option renders correctly.
+          const raw = data.paymentMethods ? { ...data.paymentMethods } : null;
+          if (raw?.encryptedIBAN) {
+            try {
+              raw.iban = decryptData(raw.encryptedIBAN);
+            } catch (e) {
+              console.error('Failed to decrypt recipient IBAN:', e);
+            }
+          }
+          setRecipientPaymentMethods(raw);
         }
       } catch (error) {
         console.error('Error fetching payment methods:', error);
@@ -745,8 +759,10 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                       disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
                       className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-700 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                        {method.icon}
+                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        {method.id === 'paypal' && <CreditCard size={20} className="text-blue-600 dark:text-blue-400" />}
+                        {method.id === 'revolut' && <Smartphone size={20} className="text-indigo-600 dark:text-indigo-400" />}
+                        {method.id === 'bank' && <Landmark size={20} className="text-green-600 dark:text-green-400" />}
                       </div>
                       <div className="flex-1 text-left">
                         <p className="font-semibold text-gray-900 dark:text-white">{method.name}</p>
@@ -762,32 +778,6 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
               </div>
             )}
 
-            {/* SEPA Bank Transfer Button — hidden when Paid Offline is selected */}
-            {!loadingPaymentMethods && recipientPaymentMethods?.encryptedIBAN && !selectedPaymentLink && paymentMethod !== 'manual' && (
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Or pay directly with SEPA</h3>
-                <button
-                  onClick={handleSepaPayment}
-                  disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
-                  className="w-full flex items-center gap-3 p-4 border-2 border-indigo-300 dark:border-indigo-700 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900/50 transition">
-                    <Landmark size={24} className="text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <div className="text-left flex-1">
-                    <div className="font-semibold text-gray-900 dark:text-white">SEPA Bank Transfer</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Secure bank-to-bank payment
-                    </div>
-                    <div className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
-                      <CheckCircle2 size={12} />
-                      IBAN available · Biometric secured
-                    </div>
-                  </div>
-                  <ArrowRight size={20} className="text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition" />
-                </button>
-              </div>
-            )}
 
             {/* Bank Transfer Details */}
             {selectedPaymentLink && selectedPaymentLink.id === 'bank' && (
@@ -840,7 +830,24 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                   
                   <div>
                     <p className="text-blue-600 dark:text-blue-400 font-medium">Amount</p>
-                    <p className="text-blue-900 dark:text-blue-200 font-semibold bg-white dark:bg-gray-700 p-2 rounded">{group.currency} {amount}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-blue-900 dark:text-blue-200 font-semibold bg-white dark:bg-gray-700 p-2 rounded flex-1">
+                        {group.currency} {amount}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(amount);
+                          setCopiedAmount(true);
+                          setTimeout(() => setCopiedAmount(false), 2000);
+                        }}
+                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded flex-shrink-0"
+                      >
+                        {copiedAmount
+                          ? <Check size={16} className="text-green-600 dark:text-green-400" />
+                          : <Copy size={16} className="text-blue-400 dark:text-blue-400" />}
+                      </button>
+                    </div>
                   </div>
                   
                   <div>
@@ -849,9 +856,14 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                   </div>
                 </div>
                 
-                <p className="text-xs text-blue-700 dark:text-blue-400 mt-3 text-center">
-                  After making the transfer, mark the payment as completed below
-                </p>
+                {/* Info bubble — guides user to complete the transfer in their banking app */}
+                <div className="mt-4 flex items-start gap-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg p-3">
+                  <Info size={14} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
+                  <p className="text-xs text-indigo-800 dark:text-indigo-300">
+                    Copy the IBAN above and use it to send the payment from your banking app (e.g. your bank, Wise, or Revolut).
+                    Once sent, return here and mark the payment as completed below.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -923,7 +935,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                     </p>
                   </div>
                 )}
-                {/* Demo Mode — collapsible panel containing all PayPal sandbox UI */}
+                {/* Future Feature — collapsible demo panel for PayPal sandbox and SEPA simulation */}
                 <button
                   type="button"
                   onClick={() => setShowDemoInfo(prev => !prev)}
@@ -938,7 +950,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                         Future feature - Settlement Payment Flow
                       </p>
                       <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-0.5">
-                        {showDemoInfo ? 'Tap to collapse' : 'PayPal or Credit/Debit Card payment demo'}
+                        {showDemoInfo ? 'Tap to collapse' : 'PayPal sandbox and SEPA simulation demos'}
                       </p>
                     </div>
                   </div>
@@ -948,18 +960,23 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                   />
                 </button>
 
-                {/* Expanded PayPal sandbox panel */}
+                {/* Expanded demo panel — PayPal sandbox + SEPA simulation */}
                 {showDemoInfo && (
                   <div className="mb-2 border border-yellow-200 dark:border-yellow-800 rounded-xl overflow-hidden">
                     {/* Demo notice */}
                     <div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 flex items-start gap-2 border-b border-yellow-200 dark:border-yellow-800">
                       <Info size={14} className="text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
                       <p className="text-xs text-yellow-800 dark:text-yellow-300">
-                        <strong>Demo Mode:</strong> This uses a PayPal Sandbox environment. No real money is transferred. Use sandbox test credentials to complete the payment flow.
+                        <strong>Demo Mode:</strong> These demos use sandbox environments. No real money is transferred.
+                        Use test credentials to explore the payment flows.
                       </p>
                     </div>
-                    {/* PayPal buttons */}
-                    <div className="px-4 py-4 bg-white dark:bg-gray-800">
+
+                    {/* PayPal sandbox buttons */}
+                    <div className="px-4 pt-4 pb-2 bg-white dark:bg-gray-800 border-b border-yellow-100 dark:border-yellow-800">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        PayPal or Credit/Debit Card
+                      </p>
                       {parseFloat(amount) > 0 ? (
                         <PayPalButtons
                           style={{ layout: 'vertical', label: 'pay' }}
@@ -974,6 +991,30 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                         </div>
                       )}
                     </div>
+
+                    {/* SEPA simulation button — only shown if recipient has IBAN set */}
+                    {recipientPaymentMethods?.encryptedIBAN && (
+                      <div className="px-4 py-4 bg-white dark:bg-gray-800">
+                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                          SEPA Bank Transfer Simulation
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleSepaPayment}
+                          disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
+                          className="w-full flex items-center gap-3 p-3 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center group-hover:bg-indigo-200 transition shrink-0">
+                            <Landmark size={18} className="text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">SEPA Payment Demo</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Simulated bank-to-bank transfer — no real funds moved</p>
+                          </div>
+                          <ArrowRight size={16} className="text-gray-400 group-hover:text-indigo-500 transition shrink-0" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

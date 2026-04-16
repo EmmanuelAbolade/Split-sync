@@ -49,6 +49,13 @@ jest.mock('../utils/biometric', () => ({
   authenticateWithBiometric: jest.fn(() => Promise.resolve(true)),
 }));
 
+// decryptData is called when fetching recipient payment methods to expose
+// the plain-text IBAN from the stored encryptedIBAN field.
+jest.mock('../utils/encryption', () => ({
+  decryptData: jest.fn((val) => `DECRYPTED-${val}`),
+  encryptData: jest.fn((val) => `ENCRYPTED-${val}`),
+}));
+
 // Return empty array to prevent crash from .length on undefined
 jest.mock('../utils/paymentLinks', () => ({
   generatePayPalLink: jest.fn(() => 'https://paypal.me/bob_paypal'),
@@ -879,7 +886,13 @@ describe('SettleUpModal - SEPA payment flow', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    // Recipient has an IBAN so the SEPA button is visible
+    // Restore decryptData so it returns a usable plain-text IBAN.
+    // This allows encryptedIBAN to be resolved into the iban key that
+    // getAvailablePaymentMethods and the SEPA demo button depend on.
+    const { decryptData } = require('../utils/encryption');
+    decryptData.mockImplementation((val) => `DECRYPTED-${val}`);
+    // Recipient has an IBAN so the SEPA demo button is visible inside the
+    // Future Feature panel.
     const { getDoc } = require('firebase/firestore');
     getDoc.mockResolvedValue({
       exists: () => true,
@@ -889,20 +902,28 @@ describe('SettleUpModal - SEPA payment flow', () => {
     });
   });
 
-  test('clicking SEPA Bank Transfer opens SepaPaymentModal', async () => {
-    renderModal();
+  // Helper — expands the Future Feature collapsible panel then clicks SEPA demo
+  const expandAndClickSEPA = async () => {
     await waitFor(() =>
-      expect(screen.getByText('SEPA Bank Transfer')).toBeInTheDocument()
+      expect(screen.getByText('Future feature - Settlement Payment Flow')).toBeInTheDocument()
     );
-    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    fireEvent.click(screen.getByText('Future feature - Settlement Payment Flow'));
+    await waitFor(() =>
+      expect(screen.getByText('SEPA Payment Demo')).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByText('SEPA Payment Demo'));
+  };
+
+  test('clicking SEPA Payment Demo inside Future Feature panel opens SepaPaymentModal', async () => {
+    renderModal();
+    await expandAndClickSEPA();
     expect(screen.getByTestId('sepa-modal')).toBeInTheDocument();
   });
 
   test('SEPA success callback calls recordPaymentSent and shows success screen', async () => {
     const { recordPaymentSent } = require('../stores/notificationsStore');
     renderModal();
-    await waitFor(() => screen.getByText('SEPA Bank Transfer'));
-    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    await expandAndClickSEPA();
     await act(async () => {
       fireEvent.click(screen.getByText('Complete SEPA'));
     });
@@ -920,8 +941,7 @@ describe('SettleUpModal - SEPA payment flow', () => {
     recordPaymentSent.mockRejectedValueOnce(err);
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
-    await waitFor(() => screen.getByText('SEPA Bank Transfer'));
-    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    await expandAndClickSEPA();
     await act(async () => {
       fireEvent.click(screen.getByText('Complete SEPA'));
     });
@@ -938,8 +958,7 @@ describe('SettleUpModal - SEPA payment flow', () => {
     recordPaymentSent.mockRejectedValueOnce(new Error('Network error'));
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
-    await waitFor(() => screen.getByText('SEPA Bank Transfer'));
-    fireEvent.click(screen.getByText('SEPA Bank Transfer'));
+    await expandAndClickSEPA();
     await act(async () => {
       fireEvent.click(screen.getByText('Complete SEPA'));
     });
