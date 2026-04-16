@@ -1,4 +1,4 @@
-# Split-Sync 💰
+# Split-Sync
 
 > A modern Progressive Web Application for seamless smart group expense management, bill splitting, and group payment tracking with integrated payment solutions built as a Final Year Project at SETU Carlow.
 
@@ -9,6 +9,7 @@
 - **Doxygen Documentation**: [https://splitsync-docs.netlify.app](https://splitsync-docs.netlify.app)
 - **Test Coverage Report**: [https://splitsync-coverage-test.netlify.app](https://splitsync-coverage-test.netlify.app)
 - **Documentation**: [View Docs](./docs)
+- **Showcase URL**: [https://showcase.setu.ie/C00288657/index.html](https://showcase.setu.ie/C00288657/index.html)
 
 
 ## Table of Contents
@@ -46,7 +47,8 @@
 - **Smart Contact Sync**: Find friends using Split-Sync through privacy-preserving phone number matching
 - **Real-Time Notifications**: Instant updates for expenses, settlements, and group activities
 - **Advanced Split Methods**: Equal splits, percentage-based, exact amounts, and shares
-- **Receipt Scanning**: OCR-powered receipt scanning with Google Cloud Vision API (planned)
+- **Receipt Scanning**: OCR-powered receipt scanning with Google Cloud Vision API
+
 
 
 
@@ -84,17 +86,27 @@
 - **Expense History**: Complete activity timeline with filters
 - **Settlement Suggestions**: Smart balance calculation and optimal settlement paths
 - **CSV and PDF Report Export**: Report generated for use in spreadsheet and printable browser print dialogue
-- **Expense Management**: Edit and delete expenses (owner only) if no member or all settled up
+- **Expense Management**: Edit, archive, or remove expenses (creator only). 
+  Archived expenses stay in balances but are hidden from the active list and 
+  can be restored. Removed expenses are excluded from balances and cannot be undone
+- **Built-in Split Calculator**: Inline number pad inside the Add Expense modal — 
+  calculate amounts directly without leaving the app. Available on the amount 
+  field (inserts result) and the Exact Amounts split section (copies result for 
+  pasting into member fields)
 
 #### **Payment Integration**
 - **PayPal Integration**: Direct payment links with PayPal
 - **Revolut Support**: Payment links for Revolut users
-- **SEPA Bank Transfers**: IBAN validation and transfer details
+- **SEPA Bank Transfers**: IBAN validation and transfer details. Quick payment Options with copy button for manual bank transfer. SEPA Demo Simulation availble in future feature panel. 
 - **Manual Settlements**: Mark payments as sent/received offline outside the app
 - **Payment confirmation**: Payee confirms or declines receipt
 - **Biometric Confirmation**: Secure payment authorization
 - **Amount Validation**: Method-specific limits (PayPal: €0.01-€60,000, SEPA: €0.01-€999,999.99)
 - **Personal Payment Activity**: My Payment Activity section tracks all payment statuses in real time
+- **Dashboard Settlement Suggestion**: Highlights your highest outstanding debt 
+  across all groups with a direct Settle shortcut
+- **Payment Retry**: Declined payments show a Retry button in My Payment Activity 
+  inside each group
 
 #### **Notifications System**
 - **Real-Time Notifications**: Bell icon with unread badge
@@ -112,6 +124,8 @@
 - PayPal, Revolut, and SEPA payment methods supported
 - Input validation enforced on all payment fields with strict length limits
 - Display name changed, sync across Firebase Auth, Firestore, and all group member arrays in real time
+- Tapping Owed to You or You Owe on the Profile page opens a balance breakdown 
+  showing which groups and people make up that total
 
 ### **Analytics**
 - Spending Over Time chart (last 6 months)
@@ -171,7 +185,7 @@
 |---|---|
 | Jest | Test runner |
 | React Testing Library | Component testing |
-| Coverage | ~84.37% line coverage, 1,397 passing tests across 52+ suites |
+| Coverage | ~84.37% line coverage, 1,397 passing tests across 52 suites |
 
 ### Security & Privacy
 - **WebAuthn**: Biometric authentication
@@ -638,6 +652,10 @@ This is an academic project (Final Year Project) and is not currently accepting 
 - [x] Onboarding wizard with Settings revisit
 - [x] Embedded video tutorial guides
 - [x] Input validation and maxLength on all payment fields
+- [x] Inline calculator for amount and exact split fields
+- [x] SEPA Bank Transfer Details with full IBAN and copy button for manual payment, encrypted IBAN in future feature 
+- [x] Dashboard suggested settlement card
+- [x] Payment retry on declined payments
 - [x] ~84.73% automated test coverage
 
 ### Planned Features
@@ -685,7 +703,7 @@ This is an academic project (Final Year Project) and is not currently accepting 
 
 ## License
 
-This project is licensed under the **Apache License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Apache License** - see the [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE) file for details.
 ```
 Apache License
 
