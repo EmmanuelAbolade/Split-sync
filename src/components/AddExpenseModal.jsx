@@ -1,6 +1,6 @@
 // src/components/AddExpenseModal.jsx
 import ReceiptScanner from './ReceiptScanner';
-import { Camera } from 'lucide-react';
+import { Camera, Calculator, Copy, Check, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { collection, addDoc, doc, updateDoc, serverTimestamp, getDocs, query, where, deleteDoc  } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -25,6 +25,125 @@ const SPLIT_METHODS = [
   { id: 'shares', name: 'By Shares', description: 'Proportional shares (e.g., 2x, 1x)' },
 ];
 
+// InlineCalculator — mini number pad that evaluates expressions.
+// mode='insert': result inserted directly into the amount field via onUseResult.
+// mode='copy': result copied to clipboard for pasting into exact split fields.
+function InlineCalculator({ onUseResult, mode = 'insert' }) {
+  const [expr, setExpr]     = useState('');
+  const [result, setResult] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  // Safely evaluate a numeric expression — digits and basic operators only.
+  const safeEval = (expression) => {
+    const sanitized = expression
+      .replace(/÷/g, '/')
+      .replace(/×/g, '*')
+      .replace(/[^0-9+\-*/.]/g, '');
+    if (!sanitized) return null;
+    try {
+      // eslint-disable-next-line no-new-func
+      const val = new Function('return ' + sanitized)();
+      if (!isFinite(val) || isNaN(val) || val < 0) return null;
+      return Math.round(val * 100) / 100;
+    } catch { return null; }
+  };
+
+  const press = (key) => {
+    if (key === 'C')  { setExpr(''); setResult(null); return; }
+    if (key === '⌫')  { setExpr(prev => prev.slice(0, -1)); setResult(null); return; }
+    if (key === '=')  { setResult(safeEval(expr)); return; }
+    // Prevent leading double operator
+    const operators = ['+', '-', '÷', '×'];
+    if (operators.includes(key) && operators.includes(expr.slice(-1))) return;
+    setExpr(prev => prev + key);
+    setResult(null);
+  };
+
+  const handleAction = () => {
+    if (result === null) return;
+    const formatted = result.toFixed(2);
+    if (mode === 'insert') {
+      onUseResult(formatted);
+    } else {
+      navigator.clipboard.writeText(formatted).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const rows = [
+    ['7', '8', '9', '÷'],
+    ['4', '5', '6', '×'],
+    ['1', '2', '3', '−'],
+    ['.', '0', '⌫', '+'],
+  ];
+
+  return (
+    <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl">
+      {/* Display */}
+      <div className="mb-2 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 min-h-[3rem]">
+        <p className="text-xs text-gray-400 dark:text-gray-500 font-mono break-all">{expr || '0'}</p>
+        {result !== null && (
+          <p className="text-base font-bold text-indigo-600 dark:text-indigo-400 font-mono">
+            = {result.toFixed(2)}
+          </p>
+        )}
+        {result === null && expr && safeEval(expr) === null && (
+          <p className="text-xs text-red-500 dark:text-red-400">Invalid expression</p>
+        )}
+      </div>
+      {/* Number pad */}
+      <div className="grid grid-cols-4 gap-1 mb-1.5">
+        {rows.flat().map((key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => press(key === '−' ? '-' : key)}
+            className={`py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-95 select-none ${
+              ['÷', '×', '−', '+'].includes(key)
+                ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/60'
+                : key === '⌫'
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                : 'bg-white dark:bg-gray-600 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-500'
+            }`}
+          >
+            {key}
+          </button>
+        ))}
+      </div>
+      {/* Bottom row: equals, clear, action */}
+      <div className="grid grid-cols-3 gap-1">
+        <button
+          type="button"
+          onClick={() => press('=')}
+          className="py-2.5 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 dark:hover:bg-indigo-700 transition active:scale-95"
+        >
+          =
+        </button>
+        <button
+          type="button"
+          onClick={() => press('C')}
+          className="py-2.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-bold hover:bg-gray-300 dark:hover:bg-gray-500 transition active:scale-95"
+        >
+          C
+        </button>
+        <button
+          type="button"
+          onClick={handleAction}
+          disabled={result === null}
+          className="py-2.5 bg-green-600 dark:bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+        >
+          {mode === 'insert'
+            ? 'Use'
+            : copied
+              ? <><Check size={13} /> Copied</>
+              : <><Copy size={13} /> Copy</>}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AddExpenseModal({ isOpen, onClose, group, initialExpense = null }) {
   // isEditing drives all conditional labels and the submit path
   const isEditing = !!initialExpense;
@@ -44,6 +163,9 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showReceiptScanner, setShowReceiptScanner] = useState(false);
   const [scannedData, setScannedData] = useState(null);
+  // Calculator visibility — amount field and exact split section
+  const [showAmountCalc, setShowAmountCalc]   = useState(false);
+  const [showExactCalc,  setShowExactCalc]    = useState(false);
 
       // Initialize members when modal opens
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -615,39 +737,65 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
                 Amount ({group.currency})
                 <Tooltip text="Enter the total amount that was paid for this expense. This will be divided among the selected members based on the split method." />
               </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                value={amount}
-                onChange={(e) => {
-                  const value = e.target.value;
+              {/* Amount input with calculator icon toggle */}
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={amount}
+                  onChange={(e) => {
+                    const value = e.target.value;
 
-                  // Check if amount exceeds limit
-                  if (value && parseFloat(value) > 1000000) {
-                    setError('Amount cannot exceed 1,000,000');
-                    return;
-                  }
-
-                  // Allow empty or valid numbers with max 2 decimals
-                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                    setAmount(value);
-                    if (error && error.includes('Amount cannot exceed')) {
-                      setError(''); // Clear error when user fixes amount
+                    // Check if amount exceeds limit
+                    if (value && parseFloat(value) > 1000000) {
+                      setError('Amount cannot exceed 1,000,000');
+                      return;
                     }
-                  }
-                }}
-                onBlur={(e) => {
-                  // Format to 2 decimals when user leaves field
-                  if (e.target.value && !isNaN(e.target.value)) {
-                    const formatted = parseFloat(e.target.value).toFixed(2);
-                    setAmount(formatted);
-                  }
-                }}
-                placeholder="0.00"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
-                required
-              />
+
+                    // Allow empty or valid numbers with max 2 decimals
+                    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                      setAmount(value);
+                      if (error && error.includes('Amount cannot exceed')) {
+                        setError(''); // Clear error when user fixes amount
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Format to 2 decimals when user leaves field
+                    if (e.target.value && !isNaN(e.target.value)) {
+                      const formatted = parseFloat(e.target.value).toFixed(2);
+                      setAmount(formatted);
+                    }
+                  }}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none"
+                  required
+                />
+                {/* Calculator toggle button — sits inside the amount field */}
+                <button
+                  type="button"
+                  onClick={() => setShowAmountCalc(prev => !prev)}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded transition ${
+                    showAmountCalc
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400'
+                  }`}
+                  title="Open calculator"
+                >
+                  <Calculator size={16} />
+                </button>
+              </div>
+              {/* Inline calculator for amount field */}
+              {showAmountCalc && (
+                <InlineCalculator
+                  mode="insert"
+                  onUseResult={(val) => {
+                    setAmount(val);
+                    setShowAmountCalc(false);
+                  }}
+                />
+              )}
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Maximum: {group.currency} 1,000,000.00
               </p>
@@ -749,6 +897,33 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
               Split Between
               <Tooltip text="Select which group members should pay their share. You can choose everyone or just specific people who participated in this expense." />
             </label>
+
+            {/* Exact split calculator — collapsible panel for calculating per-person amounts */}
+            {splitMethod === 'exact' && (
+              <div className="mb-2">
+                <button
+                  type="button"
+                  onClick={() => setShowExactCalc(prev => !prev)}
+                  className="w-full flex items-center justify-between px-3 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg text-sm text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition"
+                >
+                  <div className="flex items-center gap-2">
+                    <Calculator size={14} />
+                    <span className="font-medium">Split Calculator</span>
+                    <span className="text-xs text-indigo-500 dark:text-indigo-400">
+                      — calculate then copy into each field
+                    </span>
+                  </div>
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${showExactCalc ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {showExactCalc && (
+                  <InlineCalculator mode="copy" />
+                )}
+              </div>
+            )}
+
             <div className="space-y-2 max-h-40 overflow-y-auto bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
               {group?.members?.map((member) => (
                 <label
