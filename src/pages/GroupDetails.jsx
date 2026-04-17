@@ -12,7 +12,7 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, XCircle, LogOut, Trash2, MoreVertical, Download
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, AlertCircle, XCircle, LogOut, Trash2, MoreVertical, Download
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -93,7 +93,7 @@ export default function GroupDetails() {
   // Derive pending settlement data from the global notifications store.
   // This avoids a separate Firestore query and requires no new collection.
   const { notifications: allNotifications } = useNotificationsStore();
-
+  
   // payment_confirmation_needed notifications addressed to THIS user for THIS group
   // Used to show payee confirm/decline banners and payer "awaiting" banners
   const groupPaymentActions = allNotifications.filter(
@@ -1318,6 +1318,38 @@ export default function GroupDetails() {
                           Not involved
                         </div>
                       )}
+
+                      {/* Payment status badge — visible when payer has a pending or
+                          declined payment log for this settlement pair.
+                          Tapping scrolls to My Payment Activity section. */}
+                      {(() => {
+                        const log = groupPaymentLog.find(
+                          n => n.data?.payeeId === settlement.to &&
+                               user.uid === settlement.from
+                        );
+                        if (!log) return null;
+                        const isPending  = log.status === 'pending_confirmation';
+                        const isDeclined = log.status === 'declined';
+                        if (!isPending && !isDeclined) return null;
+                        return (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              refHistory.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                            }
+                            className={`mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                              isDeclined
+                                ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-700'
+                                : 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700'
+                            }`}
+                          >
+                            {isDeclined
+                              ? <><AlertCircle size={12} /> Declined — tap to retry</>
+                              : <><Clock size={12} /> Awaiting confirmation — tap to view</>
+                            }
+                          </button>
+                        );
+                      })()}
                     </div>
                   </div>
                 );
