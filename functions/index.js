@@ -158,6 +158,12 @@ Expenses:
   above the member list — tap it to expand the same number pad, calculate your 
   value, tap = then Copy, and paste the result into any member's amount field. 
   This is useful when dividing large or decimal amounts across members.
+  - In the Recent Expenses list inside a group, settlement records are shown 
+  with a green Settlement badge to distinguish them from regular expenses. 
+  Settlements cannot be archived. Only expenses you added yourself can be 
+  archived — you cannot archive another member's expense. A note below the 
+  Recent Expenses header reminds you of this. Archived expenses are visible 
+  on the Activity page.
 
 Archiving and removing expenses:
 - To keep your expense list tidy, you can archive old expenses. Tap an expense to open it, then tap the Archive button. Archived expenses are hidden from your active list but still count toward group balances. You can restore them at any time.
@@ -184,10 +190,12 @@ Balances and settling up:
   to clear all balances in that group with the minimum number of transactions. Each 
   suggestion shows who pays who and how much. Tap Pay on any suggestion to open 
   the Settle Up flow for that specific payment.
-  - Inside each group, the My Payment Activity section shows the status of payments 
-  you have sent: Awaiting Confirmation, Confirmed, or Declined. If a payment is 
-  declined by the payee, a Retry Payment button appears — tap it to open the 
-  Settle Up flow and try again.
+  - Inside each group, the My Payment Activity section shows the status of 
+  payments you have sent: Awaiting Confirmation, Confirmed, or Declined. 
+  If a payment is declined, a Retry Payment button appears. Confirmed payments 
+  can be dismissed from your active list using the Dismiss button — they are 
+  not deleted and can be restored at any time from the Dismissed tab inside 
+  the same section.
   - When someone sends you a payment, you will receive a notification asking you to 
   confirm or decline receipt. Go to the notification or the group and tap Confirm 
   Receipt if the money arrived, or Decline if it did not. Declining notifies the 
@@ -196,6 +204,11 @@ Balances and settling up:
   appears on the Dashboard. Tap Review to go to the group and confirm or decline.
   - On the Profile page, tap either the Owed to You or You Owe card to see a full 
   breakdown showing which groups and which people make up that total.
+  - Inside each group, the Settlement Summary shows a status badge on any row 
+  where you have a payment awaiting confirmation or a declined payment. 
+  An amber badge means the payment is awaiting confirmation from the payee. 
+  A red badge means the payment was declined. Tap either badge to scroll 
+  directly to My Payment Activity for details.
 
 Activity page:
 - The Activity page shows all expenses across all your groups in chronological order.
@@ -208,7 +221,9 @@ Payment methods:
 - You can add PayPal (your PayPal.me username, max 20 characters), Revolut (@username, max 30 characters), or SEPA bank transfer (IBAN, max 34 characters, and optional BIC/SWIFT code, max 11 characters).
 - Your IBAN is encrypted before being stored. It is never stored in plain text.
 - You only need one payment method. Add more to give group members more options.
-- PayPal and Revolut open a direct payment link and copy the amount to your clipboard automatically. SEPA generates your bank transfer details.
+- PayPal and Revolut open a direct payment link and copy the amount to your clipboard automatically. SEPA generates your bank transfer details. When the SEPA demo simulation completes successfully, the group balance 
+  updates immediately without requiring the payee to confirm receipt — 
+  this is intentional for demonstration purposes only.
 
 Analytics:
 - Navigate to Stats from the bottom navigation bar.
