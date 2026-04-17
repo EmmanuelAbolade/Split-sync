@@ -920,25 +920,22 @@ describe('SettleUpModal - SEPA payment flow', () => {
     expect(screen.getByTestId('sepa-modal')).toBeInTheDocument();
   });
 
-  test('SEPA success callback calls recordPaymentSent and shows success screen', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
+  test('SEPA success callback calls addDoc directly and shows success screen', async () => {
+    const { addDoc } = require('firebase/firestore');
     renderModal();
     await expandAndClickSEPA();
     await act(async () => {
       fireEvent.click(screen.getByText('Complete SEPA'));
     });
-    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledWith(
-      expect.objectContaining({ method: 'sepa', groupId: 'group-1' })
-    ));
+    await waitFor(() => expect(addDoc).toHaveBeenCalled());
     await waitFor(() =>
       expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
     );
   });
 
-  test('SEPA success shows permission-denied error when recordPaymentSent is rejected', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    const err = Object.assign(new Error('denied'), { code: 'permission-denied' });
-    recordPaymentSent.mockRejectedValueOnce(err);
+  test('SEPA success shows error when addDoc fails', async () => {
+    const { addDoc } = require('firebase/firestore');
+    addDoc.mockRejectedValueOnce(new Error('Firestore write failed'));
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
     await expandAndClickSEPA();
@@ -947,15 +944,15 @@ describe('SettleUpModal - SEPA payment flow', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByText('Permission denied. Ensure you are signed in and try again.')
+        screen.getByText('Payment processed but failed to update balances. Please try again.')
       ).toBeInTheDocument()
     );
     consoleSpy.mockRestore();
   });
 
-  test('SEPA success shows generic error when recordPaymentSent fails', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    recordPaymentSent.mockRejectedValueOnce(new Error('Network error'));
+  test('SEPA success shows error when createNotification fails', async () => {
+    const { createNotification } = require('../stores/notificationsStore');
+    createNotification.mockRejectedValueOnce(new Error('Network error'));
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
     await expandAndClickSEPA();
@@ -964,9 +961,7 @@ describe('SettleUpModal - SEPA payment flow', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByText(
-          'Payment processed but notification failed to send. Please contact support.'
-        )
+        screen.getByText('Payment processed but failed to update balances. Please try again.')
       ).toBeInTheDocument()
     );
     consoleSpy.mockRestore();

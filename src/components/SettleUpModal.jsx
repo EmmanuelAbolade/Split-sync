@@ -311,40 +311,54 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setShowSepaModal(true);
   };
 
-  // Handle SEPA payment success.
-  // Previously wrote the expense directly, bypassing recordPaymentSent — the payee
-  // received no notification and the balance updated without their confirmation.
-  // Now uses the same confirmation flow as PayPal and Revolut: recordPaymentSent
-  // sends the payee a payment_confirmation_needed notification. The expense (and
-  // balance update) only happens after the payee confirms receipt.
+  // Handle SEPA demo simulation success.
+  // The demo simulates a completed transfer so balances update immediately
+  // without requiring payee confirmation — appropriate for demo purposes only.
   const handleSepaPaymentSuccess = async (paymentResult) => {
     try {
-      await recordPaymentSent({
-        payerId: settlement.from,
-        payerName: fromMember?.name || 'Unknown',
-        payeeId: settlement.to,
-        payeeName: toMember?.name || 'Unknown',
+      const amountNum = paymentResult.amount;
+
+      // Write settlement expense directly — same as a confirmed payment
+      await addDoc(collection(db, 'expenses'), {
         groupId: group.id,
-        groupName: group.name,
-        amount: paymentResult.amount,
+        title: `Settlement: ${fromMember?.name} → ${toMember?.name}`,
+        amount: amountNum,
         currency: group.currency,
-        method: 'sepa',
+        paidBy: settlement.from,
+        category: 'settlement',
+        description: 'SEPA Demo Payment (simulated)',
+        date: new Date(),
+        splitMethod: 'exact',
+        splits: { [settlement.to]: amountNum },
+        participants: [settlement.from, settlement.to],
+        createdAt: serverTimestamp(),
+        isSettlement: true,
+        paymentMethod: 'sepa',
+        recordedBy: currentUserId,
+      });
+
+      // Notify the payee that payment was received — no confirmation needed
+      await createNotification({
+        userId: settlement.to,
+        type: 'payment',
+        title: 'Payment Received',
+        message: `${fromMember?.name} paid you ${group.currency} ${amountNum.toFixed(2)} via SEPA in ${group.name}`,
+        data: {
+          groupId: group.id,
+          amount: amountNum,
+          currency: group.currency,
+          fromUserId: settlement.from,
+          fromName: fromMember?.name,
+        },
       });
 
       setPaymentSuccess(true);
       setShowSepaModal(false);
-
-      setTimeout(() => {
-        onClose();
-      }, 2500);
+      setTimeout(() => onClose(), 2500);
 
     } catch (err) {
-      console.error('Error recording SEPA settlement:', err);
-      setError(
-        err?.code === 'permission-denied'
-          ? 'Permission denied. Ensure you are signed in and try again.'
-          : 'Payment processed but notification failed to send. Please contact support.'
-      );
+      console.error('Error recording SEPA demo settlement:', err);
+      setError('Payment processed but failed to update balances. Please try again.');
     }
   };
 
