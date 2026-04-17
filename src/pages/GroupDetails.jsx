@@ -1671,6 +1671,9 @@ export default function GroupDetails() {
                     {expenses.length} expense{expenses.length !== 1 ? 's' : ''} • Total: {group.currency} {expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
                   </p>
                 )}
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  Archived expenses are visible on the Activity page.
+                </p>
               </div>
             </div>
             <button
