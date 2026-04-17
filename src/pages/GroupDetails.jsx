@@ -12,7 +12,7 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, AlertCircle, XCircle, LogOut, Trash2, MoreVertical, Download
+  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, X, AlertCircle, XCircle, LogOut, Trash2, MoreVertical, Download
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -69,6 +69,8 @@ export default function GroupDetails() {
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [settlementActionLoading, setSettlementActionLoading] = useState({});
   const [showPaymentHistory, setShowPaymentHistory] = useState(true);
+  // Active = non-dismissed entries, Dismissed = dismissed confirmed entries
+  const [paymentActivityTab, setPaymentActivityTab] = useState('active');
   const [showGroupOptions, setShowGroupOptions] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [showConfirmLeave, setShowConfirmLeave] = useState(false);
@@ -107,6 +109,10 @@ export default function GroupDetails() {
   const groupPaymentLog = allNotifications.filter(
     n => n.data?.groupId === groupId && n.type === 'payment_log'
   );
+
+  // Split into active (not dismissed) and dismissed confirmed entries
+  const activePaymentLog    = groupPaymentLog.filter(n => !n.dismissed);
+  const dismissedPaymentLog = groupPaymentLog.filter(n => n.dismissed);
 
   // Get display title with current names for settlements
   const getDisplayTitle = (expense) => {
@@ -1454,7 +1460,7 @@ export default function GroupDetails() {
                   My Payment Activity
                 </h3>
                 <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full">
-                  {groupPaymentLog.length}
+                  {activePaymentLog.length}
                 </span>
               </div>
               <ChevronDown
@@ -1462,101 +1468,182 @@ export default function GroupDetails() {
                 className={`text-gray-400 dark:text-gray-500 transition-transform duration-300 ${showPaymentHistory ? 'rotate-180' : ''}`}
               />
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 text-left">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-left">
               Payments you have initiated — awaiting confirmation, confirmed, or declined.
             </p>
 
             {showPaymentHistory && (
-              <div className="space-y-3">
-                {groupPaymentLog.map((record) => {
-                  // payment_log uses notification-level status field
-                  const status = record.status || 'pending_confirmation';
-                  const pd = record.data || {};
-
-                  const statusConfig = {
-                    pending_confirmation: {
-                      label: 'Awaiting Confirmation',
-                      icon: <Clock size={14} className="text-amber-600 dark:text-amber-400" />,
-                      pill: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
-                      border: 'border-amber-200 dark:border-amber-800',
-                      bg: 'bg-amber-50 dark:bg-amber-900/10',
-                      hint: `Waiting for ${pd.payeeName} to confirm receipt.`,
-                    },
-                    confirmed: {
-                      label: 'Confirmed',
-                      icon: <CheckCircle2 size={14} className="text-green-600 dark:text-green-400" />,
-                      pill: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
-                      border: 'border-green-200 dark:border-green-800',
-                      bg: 'bg-green-50 dark:bg-green-900/10',
-                      hint: `${pd.payeeName} confirmed receiving this payment. Balance updated.`,
-                    },
-                    declined: {
-                      label: 'Not Confirmed',
-                      icon: <XCircle size={14} className="text-red-600 dark:text-red-400" />,
-                      pill: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
-                      border: 'border-red-200 dark:border-red-800',
-                      bg: 'bg-red-50 dark:bg-red-900/10',
-                      hint: `${pd.payeeName} could not confirm this payment. Use Retry to try again.`,
-                    },
-                  };
-
-                  const cfg = statusConfig[status] || statusConfig.pending_confirmation;
-                  const date = formatDate(record.createdAt);
-
-                  return (
-                    <div
-                      key={record.id}
-                      className={`flex items-start gap-4 p-4 rounded-xl border ${cfg.border} ${cfg.bg} transition-all duration-200`}
+              <>
+                {/* Active / Dismissed tab pills */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentActivityTab('active')}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                      paymentActivityTab === 'active'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    Active ({activePaymentLog.length})
+                  </button>
+                  {dismissedPaymentLog.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setPaymentActivityTab('dismissed')}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                        paymentActivityTab === 'dismissed'
+                          ? 'bg-gray-600 text-white'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-sm">
-                        <DollarSign size={18} className="text-indigo-500 dark:text-indigo-400" />
-                      </div>
+                      Dismissed ({dismissedPaymentLog.length})
+                    </button>
+                  )}
+                </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {pd.currency} {Number(pd.amount).toFixed(2)}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            to {pd.payeeName}
-                          </span>
-                          <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.pill}`}>
-                            {cfg.icon}
-                            {cfg.label}
-                          </span>
+                {/* Entry list */}
+                <div className="space-y-3">
+                  {(paymentActivityTab === 'active' ? activePaymentLog : dismissedPaymentLog).map((record) => {
+                    const status = record.status || 'pending_confirmation';
+                    const pd = record.data || {};
+                    const isDismissed = !!record.dismissed;
+
+                    const statusConfig = {
+                      pending_confirmation: {
+                        label: 'Awaiting Confirmation',
+                        icon: <Clock size={14} className="text-amber-600 dark:text-amber-400" />,
+                        pill: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+                        border: 'border-amber-200 dark:border-amber-800',
+                        bg: 'bg-amber-50 dark:bg-amber-900/10',
+                        hint: `Waiting for ${pd.payeeName} to confirm receipt.`,
+                      },
+                      confirmed: {
+                        label: 'Confirmed',
+                        icon: <CheckCircle2 size={14} className="text-green-600 dark:text-green-400" />,
+                        pill: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
+                        border: 'border-green-200 dark:border-green-800',
+                        bg: 'bg-green-50 dark:bg-green-900/10',
+                        hint: `${pd.payeeName} confirmed receiving this payment. Balance updated.`,
+                      },
+                      declined: {
+                        label: 'Not Confirmed',
+                        icon: <XCircle size={14} className="text-red-600 dark:text-red-400" />,
+                        pill: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
+                        border: 'border-red-200 dark:border-red-800',
+                        bg: 'bg-red-50 dark:bg-red-900/10',
+                        hint: `${pd.payeeName} could not confirm this payment. Use Retry to try again.`,
+                      },
+                    };
+
+                    const cfg = statusConfig[status] || statusConfig.pending_confirmation;
+                    const date = formatDate(record.createdAt);
+
+                    return (
+                      <div
+                        key={record.id}
+                        className={`flex items-start gap-4 p-4 rounded-xl border ${cfg.border} ${cfg.bg} transition-all duration-200`}
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-sm">
+                          <DollarSign size={18} className="text-indigo-500 dark:text-indigo-400" />
                         </div>
 
-                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1 flex-wrap">
-                          <span className="uppercase font-medium tracking-wide">{pd.method}</span>
-                          <span>•</span>
-                          <span>{date}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {pd.currency} {Number(pd.amount).toFixed(2)}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              to {pd.payeeName}
+                            </span>
+                            <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.pill}`}>
+                              {cfg.icon}
+                              {cfg.label}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1 flex-wrap">
+                            <span className="uppercase font-medium tracking-wide">{pd.method}</span>
+                            <span>•</span>
+                            <span>{date}</span>
+                          </div>
+
+                          <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                            {cfg.hint}
+                          </p>
+
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            {/* Retry — declined entries only */}
+                            {status === 'declined' && !isDismissed && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const matching = settlements.find(
+                                    s => s.from === user.uid && s.to === pd.payeeId
+                                  );
+                                  if (matching) setSelectedSettlement(matching);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 dark:bg-indigo-700 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition"
+                              >
+                                <DollarSign size={12} />
+                                Retry Payment
+                              </button>
+                            )}
+
+                            {/* Dismiss — confirmed entries only */}
+                            {status === 'confirmed' && !isDismissed && (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    await updateDoc(doc(db, 'notifications', record.id), {
+                                      dismissed: true,
+                                    });
+                                  } catch (e) {
+                                    console.error('Failed to dismiss payment record:', e);
+                                  }
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition"
+                                title="Dismiss this confirmed payment from your active list"
+                              >
+                                <X size={12} />
+                                Dismiss
+                              </button>
+                            )}
+
+                            {/* Restore — dismissed entries only */}
+                            {isDismissed && (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    await updateDoc(doc(db, 'notifications', record.id), {
+                                      dismissed: false,
+                                    });
+                                  } catch (e) {
+                                    console.error('Failed to restore payment record:', e);
+                                  }
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 border border-green-200 dark:border-green-700 transition"
+                              >
+                                <CheckCircle2 size={12} />
+                                Restore
+                              </button>
+                            )}
+                          </div>
                         </div>
-
-                        <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                          {cfg.hint}
-                        </p>
-
-                        {/* Retry button only appears when the payment was declined */}
-                        {status === 'declined' && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const matching = settlements.find(
-                                s => s.from === user.uid && s.to === pd.payeeId
-                              );
-                              if (matching) setSelectedSettlement(matching);
-                            }}
-                            className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 dark:bg-indigo-700 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition"
-                          >
-                            <DollarSign size={12} />
-                            Retry Payment
-                          </button>
-                        )}
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+
+                  {/* Empty state for dismissed tab */}
+                  {paymentActivityTab === 'dismissed' && dismissedPaymentLog.length === 0 && (
+                    <p className="text-xs text-center text-gray-400 dark:text-gray-500 py-4">
+                      No dismissed payments yet.
+                    </p>
+                  )}
+                </div>
+              </>
             )}
           </div>
         )}
