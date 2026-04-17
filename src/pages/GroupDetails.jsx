@@ -1672,7 +1672,7 @@ export default function GroupDetails() {
                   </p>
                 )}
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  Archived expenses are visible on the Activity page.
+                  You can only archive expenses you added. Archived expenses are visible on the Activity page.
                 </p>
               </div>
             </div>
