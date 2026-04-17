@@ -1716,27 +1716,40 @@ export default function GroupDetails() {
                     const payer = group.members?.find(m => m.userId === expense.paidBy);
                     const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
 
+                    const isSettlement = !!expense.isSettlement;
+
                     return (
                       <div
                         key={expense.id}
                         onClick={() => setSelectedExpense(expense)}
-                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-indigo-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover dark:hover:shadow-gray-900/50 cursor-pointer bg-white dark:bg-gray-700 shadow-card dark:shadow-gray-900/50"
+                        className={`p-4 border rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover dark:hover:shadow-gray-900/50 cursor-pointer shadow-card dark:shadow-gray-900/50 ${
+                          isSettlement
+                            ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10 hover:border-green-400 dark:hover:border-green-600'
+                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-primary dark:hover:border-indigo-500'
+                        }`}
                       >
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h4 className="font-semibold text-gray-900 dark:text-white">{getDisplayTitle(expense)}</h4>
-                
-                              {/* Category Icon Badge */}
-                              <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
-                                {(() => {
-                                  const CategoryIcon = getCategoryIcon(expense.category);
-                                  return <CategoryIcon size={14} className="text-gray-600 dark:text-gray-400" />;
-                                })()}
-                                <span className="text-xs text-gray-600 dark:text-gray-400 capitalize">{expense.category}</span>
-                              </div>
+
+                              {/* Settlement badge — replaces category badge for settlement entries */}
+                              {isSettlement ? (
+                                <span className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded text-xs font-medium">
+                                  <CheckCircle2 size={12} />
+                                  Settlement
+                                </span>
+                              ) : (
+                                <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
+                                  {(() => {
+                                    const CategoryIcon = getCategoryIcon(expense.category);
+                                    return <CategoryIcon size={14} className="text-gray-600 dark:text-gray-400" />;
+                                  })()}
+                                  <span className="text-xs text-gray-600 dark:text-gray-400 capitalize">{expense.category}</span>
+                                </div>
+                              )}
                             </div>
-              
+
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                               Paid by {payer?.name || 'Unknown'}
                             </p>
@@ -1745,7 +1758,7 @@ export default function GroupDetails() {
                             )}
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-bold text-gray-900 dark:text-white">
+                            <p className={`text-lg font-bold ${isSettlement ? 'text-green-700 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
                               {expense.currency} {expense.amount.toFixed(2)}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -1754,12 +1767,21 @@ export default function GroupDetails() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                          <Users size={14} className="text-gray-400 dark:text-gray-500" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            Split {expense.splitMethod} among {expense.participants?.length || 0} member
-                            {expense.participants?.length !== 1 ? 's' : ''}
-                          </span>
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center gap-2">
+                            <Users size={14} className="text-gray-400 dark:text-gray-500" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              {isSettlement
+                                ? 'Payment settlement record'
+                                : `Split ${expense.splitMethod} among ${expense.participants?.length || 0} member${expense.participants?.length !== 1 ? 's' : ''}`}
+                            </span>
+                          </div>
+                          {/* Settlement entries cannot be archived — show a note instead */}
+                          {isSettlement && (
+                            <span className="text-xs text-green-600 dark:text-green-400 italic">
+                              Cannot be archived
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
