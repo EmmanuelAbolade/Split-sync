@@ -55,13 +55,12 @@ function ProtectedLayout({ children }) {
       {!hideBottomNav && <BottomNav />}
       <SplitSyncChat />
       {/* Session timeout warning modal */}
-      {showWarning && (
-        <SessionTimeoutWarning
-          countdown={countdown}
-          onStayLoggedIn={stayLoggedIn}
-          onLogout={logoutNow}
-        />
-      )}
+      <SessionTimeoutWarning
+        isOpen={showWarning}
+        countdown={countdown}
+        onStayLoggedIn={stayLoggedIn}
+        onLogoutNow={logoutNow}
+      />
     </>
   );
 }
