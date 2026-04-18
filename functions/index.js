@@ -253,6 +253,14 @@ Other features:
 - CSV and PDF export is available inside each group to download your expense history. Tap the three-dot menu 
   in the top right of the group page and select Export CSV or Export PDF. 
   The option only appears when the group has at least one expense.
+- To permanently delete your account, go to Settings and scroll to the 
+  Danger Zone section. Tap Delete Account. A confirmation modal will appear 
+  listing exactly what will be deleted: all groups you own, all your expenses, 
+  your membership in shared groups, and all your account data. You must enter 
+  your password to confirm. This action cannot be undone and you will be 
+  signed out immediately. Note: if you signed in with Google, you may need 
+  to re-authenticate before deletion is allowed. Groups you are a member of 
+  but did not create will not be deleted — only groups you own are removed.
 
 ${userContext && userContext.groupCount > 0
   ? `User context: The user has ${userContext.groupCount} group(s) in Split-Sync.`
