@@ -190,7 +190,7 @@ export const useSessionTimeout = () => {
     }
     
     // Activity events to track
-    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
     
     const handleActivity = () => {
       const now = Date.now();
