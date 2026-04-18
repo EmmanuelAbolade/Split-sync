@@ -12,7 +12,7 @@ import {
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
   Utensils, Music, Briefcase, GraduationCap, Gift,
-  ArrowLeft, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, X, AlertCircle, XCircle, LogOut, Trash2, MoreVertical, Download
+  ArrowLeft, ArrowLeftRight, UserPlus, Plus, Link as LinkIcon, UtensilsCrossed, Lightbulb, Tag, ChevronDown, Landmark, CheckCircle2, Clock, Mail, DollarSign, AlertTriangle, X, AlertCircle, XCircle, LogOut, Trash2, MoreVertical, Download
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
@@ -1455,7 +1455,7 @@ export default function GroupDetails() {
               className="w-full flex items-center justify-between mb-1"
             >
               <div className="flex items-center gap-2">
-                <DollarSign size={20} className="text-indigo-500 dark:text-indigo-400" />
+                <ArrowLeftRight size={20} className="text-indigo-500 dark:text-indigo-400" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   My Payment Activity
                 </h3>
@@ -1545,7 +1545,7 @@ export default function GroupDetails() {
                         className={`flex items-start gap-4 p-4 rounded-xl border ${cfg.border} ${cfg.bg} transition-all duration-200`}
                       >
                         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shadow-sm">
-                          <DollarSign size={18} className="text-indigo-500 dark:text-indigo-400" />
+                          <ArrowLeftRight size={18} className="text-indigo-500 dark:text-indigo-400" />
                         </div>
 
                         <div className="flex-1 min-w-0">
