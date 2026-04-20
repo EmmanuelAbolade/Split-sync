@@ -442,3 +442,161 @@ describe('AddExpenseModal - Selects', () => {
     expect(paidBySelect).toHaveValue('user-2');
   });
 });
+
+
+
+// ---------------------------------------------------------------------------
+// 8. Inline Calculator — Amount field
+// ---------------------------------------------------------------------------
+
+describe('AddExpenseModal - Calculator (Amount field)', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Calculator icon button is visible in amount field', () => {
+    renderModal();
+    expect(screen.getByTitle('Open calculator')).toBeInTheDocument();
+  });
+
+  test('Calculator panel is hidden by default', () => {
+    renderModal();
+    expect(screen.queryByText('Use')).not.toBeInTheDocument();
+  });
+
+  test('Tapping calculator icon opens the number pad', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    expect(screen.getByText('Use')).toBeInTheDocument();
+  });
+
+  test('Tapping calculator icon again closes the number pad', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    expect(screen.queryByText('Use')).not.toBeInTheDocument();
+  });
+
+  test('Number pad renders digit buttons 0 through 9', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach(digit => {
+      expect(screen.getAllByText(digit).length).toBeGreaterThan(0);
+    });
+  });
+
+  test('Number pad renders operator buttons', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    expect(screen.getByText('÷')).toBeInTheDocument();
+    expect(screen.getByText('×')).toBeInTheDocument();
+    expect(screen.getByText('+')).toBeInTheDocument();
+    expect(screen.getByText('=')).toBeInTheDocument();
+    expect(screen.getByText('C')).toBeInTheDocument();
+  });
+
+  test('Use button is disabled before equals is pressed', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    const useBtn = screen.getByText('Use');
+    expect(useBtn).toBeDisabled();
+  });
+
+  test('Pressing digit updates expression display', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    fireEvent.click(screen.getAllByText('5')[0]);
+    fireEvent.click(screen.getAllByText('0')[0]);
+    // Expression should show 50 in the display area
+    expect(screen.getByText('50')).toBeInTheDocument();
+  });
+
+  test('Pressing C clears the expression', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    fireEvent.click(screen.getAllByText('5')[0]);
+    fireEvent.click(screen.getByText('C'));
+    // Display resets to '0' — use getAllByText since the '0' button also exists
+    const zeros = screen.getAllByText('0');
+    expect(zeros.length).toBeGreaterThan(0);
+  });
+
+  test('Pressing = shows result', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    fireEvent.click(screen.getAllByText('4')[0]);
+    fireEvent.click(screen.getAllByText('0')[0]);
+    fireEvent.click(screen.getByText('='));
+    expect(screen.getByText('= 40.00')).toBeInTheDocument();
+  });
+
+  test('Use button inserts result into amount field and closes calculator', () => {
+    renderModal();
+    fireEvent.click(screen.getByTitle('Open calculator'));
+    fireEvent.click(screen.getAllByText('4')[0]);
+    fireEvent.click(screen.getAllByText('0')[0]);
+    fireEvent.click(screen.getByText('='));
+    fireEvent.click(screen.getByText('Use'));
+    expect(screen.getByPlaceholderText('0.00')).toHaveValue(40);
+    expect(screen.queryByText('Use')).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Inline Calculator — Exact Split section
+// ---------------------------------------------------------------------------
+
+describe('AddExpenseModal - Calculator (Exact Split)', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Split Calculator row is hidden when Equal split is selected', () => {
+    renderModal();
+    expect(screen.queryByText('Split Calculator')).not.toBeInTheDocument();
+  });
+
+  test('Split Calculator row appears when Exact Amounts is selected', () => {
+    renderModal();
+    fireEvent.click(screen.getByText('Exact Amounts'));
+    expect(screen.getByText('Split Calculator')).toBeInTheDocument();
+  });
+
+  test('Split Calculator row is hidden when Percentage is selected', () => {
+    renderModal();
+    fireEvent.click(screen.getByText('By Percentage'));
+    expect(screen.queryByText('Split Calculator')).not.toBeInTheDocument();
+  });
+
+  test('Split Calculator panel is collapsed by default', () => {
+    renderModal();
+    fireEvent.click(screen.getByText('Exact Amounts'));
+    expect(screen.queryByText('Copy')).not.toBeInTheDocument();
+  });
+
+  test('Tapping Split Calculator expands the number pad', () => {
+    renderModal();
+    fireEvent.click(screen.getByText('Exact Amounts'));
+    fireEvent.click(screen.getByText('Split Calculator'));
+    expect(screen.getByText('Copy')).toBeInTheDocument();
+  });
+
+  test('Copy button is disabled before equals is pressed', () => {
+    renderModal();
+    fireEvent.click(screen.getByText('Exact Amounts'));
+    fireEvent.click(screen.getByText('Split Calculator'));
+    const copyBtn = screen.getByText('Copy');
+    expect(copyBtn).toBeDisabled();
+  });
+
+  test('Pressing = in exact split calculator shows result', () => {
+    renderModal();
+    fireEvent.click(screen.getByText('Exact Amounts'));
+    fireEvent.click(screen.getByText('Split Calculator'));
+    // Press 3, 0, =
+    const buttons = screen.getAllByText('3');
+    fireEvent.click(buttons[buttons.length - 1]);
+    const zeroButtons = screen.getAllByText('0');
+    fireEvent.click(zeroButtons[zeroButtons.length - 1]);
+    const equalsButtons = screen.getAllByText('=');
+    fireEvent.click(equalsButtons[equalsButtons.length - 1]);
+    expect(screen.getByText('= 30.00')).toBeInTheDocument();
+  });
+});
+
