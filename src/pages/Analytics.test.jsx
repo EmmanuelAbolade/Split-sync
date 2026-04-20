@@ -425,3 +425,305 @@ describe('Analytics - Multiple Expenses', () => {
     });
   });
 });
+
+// ---------------------------------------------------------------------------
+// 7. Group Selector
+// ---------------------------------------------------------------------------
+
+describe('Analytics - Group Selector', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCalculateBalances.mockReturnValue({});
+    mockCalculateSettlements.mockReturnValue([]);
+  });
+
+  test('Group selector renders with All Groups option', async () => {
+    setupWithData();
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('All Groups (mixed currencies)')).toBeInTheDocument()
+    );
+  });
+
+  test('Group selector shows group name and currency as an option', async () => {
+    const group = {
+      id: 'grp-1', name: 'House', currency: 'EUR',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group]))
+      .mockResolvedValueOnce(expenseSnap([makeExpense()]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('House — EUR')).toBeInTheDocument()
+    );
+  });
+
+  test('Mixed currency warning shown when All Groups selected', async () => {
+    setupWithData();
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Amounts across groups may be of different currencies/i)
+      ).toBeInTheDocument()
+    );
+  });
+
+  test('Mixed currency warning hidden when specific group selected', async () => {
+    const group = {
+      id: 'grp-1', name: 'House', currency: 'EUR',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group]))
+      .mockResolvedValueOnce(expenseSnap([makeExpense()]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() => screen.getByText('House — EUR'));
+    const selector = screen.getByRole('combobox');
+    fireEvent.change(selector, { target: { value: 'grp-1' } });
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/Amounts across groups may be of different currencies/i)
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  test('Selecting a group filters expense count', async () => {
+    const group1 = {
+      id: 'grp-1', name: 'House', currency: 'EUR',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    const group2 = {
+      id: 'grp-2', name: 'Trip', currency: 'GBP',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group1, group2]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ id: 'e1', groupId: 'grp-1', amount: 50 }),
+      ]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ id: 'e2', groupId: 'grp-2', amount: 30 }),
+      ]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() => screen.getByText('House — EUR'));
+    // Select grp-1 only
+    const selector = screen.getByRole('combobox');
+    fireEvent.change(selector, { target: { value: 'grp-1' } });
+    await waitFor(() => {
+      const totalExpensesLabel = screen.getByText('Total Expenses');
+      const card = totalExpensesLabel.closest('div');
+      expect(card).toHaveTextContent('1');
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. Multi-currency summary cards
+// ---------------------------------------------------------------------------
+
+describe('Analytics - Multi-currency summary cards', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCalculateBalances.mockReturnValue({});
+    mockCalculateSettlements.mockReturnValue([]);
+  });
+
+  test('Shows EUR and GBP totals separately when all groups selected', async () => {
+    const group1 = {
+      id: 'grp-1', name: 'House', currency: 'EUR',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    const group2 = {
+      id: 'grp-2', name: 'Trip', currency: 'GBP',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group1, group2]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ id: 'e1', groupId: 'grp-1', amount: 100 }),
+      ]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ id: 'e2', groupId: 'grp-2', amount: 50 }),
+      ]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() => {
+      expect(screen.getByText('EUR 100.00')).toBeInTheDocument();
+      expect(screen.getByText('GBP 50.00')).toBeInTheDocument();
+    });
+  });
+
+  test('Shows dash when no expenses exist in all-groups view', async () => {
+    mockGetDocs.mockResolvedValue(emptySnap());
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('No data yet')).toBeInTheDocument()
+    );
+  });
+
+  test('Shows formatted single currency total when group is selected', async () => {
+    const group = {
+      id: 'grp-1', name: 'House', currency: 'GBP',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ id: 'e1', groupId: 'grp-1', amount: 75 }),
+      ]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() => screen.getByText('House — GBP'));
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'grp-1' } });
+    await waitFor(() =>
+      expect(screen.getByText('GBP 75.00')).toBeInTheDocument()
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Who Owes Who — with settlements
+// ---------------------------------------------------------------------------
+
+describe('Analytics - Who Owes Who with settlements', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCalculateBalances.mockReturnValue({});
+    mockCalculateSettlements.mockReturnValue([]);
+  });
+
+  test('Shows settlement row when settlements exist', async () => {
+    mockCalculateBalances.mockReturnValue({
+      'user-001': 30, 'user-002': -30,
+    });
+    mockCalculateSettlements.mockReturnValue([
+      { from: 'user-002', to: 'user-001', amount: 30 },
+    ]);
+    const group = {
+      id: 'grp-1', name: 'House', currency: 'EUR',
+      memberIds: ['user-001', 'user-002'],
+      members: [
+        { userId: 'user-001', name: 'Alice', email: 'alice@example.com' },
+        { userId: 'user-002', name: 'Bob',   email: 'bob@example.com' },
+      ],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group]))
+      .mockResolvedValueOnce(expenseSnap([makeExpense({ amount: 60 })]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.queryByText('All settled up!')).not.toBeInTheDocument()
+    );
+  });
+
+  test('Shows All settled up when no settlements needed', async () => {
+    mockCalculateBalances.mockReturnValue({});
+    mockCalculateSettlements.mockReturnValue([]);
+    setupWithData();
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('All settled up!')).toBeInTheDocument()
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. Category Breakdown
+// ---------------------------------------------------------------------------
+
+describe('Analytics - Category Breakdown', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCalculateBalances.mockReturnValue({});
+    mockCalculateSettlements.mockReturnValue([]);
+  });
+
+  test('Category Breakdown section is present with data', async () => {
+    setupWithData([makeExpense({ category: 'food', amount: 50 })]);
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('Category Breakdown')).toBeInTheDocument()
+    );
+  });
+
+  test('Multiple expenses with different categories render without error', async () => {
+    setupWithData([
+      makeExpense({ id: 'e1', category: 'food',      amount: 50 }),
+      makeExpense({ id: 'e2', category: 'transport', amount: 30 }),
+      makeExpense({ id: 'e3', category: 'accommodation', amount: 100 }),
+    ]);
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('Category Breakdown')).toBeInTheDocument()
+    );
+  });
+
+  test('Settlements are excluded from category breakdown', async () => {
+    setupWithData([
+      makeExpense({ id: 'e1', category: 'food',       amount: 50, isSettlement: false }),
+      makeExpense({ id: 'e2', category: 'settlement', amount: 30, isSettlement: true }),
+    ]);
+    await renderAndWait(<Analytics />);
+    await waitFor(() =>
+      expect(screen.getByText('Category Breakdown')).toBeInTheDocument()
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 11. Groups count card
+// ---------------------------------------------------------------------------
+
+describe('Analytics - Groups count card', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCalculateBalances.mockReturnValue({});
+    mockCalculateSettlements.mockReturnValue([]);
+  });
+
+  test('Groups card shows count of 1 with one group', async () => {
+    setupWithData();
+    await renderAndWait(<Analytics />);
+    await waitFor(() => {
+      const groupsLabel = screen.getByText('Groups');
+      const card = groupsLabel.closest('div');
+      expect(card).toHaveTextContent('1');
+    });
+  });
+
+  test('Groups card shows count of 2 with two groups', async () => {
+    const group1 = {
+      id: 'grp-1', name: 'House', currency: 'EUR',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    const group2 = {
+      id: 'grp-2', name: 'Trip', currency: 'GBP',
+      memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice', email: 'alice@example.com' }],
+    };
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group1, group2]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ id: 'e1', groupId: 'grp-1', amount: 50 }),
+      ]))
+      .mockResolvedValueOnce(expenseSnap([]));
+    await renderAndWait(<Analytics />);
+    await waitFor(() => {
+      const groupsLabel = screen.getByText('Groups');
+      const card = groupsLabel.closest('div');
+      expect(card).toHaveTextContent('2');
+    });
+  });
+});
