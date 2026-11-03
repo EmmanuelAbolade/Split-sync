@@ -13,6 +13,14 @@ import SettleUpModal from './SettleUpModal';
 
 jest.mock('../services/firebase', () => ({ db: {} }));
 
+// PayPal capture now happens server-side via the capturePayPalOrder callable.
+// Plain functions (not jest.fn) so CRA's resetMocks does not clear them.
+jest.mock('firebase/functions', () => ({
+  getFunctions: () => ({}),
+  httpsCallable: () => () =>
+    Promise.resolve({ data: { success: true, orderId: 'capture-123', status: 'COMPLETED' } }),
+}));
+
 jest.mock('firebase/firestore', () => ({
   collection:      jest.fn(() => ({})),
   addDoc:          jest.fn(() => Promise.resolve({ id: 'settlement-id' })),
@@ -49,11 +57,10 @@ jest.mock('../utils/biometric', () => ({
   authenticateWithBiometric: jest.fn(() => Promise.resolve(true)),
 }));
 
-// decryptData is called when fetching recipient payment methods to expose
-// the plain-text IBAN from the stored encryptedIBAN field.
-jest.mock('../utils/encryption', () => ({
-  decryptData: jest.fn((val) => `DECRYPTED-${val}`),
-  encryptData: jest.fn((val) => `ENCRYPTED-${val}`),
+// The recipient's IBAN is decrypted server-side (ibanService.fetchIban → getIban
+// Cloud Function) and exposed under .iban. Plain function so resetMocks keeps it.
+jest.mock('../utils/ibanService', () => ({
+  fetchIban: async () => 'DECRYPTED-enc-iban-data',
 }));
 
 // Return empty array to prevent crash from .length on undefined
@@ -886,11 +893,8 @@ describe('SettleUpModal - SEPA payment flow', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    // Restore decryptData so it returns a usable plain-text IBAN.
-    // This allows encryptedIBAN to be resolved into the iban key that
+    // fetchIban (mocked above) resolves encryptedIBAN into the iban key that
     // getAvailablePaymentMethods and the SEPA demo button depend on.
-    const { decryptData } = require('../utils/encryption');
-    decryptData.mockImplementation((val) => `DECRYPTED-${val}`);
     // Recipient has an IBAN so the SEPA demo button is visible inside the
     // Future Feature panel.
     const { getDoc } = require('firebase/firestore');

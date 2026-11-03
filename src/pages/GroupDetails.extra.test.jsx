@@ -27,6 +27,7 @@ const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   useParams:   () => ({ groupId: 'group-123' }),
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ state: null }),
 }));
 
 const mockGetDoc     = jest.fn();
@@ -38,6 +39,7 @@ const mockWhere      = jest.fn();
 const mockUpdateDoc  = jest.fn(() => Promise.resolve());
 const mockDeleteDoc  = jest.fn(() => Promise.resolve());
 const mockArrayRemove = jest.fn((val) => val);
+const mockArrayUnion  = jest.fn((val) => val);
 
 const mockBatch = {
   delete: jest.fn(),
@@ -58,6 +60,7 @@ jest.mock('firebase/firestore', () => ({
   getDocs:     (...a) => mockGetDocs(...a),
   writeBatch:  (...a) => mockWriteBatch(...a),
   arrayRemove: (...a) => mockArrayRemove(...a),
+  arrayUnion:  (...a) => mockArrayUnion(...a),
 }));
 
 jest.mock('../services/firebase', () => ({ db: {}, auth: {} }));
@@ -225,12 +228,25 @@ describe('GroupDetails Extra - getDisplayTitle for settlement expenses', () => {
     );
   });
 
-  test('Settlement expense shows Unknown when member not found', async () => {
+  test('Settlement expense shows "Former member" when no name can be found', async () => {
     const orphanSettlement = { ...settlementExpense, paidBy: 'user-999', participants: ['user-999', 'user-888'] };
     setupWithGroup(mockGroupOwner, [orphanSettlement]);
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText(/Settlement: Unknown → Unknown/)).toBeInTheDocument()
+      expect(screen.getByText(/Settlement: Former member → Former member/)).toBeInTheDocument()
+    );
+  });
+
+  test('Settlement expense keeps the name of a member who left (formerMembers)', async () => {
+    const groupWithLeaver = {
+      ...mockGroupOwner,
+      formerMembers: [{ userId: 'user-999', name: 'Carol', email: 'carol@example.com', reason: 'left' }],
+    };
+    const leaverSettlement = { ...settlementExpense, paidBy: 'user-999', participants: ['user-999', 'user-123'] };
+    setupWithGroup(groupWithLeaver, [leaverSettlement]);
+    render(<GroupDetails />);
+    await waitFor(() =>
+      expect(screen.getByText(/Settlement: Carol \(left\) → Alice/)).toBeInTheDocument()
     );
   });
 });
@@ -854,6 +870,15 @@ describe('GroupDetails Extra - Leave Group flow', () => {
     const confirmBtn = leaveButtons[leaveButtons.length - 1];
     await act(async () => { fireEvent.click(confirmBtn); });
     await waitFor(() => expect(mockUpdateDoc).toHaveBeenCalled());
+    // Leaving must clear memberIds (permissions) and keep a name snapshot
+    // (CRA resets mock implementations, so assert on the helper calls)
+    const leaveUpdate = mockUpdateDoc.mock.calls.map(c => c[1]).find(u => u && 'formerMembers' in u);
+    expect(leaveUpdate).toBeDefined();
+    expect(leaveUpdate).toHaveProperty('memberIds');
+    expect(mockArrayRemove).toHaveBeenCalledWith('user-123');
+    expect(mockArrayUnion).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: 'user-123', name: 'Alice', reason: 'left' })
+    );
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
   });
 
@@ -1072,5 +1097,73 @@ describe('GroupDetails Extra - Delete Group flow', () => {
     await waitFor(() =>
       expect(screen.queryByText(/permanently delete/i)).not.toBeInTheDocument()
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Membership & Add Expense gating (regression: Recent Expenses "Add Expense"
+// link and "Add First Expense" used to bypass the solo-group restriction, and
+// non-members could open the group by URL and add expenses)
+// ---------------------------------------------------------------------------
+
+describe('GroupDetails Extra - membership and Add Expense gating', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+  });
+
+  const soloGroup = {
+    ...mockGroupOwner,
+    members: [{ userId: 'user-123', name: 'Alice', email: 'alice@example.com', role: 'owner' }],
+  };
+
+  test('Solo group: every Add Expense entry point is disabled', async () => {
+    setupWithGroup(soloGroup, mockExpenses);
+    render(<GroupDetails />);
+    await waitFor(() => screen.getByText('Weekend Trip'));
+    const addButtons = screen.getAllByRole('button', { name: /Add Expense/ });
+    expect(addButtons.length).toBeGreaterThanOrEqual(2); // header + Recent Expenses link
+    addButtons.forEach(btn => fireEvent.click(btn));
+    expect(screen.queryByTestId('add-expense-modal')).not.toBeInTheDocument();
+  });
+
+  test('Solo group with no expenses hides "Add First Expense"', async () => {
+    setupWithGroup(soloGroup, []);
+    render(<GroupDetails />);
+    await waitFor(() => screen.getByText('Weekend Trip'));
+    expect(screen.queryByText('Add First Expense')).not.toBeInTheDocument();
+    expect(screen.getByText(/Invite at least one member to start adding expenses/)).toBeInTheDocument();
+  });
+
+  test('Recent Expenses Add Expense link opens the modal when the group has members', async () => {
+    setupWithGroup(mockGroupOwner, mockExpenses);
+    render(<GroupDetails />);
+    await waitFor(() => screen.getByText('Weekend Trip'));
+    const addButtons = screen.getAllByRole('button', { name: /Add Expense/ });
+    fireEvent.click(addButtons[addButtons.length - 1]);
+    expect(screen.getByTestId('add-expense-modal')).toBeInTheDocument();
+  });
+
+  test('Non-member sees the rejoin screen instead of the group contents', async () => {
+    const notMine = {
+      ...mockGroupOwner,
+      createdBy: 'user-456',
+      members: [{ userId: 'user-456', name: 'Bob', email: 'bob@example.com', role: 'owner' }],
+    };
+    setupWithGroup(notMine, mockExpenses);
+    render(<GroupDetails />);
+    await waitFor(() => screen.getByText(/You're not a member of this group/));
+    expect(screen.queryByRole('button', { name: /Add Expense/ })).not.toBeInTheDocument();
+    expect(screen.queryByText('Hotel')).not.toBeInTheDocument();
+  });
+
+  test('Personal tracker: Add Expense works without other members and no Invite Link is shown', async () => {
+    setupWithGroup({ ...soloGroup, type: 'personal' }, mockExpenses);
+    render(<GroupDetails />);
+    await waitFor(() => screen.getByText('Weekend Trip'));
+    expect(screen.queryByText('Invite Link')).not.toBeInTheDocument();
+    expect(screen.queryByText(/no other members yet/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole('button', { name: /Add Expense/ })[0]);
+    expect(screen.getByTestId('add-expense-modal')).toBeInTheDocument();
   });
 });

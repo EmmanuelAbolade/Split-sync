@@ -79,6 +79,12 @@ jest.mock('../utils/encryption', () => ({
   validateIBAN: (...a) => mockValidateIBAN(...a),
 }));
 
+// IBAN encryption is server-side (utils/ibanService → Cloud Functions)
+jest.mock('../utils/ibanService', () => ({
+  fetchIban:   async () => '',
+  encryptIban: async (v) => `encrypted-${v}`,
+}));
+
 const mockAuthenticateWithBiometric  = jest.fn();
 const mockIsBiometricAvailable       = jest.fn(() => false);
 const mockIsBiometricEnabledOnDevice = jest.fn(() => false);
@@ -231,7 +237,7 @@ describe('Profile extra - handleSavePaymentMethods error paths', () => {
     const inputs = screen.getAllByPlaceholderText('username');
     fireEvent.change(inputs[0], { target: { value: 'alice123' } });
     fireEvent.click(screen.getByText('Save Payment Settings'));
-    await waitFor(() => expect(screen.getByText(/permission denied/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/do not have permission to save/i)).toBeInTheDocument());
     spy.mockRestore();
   });
 });

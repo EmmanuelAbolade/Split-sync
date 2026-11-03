@@ -16,7 +16,22 @@ jest.mock('firebase/functions', () => ({
   getFunctions:   jest.fn(() => ({})),
   httpsCallable:  jest.fn(() => mockChatFn),
 }));
-jest.mock('../services/firebase', () => ({}));
+jest.mock('../services/firebase', () => ({ db: {} }));
+
+// Group lookup used to give the assistant counts (shared vs personal) as context.
+// Plain functions so CRA's resetMocks keeps them.
+jest.mock('firebase/firestore', () => ({
+  collection: () => ({}),
+  where:      () => ({}),
+  query:      () => ({}),
+  getDocs:    () => Promise.resolve({
+    docs: [
+      { data: () => ({ type: 'shared',   members: [{ userId: 'user-123' }, { userId: 'b' }] }) },
+      { data: () => ({ type: 'personal', members: [{ userId: 'user-123' }] }) },
+      { data: () => ({ type: 'shared',   members: [{ userId: 'b' }] }) }, // left earlier
+    ],
+  }),
+}));
 
 // Mock auth store
 const mockAuthStore = { user: { uid: 'user-123', displayName: 'Alice' } };
@@ -206,6 +221,21 @@ describe('SplitSyncChat - Send message', () => {
         messages: expect.arrayContaining([
           expect.objectContaining({ content: 'How do I split an expense equally?' }),
         ]),
+      })
+    );
+  });
+
+  test('Sends group counts (shared vs personal, excluding groups left) as context', async () => {
+    mockChatFn.mockResolvedValue({ data: { reply: 'Sure!' } });
+    render(<SplitSyncChat />);
+    fireEvent.click(screen.getByLabelText('Open assistant'));
+    await act(async () => { await Promise.resolve(); }); // let the group lookup resolve
+    await act(async () => {
+      fireEvent.click(screen.getByText('How do I split an expense equally?'));
+    });
+    expect(mockChatFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userContext: { groupCount: 2, sharedCount: 1, personalCount: 1 },
       })
     );
   });

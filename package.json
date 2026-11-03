@@ -23,23 +23,25 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-splitsync \"npm --prefix firestore-tests test\"",
+    "test:functions": "node --test functions/iban.test.js"
   },
   "jest": {
-  "transformIgnorePatterns": [
-    "node_modules/(?!(firebase|@firebase)/)"
-  ],
-  "moduleNameMapper": {
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "transformIgnorePatterns": [
+      "node_modules/(?!(firebase|@firebase)/)"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "src/pages/Taskmaster.jsx",
+      "src/components/CloudinaryUpload.jsx",
+      "src/components/ContactSyncButton.jsx",
+      "src/components/ReceiptScanner.jsx"
+    ]
   },
-  "coveragePathIgnorePatterns": [
-    "/node_modules/",
-    "src/pages/Taskmaster.jsx",
-    "src/components/CloudinaryUpload.jsx",
-    "src/components/ContactSyncButton.jsx",
-    "src/components/ReceiptScanner.jsx"
-  ]
-},
   "eslintConfig": {
     "extends": [
       "react-app",

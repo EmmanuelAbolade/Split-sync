@@ -6,7 +6,8 @@ import { collection, addDoc, doc, updateDoc, serverTimestamp, getDocs, query, wh
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import Tooltip from './Tooltip';
-import { createNotification } from '../stores/notificationsStore'; 
+import { createNotification } from '../stores/notificationsStore';
+import { isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
 
 const CATEGORIES = [
   { id: 'food', name: 'Food & Dining' },
@@ -148,7 +149,9 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
   // isEditing drives all conditional labels and the submit path
   const isEditing = !!initialExpense;
   const { user } = useAuthStore();
-  
+  // Personal trackers: owner pays, owner is the only participant, no split UI
+  const isPersonal = isPersonalGroup(group);
+
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [paidBy, setPaidBy] = useState(user?.uid || '');
@@ -421,6 +424,17 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
       return;
     }
 
+    // Membership guard — the modal enforces this itself so no button can bypass it.
+    // Non-members cannot add or edit; shared groups need at least one other member.
+    if (!isActiveMember(group, user?.uid)) {
+      setError('You are no longer a member of this group.');
+      return;
+    }
+    if (!isEditing && !isPersonal && (group?.members?.length || 0) <= 1) {
+      setError('Invite at least one member before adding an expense.');
+      return;
+    }
+
     // Ensure at least one member is selected
     const selected = Object.keys(selectedMembers).filter(id => selectedMembers[id]);
     if (selected.length === 0) {
@@ -487,8 +501,18 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
       };
 
        if (isEditing) {
-        // Update existing document — do not overwrite groupId, createdAt, or createdBy
-        await updateDoc(doc(db, 'expenses', initialExpense.id), expenseData);
+        // Update existing document — do not overwrite groupId, createdAt, or createdBy.
+        // createdAt drives the "settlement recorded after this expense" edit/remove
+        // lock, so resetting it on edit would wrongly unlock settled expenses.
+        const updates = { ...expenseData };
+        delete updates.groupId;
+        delete updates.createdAt;
+        delete updates.createdBy;
+        await updateDoc(doc(db, 'expenses', initialExpense.id), {
+          ...updates,
+          updatedAt: serverTimestamp(),
+          updatedBy: user.uid,
+        });
       } else {
         // Create a new expense document
         const newExpense = {
@@ -804,6 +828,7 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
 
           {/* Paid By & Category */}
           <div className="grid grid-cols-2 gap-4">
+            {!isPersonal && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Paid By *
@@ -821,6 +846,7 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
                 ))}
               </select>
             </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category
@@ -866,6 +892,14 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
             </div>
           </div>
 
+          {/* Personal trackers have no split — the whole amount is the owner's */}
+          {isPersonal && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              Personal expense — recorded for you only. Nothing is split or owed.
+            </p>
+          )}
+
+          {!isPersonal && (<>
           {/* Split Method */}
           <div>
             <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1055,6 +1089,7 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
               </div>
             </div>
           )}
+          </>)}
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">

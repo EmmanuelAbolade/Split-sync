@@ -11,7 +11,7 @@ import {
   createPaymentDescription,
   calculatePaymentFee
 } from '../utils/sepaPayment';
-import { decryptData } from '../utils/encryption';
+import { fetchIban } from '../utils/ibanService';
 import { authenticateWithBiometric } from '../utils/biometric';
 
 export default function SepaPaymentModal({ 
@@ -38,7 +38,12 @@ export default function SepaPaymentModal({
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
-          setSenderPaymentMethods(data.paymentMethods || null);
+          const methods = data.paymentMethods ? { ...data.paymentMethods } : null;
+          // Own IBAN is decrypted server-side (the browser holds no key)
+          if (methods?.encryptedIBAN) {
+            methods.iban = await fetchIban(currentUser.uid);
+          }
+          setSenderPaymentMethods(methods);
         }
       } catch (error) {
         console.error('Error fetching sender payment methods:', error);
@@ -62,24 +67,10 @@ export default function SepaPaymentModal({
     groupId
   } = payment;
 
-  // Decrypt IBANs for processing
-  const getDecryptedIBAN = (encryptedIBAN) => {
-    if (!encryptedIBAN) return null;
-    try {
-      return decryptData(encryptedIBAN);
-    } catch (error) {
-      console.error('Error decrypting IBAN:', error);
-      return null;
-    }
-  };
-
-  const fromIBAN = senderPaymentMethods?.encryptedIBAN 
-    ? getDecryptedIBAN(senderPaymentMethods.encryptedIBAN)
-    : null;
-    
-  const toIBAN = toUserPaymentMethods?.encryptedIBAN
-    ? getDecryptedIBAN(toUserPaymentMethods.encryptedIBAN)
-    : null;
+  // Plain IBANs come from the server: the sender's own (fetched above) and the
+  // recipient's (fetched by SettleUpModal, which passes it as .iban)
+  const fromIBAN = senderPaymentMethods?.iban || null;
+  const toIBAN   = toUserPaymentMethods?.iban || null;
 
   const paymentFee = calculatePaymentFee(amount);
   const totalAmount = amount + paymentFee;

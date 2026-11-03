@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
 import { useAuthStore } from '../stores/authStore';
 import { Users, CheckCircle, AlertTriangle, DollarSign, BarChart2 } from 'lucide-react';
 
@@ -45,9 +46,16 @@ export default function JoinGroup() {
           setInviterName(creatorMember.name);
         }
 
-        // Check if user is already a member
-        const isMember = groupData.memberIds?.includes(user.uid);
+        // Check membership against the members list, not memberIds — people who
+        // left before the leave-group fix can still appear in memberIds and would
+        // otherwise be told they are "already a member" and never be able to rejoin.
+        const isMember = isActiveMember(groupData, user.uid);
         setAlreadyMember(isMember);
+
+        // Personal groups are private trackers and cannot be joined
+        if (!isMember && isPersonalGroup(groupData)) {
+          setError('This is a personal expense tracker and cannot be joined.');
+        }
 
         setLoading(false);
       } catch (err) {
@@ -62,6 +70,10 @@ export default function JoinGroup() {
 
   const handleJoinGroup = async () => {
     if (!user || !group) return;
+    if (isPersonalGroup(group)) {
+      setError('This is a personal expense tracker and cannot be joined.');
+      return;
+    }
 
     setJoining(true);
     setError('');
@@ -75,9 +87,13 @@ export default function JoinGroup() {
         joinedAt: new Date(),
       };
 
+      // Rejoining clears the user's formerMembers snapshot so they are not
+      // shown as "(left)" while active again.
+      const formerMembers = (group.formerMembers || []).filter(m => m.userId !== user.uid);
       await updateDoc(doc(db, 'groups', groupId), {
         members: arrayUnion(newMember),
         memberIds: arrayUnion(user.uid),
+        ...(formerMembers.length !== (group.formerMembers || []).length && { formerMembers }),
       });
 
       // Show onboarding wizard for users who have never completed it.

@@ -11,7 +11,16 @@ import { isBiometricEnabledOnDevice, authenticateWithBiometric } from '../utils/
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  // App.js signs suspended accounts out and leaves this flag for the message
+  const [error, setError] = useState(() => {
+    try {
+      if (sessionStorage.getItem('accountSuspended')) {
+        sessionStorage.removeItem('accountSuspended');
+        return 'This account has been suspended. Please contact support.';
+      }
+    } catch { /* storage unavailable */ }
+    return '';
+  });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();

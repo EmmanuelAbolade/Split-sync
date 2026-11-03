@@ -1,64 +1,11 @@
 // src/utils/encryption.test.js
-// Test suite for encryption/decryption and validation functions
-import { 
-  encryptData, 
-  decryptData, 
+// IBAN validation and display helpers. Encryption itself moved server-side
+// (functions/iban.js, tested by functions/iban.test.js).
+import {
   validateIBAN,
   formatIBANDisplay,
   maskIBAN
 } from './encryption';
-
-describe('Encryption Functions', () => {
-  
-  test('Encrypts and decrypts data correctly', () => {
-    const originalData = 'IE29AIBK93115212345678';
-    const encrypted = encryptData(originalData);
-    const decrypted = decryptData(encrypted);
-    expect(encrypted).not.toBe(originalData);
-    expect(decrypted).toBe(originalData);
-  });
-
-  test('Encrypted data is different from plain text', () => {
-    const plainText = 'sensitive-data-123';
-    const encrypted = encryptData(plainText);
-    expect(encrypted).not.toBe(plainText);
-    expect(encrypted.length).toBeGreaterThan(0);
-  });
-
-  test('Handles empty string encryption', () => {
-    const encrypted = encryptData('');
-    const decrypted = decryptData(encrypted);
-    expect(decrypted).toBe('');
-  });
-
-  test('Handles special characters in encryption', () => {
-    const specialData = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-    const encrypted = encryptData(specialData);
-    const decrypted = decryptData(encrypted);
-    expect(decrypted).toBe(specialData);
-  });
-
-  test('Handles unicode characters in encryption', () => {
-    const unicodeData = 'Hello 世界 🌍';
-    const encrypted = encryptData(unicodeData);
-    const decrypted = decryptData(encrypted);
-    expect(decrypted).toBe(unicodeData);
-  });
-
-  test('Handles large data encryption', () => {
-    const largeData = 'A'.repeat(1000);
-    const encrypted = encryptData(largeData);
-    const decrypted = decryptData(encrypted);
-    expect(decrypted).toBe(largeData);
-  });
-
-  test('Trims whitespace before encryption', () => {
-    const dataWithSpaces = '  sensitive-data  ';
-    const encrypted = encryptData(dataWithSpaces);
-    const decrypted = decryptData(encrypted);
-    expect(decrypted).toBe('sensitive-data');
-  });
-});
 
 describe('IBAN Validation', () => {
   

@@ -1,85 +1,20 @@
 /**
  * @file encryption.js
- * @brief AES-256 encryption and IBAN formatting utilities for secure data storage.
+ * @brief IBAN validation and display helpers.
  *
- * @details This module handles client-side encryption of sensitive financial data
- * (specifically IBAN numbers) before they are written to Firestore. Encryption
- * uses AES-256 via the CryptoJS library. The encryption key is read from an
- * environment variable so it is never hard-coded in the production bundle.
- *
- * IBAN display helpers (formatting and masking) are also provided for the
- * Payment Settings UI.
+ * @details IBAN encryption moved server-side on 2026-11-03 (functions/iban.js,
+ * AES-256-GCM with a key in Secret Manager). The previous client-side
+ * encryptData/decryptData used a key from REACT_APP_ENCRYPTION_KEY, which is
+ * bundled into the public JavaScript, so it offered no real protection.
+ * Use utils/ibanService.js (encryptIban / fetchIban) instead.
  *
  * @author Emmanuel Abolade (C00288657)
  * @date 2025-2026
- * @version 1.0.0
+ * @version 2.0.0
  * @copyright SETU Carlow — Final Year Project 2025/2026
- *
- * @warning The encryption key must be stored in REACT_APP_ENCRYPTION_KEY
- * environment variable. Never commit the key to version control.
  */
 
 // src/utils/encryption.js
-import CryptoJS from 'crypto-js';
-
-const ENCRYPTION_KEY = process.env.REACT_APP_ENCRYPTION_KEY || 'split-sync-secure-key-2026';
-
-/**
- * @brief Encrypts a plaintext string using AES-256 before Firestore storage.
- *
- * @details Uses CryptoJS.AES.encrypt with the application encryption key.
- * Empty or whitespace-only input returns an empty string without encrypting.
- * This function is called before any IBAN value is written to Firestore.
- *
- * @param {string} data - Plaintext data to encrypt (e.g. a raw IBAN string).
- *
- * @returns {string} AES-encrypted ciphertext as a Base64 string, or '' if input is empty.
- *
- * @throws {Error} Throws 'Failed to encrypt data' if CryptoJS encounters an error.
- *
- * @example
- * const encrypted = encryptData('IE29AIBK93115212345678');
- * // 'U2FsdGVkX1+...' (Base64 ciphertext)
- */
-export const encryptData = (data) => {
-  if (!data || data.trim() === '') return '';
-  try {
-    return CryptoJS.AES.encrypt(data.trim(), ENCRYPTION_KEY).toString();
-  } catch (error) {
-    console.error('Encryption error:', error);
-    throw new Error('Failed to encrypt data');
-  }
-};
-
-/**
- * @brief Decrypts an AES-256 ciphertext string retrieved from Firestore.
- *
- * @details Reverses the operation performed by encryptData(). Called when
- * displaying payment settings to the authenticated user. Empty or
- * whitespace-only input returns an empty string without attempting decryption.
- *
- * @param {string} encryptedData - AES ciphertext (Base64 string from Firestore).
- *
- * @returns {string} Plaintext string, or '' if input is empty.
- *
- * @throws {Error} Throws 'Failed to decrypt data' if decryption fails
- * (e.g. wrong key or corrupted ciphertext).
- *
- * @example
- * const iban = decryptData('U2FsdGVkX1+...');
- * // 'IE29AIBK93115212345678'
- */
-export const decryptData = (encryptedData) => {
-  if (!encryptedData || encryptedData.trim() === '') return '';
-  try {
-    const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
-    return bytes.toString(CryptoJS.enc.Utf8);
-  } catch (error) {
-    console.error('Decryption error:', error);
-    throw new Error('Failed to decrypt data');
-  }
-};
-
 /**
  * @brief Validates whether a string conforms to the basic IBAN format.
  *

@@ -14,6 +14,7 @@ import {
   Utensils, Music, Briefcase, GraduationCap, Gift,
 } from 'lucide-react';
 import AddExpenseModal from '../components/AddExpenseModal';
+import { isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
 
 // Matches the same icon map used in GroupDetails
 const ICON_MAP = {
@@ -80,10 +81,11 @@ export default function QuickAdd() {
     );
 
     const unsubscribe = onSnapshot(groupsQuery, (snapshot) => {
+      // memberIds may still list people who left before leave-group cleared it
       const groupsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-      }));
+      })).filter(g => isActiveMember(g, user.uid));
       setGroups(groupsData);
     });
 
@@ -146,7 +148,9 @@ export default function QuickAdd() {
             {groups.map((group) => {
               const IconComponent = getIconComponent(group.icon);
               const colorClass    = getIconColor(group.icon);
-              const isSolo        = (group.members?.length || 0) <= 1;
+              const isPersonal    = isPersonalGroup(group);
+              // Shared groups need another member; personal trackers never do
+              const isSolo        = !isPersonal && (group.members?.length || 0) <= 1;
 
               return (
                 <button
@@ -173,7 +177,9 @@ export default function QuickAdd() {
                         {group.name}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {group.members?.length || 0} member{group.members?.length !== 1 ? 's' : ''} • {group.currency}
+                        {isPersonal
+                          ? 'Personal'
+                          : `${group.members?.length || 0} member${group.members?.length !== 1 ? 's' : ''}`} • {group.currency}
                       </p>
                       {isSolo && (
                         <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">

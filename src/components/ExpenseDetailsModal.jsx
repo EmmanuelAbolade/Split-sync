@@ -6,8 +6,10 @@ import { db } from '../services/firebase';
 import {
   X, User, Calendar, Tag, Users, DollarSign, FileText,
   Receipt, Download, ExternalLink, Pencil, Trash2,
-  AlertTriangle, Lock, Archive, ArchiveRestore, Info,
+  AlertTriangle, Lock, Archive, ArchiveRestore, Info, ChevronRight,
 } from 'lucide-react';
+import { findMember, getMemberName } from '../utils/memberDirectory';
+import useFormerMemberNames from '../hooks/useFormerMemberNames';
 
 export default function ExpenseDetailsModal({
   isOpen,
@@ -19,15 +21,24 @@ export default function ExpenseDetailsModal({
   onEdit,
   onDeleted,
   onStatusChanged,
+  onGoToGroup, // optional — when set, the group name in the header links to the group
 }) {
   const [showDeleteConfirm,  setShowDeleteConfirm]  = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [actionLoading,      setActionLoading]      = useState(false);
   const [actionError,        setActionError]        = useState('');
+  const formerNames = useFormerMemberNames(isOpen ? group : null, expense ? [expense] : []);
 
   if (!isOpen || !expense) return null;
 
-  const payer       = group?.members?.find(m => m.userId === expense.paidBy);
+  // Resolves current and former members so people who left keep their name
+  const memberOf = (uid) => ({
+    ...(findMember(group, uid) || {}),
+    userId: uid,
+    name: getMemberName(group, uid, formerNames, { markFormer: true }),
+  });
+
+  const payer       = memberOf(expense.paidBy);
   const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
   const isSettlement = !!expense.isSettlement;
   const isCreator    = expense.createdBy === currentUserId;
@@ -50,14 +61,12 @@ export default function ExpenseDetailsModal({
   // ── Helpers ────────────────────────────────────────────────────────────────
   const getSettlementTitle = () => {
     if (!expense.participants || expense.participants.length !== 2) return 'Settlement';
-    const fromMember = group?.members?.find(m => m.userId === expense.paidBy);
     const toUserId   = expense.participants.find(id => id !== expense.paidBy);
-    const toMember   = group?.members?.find(m => m.userId === toUserId);
-    return `Settlement: ${fromMember?.name || 'Unknown'} to ${toMember?.name || 'Unknown'}`;
+    return `Settlement: ${memberOf(expense.paidBy).name} to ${memberOf(toUserId).name}`;
   };
 
   const participantShares = expense.participants?.map(userId => {
-    const member     = group?.members?.find(m => m.userId === userId);
+    const member     = memberOf(userId);
     const share      = expense.splits?.[userId] || 0;
     const percentage = expense.amount > 0
       ? ((share / expense.amount) * 100).toFixed(1)
@@ -239,6 +248,18 @@ export default function ExpenseDetailsModal({
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex-1 pr-4">
+            {/* Group link — lets the user jump to where this expense was recorded */}
+            {onGoToGroup && group && (
+              <button
+                onClick={() => onGoToGroup(expense)}
+                className="group inline-flex items-center gap-1 mb-1 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                title={`Open ${group.name} and show this ${isSettlement ? 'settlement' : 'expense'}`}
+              >
+                <Users size={14} />
+                <span className="group-hover:underline">{group.name}</span>
+                <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+              </button>
+            )}
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
               {isSettlement ? getSettlementTitle() : expense.title}
             </h2>

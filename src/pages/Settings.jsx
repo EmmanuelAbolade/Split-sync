@@ -15,11 +15,14 @@ import { useSessionTimeout } from '../hooks/useSessionTimeout';
 import {
   updateProfile,
   EmailAuthProvider,
+  GoogleAuthProvider,
   reauthenticateWithCredential,
+  reauthenticateWithPopup,
   deleteUser,
 } from 'firebase/auth';
+import { findUnsettledGroups, deleteAccountData } from '../utils/accountDeletion';
 import { auth, db } from '../services/firebase';
-import { doc, updateDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import QRCodeModal    from '../components/QRCodeModal';
 import InfoHubModal   from '../components/InfoHubModal';
 import DarkModeToggle from '../components/DarkModeToggle';
@@ -262,19 +265,40 @@ export default function Settings() {
     }
   };
 
+  // Google-only accounts have no password — they re-authenticate with a popup
+  const isGoogleOnlyAccount =
+    !!auth.currentUser?.providerData?.some(p => p.providerId === 'google.com') &&
+    !auth.currentUser?.providerData?.some(p => p.providerId === 'password');
+
+  // Account deletion — see utils/accountDeletion.js for the full data policy.
+  // Previously this deleted every expense the user had paid in ANY group
+  // (silently erasing debts other members owed), deleted owned groups while
+  // leaving their expenses orphaned, never removed the user from shared groups,
+  // and could not work for Google sign-in accounts.
   const handleDeleteAccount = async () => {
-    if (!deletePassword) { setDeleteError('Password is required'); return; }
+    if (!isGoogleOnlyAccount && !deletePassword) { setDeleteError('Password is required'); return; }
     setDeleteLoading(true); setDeleteError('');
     try {
-      const credential = EmailAuthProvider.credential(auth.currentUser.email, deletePassword);
-      await reauthenticateWithCredential(auth.currentUser, credential);
+      // 1. Re-authenticate (Firebase requires a recent login to delete a user)
+      if (isGoogleOnlyAccount) {
+        await reauthenticateWithPopup(auth.currentUser, new GoogleAuthProvider());
+      } else {
+        const credential = EmailAuthProvider.credential(auth.currentUser.email, deletePassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
+      }
 
-      const groupsSnap = await getDocs(query(collection(db, 'groups'), where('createdBy', '==', user.uid)));
-      for (const g of groupsSnap.docs) await deleteDoc(doc(db, 'groups', g.id));
+      // 2. Block while money is still owed in either direction
+      const unsettled = await findUnsettledGroups(user.uid);
+      if (unsettled.length > 0) {
+        setDeleteError(
+          'Settle all balances before deleting your account. Outstanding: ' +
+          unsettled.map(u => `${u.name} (you ${u.direction} ${u.currency} ${u.amount})`).join(', ') + '.'
+        );
+        return;
+      }
 
-      const expSnap = await getDocs(query(collection(db, 'expenses'), where('paidBy', '==', user.uid)));
-      for (const e of expSnap.docs) await deleteDoc(doc(db, 'expenses', e.id));
-
+      // 3. Leave shared groups (history kept), remove personal data, then the auth user
+      await deleteAccountData(user);
       await deleteUser(auth.currentUser);
       navigate('/login');
     } catch (err) {
@@ -283,6 +307,8 @@ export default function Settings() {
         setDeleteError('Incorrect password. Please try again.');
       } else if (err.code === 'auth/too-many-requests') {
         setDeleteError('Too many attempts. Please try again later.');
+      } else if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        setDeleteError('Sign-in was cancelled. Please confirm with Google to delete your account.');
       } else {
         setDeleteError('Failed to delete account. Please try again.');
       }
@@ -694,11 +720,14 @@ export default function Settings() {
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-4 text-sm text-red-700 dark:text-red-300">
               <p className="font-semibold mb-2">This will permanently:</p>
               <ul className="space-y-1 list-disc list-inside">
-                <li>Delete all groups you own</li>
-                <li>Delete all your expenses</li>
-                <li>Remove you from shared groups</li>
-                <li>Erase all your account data</li>
+                <li>Remove you from all shared groups</li>
+                <li>Pass groups you own to another member</li>
+                <li>Delete your personal trackers</li>
+                <li>Erase your profile, notifications and payment details</li>
               </ul>
+              <p className="text-xs mt-3 text-red-600 dark:text-red-400">
+                You must settle all balances first. Expenses you shared with others stay in those groups under your name so their history remains correct.
+              </p>
             </div>
 
             {deleteError && (
@@ -707,6 +736,11 @@ export default function Settings() {
               </div>
             )}
 
+            {isGoogleOnlyAccount ? (
+              <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                You signed in with Google. You'll be asked to confirm with Google before your account is deleted.
+              </p>
+            ) : (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Enter your password to confirm
@@ -728,6 +762,7 @@ export default function Settings() {
                 </button>
               </div>
             </div>
+            )}
 
             <div className="flex gap-3">
               <button
@@ -738,7 +773,7 @@ export default function Settings() {
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteLoading || !deletePassword}
+                disabled={deleteLoading || (!isGoogleOnlyAccount && !deletePassword)}
                 className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
               >
                 {deleteLoading ? 'Deleting...' : 'Delete Account'}

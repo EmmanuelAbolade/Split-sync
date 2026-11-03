@@ -38,6 +38,8 @@ jest.mock('firebase/firestore', () => ({
   getDocs:     (...a) => mockGetDocs(...a),
   updateDoc:   (...a) => mockUpdateDoc(...a),
   doc:         (...a) => mockDoc(...a),
+  arrayRemove: (v) => ({ __arrayRemove: v }),
+  arrayUnion:  (v) => ({ __arrayUnion: v }),
 }));
 
 jest.mock('../services/firebase', () => ({ auth: {}, db: {} }));
@@ -246,6 +248,24 @@ describe('Dashboard - Groups list', () => {
     await waitFor(() => screen.getByText('Trip to Rome'));
     fireEvent.click(screen.getByText('Trip to Rome'));
     expect(mockNavigate).toHaveBeenCalledWith('/group/g1');
+  });
+
+  test('Hides a group the user left earlier and removes them from its memberIds', async () => {
+    // Legacy data: user-123 is still in memberIds but no longer in members
+    const leftGroup = { id: 'g9', name: 'Old Flat', currency: 'EUR', icon: 'home', members: [{ userId: 'user-456' }], memberIds: ['user-123', 'user-456'] };
+    setupWithGroups([...mockGroups, leftGroup]);
+    render(<Dashboard />);
+    await waitFor(() => screen.getByText('Trip to Rome'));
+    expect(screen.queryByText('Old Flat')).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockUpdateDoc).toHaveBeenCalledWith(
+        undefined, // mockDoc returns undefined
+        expect.objectContaining({
+          memberIds: { __arrayRemove: 'user-123' },
+          formerMembers: { __arrayUnion: expect.objectContaining({ userId: 'user-123', reason: 'left' }) },
+        })
+      )
+    );
   });
 });
 

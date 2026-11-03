@@ -7,6 +7,12 @@ import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { ArrowLeft, Calendar, Users, TrendingUp, TrendingDown, Archive, Info } from 'lucide-react';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
+import { getMemberName, isActiveMember } from '../utils/memberDirectory';
+
+// Firestore 'in' queries accept at most 30 values — split larger id lists.
+const IN_QUERY_LIMIT = 30;
+const chunk = (arr, size) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, i * size + size));
 
 export default function Activity() {
   const navigate  = useNavigate();
@@ -25,10 +31,8 @@ export default function Activity() {
 
   const getDisplayTitle = (expense, group) => {
     if (!expense.isSettlement) return expense.title;
-    const fromMember = group?.members?.find(m => m.userId === expense.paidBy);
-    const toUserId   = expense.participants?.find(id => id !== expense.paidBy);
-    const toMember   = group?.members?.find(m => m.userId === toUserId);
-    return `Settlement: ${fromMember?.name || 'Unknown'} → ${toMember?.name || 'Unknown'}`;
+    const toUserId = expense.participants?.find(id => id !== expense.paidBy);
+    return `Settlement: ${getMemberName(group, expense.paidBy)} → ${getMemberName(group, toUserId)}`;
   };
 
   // Fetch groups
@@ -36,8 +40,13 @@ export default function Activity() {
     if (!user) return;
     const q = query(collection(db, 'groups'), where('memberIds', 'array-contains', user.uid));
     const unsub = onSnapshot(q, (snapshot) => {
-      setGroups(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-      if (snapshot.docs.length === 0) setLoading(false);
+      // memberIds can still list people who left before leave-group cleared it;
+      // only show groups the user is actually a member of.
+      const mine = snapshot.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(g => isActiveMember(g, user.uid));
+      setGroups(mine);
+      if (mine.length === 0) { setExpenses([]); setLoading(false); }
     });
     return () => unsub();
   }, [user]);
@@ -45,10 +54,11 @@ export default function Activity() {
   // Fetch expenses
   useEffect(() => {
     if (!user || groups.length === 0) return;
-    const groupIds = groups.map(g => g.id);
-    const q = query(collection(db, 'expenses'), where('groupId', 'in', groupIds));
-    const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const batches = chunk(groups.map(g => g.id), IN_QUERY_LIMIT);
+    const perBatch = {}; // batch index -> expenses
+    const publish = () => {
+      if (Object.keys(perBatch).length < batches.length) return; // wait for all
+      const data = Object.values(perBatch).flat();
       data.sort((a, b) => {
         const dA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
         const dB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
@@ -56,8 +66,14 @@ export default function Activity() {
       });
       setExpenses(data);
       setLoading(false);
-    });
-    return () => unsub();
+    };
+    const unsubs = batches.map((ids, i) =>
+      onSnapshot(query(collection(db, 'expenses'), where('groupId', 'in', ids)), (snapshot) => {
+        perBatch[i] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        publish();
+      })
+    );
+    return () => unsubs.forEach(u => u());
   }, [user, groups]);
 
   const getGroupForExpense = (groupId) => groups.find(g => g.id === groupId);
@@ -271,6 +287,7 @@ export default function Activity() {
               const group       = getGroupForExpense(expense.groupId);
               const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
               const isPayer     = expense.paidBy === user.uid;
+              const isParticipant = expense.participants?.includes(user.uid);
               const yourShare   = expense.splits?.[user.uid] || 0;
               const isArchived  = expense.status === 'archived';
 
@@ -313,6 +330,8 @@ export default function Activity() {
                       </p>
                       {isPayer ? (
                         <span className="text-xs text-green-600 dark:text-green-400 font-medium">You paid</span>
+                      ) : !isParticipant ? (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Not involved</span>
                       ) : (
                         <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">
                           You owe {group?.currency || ''} {yourShare.toFixed(2)}
@@ -359,6 +378,10 @@ export default function Activity() {
         }
         onDeleted={() => setSelectedExpense(null)}
         onStatusChanged={() => setSelectedExpense(null)}
+        // Header group name → open the group scrolled to this expense
+        onGoToGroup={(exp) => navigate(`/group/${exp.groupId}`, { state: { focusExpenseId: exp.id } })}
+        // Editing happens inside the group, where the Add Expense form lives
+        onEdit={(exp) => navigate(`/group/${exp.groupId}`, { state: { focusExpenseId: exp.id, editExpense: true } })}
       />
     </div>
   );

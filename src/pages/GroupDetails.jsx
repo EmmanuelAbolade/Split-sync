@@ -1,7 +1,9 @@
 // src/pages/GroupDetails.jsx
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove } from 'firebase/firestore';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove, arrayUnion } from 'firebase/firestore';
+import { findMember, getMemberName, isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
+import useFormerMemberNames from '../hooks/useFormerMemberNames';
 import { authenticateWithBiometric, isBiometricEnabledOnDevice } from '../utils/biometric';
 import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -52,7 +54,13 @@ function getCategoryIcon(category) {
 export default function GroupDetails() {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthStore();
+  // Expense to scroll to / highlight when arriving from the Activity page
+  const [focusExpenseId, setFocusExpenseId] = useState(location.state?.focusExpenseId || null);
+  const [openEditorOnFocus] = useState(!!location.state?.editExpense);
+  const [highlightExpenseId, setHighlightExpenseId] = useState(null);
+  const expenseCardRefs = useRef({});
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showInviteLink] = useState(false);
@@ -114,18 +122,43 @@ export default function GroupDetails() {
   const activePaymentLog    = groupPaymentLog.filter(n => !n.dismissed);
   const dismissedPaymentLog = groupPaymentLog.filter(n => n.dismissed);
 
+  // Names for people who left before formerMembers snapshots existed
+  const formerNames = useFormerMemberNames(group, expenses);
+  // Resolves current AND former members so history never shows "Unknown"
+  const nameOf = (uid) => getMemberName(group, uid, formerNames, { markFormer: true });
+  // Member-like object for JSX that reads .name / .email
+  const memberOf = (uid) => ({ ...(findMember(group, uid) || {}), userId: uid, name: nameOf(uid) });
+
   // Get display title with current names for settlements
   const getDisplayTitle = (expense) => {
     if (!expense.isSettlement) return expense.title;
-    
-    const fromUserId = expense.paidBy;
     const toUserId = expense.participants?.find(id => id !== expense.paidBy);
-    
-    const fromMember = group.members?.find(m => m.userId === fromUserId);
-    const toMember = group.members?.find(m => m.userId === toUserId);
-    
-    return `Settlement: ${fromMember?.name || 'Unknown'} → ${toMember?.name || 'Unknown'}`;
+    return `Settlement: ${nameOf(expense.paidBy)} → ${nameOf(toUserId)}`;
   };
+
+  // Scroll to and highlight an expense passed from the Activity page.
+  // Active expenses are scrolled into view in Recent Expenses; archived or
+  // removed ones are not listed there, so their details modal is opened instead.
+  useEffect(() => {
+    if (!focusExpenseId || loadingExpenses) return;
+    const target = expenses.find(e => e.id === focusExpenseId);
+    setFocusExpenseId(null);
+    window.history.replaceState({}, ''); // don't re-focus on refresh
+    if (!target) return;
+    if (openEditorOnFocus && target.createdBy === user?.uid && !target.isSettlement) {
+      setEditingExpense(target);
+      setShowAddExpense(true);
+      return;
+    }
+    const listed = !target.status || target.status === 'active';
+    if (!listed) { setSelectedExpense(target); return; }
+    setShowRecentExpenses(true);
+    setTimeout(() => {
+      expenseCardRefs.current[target.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightExpenseId(target.id);
+      setTimeout(() => setHighlightExpenseId(null), 2500);
+    }, 150);
+  }, [focusExpenseId, loadingExpenses, expenses, openEditorOnFocus, user?.uid]);
 
   // Format a timestamp into a short date string
   const formatDate = (ts) => {
@@ -361,7 +394,12 @@ export default function GroupDetails() {
     setShowConfirmLeave(true);
   };
 
-  // Removes the current user from the group members array.
+  // Removes the current user from the group.
+  // - members AND memberIds are both cleared, so the group disappears from the
+  //   leaver's lists and Firestore rules stop granting them write access.
+  //   (Previously only `members` was removed, leaving memberIds behind.)
+  // - A name snapshot goes into formerMembers so past expenses keep their name.
+  // Rejoining is only possible through the group's invite link.
   const handleLeaveGroup = async () => {
     if (!user || !group) return;
     setGroupActionLoading(true);
@@ -371,6 +409,14 @@ export default function GroupDetails() {
       if (!currentMember) throw new Error('Member record not found.');
       await updateDoc(doc(db, 'groups', groupId), {
         members: arrayRemove(currentMember),
+        memberIds: arrayRemove(user.uid),
+        formerMembers: arrayUnion({
+          userId: user.uid,
+          name: currentMember.name || user.displayName || user.email,
+          email: currentMember.email || user.email || '',
+          leftAt: new Date(),
+          reason: 'left',
+        }),
       });
       navigate('/dashboard');
     } catch (err) {
@@ -505,8 +551,37 @@ export default function GroupDetails() {
   const userBalance = getUserBalanceSummary(balances, user.uid, group.members);
   const IconComponent = getIconComponent(group.icon);
   const isOwner = group.createdBy === user.uid;
-  const isSoloGroup = (group?.members?.length || 0) <= 1; // true when no other members have joined
-  
+  const isPersonal = isPersonalGroup(group); // self-tracking group — no invites needed
+  const isSoloGroup = !isPersonal && (group?.members?.length || 0) <= 1; // shared group with no other members yet
+  const isMember = isActiveMember(group, user.uid);
+  // Single source of truth for every "Add Expense" entry point on this page
+  const canAddExpense = isMember && !isSoloGroup;
+  const openAddExpense = () => { if (canAddExpense) setShowAddExpense(true); };
+
+  // Non-members (people who left, or anyone who opens the URL directly) get no
+  // access to the group's contents — they must rejoin with the invite link.
+  if (!isMember) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm max-w-sm w-full p-6 text-center">
+          <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LogOut size={26} className="text-amber-600 dark:text-amber-400" />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">You're not a member of this group</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            You no longer have access to <strong>{group.name}</strong>. Ask a member for the group's invite link to rejoin.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-full px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition font-medium"
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Export group expenses to a CSV file
   const handleExportCSV = () => {
     if (expenses.length === 0) return;
@@ -524,8 +599,7 @@ export default function GroupDetails() {
     ];
 
     const rows = expenses.map(expense => {
-      const payer = group.members?.find(m => m.userId === expense.paidBy);
-      const payerName = payer?.name || expense.paidBy;
+      const payerName = nameOf(expense.paidBy);
       const yourShare = expense.splits?.[user.uid] ?? '';
       const date = expense.date?.toDate
         ? expense.date.toDate().toLocaleDateString('en-IE')
@@ -583,8 +657,7 @@ export default function GroupDetails() {
     });
 
     const expenseRows = expenses.map(e => {
-      const payer = group.members?.find(m => m.userId === e.paidBy);
-      const payerName = payer?.name || 'Unknown';
+      const payerName = nameOf(e.paidBy);
       const date = e.date?.toDate
         ? e.date.toDate().toLocaleDateString('en-IE')
         : new Date(e.date).toLocaleDateString('en-IE');
@@ -613,8 +686,8 @@ export default function GroupDetails() {
     const settlementRows = settlementsData.length === 0
       ? `<tr><td colspan="3" style="text-align:center;color:#16a34a">All settled up</td></tr>`
       : settlementsData.map(s => {
-          const from = group.members?.find(m => m.userId === s.from)?.name || s.from;
-          const to   = group.members?.find(m => m.userId === s.to)?.name   || s.to;
+          const from = nameOf(s.from);
+          const to   = nameOf(s.to);
           return `<tr><td>${from}</td><td>${to}</td><td class="amount">${currency} ${s.amount.toFixed(2)}</td></tr>`;
         }).join('');
 
@@ -759,22 +832,25 @@ export default function GroupDetails() {
 
           {/* Action Buttons */}
           <div className="flex gap-3 relative">
-            <button
-              onClick={() => setShowShareModal(true)}
-              className="flex-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition flex items-center justify-center gap-2"
-            >
-              <LinkIcon size={18} />
-              {showInviteLink ? 'Link Copied!' : 'Invite Link'}
-            </button>
+            {/* Personal groups are just for the owner — no invite link */}
+            {!isPersonal && (
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="flex-1 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition flex items-center justify-center gap-2"
+              >
+                <LinkIcon size={18} />
+                {showInviteLink ? 'Link Copied!' : 'Invite Link'}
+              </button>
+            )}
             <button
               className={`flex-1 px-4 py-3 rounded-lg transition flex items-center justify-center gap-2 ${
-                isSoloGroup
+                !canAddExpense
                   ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   : 'bg-primary dark:bg-indigo-600 text-white hover:bg-primary-hover dark:hover:bg-indigo-700 cursor-pointer'
               }`}
-              onClick={() => !isSoloGroup && setShowAddExpense(true)}
+              onClick={openAddExpense}
               title={isSoloGroup ? 'Invite at least one member before adding an expense' : ''}
-              aria-disabled={isSoloGroup}
+              aria-disabled={!canAddExpense}
             >
               <Plus size={18} />
               Add Expense
@@ -1186,8 +1262,8 @@ export default function GroupDetails() {
             </h3>
             <div className="space-y-3">
               {settlements.map((settlement, index) => {
-                const fromMember = group.members?.find(m => m.userId === settlement.from);
-                const toMember = group.members?.find(m => m.userId === settlement.to);
+                const fromMember = memberOf(settlement.from);
+                const toMember = memberOf(settlement.to);
                 
                 const userIsPaying = user.uid === settlement.from;
                 const userIsReceiving = user.uid === settlement.to;
@@ -1679,9 +1755,15 @@ export default function GroupDetails() {
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent collapse when clicking Add
-                setShowAddExpense(true);
+                openAddExpense();
               }}
-              className="text-primary dark:text-indigo-400 text-sm font-medium flex items-center gap-1 hover:underline transition-all duration-300 transform hover:scale-105"
+              disabled={!canAddExpense}
+              title={isSoloGroup ? 'Invite at least one member before adding an expense' : ''}
+              className={`text-sm font-medium flex items-center gap-1 transition-all duration-300 ${
+                canAddExpense
+                  ? 'text-primary dark:text-indigo-400 hover:underline transform hover:scale-105'
+                  : 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              }`}
             >
               <Plus size={16} />
               Add Expense
@@ -1701,28 +1783,35 @@ export default function GroupDetails() {
                   <div className="text-4xl mb-4">📊</div>
                   <p className="text-gray-600 dark:text-gray-300 mb-2">No expenses yet</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    Add your first expense to start tracking
+                    {canAddExpense
+                      ? 'Add your first expense to start tracking'
+                      : 'Invite at least one member to start adding expenses'}
                   </p>
-                  <button
-                    onClick={() => setShowAddExpense(true)}
-                    className="bg-primary dark:bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition"
-                  >
-                    Add First Expense
-                  </button>
+                  {canAddExpense && (
+                    <button
+                      onClick={openAddExpense}
+                      className="bg-primary dark:bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition"
+                    >
+                      Add First Expense
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
                   {expenses.filter(e => !e.status || e.status === 'active').map((expense) => {
-                    const payer = group.members?.find(m => m.userId === expense.paidBy);
                     const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
 
                     const isSettlement = !!expense.isSettlement;
+                    const isHighlighted = highlightExpenseId === expense.id;
 
                     return (
                       <div
                         key={expense.id}
+                        ref={el => { expenseCardRefs.current[expense.id] = el; }}
                         onClick={() => setSelectedExpense(expense)}
                         className={`p-4 border rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-card-hover dark:hover:shadow-gray-900/50 cursor-pointer shadow-card dark:shadow-gray-900/50 ${
+                          isHighlighted ? 'ring-4 ring-indigo-400 dark:ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 ' : ''
+                        }${
                           isSettlement
                             ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10 hover:border-green-400 dark:hover:border-green-600'
                             : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-primary dark:hover:border-indigo-500'
@@ -1751,7 +1840,7 @@ export default function GroupDetails() {
                             </div>
 
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Paid by {payer?.name || 'Unknown'}
+                              Paid by {nameOf(expense.paidBy)}
                             </p>
                             {expense.description && (
                               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{expense.description}</p>

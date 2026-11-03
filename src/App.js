@@ -2,8 +2,9 @@
 import { useNotificationsStore } from './stores/notificationsStore';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './services/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from './services/firebase';
 import { useAuthStore } from './stores/authStore';
 import JoinGroup          from './pages/JoinGroup';
 import Login              from './pages/Login';
@@ -73,6 +74,19 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+
+      // Accounts suspended by an admin (users/{uid}.isActive === false) are
+      // signed out. Firestore rules also block their writes server-side.
+      if (user) {
+        getDoc(doc(db, 'users', user.uid))
+          .then(snap => {
+            if (snap.exists() && snap.data().isActive === false) {
+              try { sessionStorage.setItem('accountSuspended', '1'); } catch { /* ignore */ }
+              signOut(auth);
+            }
+          })
+          .catch(() => { /* non-blocking — never stop sign-in on a lookup failure */ });
+      }
     });
     return unsubscribe;
   }, [setUser, setLoading]);

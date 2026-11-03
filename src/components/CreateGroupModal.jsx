@@ -19,6 +19,9 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  // 'shared' — normal split group; 'personal' — self-tracking, no members/invites
+  const [groupType, setGroupType] = useState('shared');
+  const isPersonal = groupType === 'personal';
   const modalBodyRef = useRef(null);
 
   // STATE - ADDED FOR QUICK ADD & CONTACT SYNC
@@ -128,6 +131,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
         name: groupName.trim(),
         icon,
         currency,
+        type: groupType,
         createdBy: user.uid,
         createdAt: serverTimestamp(),
         memberIds: [user.uid],
@@ -152,8 +156,8 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
           await updateGroupConnections(docRef.id, groupName.trim(), allMemberIds);
         }
 
-        // 2. Send invitations to Quick Add / Contact Finder members
-        if (pendingInvitations.length > 0) {
+        // 2. Send invitations to Quick Add / Contact Finder members (never for personal trackers)
+        if (!isPersonal && pendingInvitations.length > 0) {
           const inviteUserIds = pendingInvitations.map(inv => inv.userId);
           const result = await sendBulkInvitations(
             user,
@@ -181,8 +185,9 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
       setGroupName('');
       setIcon('home');
       setCurrency('EUR');
+      setGroupType('shared');
       setShowQuickAdd(false);
-      
+
       if (onGroupCreated) {
         onGroupCreated(docRef.id);
       }
@@ -249,9 +254,38 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Group type — shared split group or a personal expense tracker */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Group Name
+                Type
+              </label>
+              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Group type">
+                {[
+                  { id: 'shared',   title: 'Shared group',  hint: 'Split with others' },
+                  { id: 'personal', title: 'Personal',      hint: 'Just me — track my own spending' },
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={groupType === opt.id}
+                    onClick={() => setGroupType(opt.id)}
+                    className={`text-left px-3 py-2.5 rounded-lg border-2 transition ${
+                      groupType === opt.id
+                        ? 'border-primary dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold text-gray-900 dark:text-white">{opt.title}</span>
+                    <span className="block text-xs text-gray-500 dark:text-gray-400">{opt.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {isPersonal ? 'Tracker Name' : 'Group Name'}
               </label>
               <input
                 type="text"
@@ -283,6 +317,12 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
               </select>
             </div>
 
+            {isPersonal ? (
+              <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                Personal trackers are private to you. Add expenses and receipts straight away — no invite needed. Nothing is split or owed.
+              </p>
+            ) : (
+            <>
             {/* SECTION - Add Members */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
@@ -382,6 +422,8 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
                 </span>
               </div>
             </div>
+            </>
+            )}
 
             <div className="flex gap-3 pt-4">
               <button
@@ -396,7 +438,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
                 disabled={loading}
                 className="flex-1 px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition disabled:opacity-50"
               >
-                {loading ? 'Creating...' : 'Create Group'}
+                {loading ? 'Creating...' : isPersonal ? 'Create Tracker' : 'Create Group'}
               </button>
             </div>
           </form>

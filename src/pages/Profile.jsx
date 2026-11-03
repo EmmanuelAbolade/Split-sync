@@ -12,17 +12,16 @@ import {
 import { calculateBalances,  calculateSettlements  } from '../utils/balanceCalculator';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import CloudinaryUpload from '../components/CloudinaryUpload';
-import { 
-  encryptData, 
-  decryptData, 
-  validateIBAN
-} from '../utils/encryption';
+import { validateIBAN } from '../utils/encryption';
+// IBANs are encrypted/decrypted server-side — the browser holds no key
+import { encryptIban, fetchIban } from '../utils/ibanService';
 import { 
   authenticateWithBiometric,
   isBiometricAvailable,
   isBiometricEnabledOnDevice,
 } from '../utils/biometric';
 import BalanceBreakdownModal from '../components/BalanceBreakdownModal';
+import { isActiveMember } from '../utils/memberDirectory';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -75,7 +74,9 @@ export default function Profile() {
       where('memberIds', 'array-contains', user.uid)
     );
     const unsubscribe = onSnapshot(groupsQuery, (snapshot) => {
-      const groupsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const groupsData = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(g => isActiveMember(g, user.uid)); // exclude groups the user left
       setGroups(groupsData);
     });
     return () => unsubscribe();
@@ -109,17 +110,20 @@ export default function Profile() {
 
   useEffect(() => {
     if (!user || groups.length === 0) return;
+    // Firestore 'in' accepts at most 30 values — query in chunks of 30 groups
     const groupIds = groups.map(g => g.id);
-    const expensesQuery = query(
-      collection(db, 'expenses'),
-      where('groupId', 'in', groupIds)
+    const batches = [];
+    for (let i = 0; i < groupIds.length; i += 30) batches.push(groupIds.slice(i, i + 30));
+    const perBatch = {};
+    const unsubs = batches.map((ids, i) =>
+      onSnapshot(query(collection(db, 'expenses'), where('groupId', 'in', ids)), (snapshot) => {
+        perBatch[i] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (Object.keys(perBatch).length < batches.length) return; // wait for all batches
+        setExpenses(Object.values(perBatch).flat());
+        setLoading(false);
+      })
     );
-    const unsubscribe = onSnapshot(expensesQuery, (snapshot) => {
-      const expensesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setExpenses(expensesData);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    return () => unsubs.forEach(u => u());
   }, [user, groups]);
 
   // Fetch user data including payment methods
@@ -135,7 +139,7 @@ export default function Profile() {
             const methods = data.paymentMethods;
             if (methods.encryptedIBAN) {
               try {
-                const decryptedIBAN = decryptData(methods.encryptedIBAN);
+                const decryptedIBAN = (await fetchIban(user.uid)) || '';
                 setPaymentMethods({
                   paypalUsername: methods.paypalUsername || '',
                   revolutUsername: methods.revolutUsername || '',
@@ -341,7 +345,7 @@ export default function Profile() {
         cleanedPaymentMethods.bic = paymentMethods.bic.trim().toUpperCase();
       if (paymentMethods.iban?.trim()) {
         const cleanIBAN = paymentMethods.iban.replace(/\s/g, '').toUpperCase();
-        cleanedPaymentMethods.encryptedIBAN = encryptData(cleanIBAN);
+        cleanedPaymentMethods.encryptedIBAN = await encryptIban(cleanIBAN);
       }
       const userDocRef = doc(db, 'users', user.uid);
       const userDocSnap = await getDoc(userDocRef);
@@ -371,9 +375,8 @@ export default function Profile() {
     } catch (err) {
       console.error('Payment save error:', err);
       let errorMessage = 'Failed to save payment methods. ';
-      if (err.message?.includes('Encryption failed')) errorMessage = 'Encryption error: ' + err.message;
-      else if (err.code === 'permission-denied') errorMessage = 'Permission denied. Check Firestore security rules.';
-      else if (err.code === 'unavailable') errorMessage = 'Network error. Check your internet connection.';
+      if (err.code === 'permission-denied') errorMessage = 'You do not have permission to save these details. Please sign in again.';
+      else if (err.code === 'unavailable' || err.code === 'functions/unavailable') errorMessage = 'Network error. Check your internet connection.';
       else errorMessage += err.message || 'Please try again.';
       setPaymentError(errorMessage);
     } finally {

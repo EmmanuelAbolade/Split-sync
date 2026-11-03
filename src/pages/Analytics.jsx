@@ -18,6 +18,7 @@ import {
   TrendingUp, PieChart as PieIcon, BarChart2,
   Calendar, ArrowLeftRight, ArrowLeft, Loader,
 } from 'lucide-react';
+import { isActiveMember } from '../utils/memberDirectory';
 
 // ─── Colour palette ───────────────────────────────────────────────────────────
 
@@ -112,7 +113,9 @@ export default function Analytics() {
         const gSnap = await getDocs(
           query(collection(db, 'groups'), where('memberIds', 'array-contains', user.uid))
         );
-        const groupList = gSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const groupList = gSnap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(g => isActiveMember(g, user.uid)); // exclude groups the user left
         setGroups(groupList);
 
         // 2. Build a userId→name map from all members across groups

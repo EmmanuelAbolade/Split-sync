@@ -3,9 +3,9 @@
 // Handles offline caching using a Cache-First strategy for static assets
 // and a Network-First strategy for dynamic/API content.
 
-const CACHE_NAME = 'splitsync-v1';
-const STATIC_CACHE = 'splitsync-static-v1';
-const DYNAMIC_CACHE = 'splitsync-dynamic-v1';
+const CACHE_NAME    = 'splitsync-v2';
+const STATIC_CACHE  = 'splitsync-static-v2';
+const DYNAMIC_CACHE = 'splitsync-dynamic-v2';
 
 // Static assets to pre-cache on install
 const STATIC_ASSETS = [
@@ -70,6 +70,7 @@ self.addEventListener('fetch', (event) => {
     url.hostname.includes('googleapis.com') ||
     url.hostname.includes('firestore.googleapis.com') ||
     url.hostname.includes('cloudfunctions.net') ||
+    url.hostname.includes('run.app') ||
     url.hostname.includes('identitytoolkit.googleapis.com');
 
   if (isFirebase) {

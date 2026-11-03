@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+/firestore-tests/node_modules
+firestore-debug.log
+firebase-debug.log
 /.pnp
 .pnp.js
 

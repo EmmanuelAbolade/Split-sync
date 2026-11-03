@@ -106,6 +106,13 @@ jest.mock('../utils/encryption', () => ({
   validateIBAN: (...a) => mockValidateIBAN(...a),
 }));
 
+// IBAN encryption is server-side (utils/ibanService → Cloud Functions)
+const mockFetchIban   = jest.fn();
+jest.mock('../utils/ibanService', () => ({
+  fetchIban:   (...a) => mockFetchIban(...a),
+  encryptIban: async (v) => `encrypted-${v}`,
+}));
+
 const mockAuthenticateWithBiometric    = jest.fn();
 const mockIsBiometricAvailable         = jest.fn(() => false);
 const mockIsBiometricEnabledOnDevice   = jest.fn(() => false);
@@ -470,8 +477,9 @@ describe('Profile - Payment Settings', () => {
       }),
     });
     render(<Profile />);
+    // The plain IBAN is requested from the server for the signed-in user
     await waitFor(() =>
-      expect(mockDecryptData).toHaveBeenCalledWith('encrypted-IE29AIBK12345678901234')
+      expect(mockFetchIban).toHaveBeenCalledWith('user-123')
     );
   });
 

@@ -37,10 +37,11 @@ jest.mock('../utils/sepaPayment', () => ({
   calculatePaymentFee:      (...a) => mockCalculatePaymentFee(...a),
 }));
 
-// encryption
+// IBANs are decrypted server-side via ibanService.fetchIban
 const mockDecryptData = jest.fn(v => `DECRYPTED-${v}`);
-jest.mock('../utils/encryption', () => ({
-  decryptData: (...a) => mockDecryptData(...a),
+jest.mock('../utils/ibanService', () => ({
+  // own IBAN lookup: mirrors the stored ciphertext so assertions stay readable
+  fetchIban: async () => mockDecryptData('encrypted-alice-iban'),
 }));
 
 // biometric auth
@@ -61,8 +62,10 @@ const mockPayment = {
   groupId:   'group-123',
   fromUser:  { id: 'user-123', name: 'Alice' },
   toUser:    { id: 'user-456', name: 'Bob'   },
+  // SettleUpModal passes the recipient's server-decrypted IBAN as .iban
   toUserPaymentMethods: {
     encryptedIBAN: 'encrypted-bob-iban',
+    iban: 'DECRYPTED-encrypted-bob-iban',
   },
 };
 

@@ -7,12 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import CreateGroupModal from '../components/CreateGroupModal';
 import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users, ShoppingCart, Coffee, Utensils, Music, Briefcase, GraduationCap, Gift, Settings, Bell, TrendingDown, TrendingUp, Layers, AlertCircle,  ArrowRightCircle } from 'lucide-react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
 import InvitationNotification from '../components/InvitationNotification';
 import OnboardingWizard from "../components/OnboardingWizard";
 import NotificationsDropdown from '../components/NotificationsDropdown'; 
 import { useNotificationsStore } from '../stores/notificationsStore';
 import { calculateBalances, getUserBalanceSummary } from '../utils/balanceCalculator';
+import { isActiveMember } from '../utils/memberDirectory';
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -209,11 +210,37 @@ export default function Dashboard() {
     );
 
     const unsubscribe = onSnapshot(groupsQuery, async (snapshot) => {
-      const groupsData = snapshot.docs.map(doc => ({
+      // memberIds may still list people who left before leave-group cleared it
+      const allGroups = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
+      const groupsData = allGroups.filter(g => isActiveMember(g, user.uid));
       setGroups(groupsData);
+
+      // Self-heal legacy data: remove this user from memberIds of groups they
+      // already left, and record a name snapshot so history keeps their name.
+      allGroups
+        .filter(g => !isActiveMember(g, user.uid))
+        .forEach(g => {
+          try {
+          const alreadyRecorded = g.formerMembers?.some(m => m.userId === user.uid);
+          updateDoc(doc(db, 'groups', g.id), {
+            memberIds: arrayRemove(user.uid),
+            ...(!alreadyRecorded && {
+              formerMembers: arrayUnion({
+                userId: user.uid,
+                name: user.displayName || user.email || 'Former member',
+                email: user.email || '',
+                leftAt: new Date(),
+                reason: 'left',
+              }),
+            }),
+          }).catch(err => console.warn('[Dashboard] legacy membership cleanup failed:', err?.code));
+          } catch (err) {
+            console.warn('[Dashboard] legacy membership cleanup skipped:', err?.message);
+          }
+        });
 
       // Fetch expenses for each group and calculate user balance
       const balanceMap = {};

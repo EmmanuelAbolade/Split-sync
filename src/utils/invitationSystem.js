@@ -1,6 +1,8 @@
 // src/utils/invitationSystem.js
 // Handles group invitations - sending, accepting, declining
 
+import { isActiveMember } from './memberDirectory';
+
 import { 
   doc, 
   setDoc, 
@@ -27,7 +29,8 @@ export const sendInvitation = async (fromUser, toUserId, groupId, groupName) => 
     const groupDoc = await getDoc(doc(db, 'groups', groupId));
     if (groupDoc.exists()) {
       const groupData = groupDoc.data();
-      if (groupData.memberIds?.includes(toUserId)) {
+      // Check members (not memberIds) — memberIds can still hold people who left
+      if (isActiveMember(groupData, toUserId)) {
         return { success: false, message: 'User is already in this group' };
       }
     }
@@ -240,7 +243,7 @@ export const acceptInvitation = async (invitationId, userId) => {
     const groupData = groupDoc.data();
 
     // Check if already a member
-    if (groupData.memberIds?.includes(userId)) {
+    if (isActiveMember(groupData, userId)) {
       await updateDoc(doc(db, 'invitations', invitationId), { status: 'accepted' });
       return { success: false, message: 'You are already a member of this group' };
     }
@@ -259,7 +262,11 @@ export const acceptInvitation = async (invitationId, userId) => {
         photoURL: userData.photoURL || null,
         joinedAt: new Date()
       }),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      // Clear any "left" snapshot when a former member rejoins
+      ...(groupData.formerMembers?.some(m => m.userId === userId) && {
+        formerMembers: groupData.formerMembers.filter(m => m.userId !== userId),
+      }),
     });
 
     // Mark invitation as accepted

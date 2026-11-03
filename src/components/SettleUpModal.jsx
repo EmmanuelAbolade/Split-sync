@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark, QrCode, Smartphone, ChevronDown } from 'lucide-react';
 import { getDoc } from 'firebase/firestore';
@@ -9,7 +10,7 @@ import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } f
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { authenticateWithBiometric } from '../utils/biometric';
-import { decryptData } from '../utils/encryption';
+import { fetchIban } from '../utils/ibanService';
 import { createNotification, recordPaymentSent } from '../stores/notificationsStore';
 import QRCodeCanvas from './QRCodeCanvas';
 
@@ -95,11 +96,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           // expose it under the iban key so the Bank Transfer option renders correctly.
           const raw = data.paymentMethods ? { ...data.paymentMethods } : null;
           if (raw?.encryptedIBAN) {
-            try {
-              raw.iban = decryptData(raw.encryptedIBAN);
-            } catch (e) {
-              console.error('Failed to decrypt recipient IBAN:', e);
-            }
+            // Decrypted server-side; only returned because we share this group
+            const plain = await fetchIban(settlement.to, group?.id);
+            if (plain) raw.iban = plain;
           }
           setRecipientPaymentMethods(raw);
         }
@@ -113,7 +112,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     if (isOpen) {
       fetchRecipientPaymentMethods();
     }
-  }, [settlement, isOpen]);
+  }, [settlement, isOpen, group?.id]);
 
   const recordSettlement = async (paypalOrderId = null) => {
     const amountNum = parseFloat(amount);
@@ -446,9 +445,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             currency_code: group.currency || 'EUR',
             value: amountNum.toFixed(2),
           },
-          payee: {
-            email_address: toMember?.email || 'receiver@example.com',
-          },
+          //payee: {
+            //email_address: toMember?.email || 'receiver@example.com',
+          //},
         },
       ],
       application_context: {
@@ -462,9 +461,11 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setError('');
 
     try {
-      const details = await actions.order.capture();
-      
-      await recordSettlement(details.id);
+      const fns           = getFunctions();
+      const capturePayPal = httpsCallable(fns, 'capturePayPalOrder');
+      const result        = await capturePayPal({ orderId: data.orderID });
+      if (!result.data.success) throw new Error('...');
+      await recordSettlement(result.data.orderId);
       setPaymentSuccess(true);
       setTimeout(() => onClose(), 2500);
     } catch (err) {

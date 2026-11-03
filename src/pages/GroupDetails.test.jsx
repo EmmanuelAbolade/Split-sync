@@ -11,6 +11,7 @@ const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   useParams:   () => ({ groupId: 'group-123' }),
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ state: null }),
 }));
 
 const mockGetDoc     = jest.fn();

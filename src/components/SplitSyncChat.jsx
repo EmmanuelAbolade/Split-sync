@@ -6,7 +6,9 @@ import { useState, useEffect, useRef } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthStore } from '../stores/authStore';
 import { MessageCircle, X, Send, Bot, User, Loader, RotateCcw } from 'lucide-react';
-import app from '../services/firebase';
+import app, { db } from '../services/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
 
 // Suggested starter questions shown before first message
 const SUGGESTIONS = [
@@ -73,6 +75,29 @@ export default function SplitSyncChat({ groupCount = 0, totalBalance = 0 }) {
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
 
+  // Group counts sent to the assistant as context (counts only — no names or
+  // amounts). Loaded once per chat opening; falls back to the props.
+  const [counts, setCounts] = useState(null);
+  useEffect(() => {
+    if (!open || !user?.uid) return;
+    let cancelled = false;
+    let request;
+    try {
+      request = getDocs(query(collection(db, 'groups'), where('memberIds', 'array-contains', user.uid)));
+    } catch {
+      return; // context is optional — never block the chat
+    }
+    request
+      .then(snap => {
+        if (cancelled) return;
+        const mine = snap.docs.map(d => d.data()).filter(g => isActiveMember(g, user.uid));
+        const personalCount = mine.filter(isPersonalGroup).length;
+        setCounts({ groupCount: mine.length, personalCount, sharedCount: mine.length - personalCount });
+      })
+      .catch(() => { /* context is optional */ });
+    return () => { cancelled = true; };
+  }, [open, user?.uid]);
+
   // Initialise Firebase Functions — connects to emulator in dev, production in prod
   const fns    = getFunctions(app);
   const chatFn = httpsCallable(fns, 'splitSyncChat');
@@ -103,7 +128,7 @@ export default function SplitSyncChat({ groupCount = 0, totalBalance = 0 }) {
     try {
       const result = await chatFn({
         messages:    updated,
-        userContext: { groupCount, totalBalance },
+        userContext: counts || { groupCount, totalBalance },
       });
       setMessages(prev => [...prev, { role: 'assistant', content: result.data.reply }]);
     } catch (err) {

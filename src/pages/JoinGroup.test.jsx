@@ -129,7 +129,7 @@ describe('JoinGroup - Already a member', () => {
   beforeEach(() => jest.clearAllMocks());
 
   test('Shows Already a Member screen when user is already in group', async () => {
-    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'] }));
+    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'], members: [{ userId: 'creator-1', name: 'Creator' }, { userId: 'user-123', name: 'Alice' }] }));
     render(<JoinGroup />);
     await waitFor(() =>
       expect(screen.getByText('Already a Member')).toBeInTheDocument()
@@ -137,7 +137,7 @@ describe('JoinGroup - Already a member', () => {
   });
 
   test('Shows group name on already member screen', async () => {
-    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'] }));
+    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'], members: [{ userId: 'creator-1', name: 'Creator' }, { userId: 'user-123', name: 'Alice' }] }));
     render(<JoinGroup />);
     await waitFor(() =>
       expect(screen.getByText(/Trip to Rome/)).toBeInTheDocument()
@@ -145,7 +145,7 @@ describe('JoinGroup - Already a member', () => {
   });
 
   test('Shows View Group button when already a member', async () => {
-    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'] }));
+    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'], members: [{ userId: 'creator-1', name: 'Creator' }, { userId: 'user-123', name: 'Alice' }] }));
     render(<JoinGroup />);
     await waitFor(() =>
       expect(screen.getByText('View Group')).toBeInTheDocument()
@@ -153,7 +153,7 @@ describe('JoinGroup - Already a member', () => {
   });
 
   test('Navigates to group page from already member screen', async () => {
-    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'] }));
+    setupGroupDoc(mockGroupData({ memberIds: ['user-123', 'creator-1'], members: [{ userId: 'creator-1', name: 'Creator' }, { userId: 'user-123', name: 'Alice' }] }));
     render(<JoinGroup />);
     await waitFor(() => screen.getByText('View Group'));
     fireEvent.click(screen.getByText('View Group'));

@@ -68,7 +68,7 @@ describe('sendInvitation', () => {
   test('Returns failure when user is already in the group', async () => {
     mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
     mockGetDoc
-      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'] }) })
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'], members: [{ userId: 'user-2' }] }) })
       .mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
     const result = await sendInvitation(mockFromUser, 'user-2', 'group-1', 'Trip');
     expect(result.success).toBe(false);
@@ -116,7 +116,7 @@ describe('sendBulkInvitations', () => {
     mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
     mockGetDoc.mockResolvedValue({
       exists: () => true,
-      data: () => ({ memberIds: ['user-2', 'user-3'] }), // both already in group
+      data: () => ({ memberIds: ['user-2', 'user-3'], members: [{ userId: 'user-2' }, { userId: 'user-3' }] }), // both already in group
     });
     const result = await sendBulkInvitations(mockFromUser, ['user-2', 'user-3'], 'group-1', 'Trip');
     expect(result.failed).toHaveLength(2);
@@ -302,7 +302,7 @@ describe('acceptInvitation', () => {
         exists: () => true,
         data: () => ({ toUserId: 'user-2', expiresAt: futureExpiry, groupId: 'group-1' }),
       })
-      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'] }) });
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'], members: [{ userId: 'user-2' }] }) });
     mockUpdateDoc.mockResolvedValue(undefined);
     const result = await acceptInvitation('inv-1', 'user-2');
     expect(result.success).toBe(false);
@@ -512,5 +512,21 @@ describe('getInvitationCount', () => {
     mockGetDocs.mockRejectedValue(new Error('Firebase error'));
     const count = await getInvitationCount('user-1');
     expect(count).toBe(0);
+  });
+});
+
+// Regression: people who left before the leave-group fix stayed in memberIds.
+// They must be invitable again (membership is judged by `members`).
+describe('sendInvitation - legacy leaver still in memberIds', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Does not report "already in this group" for someone only in memberIds', async () => {
+    mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
+    mockGetDoc
+      .mockResolvedValueOnce({ exists: () => true, data: () => ({ memberIds: ['user-2'], members: [] }) })
+      .mockResolvedValueOnce({ exists: () => false });
+    const result = await sendInvitation(mockFromUser, 'user-2', 'group-1', 'Trip');
+    expect(result.message).not.toBe('User is already in this group');
+    expect(result.message).toBe('User not found'); // proceeded past the membership check
   });
 });

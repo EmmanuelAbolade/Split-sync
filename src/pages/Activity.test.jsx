@@ -34,10 +34,12 @@ jest.mock('../stores/authStore', () => {
   };
 });
 
-jest.mock('../components/ExpenseDetailsModal', () => ({ isOpen, onClose, expense }) =>
+jest.mock('../components/ExpenseDetailsModal', () => ({ isOpen, onClose, expense, group, onGoToGroup, onEdit }) =>
   isOpen ? (
     <div data-testid="expense-details-modal">
       <span data-testid="modal-expense-title">{expense?.title}</span>
+      {onGoToGroup && <button onClick={() => onGoToGroup(expense)}>Go to {group?.name}</button>}
+      {onEdit && <button onClick={() => onEdit(expense)}>Edit From Activity</button>}
       <button onClick={onClose}>Close Details</button>
     </div>
   ) : null
@@ -49,7 +51,7 @@ import Activity from './Activity';
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const mockGroups = [
-  { id: 'g1', name: 'Trip to Rome', currency: 'EUR', memberIds: ['user-123'] },
+  { id: 'g1', name: 'Trip to Rome', currency: 'EUR', memberIds: ['user-123'], members: [{ userId: 'user-123', name: 'Alice' }] },
 ];
 
 const mockExpenses = [
@@ -301,6 +303,34 @@ describe('Activity - Expense details modal', () => {
     fireEvent.click(screen.getByText('Dinner'));
     fireEvent.click(screen.getByText('Close Details'));
     expect(screen.queryByTestId('expense-details-modal')).not.toBeInTheDocument();
+  });
+
+  test('Group link in the modal opens the group focused on the expense', async () => {
+    render(<Activity />);
+    await waitFor(() => screen.getByText('Dinner'));
+    fireEvent.click(screen.getByText('Dinner'));
+    fireEvent.click(screen.getByText('Go to Trip to Rome'));
+    expect(mockNavigate).toHaveBeenCalledWith('/group/g1', { state: { focusExpenseId: 'e1' } });
+  });
+
+  test('Edit from Activity opens the group with the editor requested', async () => {
+    render(<Activity />);
+    await waitFor(() => screen.getByText('Dinner'));
+    fireEvent.click(screen.getByText('Dinner'));
+    fireEvent.click(screen.getByText('Edit From Activity'));
+    expect(mockNavigate).toHaveBeenCalledWith('/group/g1', { state: { focusExpenseId: 'e1', editExpense: true } });
+  });
+});
+
+describe('Activity - Groups the user has left', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('Hides groups where the user is only in memberIds (left before the fix)', async () => {
+    const leftGroup = { id: 'g2', name: 'Old Flat', currency: 'EUR', memberIds: ['user-123'], members: [{ userId: 'user-999', name: 'Zed' }] };
+    setupActivity([leftGroup], [{ ...mockExpenses[0], groupId: 'g2' }]);
+    render(<Activity />);
+    await waitFor(() => screen.getByText('No activity yet'));
+    expect(screen.queryByText('Dinner')).not.toBeInTheDocument();
   });
 });
 
