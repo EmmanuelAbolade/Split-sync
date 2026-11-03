@@ -207,11 +207,11 @@ Resolved on 2026-11-03 (second session): expense read access, IBAN key exposure,
 
 ## 12. Deployment state / pending actions
 
-Status at the end of 2026-11-03:
+Status at the end of 2026-11-03: **fully deployed.**
 
 - [x] **Firestore rules deployed** (expense reads/writes members-only, notification update limits, admin suspend, owner-only group delete).
 - [x] All code committed to `master`.
-- [ ] **Create the two secrets.** This is blocked on the user: Claude's session was not permitted to write to Secret Manager. Every function deploy is blocked until both exist, because the CLI checks all declared secrets.
+- [x] **Secrets created** by the user (Claude's session was not permitted to write to Secret Manager), then verified: `IBAN_ENCRYPTION_KEY` is 64 hex chars; `LEGACY_IBAN_KEY` matches the old client key. To recreate or rotate them:
   ```powershell
   # 1. new random AES-256 key
   node -e "process.stdout.write(require('crypto').randomBytes(32).toString('hex'))" > iban.key
@@ -220,10 +220,11 @@ Status at the end of 2026-11-03:
   # 2. the old client key, so existing IBANs can be migrated (value of REACT_APP_ENCRYPTION_KEY in .env)
   firebase functions:secrets:set LEGACY_IBAN_KEY
   ```
-- [ ] Remove the `REACT_APP_ENCRYPTION_KEY=` line from `.env` (after step 2) so it is no longer bundled into the app.
-- [ ] `firebase deploy --only functions`. **The AI assistant stays down in production until this runs** (the live function still calls the retired model). This also deploys `encryptIban`, `getIban`, the scanReceipt auth check and `capturePayPalOrder`.
-- [ ] `npm run build && firebase deploy --only hosting`, **after** functions (the new client calls `encryptIban`/`getIban`).
-- [ ] Verify: ask the in-app assistant a question; check `firebase functions:log --only splitSyncChat` for errors.
+- [x] `REACT_APP_ENCRYPTION_KEY` removed from `.env` (replaced by a comment); the production bundle was checked and contains no key value.
+- [x] Functions deployed: `splitSyncChat` (AI assistant restored), `encryptIban`, `getIban` (new), `scanReceipt`, `capturePayPalOrder`.
+- [x] Hosting deployed to https://splitsync-dev.web.app.
+- [x] Assistant verified by sending the exact production request (model, settings, new prompt) to the Claude API: HTTP 200, accurate answer about personal trackers and leaving groups, prompt cache written (3,935 tokens). An in-browser check was not possible (Chrome extension not connected), so try the chat once on the live site.
+- [ ] Optional: make the GitHub repo public for employers (see the recommendations in the 2026-11-03 conversation: confirm SETU policy, add homepage and topics, a README "my role" section, and restrict the Firebase web API key to your domains).
 
 Order matters: secrets → functions → hosting. Until hosting is deployed, users run the previous client against the new rules. That is safe: its queries still pass the rules, and its destructive old account-deletion path is now blocked, because its cross-group expense query is denied.
 
@@ -286,7 +287,7 @@ Tests added: gating, non-member, personal-tracker, leave-writes-formerMembers an
 
 New: `functions/iban.js` (+ `iban.test.js`, 5 tests), `functions/assistantPrompt.js`, `src/utils/ibanService.js`, `firestore-tests/` (23 emulator rule tests), npm scripts `test:functions` and `test:rules`.
 Results: Jest 54 suites / 1,461 tests passing (7 obsolete client-encryption tests removed), functions 5/5, rules 23/23, production build compiles.
-Deployed: Firestore rules. **Blocked:** functions and hosting, waiting for the two secrets (§12).
+Deployed: Firestore rules, all functions, hosting (after the user created the two secrets).
 
 ---
 
