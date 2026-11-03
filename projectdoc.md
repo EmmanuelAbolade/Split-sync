@@ -200,6 +200,8 @@ Ordered by importance.
 6. Any signed-in user can *create* a notification for anyone (needed for expense/payment notifications). This could be abused for spam; moving notification creation into Cloud Functions would fix it.
 7. Receipt OCR is heuristic (first line as merchant, dd/mm/yyyy dates only).
 8. PayPal integration is sandbox-only; the payee e-mail was intentionally removed from the order.
+9. One Jest test failed once in five coverage runs (2026-11-03) and passed on every rerun. It is a timing flake; the failing test name was not captured. If it recurs, note the name here.
+10. Coverage is 82.9% of lines (it was 84.4%). The new `utils/accountDeletion.js` and `utils/ibanService.js` have no unit tests yet; they are good next candidates.
 
 Resolved on 2026-11-03 (second session): expense read access, IBAN key exposure, notification tampering, Taskmaster suspend, legacy `memberIds` (self-healing).
 

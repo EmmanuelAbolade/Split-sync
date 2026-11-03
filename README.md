@@ -40,7 +40,8 @@
 
 ### Why Split-Sync?
 
-- **Privacy-First Design**: End-to-end encryption, secure authentication, and privacy-preserving contact sync
+- **Privacy-First Design**: Bank details encrypted server-side, membership-scoped data access, secure authentication, and privacy-preserving contact sync
+- **Personal Expense Tracking**: Private trackers for your own spending and receipts, no invite needed
 - **Multiple Payment Methods**: Integrated PayPal, Revolut, and SEPA bank transfers
 - **Progressive Web App**: Install on any device, and have native app experience
 - **Multi-Currency Support**: EUR, USD, GBP with automatic currency handling
@@ -65,6 +66,7 @@
 
 #### **Group Management**
 - **Flexible Group Creation**: Custom icons, names, and currencies
+- **Shared Groups or Personal Trackers**: Shared groups need at least one other member before expenses can be added; personal trackers are private, need no invite, and support receipt scanning with no splitting
 - **Multiple Invitation Methods**:
   - Quick Add from previous connections
   - Contact sync (find friends via phone contacts)
@@ -72,6 +74,8 @@
   - Shareable invite links via whatsApp, SMS, Email etc.
 - **Real-Time Updates**: Live expense and member updates via Firestore subscriptions
 - **Group Management**: Leave or delete a group with unsettled balance protection.
+- **Membership Lifecycle**: Members who leave lose all access and can only return through the invite link. Their past expenses and settlements stay in the group (so everyone's balances and history remain correct) and keep showing their name, marked "(left)"
+- **Safe Account Deletion**: Blocked until all balances are settled; removes you from shared groups without deleting shared history, hands owned groups to another member, and erases personal data
 - **Group Currency**: Each group maintains its own currency — no cross-currency conversion is applied to prevent confusion
 
 #### **Expense Entry and Tracking**
@@ -83,7 +87,7 @@
   4. **Shares**: Split by share ratios (e.g., 2:1:3)
 - **Rich Expense Details**: Categories, descriptions, dates, receipts
 - **Expense Categories**: Expense categories with distinct icons
-- **Expense History**: Complete activity timeline with filters
+- **Expense History**: Complete activity timeline with filters; each entry links back to its group with the expense highlighted
 - **Settlement Suggestions**: Smart balance calculation and optimal settlement paths
 - **CSV and PDF Report Export**: Report generated for use in spreadsheet and printable browser print dialogue
 - **Expense Management**: Edit, archive, or remove expenses (creator only). 
@@ -120,7 +124,7 @@
 
 ### **Profile and Payments**
 - Payment settings protected by biometric or password authentication
-- IBAN stored encrypted (AES-256)
+- IBAN encrypted server-side (AES-256-GCM, key held in Secret Manager) and only ever shown to its owner and people who share a group with them
 - PayPal, Revolut, and SEPA payment methods supported
 - Input validation enforced on all payment fields with strict length limits
 - Display name changed, sync across Firebase Auth, Firestore, and all group member arrays in real time
@@ -140,8 +144,8 @@
 - WebAuthn biometric login (fingerprint and Face ID) per device
 - Configurable session timeout with auto-logout warning
 - All routes protected — unauthenticated users are redirected to login
-- Firestore security rules restrict all reads and writes to authorised users only
-- API keys secured server-side in Firebase Cloud Functions — never exposed to the client
+- Firestore security rules: expenses are readable and writable only by members of their group; only owners can delete groups; payment notifications can only be changed by the people involved; suspended accounts cannot write. Rules are covered by emulator tests
+- API keys and the IBAN encryption key secured server-side in Firebase Cloud Functions — never exposed to the client
 - Input validation and maxLength constraints on all user-facing fields
 
 
@@ -162,19 +166,20 @@
 ### Frontend
 | Technology | Version | Purpose |
 |---|---|---|
-| React | 18.3.1 | Component-based UI |
-| React Router | 7.1.1 | Client-side routing |
-| Tailwind CSS | 3.4.17 | Utility-first styling |
-| Zustand | 5.0.2 | Global state management |
-| Lucide React | 0.469.0 | Icon library |
-| Recharts | latest | Analytics charts |
+| React | 19.2 | Component-based UI |
+| React Router | 7.13 | Client-side routing |
+| Tailwind CSS | 3.4 | Utility-first styling |
+| Zustand | 5.0 | Global state management |
+| Lucide React | 0.555 | Icon library |
+| Recharts | 3.7 | Analytics charts |
+| Firebase JS SDK | 12.6 | Auth, Firestore, Functions client |
 
 ### Backend & Services
 | Service | Purpose |
 |---|---|
 | Firebase Authentication | Email/password and Google OAuth |
 | Firestore | Real-time NoSQL database |
-| Firebase Cloud Functions | Secure API proxy (Anthropic, Vision) |
+| Firebase Cloud Functions | Secure API proxy (Anthropic, Vision, PayPal) and server-side IBAN encryption |
 | Firebase Hosting | Static site deployment |
 | Google Cloud Vision API | OCR receipt scanning |
 | Cloudinary | Profile photo upload and optimisation |
@@ -185,12 +190,13 @@
 |---|---|
 | Jest | Test runner |
 | React Testing Library | Component testing |
-| Coverage | ~84.37% line coverage, 1,397 passing tests across 52 suites |
+| Coverage | ~82.9% line coverage; 1,461 Jest tests across 54 suites, plus 23 Firestore rules emulator tests and 5 Cloud Functions tests |
+| Firebase Rules Unit Testing | Security rules tested against the Firestore emulator |
 
 ### Security & Privacy
 - **WebAuthn**: Biometric authentication
 - **SHA-256**: Privacy-preserving contact matching
-- **AES-256**: Data encryption at rest
+- **AES-256-GCM**: Server-side encryption of bank details (IBAN)
 - **TLS 1.3**: Transport layer security
 - **Firestore Security Rules**: Fine-grained access control
 
@@ -251,13 +257,13 @@ REACT_APP_FIREBASE_APP_ID=your_app_id_here
 REACT_APP_CLOUDINARY_CLOUD_NAME=your_cloud_name
 REACT_APP_CLOUDINARY_UPLOAD_PRESET=your_preset
 
-# Google Cloud Vision API (Optional)
-REACT_APP_GOOGLE_CLOUD_VISION_KEY=your_api_key
+# PayPal sandbox client ID (public, used by the PayPal buttons)
+REACT_APP_PAYPAL_CLIENT_ID=your_paypal_client_id
 
 # App base URL (used for invite links)
 REACT_APP_BASE_URL=https://splitsync-dev.web.app
 ```
-The Anthropic API key and Google Cloud Vision API key are stored as Firebase Secret Manager secrets and accessed only via Cloud Functions. They are never placed in the frontend environment.
+**Never put a secret in a `REACT_APP_*` variable.** Create React App bundles every `REACT_APP_*` value into the public JavaScript. All secrets (Anthropic, Google Vision, PayPal client secret, IBAN encryption key) live in Firebase Secret Manager and are used only by Cloud Functions.
 
 ### 5. Firestore Security Rules
 
@@ -265,18 +271,26 @@ Deploy the security rules from `firestore.rules`:
 ```bash
 firebase deploy --only firestore:rules
 ```
-Deploy Cloud Functions from `firebasestore,functions`:
+Set the Cloud Function secrets **before** deploying functions (the Firebase CLI refuses to deploy until every declared secret exists):
+
+```bash
+firebase functions:secrets:set ANTHROPIC_API_KEY
+firebase functions:secrets:set GOOGLE_VISION_API_KEY
+firebase functions:secrets:set PAYPAL_CLIENT_ID
+firebase functions:secrets:set PAYPAL_CLIENT_SECRET
+# 32-byte hex key for IBAN encryption (AES-256-GCM)
+node -e "require('fs').writeFileSync('iban.key', require('crypto').randomBytes(32).toString('hex'))"
+firebase functions:secrets:set IBAN_ENCRYPTION_KEY --data-file iban.key   # then delete iban.key
+# Only needed to migrate IBANs saved by versions before Nov 2026; any value works for a fresh project
+firebase functions:secrets:set LEGACY_IBAN_KEY
+```
+
+Then deploy the Cloud Functions from the `functions` folder:
 
 ```bash
 cd functions
 npm install
 firebase deploy --only functions
-```
-Set Cloud Function secrets:
-
-```bash
-firebase functions:secrets:set ANTHROPIC_API_KEY
-firebase functions:secrets:set GOOGLE_VISION_API_KEY
 ```
 
 ### 6. Run Development Server
@@ -450,7 +464,8 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 
 ### Data Protection
 - Firestore security rules with role-based access control: All Firestore reads and writes require authenticated and authorised requests via security rules
-- AES-256 encryption at rest: IBAN is encrypted with AES-256 before being stored in Firestore
+- Membership-scoped access: expenses can only be read or changed by current members of their group; people who leave lose access immediately
+- Server-side IBAN encryption: IBANs are encrypted by a Cloud Function with AES-256-GCM using a key held in Firebase Secret Manager, and decrypted only for the owner or people who share a group with them. The browser never holds the key
 - TLS 1.3 for data in transit
 - Input validation and sanitization
 - XSS and CSRF protection
@@ -463,7 +478,7 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 - **Minimal Data Collection**: Only essential information stored
 
 ### API Security
-- Anthropic API key and Google Vision API key are stored in Firebase Secret Manager
+- Anthropic, Google Vision and PayPal credentials and the IBAN encryption key are stored in Firebase Secret Manager
 - All external API calls are proxied through Firebase Cloud Functions
 - No sensitive keys are present in the frontend bundle
 
@@ -519,12 +534,18 @@ npm test -- --coverage --watchAll=false
 
 # Run a specific test file
 npm test -- AddExpenseModal --watchAll=false
+
+# Cloud Functions unit tests (IBAN encryption)
+npm run test:functions
+
+# Firestore security rules against the local emulator (needs Java; first run: cd firestore-tests && npm install)
+npm run test:rules
 ```
 
 
 View the live coverage report: [https://splitsync-coverage-test.netlify.app](https://splitsync-coverage-test.netlify.app)
 
-Coverage target: 80%+ line coverage. Current coverage: approximately 84.37% across 52 test suites.
+Coverage target: 80%+ line coverage. Current coverage: approximately 82.9% of lines across 54 Jest suites (1,461 tests), measured November 2026.
 
 ---
 
