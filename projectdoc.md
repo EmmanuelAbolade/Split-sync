@@ -2,7 +2,7 @@
 
 > Living reference for the Split-Sync project. Update it whenever behaviour, data shape, rules, or deployment state changes. The **Change log** at the bottom records each working session.
 >
-> Last updated: **2026-11-03**
+> Last updated: **2026-11-04**
 
 ---
 
@@ -17,7 +17,7 @@
 | Docs | Doxygen: https://splitsync-docs.netlify.app · Coverage: https://splitsync-coverage-test.netlify.app · Showcase: https://showcase.setu.ie/C00288657/index.html · Screencast: https://youtu.be/7uat5PeTsrI |
 | Formal docs in repo | `docs/` — Research Document, Functional Specification, Design Document, Project Report (PDFs), screenshots, `docs/index.html` showcase page |
 | Size | ~38k lines of JS/JSX in `src/` + `functions/`; 191 commits (2025-11-25 → 2026-04-20) plus uncommitted work |
-| Tests | 54 Jest suites / 1,461 tests, 5 Cloud Functions unit tests, 23 Firestore rules emulator tests; all passing as of 2026-11-03 (coverage last published 84.37%) |
+| Tests | 58 Jest suites / 1,483 tests (84.1% line coverage), 9 Cloud Functions unit tests, 31 Firestore rules emulator tests; all passing as of 2026-11-04 |
 | Licence | Apache 2.0 |
 
 ---
@@ -75,7 +75,10 @@ split-sync-app/
 ## 5. Data model (Firestore)
 
 ### `users/{uid}`
-`displayName`, `fullName`, `email`, `photoURL`, `phoneNumber`, `paymentMethods` `{ paypal, revolut, sepa: { iban (encrypted), bic } }`, `isFirstLogin`, `onboardingCompletedAt`, session-timeout setting, `isActive` (written by Taskmaster; **not enforced anywhere**).
+Public profile (readable by any signed-in user): `displayName`, `fullName`, `email`, `photoURL`, `phoneHash` (SHA-256 of the number, for contact discovery), `isFirstLogin`, `onboardingCompletedAt`, session-timeout setting, `lastActive` (written once a day per device), `isActive` (`false` = suspended by an admin; enforced at login and by the rules).
+
+### `users/{uid}/private/details` (owner only, added 2026-11-04)
+`paymentMethods` `{ paypalUsername, revolutUsername, bic, encryptedIBAN (v2 AES-256-GCM) }`, `phoneNumber`, `updatedAt`. Legacy copies of these fields on the public doc are moved here on first read (by the client or the Cloud Functions) and deleted from the public doc.
 
 ### `groups/{groupId}`
 | field | notes |
@@ -113,7 +116,7 @@ Settlements also carry: `isSettlement: true`, `paymentMethod` (`paypal|manual|se
 
 **Dashboard / Activity / Analytics / Profile:** dashboard overview cards, per-group balances, suggested settlement, cycling tagline. Activity lists all expenses across groups with Active/Archived and All/I Paid/I Owe filters, per-currency totals, and **a group link in the expense details that opens the group focused on that expense** (2026-11-03). Analytics has 5 charts (spending over time, monthly, category, per-person balance, who-owes-who) with a group selector; totals are per currency. Profile has per-currency owed/owe cards with a breakdown modal, payment settings (auth required), phone number for discovery, and collapsible sections.
 
-**Admin (Taskmaster, `/taskmaster`):** system health, user/group lists, financial oversight, moderation, notifications. Gated by the `admin` custom claim. The logo routes admins here.
+**Admin (Taskmaster, `/taskmaster`):** gated by the `admin` custom claim (the logo routes admins here). Sections: **System Health** (live counts, users active in the last 7 days, pending/expired invitations; quick actions to delete expired invitations and open Firestore usage and Cloud Function logs), **Platform Growth** (new users, groups and expenses per month), **User Management** (search, details, suspend/re-activate; admins cannot suspend themselves), **Group Management** (type, owner, members, former members, expense count, balance status), **Financial Oversight** (spending, settlements and amounts still owed per currency; removed expenses excluded), **Content Moderation** (keyword scan of group names and expense text, with remove-expense and rename-group actions; link to Formspree feedback submissions), and **Notifications** (system-wide in-app announcement to all active users). Calculations live in `src/utils/adminStats.js` (unit-tested). Admins cannot see payment details or phone numbers.
 
 **AI assistant:** floating chat on every protected page, suggestion chips, plain-text answers.
 
@@ -127,9 +130,10 @@ Settlements also carry: `isSettlement: true`, `paymentMethod` (`paypal|manual|se
 | `scanReceipt` | required (added 2026-11-03) | `GOOGLE_VISION_API_KEY` | OCR. Merchant = first alphabetic line; amount = "total"/"amount" line, else the largest decimal; date = dd/mm/yyyy |
 | `splitSyncChat` | required | `ANTHROPIC_API_KEY` | Claude proxy. Model **`claude-sonnet-5-5`**, `effort: low`, `max_tokens: 2048`, server-side refusal fallback (`fallbacks: "default"`, beta header `server-side-fallback-2026-07-01`), last 20 messages, ≤4,000 chars per message. Reads only `text` blocks from the response. The system prompt is built by **`functions/assistantPrompt.js`** (full app guide + user context of shared/personal group counts sent by `SplitSyncChat`). The static guide carries a `cache_control` breakpoint so repeat turns hit the prompt cache |
 | `encryptIban` | required | `IBAN_ENCRYPTION_KEY` | Validates and encrypts an IBAN with AES-256-GCM (`v2:iv:tag:ct`). Called by Profile when saving payment settings |
+| `getGroupPaymentMethods` | required | none | Returns `{ paypalUsername, revolutUsername, bic, hasIban }` for every member of a group the caller belongs to. Never returns IBANs or phone numbers. Migrates legacy public payment fields to the private doc |
 | `getIban` | required | `IBAN_ENCRYPTION_KEY`, `LEGACY_IBAN_KEY` | Returns a user's plain IBAN only to the owner, or to someone who is in `members` of the same group (`groupId` required). Legacy CryptoJS ciphertext is decrypted with `LEGACY_IBAN_KEY` and re-encrypted to v2 on read |
 
-Crypto helpers live in `functions/iban.js` (unit-tested by `functions/iban.test.js`, run with `npm run test:functions`).
+Crypto helpers live in `functions/iban.js`, and private-profile helpers in `functions/privateData.js`. Both are unit-tested (`iban.test.js`, `privateData.test.js`; run with `npm run test:functions`). Dependencies: `firebase-functions` 7.4, `firebase-admin` 13 (14 is available but is a major upgrade, not yet done); the unused `@google/generative-ai` was removed.
 Secrets live in Firebase Secret Manager (`firebase functions:secrets:set NAME`). The Firebase CLI refuses to deploy **any** function until **every** secret the codebase declares exists. Logs: `firebase functions:log --only splitSyncChat`.
 
 ---
@@ -147,18 +151,19 @@ Policy as implemented on 2026-11-03:
 
 ---
 
-## 9. Firestore security rules (summary, as written 2026-11-03)
+## 9. Firestore security rules (summary, as of 2026-11-04)
 
-- `users`: read by any signed-in user; write own doc only; **admins may change only `isActive`** (Taskmaster suspend/reactivate).
+- `users`: read by any signed-in user; write own doc only; **admins may change only `isActive`** (Taskmaster suspend/reactivate). **`paymentMethods` and `phoneNumber` can never be added or changed on the public doc** (legacy copies may only be removed).
+- `users/{uid}/private/{doc}`: **owner only** (not even admins).
 - `notSuspended()`: users with `isActive == false` cannot write expenses or update groups. The app also signs them out at login with a "suspended" message.
-- `groups`: read by any signed-in user (needed for invite previews). Create only as `createdBy == uid` with `memberIds == [uid]`. Update by (non-suspended) members, or by a non-member adding themselves (joining), except on personal trackers. **Delete by the owner only** (or a sole remaining member).
-- `expenses`: **read only by current group members or admins**. **Create/update/delete only by current, non-suspended group members** (`isGroupMember()` reads the group's `memberIds`); `createdBy`, when present, must be the requester; `groupId` can't change. The app's `==` and `in` (≤30) queries satisfy the read rule; listing the whole collection does not (except for admins).
-- `invitations`: read by sender, recipient or admin; create as sender; recipient updates; sender deletes.
+- `groups`: read by any signed-in user (needed for invite previews). Create only as `createdBy == uid` with `memberIds == [uid]`. Update by (non-suspended) members. A non-member may **only join** (`isSelfJoin()`): `memberIds` gains exactly their uid, `members` gains exactly one entry (theirs), and `formerMembers`/`updatedAt` may change; nothing else, and never on personal trackers. Before 2026-11-04 a "join" could also rename the group, change the owner or remove members. Admins may only rename (`name`, `moderatedAt`, `moderatedBy`). **Delete by the owner only** (or a sole remaining member).
+- `expenses`: **read only by current group members or admins**. **Create/update/delete only by current, non-suspended group members** (`isGroupMember()` reads the group's `memberIds`); `createdBy`, when present, must be the requester; `groupId` can't change. Admins may only soft-remove (`status: 'deleted'` plus `deletedAt`/`deletedBy`/`moderated`). The app's `==` and `in` (≤30) queries satisfy the read rule; listing the whole collection does not (except for admins).
+- `invitations`: read by sender, recipient or admin; create as sender; recipient updates; sender **or admin** deletes (expired-invitation cleanup).
 - `notifications`: read/delete own; any signed-in user can create. **Update only by the owner, or by the payer/payee named in `data`**, and they cannot change `userId`, `type`, or `data.amount/payerId/payeeId/groupId`.
 - `pendingPayments`: payer or payee read/delete; payer creates/updates.
 - `connections`, `phoneNumbers`: as before. Fallback: deny everything else.
 
-Tested against the Firestore emulator by `firestore-tests/rules.test.js` (23 tests covering every query and write path the app uses): `npm run test:rules`. **Deployed 2026-11-03.**
+Tested against the Firestore emulator by `firestore-tests/rules.test.js` (31 tests covering every query and write path the app uses, including the admin moderation paths): `npm run test:rules`. **Deployed 2026-11-04.**
 
 ---
 
@@ -192,24 +197,25 @@ The production build has 6 ESLint warnings that predate 2026-11-03 (hook deps in
 
 Ordered by importance.
 
-1. **User profiles are readable by any signed-in user.** Payment handles (PayPal/Revolut usernames), phone number and email are visible to any account that knows a uid. The IBAN is now server-encrypted, so its ciphertext is useless without the key. Fixing the rest needs payment details moved to a sub-document readable only by co-members (rules can't check "shares a group" without a lookup per group).
-2. **Legacy IBAN ciphertext.** Until an IBAN is next read through `getIban` (owner opens Profile, or someone opens Settle Up with them), it stays in the old format, which anyone with the old key can decrypt. That key was public in earlier app bundles. Once `LEGACY_IBAN_KEY` is set and functions are deployed, each IBAN upgrades on first read. A one-off batch migration can be added if needed.
-3. **Settling with a former member** (only possible for accounts deleted under the old code, which skipped balance checks): SettleUpModal looks up payees only in `members`, so payment details won't load, and `getIban` refuses non-members. The old account deletion also *deleted those users' paid expenses*, which may have shifted balances in shared groups before 2026-11-03. That can't be repaired automatically.
-4. `pendingPayments` read allows `resource == null`, which lets anyone probe whether a document ID exists. Low risk.
-5. Group documents are readable by any signed-in user who knows the ID (needed for invite previews). Member names and emails are exposed to anyone holding an invite link.
-6. Any signed-in user can *create* a notification for anyone (needed for expense/payment notifications). This could be abused for spam; moving notification creation into Cloud Functions would fix it.
-7. Receipt OCR is heuristic (first line as merchant, dd/mm/yyyy dates only).
-8. PayPal integration is sandbox-only; the payee e-mail was intentionally removed from the order.
-9. One Jest test failed once in five coverage runs (2026-11-03) and passed on every rerun. It is a timing flake; the failing test name was not captured. If it recurs, note the name here.
-10. Coverage is 82.9% of lines (it was 84.4%). The new `utils/accountDeletion.js` and `utils/ibanService.js` have no unit tests yet; they are good next candidates.
+1. **Legacy IBAN ciphertext.** Until an IBAN is next read through `getIban` or `getGroupPaymentMethods`, it stays in the old format, which anyone with the old key can decrypt (that key was public in earlier app bundles). It upgrades on first read. A one-off batch migration can be added if needed.
+2. **Group members can change any group field.** A current member can edit the group document freely (needed for leaving, name sync and ownership hand-over), so a malicious member could, for example, remove others. Tightening this means per-operation rules or moving those operations into Cloud Functions.
+3. **Phone-number hashes can be reversed.** Contact discovery stores an unsalted SHA-256 of the number on the public profile, and the space of phone numbers is small enough to brute-force. This is a general limitation of hash-based contact matching; a server-side matching function would remove it.
+4. **Settling with a former member** (only possible for accounts deleted under the old code, which skipped balance checks): payment details won't load for non-members. The old account deletion also *deleted those users' paid expenses*, which may have shifted balances in shared groups before 2026-11-03. That can't be repaired automatically.
+5. `pendingPayments` read allows `resource == null`, which lets anyone probe whether a document ID exists. Low risk.
+6. Group documents are readable by any signed-in user who knows the ID (needed for invite previews). Member names and emails are exposed to anyone holding an invite link.
+7. Any signed-in user can *create* a notification for anyone (needed for expense/payment notifications). This could be abused for spam; moving notification creation into Cloud Functions would fix it.
+8. **Unidentified API key `splitsync-web-key`** in Google Cloud. It is either the receipt-scanner (Vision) key or unused. To check: `firebase functions:secrets:access GOOGLE_VISION_API_KEY` and compare it with the key shown in the console. If it doesn't match, the key is unused and can be deleted. If it does, restrict it to the Cloud Vision API only (no website restriction). Claude's session isn't allowed to read secret values.
+9. `firebase-admin` 13 → 14 (major) upgrade not done.
+10. Receipt OCR is heuristic (first line as merchant, dd/mm/yyyy dates only). PayPal is sandbox-only.
+11. One Jest test failed once in five coverage runs on 2026-11-03 and passed on every rerun since (timing flake; name not captured).
 
-Resolved on 2026-11-03 (second session): expense read access, IBAN key exposure, notification tampering, Taskmaster suspend, legacy `memberIds` (self-healing).
+Resolved: expense read access, IBAN key exposure, notification tampering, Taskmaster suspend, legacy `memberIds` (self-healing), the Gemini key (deleted by the user), Firebase web key restricted to the app's domains (by the user), **public-profile exposure of payment details and phone numbers (2026-11-04)**, **join-and-hijack via the group join rule (2026-11-04)**, **non-functional Taskmaster sections (2026-11-04)**, and coverage back to 84.1%.
 
 ---
 
 ## 12. Deployment state / pending actions
 
-Status at the end of 2026-11-03: **fully deployed.**
+Status at the end of 2026-11-04: **fully deployed** (functions incl. `getGroupPaymentMethods`, rules, hosting).
 
 - [x] **Firestore rules deployed** (expense reads/writes members-only, notification update limits, admin suspend, owner-only group delete).
 - [x] All code committed to `master`.
@@ -226,7 +232,8 @@ Status at the end of 2026-11-03: **fully deployed.**
 - [x] Functions deployed: `splitSyncChat` (AI assistant restored), `encryptIban`, `getIban` (new), `scanReceipt`, `capturePayPalOrder`.
 - [x] Hosting deployed to https://splitsync-dev.web.app.
 - [x] Assistant verified by sending the exact production request (model, settings, new prompt) to the Claude API: HTTP 200, accurate answer about personal trackers and leaving groups, prompt cache written (3,935 tokens). An in-browser check was not possible (Chrome extension not connected), so try the chat once on the live site.
-- [ ] Optional: make the GitHub repo public for employers (see the recommendations in the 2026-11-03 conversation: confirm SETU policy, add homepage and topics, a README "my role" section, and restrict the Firebase web API key to your domains).
+- [x] GitHub repo made **public** (2026-11-04) with homepage, topics and a README Highlights section; Firebase web key restricted to the app domains and localhost by the user.
+- [ ] Identify or delete the `splitsync-web-key` API key (§11.8).
 
 Order matters: secrets → functions → hosting. Until hosting is deployed, users run the previous client against the new rules. That is safe: its queries still pass the rules, and its destructive old account-deletion path is now blocked, because its cross-group expense query is denied.
 
@@ -290,6 +297,20 @@ Tests added: gating, non-member, personal-tracker, leave-writes-formerMembers an
 New: `functions/iban.js` (+ `iban.test.js`, 5 tests), `functions/assistantPrompt.js`, `src/utils/ibanService.js`, `firestore-tests/` (23 emulator rule tests), npm scripts `test:functions` and `test:rules`.
 Results: Jest 54 suites / 1,461 tests passing (7 obsolete client-encryption tests removed), functions 5/5, rules 23/23, production build compiles.
 Deployed: Firestore rules, all functions, hosting (after the user created the two secrets).
+
+### 2026-11-04: Taskmaster, profile privacy, tests and cleanups
+
+| Area | Problem | Change |
+|---|---|---|
+| Taskmaster | Quick actions, moderation cards and broadcast did nothing; "Active (7 days)", "Settled", group status and the user list read fields that never existed; the suspend popup never closed; admin claims were logged to the console | Every card and button now works (see §6): expired-invitation cleanup, console links, new Platform Growth section, real active-user count (`lastActive`), accurate financial totals, group details incl. former members, keyword moderation with remove/rename, real broadcast. Logic in `utils/adminStats.js` with 7 unit tests |
+| Profile privacy | Any signed-in user could read anyone's PayPal/Revolut usernames, BIC and plain phone number from the public profile | Moved to the owner-only `users/{uid}/private/details`; members get payment options from the new `getGroupPaymentMethods` function (membership-checked, no IBANs); rules forbid writing these fields to the public profile; legacy data migrates automatically |
+| Group join rule | "Joining" a shared group could be combined with renaming it, changing the owner or removing members | `isSelfJoin()` allows only adding yourself |
+| Tests | No tests for account deletion, the IBAN service or the private profile; coverage had dropped to 82.9% | 22 new unit tests (`accountDeletion`, `ibanService`, `privateProfile`, `adminStats`) + 4 functions tests + 8 emulator rule tests. Coverage 84.1% |
+| Cleanups | Unused Gemini SDK; outdated `firebase-functions` | Removed; upgraded to 7.4.0. Gemini API key deleted by the user; Firebase web key restricted by the user |
+| README | Draft employer section pending | Highlights section added; privacy and test descriptions updated |
+| AI assistant | Did not know payment details are now private | Prompt updated |
+
+Results: Jest 58 suites / 1,483 tests, functions 9/9, rules 31/31, lint clean on changed files, build compiles. Deployed functions, rules and hosting; the new functions were checked live (they reject callers who aren't signed in).
 
 ---
 

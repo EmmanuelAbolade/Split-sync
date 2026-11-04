@@ -11,6 +11,16 @@
 - **Documentation**: [View Docs](./docs)
 - **Showcase URL**: [https://showcase.setu.ie/C00288657/index.html](https://showcase.setu.ie/C00288657/index.html)
 
+## Highlights
+
+Split-Sync started as my final-year project at SETU Carlow and I've kept improving it since grading, for real users. I designed and built the whole thing: the React PWA, Firestore data model and security rules, Cloud Functions, admin panel and test suite.
+
+- **Data integrity:** a clear membership lifecycle. People who leave lose access instantly, but their history is kept so everyone's balances stay correct. Account deletion is blocked until all debts are settled and never touches shared records.
+- **Security and privacy:** expenses are readable only by group members, and joining a group can't be combined with any other change. Payment details and phone numbers live in an owner-only private profile; group members get only what they need to pay you, through a Cloud Function that checks membership. Bank details are encrypted server-side with AES-256-GCM, with keys in Secret Manager. All of this is enforced by Firestore rules covered by emulator tests.
+- **Quality:** about 1,500 automated tests (Jest and React Testing Library, Firestore rules on the emulator, Node unit tests for the Cloud Functions).
+- **AI:** an in-app Claude assistant, served through a Cloud Function so the API key stays on the server, with prompt caching to keep costs down.
+- **Operations:** an admin panel (Taskmaster) with live platform stats, growth by month, user suspension, financial oversight, keyword-based content moderation and system-wide announcements.
+
 
 ## Table of Contents
 
@@ -124,6 +134,7 @@
 
 ### **Profile and Payments**
 - Payment settings protected by biometric or password authentication
+- Payment details and phone number stored in an owner-only private profile; group members only receive the payment options they need, via a membership-checked Cloud Function
 - IBAN encrypted server-side (AES-256-GCM, key held in Secret Manager) and only ever shown to its owner and people who share a group with them
 - PayPal, Revolut, and SEPA payment methods supported
 - Input validation enforced on all payment fields with strict length limits
@@ -190,7 +201,7 @@
 |---|---|
 | Jest | Test runner |
 | React Testing Library | Component testing |
-| Coverage | ~82.9% line coverage; 1,461 Jest tests across 54 suites, plus 23 Firestore rules emulator tests and 5 Cloud Functions tests |
+| Coverage | ~84.1% line coverage; 1,483 Jest tests across 58 suites, plus 31 Firestore rules emulator tests and 9 Cloud Functions tests |
 | Firebase Rules Unit Testing | Security rules tested against the Firestore emulator |
 
 ### Security & Privacy
@@ -465,6 +476,7 @@ const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/;
 ### Data Protection
 - Firestore security rules with role-based access control: All Firestore reads and writes require authenticated and authorised requests via security rules
 - Membership-scoped access: expenses can only be read or changed by current members of their group; people who leave lose access immediately
+- Private profile data: payment details and plain phone numbers are kept in `users/{uid}/private/details`, readable only by the owner (not even admins); the public profile holds only name, photo, email and a phone hash for contact discovery
 - Server-side IBAN encryption: IBANs are encrypted by a Cloud Function with AES-256-GCM using a key held in Firebase Secret Manager, and decrypted only for the owner or people who share a group with them. The browser never holds the key
 - TLS 1.3 for data in transit
 - Input validation and sanitization
@@ -535,7 +547,7 @@ npm test -- --coverage --watchAll=false
 # Run a specific test file
 npm test -- AddExpenseModal --watchAll=false
 
-# Cloud Functions unit tests (IBAN encryption)
+# Cloud Functions unit tests (IBAN encryption, private profile data)
 npm run test:functions
 
 # Firestore security rules against the local emulator (needs Java; first run: cd firestore-tests && npm install)
@@ -545,7 +557,7 @@ npm run test:rules
 
 View the live coverage report: [https://splitsync-coverage-test.netlify.app](https://splitsync-coverage-test.netlify.app)
 
-Coverage target: 80%+ line coverage. Current coverage: approximately 82.9% of lines across 54 Jest suites (1,461 tests), measured November 2026.
+Coverage target: 80%+ line coverage. Current coverage: approximately 84.1% of lines across 58 Jest suites (1,483 tests), measured November 2026.
 
 ---
 
