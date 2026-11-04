@@ -36,3 +36,5 @@ yarn-error.log*
 # Claude Code files
 .claude/
 CLAUDE.md
+# Private study notes for the Circles documentation (never published)
+docs/circles/_private/

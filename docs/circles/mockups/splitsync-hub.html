@@ -1,0 +1,682 @@
+<title>SplitSync Spaces Hub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<!--
+  File: splitsync-hub.html
+  Purpose: Clickable mockup of the recommended SplitSync navigation once
+           Circles features are added. Home becomes a hub of "spaces"
+           (Expenses, Circles, Loans, Aid, Events). Each space has its own
+           ledger and balance, and balances are never added together.
+  Key ideas shown:
+    1. Separate ledgers per space (no netting across spaces)
+    2. One "Needs attention" list for tasks, not money
+    3. Context-aware + button (action sheet)
+    4. Request privacy: who can send you loan / aid requests
+    5. Held-request inbox for people outside your trusted list
+  Notes: Mock data only. Styling follows the current SplitSync web app
+         (blue gradient header, white cards, bottom nav with centre +).
+-->
+<style>
+/* Layout concept: phone-width app column centred on any screen, fixed bottom nav, sheet-style modals */
+:root{
+  --bg:#f3f6fb; --surface:#ffffff; --surface-2:#f1f4fa; --line:#e3e8f2;
+  --fg:#111827; --muted:#6b7280;
+  --primary:#2f6be8; --primary-2:#2445c4; --chat:#7c3aed;
+  --owe:#ea580c; --owe-soft:#fff4ea; --owe-line:#fbd5b5;
+  --owed:#16a34a; --owed-soft:#ecfbf1; --owed-line:#bfe9cd;
+  --exp:#2f6be8; --exp-soft:#e8f0fe;
+  --cir:#7c3aed; --cir-soft:#f1eafe;
+  --loan:#d97706; --loan-soft:#fef3e2;
+  --aid:#0d9488; --aid-soft:#e2f6f3;
+  --evt:#db2777; --evt-soft:#fde8f2;
+  --shadow:0 1px 2px rgba(17,24,39,.05),0 6px 18px rgba(17,24,39,.06);
+  --font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1220; --surface:#161d30; --surface-2:#1d2540; --line:#2a3352;
+  --fg:#eef1f8; --muted:#9aa3bd;
+  --primary:#5b8cff; --primary-2:#2f4fc9; --chat:#9b6bff;
+  --owe:#fb923c; --owe-soft:#3a2416; --owe-line:#5c3a20;
+  --owed:#4ade80; --owed-soft:#163323; --owed-line:#245236;
+  --exp:#6b9bff; --exp-soft:#1c2a4d;
+  --cir:#a78bfa; --cir-soft:#2a2150;
+  --loan:#fbbf24; --loan-soft:#3a2d12;
+  --aid:#2dd4bf; --aid-soft:#123632;
+  --evt:#f472b6; --evt-soft:#3d1a2e;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.25);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1220; --surface:#161d30; --surface-2:#1d2540; --line:#2a3352;
+  --fg:#eef1f8; --muted:#9aa3bd;
+  --primary:#5b8cff; --primary-2:#2f4fc9; --chat:#9b6bff;
+  --owe:#fb923c; --owe-soft:#3a2416; --owe-line:#5c3a20;
+  --owed:#4ade80; --owed-soft:#163323; --owed-line:#245236;
+  --exp:#6b9bff; --exp-soft:#1c2a4d;
+  --cir:#a78bfa; --cir-soft:#2a2150;
+  --loan:#fbbf24; --loan-soft:#3a2d12;
+  --aid:#2dd4bf; --aid-soft:#123632;
+  --evt:#f472b6; --evt-soft:#3d1a2e;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-weight:700;text-wrap:balance;line-height:1.2}
+svg.lucide{width:20px;height:20px;stroke-width:2;flex:none}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:10px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+/* ---------- App column ---------- */
+.app{max-width:520px;margin:0 auto;min-height:100%;background:var(--bg);position:relative;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+@media (min-width:560px){.app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Top bar (home) */
+.topbar{display:flex;align-items:center;gap:10px;background:var(--surface);border-bottom:1px solid var(--line);padding-block:12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px}
+.logo-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#14b8c4,#6a46d6);display:grid;place-items:center;color:#fff}
+.logo-mark svg.lucide{width:17px;height:17px}
+.logo span{color:var(--cir)}
+.topbar .spacer{flex:1}
+.icon-btn{position:relative;width:40px;height:40px;border-radius:12px;border:0;background:none;display:grid;place-items:center;cursor:pointer;color:var(--fg)}
+.icon-btn:hover{background:var(--surface-2)}
+.badge{position:absolute;top:4px;right:4px;min-width:17px;height:17px;border-radius:99px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+
+/* Page header (inner screens) */
+.phead{display:flex;align-items:center;gap:12px;background:var(--surface);border-bottom:1px solid var(--line);padding-block:14px}
+.phead h1{font-size:22px}
+.phead p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.phead.hero{background:linear-gradient(135deg,var(--hero-a,#3b82f6),var(--hero-b,#2445c4));color:#fff;border:0;padding-block:16px 22px}
+.phead.hero p{color:rgba(255,255,255,.85)}
+.phead.hero .icon-btn{color:#fff}
+.phead.hero .icon-btn:hover{background:rgba(255,255,255,.15)}
+
+.stack{display:flex;flex-direction:column;gap:18px;padding-block:18px}
+.label{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.row-head{display:flex;align-items:center;gap:10px}
+.row-head h2{font-size:18px}
+.row-head .spacer{flex:1}
+
+/* Welcome */
+.welcome{display:flex;gap:14px;align-items:center}
+.avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e3a8a,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:700;font-size:20px;flex:none}
+.welcome h1{font-size:24px}
+.welcome .tag{color:var(--cir);font-size:14px}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.tap{cursor:pointer;transition:transform .12s ease,border-color .12s ease}
+.tap:hover{border-color:var(--primary)}
+.tap:active{transform:scale(.99)}
+
+/* Attention list */
+.todo{display:flex;flex-direction:column}
+.todo-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;text-align:left;width:100%}
+.todo-item:last-child{border-bottom:0}
+.todo-item .grow{flex:1;min-width:0}
+.todo-item small{display:block;color:var(--muted);font-size:12px}
+.dot{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none}
+.dot svg.lucide{width:18px;height:18px}
+
+/* Space tiles */
+.spaces{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.space{display:flex;flex-direction:column;gap:10px;text-align:left;font:inherit;color:inherit}
+.space-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:#fff}
+.space h3{font-size:16px}
+.space .sub{font-size:12px;color:var(--muted)}
+.space .val{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.space .lock{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.space .lock svg.lucide{width:12px;height:12px}
+.space.wide{grid-column:1/-1;flex-direction:row;align-items:center;border-style:dashed;background:none;box-shadow:none}
+
+/* Space colour helpers */
+.c-exp{--c:var(--exp);--cs:var(--exp-soft)} .c-cir{--c:var(--cir);--cs:var(--cir-soft)}
+.c-loan{--c:var(--loan);--cs:var(--loan-soft)} .c-aid{--c:var(--aid);--cs:var(--aid-soft)} .c-evt{--c:var(--evt);--cs:var(--evt-soft)}
+.bg-c{background:var(--c)} .soft-c{background:var(--cs);color:var(--c)} .fg-c{color:var(--c)}
+
+/* Balance pair */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bal{border-radius:16px;padding:14px;border:1px solid}
+.bal .t{display:flex;align-items:center;gap:6px;font-size:14px}
+.bal .v{font-size:22px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}
+.bal.owe{background:var(--owe-soft);border-color:var(--owe-line);color:var(--owe)}
+.bal.owed{background:var(--owed-soft);border-color:var(--owed-line);color:var(--owed)}
+
+/* Lists */
+.list-item{display:flex;align-items:center;gap:12px}
+.list-item .grow{flex:1;min-width:0}
+.list-item .t{font-weight:500;font-size:16px}
+.list-item small{color:var(--muted);font-size:13px}
+.right{text-align:right;font-size:14px;font-weight:500;white-space:nowrap}
+.pos{color:var(--owed)} .neg{color:var(--owe)}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px;background:var(--c,var(--primary))}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+
+/* Chips and pills */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.chip-btn{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 14px;font-weight:500;font-size:14px;cursor:pointer;white-space:nowrap}
+.chip-btn[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.pill svg.lucide{width:12px;height:12px}
+.note{display:flex;gap:10px;font-size:13px;background:var(--surface-2);border-radius:12px;padding:10px 12px;align-items:flex-start}
+.note.info{background:var(--exp-soft);color:var(--exp)}
+.note.warn{background:var(--loan-soft);color:var(--loan)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:10px 16px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#2445c4);border-color:transparent;color:#fff}
+.btn-primary:hover{background:linear-gradient(135deg,#3b82f6,#2445c4);filter:brightness(1.07)}
+.btn-danger{color:var(--owe)}
+.btn-sm{padding:7px 12px;font-size:14px}
+
+/* Bottom nav with centre + */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:var(--surface);border-top:1px solid var(--line);display:flex;align-items:flex-end;z-index:30;
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+.nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 0}
+.nav button svg.lucide{width:24px;height:24px}
+.nav button[aria-current="page"]{color:var(--primary)}
+.nav .fab{flex:none;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#2445c4);color:#fff;margin:-28px 8px 0;box-shadow:0 8px 20px rgba(36,69,196,.4);justify-content:center}
+.nav .fab svg.lucide{width:30px;height:30px}
+.chat-fab{position:fixed;bottom:calc(92px + env(safe-area-inset-bottom,0px));right:max(16px,calc(50% - 244px));width:52px;height:52px;border-radius:50%;background:var(--chat);color:#fff;border:0;display:grid;place-items:center;box-shadow:0 8px 20px rgba(124,58,237,.35);z-index:29;cursor:pointer}
+
+/* ---------- Modal / bottom sheet (scrollable body) ---------- */
+.overlay{position:fixed;inset:0;background:rgba(8,12,28,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.sheet{background:var(--surface);width:100%;max-width:520px;max-height:88vh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:14px max(18px,env(safe-area-inset-right,0px)) 12px max(18px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.sheet-head h3{flex:1;font-size:18px}
+.sheet-body{overflow-y:auto;padding:16px max(18px,env(safe-area-inset-right,0px)) 16px max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain}
+.sheet-foot{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:12px max(18px,env(safe-area-inset-right,0px)) 14px max(18px,env(safe-area-inset-left,0px));border-top:1px solid var(--line)}
+.grabber{width:42px;height:5px;border-radius:99px;background:var(--line);margin:8px auto 0}
+
+/* Action sheet items */
+.action{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;width:100%}
+.action:hover{border-color:var(--c)}
+.action .grow{flex:1}
+.action small{display:block;color:var(--muted);font-size:13px}
+
+/* Form bits */
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.field>.flabel{font-size:14px;font-weight:700}
+.radio{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-size:14px}
+.radio input{margin-top:3px;accent-color:var(--primary)}
+.radio:has(input:checked){border-color:var(--primary);background:var(--exp-soft)}
+.radio small{display:block;color:var(--muted);font-size:12px}
+.switch{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.switch input{width:18px;height:18px;accent-color:var(--primary)}
+
+/* Simple bar chart */
+.chart{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:6px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chart .col i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--c)}
+.chart .col span{font-size:12px;color:var(--muted)}
+.chart .col b{font-size:12px;font-variant-numeric:tabular-nums}
+
+/* Toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(104px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:500;font-size:14px;z-index:60;display:flex;gap:8px;align-items:center;max-width:calc(100% - 32px)}
+
+@media (max-width:380px){.spaces{grid-template-columns:1fr}.space.wide{flex-direction:column;align-items:flex-start}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <div id="screen"></div>
+
+  <button class="chat-fab" aria-label="Open AI assistant" data-act="assistant"><i data-lucide="message-circle"></i></button>
+
+  <!-- Bottom navigation: same five slots as the current app -->
+  <nav class="nav" aria-label="Main navigation">
+    <button data-go="home"><i data-lucide="home"></i>Home</button>
+    <button data-go="activity"><i data-lucide="activity"></i>Activity</button>
+    <button class="fab" data-act="plus" aria-label="Create"><i data-lucide="plus"></i></button>
+    <button data-go="stats"><i data-lucide="bar-chart-3"></i>Stats</button>
+    <button data-go="you"><i data-lucide="user-round"></i>You</button>
+  </nav>
+</div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<script>
+/* ==========================================================================
+   Space registry
+   Each space maps to its own collection set (and ledger). Expenses and
+   Events stay in the default Firestore DB; Circles, Loans and Aid live in
+   the named "circles" DB. Balances are computed per space and never summed.
+   ========================================================================== */
+const SPACES = {
+  expenses: { name: "Expenses", cls: "c-exp", icon: "receipt", hero: ["#3b82f6", "#2445c4"], blurb: "Split bills with your groups" },
+  circles:  { name: "Circles",  cls: "c-cir", icon: "refresh-ccw-dot", hero: ["#8b5cf6", "#5b21b6"], blurb: "Rotating savings (ajo / susu)" },
+  loans:    { name: "Loans",    cls: "c-loan", icon: "hand-coins", hero: ["#f59e0b", "#c2410c"], blurb: "Interest-free loans between people" },
+  aid:      { name: "Aid",      cls: "c-aid", icon: "heart-handshake", hero: ["#14b8a6", "#0f766e"], blurb: "Help someone in your community" },
+  events:   { name: "Events",   cls: "c-evt", icon: "party-popper", hero: ["#ec4899", "#be185d"], blurb: "Budgets and pledges for occasions" }
+};
+
+/* ---------- Mock data (mirrors the user's current test account) ---------- */
+const state = {
+  user: { name: "Hymzie", email: "test2@example.com" },
+  hidden: [],                      // spaces the user removed from Home
+  privacy: { loans: "trusted", aid: "shared", direct: "groups" },
+  trusted: ["Three T", "Kemi", "Tolu"],
+  expenses: {
+    owe: "EUR 60.49", owed: "—",
+    groups: [
+      { n: "Family house", m: 2, cur: "GBP", icon: "home", s: "Settled" },
+      { n: "Dupa", m: 3, cur: "USD", icon: "coffee", s: "Settled" },
+      { n: "Super G", m: 2, cur: "EUR", icon: "graduation-cap", s: "You owe EUR 23.00", neg: true },
+      { n: "Test members", m: 4, cur: "EUR", icon: "users", s: "Settled" },
+      { n: "My Group", m: 4, cur: "EUR", icon: "users", s: "You owe EUR 37.50", neg: true }
+    ]
+  },
+  circles: [{ n: "Family Ajo Circle", amt: 200, cycle: 3, total: 6, due: "10 Nov", slot: 5, paid: false, next: "Tolu" }],
+  loans: [
+    { dir: "lent", who: "Three T", amt: 300, out: 150, next: "€75 due 30 Nov" },
+    { dir: "borrowed", who: "Kemi", amt: 120, out: 80, next: "€40 due 15 Nov" }
+  ],
+  aid: [{ n: "Support for the Okafor family", group: "Cork Community", target: 1500, got: 1040, mine: 25, ends: "15 Nov" }],
+  events: [{ n: "Ada's Wedding", budget: 6000, spent: 4180, approvals: 1 }],
+  requests: [
+    { id: "q1", kind: "aid", from: "Tolu", trusted: true, text: "Shared a help request in Family Ajo Circle", amt: "Target €400" },
+    { id: "q2", kind: "loans", from: "Marco", trusted: false, text: "Asked to borrow €250. You share 1 group: Test members", amt: "€250" }
+  ],
+  activity: [
+    { sp: "circles", t: "Tolu received the cycle 3 pot", a: "€1,200", d: "Today" },
+    { sp: "expenses", t: "Gen · My Group", a: "You owe EUR 37.50", neg: true, d: "22/07/2026" },
+    { sp: "loans", t: "Three T repaid part of the loan", a: "+€75", pos: true, d: "31 Oct" },
+    { sp: "aid", t: "You pledged to the Okafor family", a: "€25", d: "30 Oct" },
+    { sp: "events", t: "Venue payment approved", a: "€2,500", d: "28 Oct" },
+    { sp: "expenses", t: "Dublin appointment · Super G", a: "You owe EUR 23.00", neg: true, d: "14/07/2026" }
+  ]
+};
+
+/* ==========================================================================
+   Helpers
+   ========================================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const eur = n => "€" + Number(n).toLocaleString("en-IE");
+const pct = (a, b) => Math.min(100, Math.round(a / b * 100));
+const icons = () => window.lucide && lucide.createIcons();
+const sp = k => SPACES[k];
+
+function toast(msg, icon = "check-circle-2") {
+  $("#toastRoot").innerHTML = `<div class="toast" role="status"><i data-lucide="${icon}"></i>${esc(msg)}</div>`;
+  icons(); clearTimeout(toast.t); toast.t = setTimeout(() => ($("#toastRoot").innerHTML = ""), 3000);
+}
+
+/** Bottom sheet modal with grabber, header, scrollable body and optional footer. */
+function sheet({ title, body, foot = "", onMount }) {
+  $("#modalRoot").innerHTML = `<div class="overlay" data-close><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+    <div class="grabber"></div>
+    <div class="sheet-head"><h3 id="shTitle">${title}</h3><button class="icon-btn" data-close aria-label="Close"><i data-lucide="x"></i></button></div>
+    <div class="sheet-body">${body}</div>${foot ? `<div class="sheet-foot">${foot}</div>` : ""}</div></div>`;
+  icons();
+  const root = $("#modalRoot");
+  root.querySelectorAll("[data-close]").forEach(el => el.addEventListener("click", e => { if (e.target === el || el.tagName === "BUTTON") closeSheet(); }));
+  onMount && onMount(root);
+}
+function closeSheet() { $("#modalRoot").innerHTML = ""; }
+document.addEventListener("keydown", e => e.key === "Escape" && closeSheet());
+
+/** Short balance line per space. Each space reports its own figure only. */
+function spaceSummary(k) {
+  switch (k) {
+    case "expenses": return { val: `You owe ${state.expenses.owe}`, cls: "neg", sub: `${state.expenses.groups.length} groups` };
+    case "circles": { const c = state.circles[0]; return { val: c.paid ? "Paid this cycle" : `€${c.amt} due ${c.due}`, cls: c.paid ? "pos" : "neg", sub: `${state.circles.length} circle · payout slot ${c.slot}` }; }
+    case "loans": { const lent = state.loans.filter(l => l.dir === "lent").reduce((a, l) => a + l.out, 0), owe = state.loans.filter(l => l.dir === "borrowed").reduce((a, l) => a + l.out, 0);
+      return { val: `Owed €${lent} · Owe €${owe}`, cls: "", sub: `${state.loans.length} active loans` }; }
+    case "aid": return { val: `You pledged €${state.aid.reduce((a, x) => a + x.mine, 0)}`, cls: "", sub: `${state.aid.length} active request` };
+    case "events": { const e = state.events[0]; return { val: `${eur(e.spent)} of ${eur(e.budget)}`, cls: "", sub: `${e.approvals} spend to approve` }; }
+  }
+}
+
+/* ==========================================================================
+   Screens
+   ========================================================================== */
+const screens = {
+  /* ---------- Home hub ---------- */
+  home() {
+    const held = state.requests.length;
+    const visible = Object.keys(SPACES).filter(k => !state.hidden.includes(k));
+    return `
+      <header class="topbar pad">
+        <div class="logo"><div class="logo-mark"><i data-lucide="wallet"></i></div>Split<span>Sync</span></div>
+        <div class="spacer"></div>
+        <button class="icon-btn" data-act="requests" aria-label="Requests"><i data-lucide="bell"></i>${held ? `<span class="badge">${held}</span>` : ""}</button>
+        <button class="icon-btn" data-act="theme" aria-label="Switch theme"><i data-lucide="sun-moon"></i></button>
+      </header>
+      <div class="stack pad">
+        <div class="welcome"><div class="avatar">H</div><div><h1>Welcome back, ${esc(state.user.name)}!</h1>
+          <div class="tag">Keep it fair, keep it simple. Settle up.</div><div class="muted" style="font-size:14px">Wednesday 4 November 2026</div></div></div>
+
+        <!-- Needs attention: tasks from every space, never a combined money total -->
+        <div class="card">
+          <div class="row-head" style="margin-bottom:4px"><span class="label">Needs attention</span><span class="spacer"></span><span class="muted" style="font-size:12px">From all your spaces</span></div>
+          <div class="todo">
+            ${!state.circles[0].paid ? todo("circles", "Pay €200 to Tolu", "Family Ajo Circle · due 10 Nov", "circle-pay") : ""}
+            ${todo("expenses", "Settle EUR 37.50", "My Group · highest outstanding debt", "settle")}
+            ${todo("events", "Approve €180 cake deposit", "Ada's Wedding · requested by Kemi", "space:events")}
+            ${held ? todo("loans", `${held} requests waiting`, "1 held from someone not on your trusted list", "requests") : ""}
+          </div>
+        </div>
+
+        <div class="row-head"><h2>Your spaces</h2><span class="spacer"></span>
+          <button class="btn btn-sm" data-act="customise"><i data-lucide="sliders-horizontal"></i>Customise</button></div>
+        <div class="note info"><i data-lucide="shield"></i><span>Each space keeps its own ledger. Money in one space is never added to or settled against another.</span></div>
+        <div class="spaces">
+          ${visible.map(k => { const s = sp(k), sm = spaceSummary(k); return `
+            <button class="card tap space ${s.cls}" data-go="space:${k}">
+              <div class="space-ic bg-c"><i data-lucide="${s.icon}"></i></div>
+              <div><h3>${s.name}</h3><div class="sub">${sm.sub}</div></div>
+              <div class="val ${sm.cls}">${sm.val}</div>
+              <span class="lock"><i data-lucide="lock"></i>Separate ledger</span>
+            </button>`; }).join("")}
+          ${state.hidden.length ? `<button class="card tap space wide" data-act="customise"><div class="space-ic" style="background:var(--surface-2);color:var(--muted)"><i data-lucide="plus"></i></div><div><h3>Add a space</h3><div class="sub">${state.hidden.length} hidden</div></div></button>` : ""}
+        </div>
+      </div>`;
+  },
+
+  /* ---------- A single space ---------- */
+  space(k) {
+    const s = sp(k);
+    return `
+      <header class="phead hero pad" style="--hero-a:${s.hero[0]};--hero-b:${s.hero[1]}">
+        <button class="icon-btn" data-go="home" aria-label="Back to home"><i data-lucide="arrow-left"></i></button>
+        <div style="flex:1;min-width:0"><h1>${s.name}</h1><p>${s.blurb}</p></div>
+        <button class="icon-btn" data-act="spaceInfo" data-k="${k}" aria-label="About this space"><i data-lucide="info"></i></button>
+      </header>
+      <div class="stack pad ${s.cls}">${spaceBody[k]()}</div>`;
+  },
+
+  /* ---------- Activity with space filters ---------- */
+  activity() {
+    const f = state.actFilter || "all";
+    const items = state.activity.filter(a => f === "all" || a.sp === f);
+    return `
+      <header class="phead pad"><button class="icon-btn" data-go="home" aria-label="Back"><i data-lucide="arrow-left"></i></button>
+        <div><h1>Activity</h1><p>Activities across your spaces</p></div></header>
+      <div class="stack pad">
+        <div class="chips" role="group" aria-label="Filter by space">
+          <button class="chip-btn" data-filter="all" aria-pressed="${f === "all"}">All</button>
+          ${Object.keys(SPACES).map(k => `<button class="chip-btn" data-filter="${k}" aria-pressed="${f === k}">${sp(k).name}</button>`).join("")}
+        </div>
+        ${f === "all" ? `<div class="note"><i data-lucide="info"></i><span>Showing everything in time order. Amounts are labelled by space and not totalled.</span></div>` : ""}
+        ${items.map(a => { const s = sp(a.sp); return `
+          <div class="card ${s.cls}"><div class="list-item">
+            <div class="dot soft-c"><i data-lucide="${s.icon}"></i></div>
+            <div class="grow"><div class="t">${esc(a.t)}</div><small><span class="fg-c" style="font-weight:700">${s.name}</span> · ${a.d}</small></div>
+            <div class="right ${a.neg ? "neg" : a.pos ? "pos" : ""}">${esc(a.a)}</div></div></div>`; }).join("")}
+      </div>`;
+  },
+
+  /* ---------- Stats: one tab per space ---------- */
+  stats() {
+    const t = state.statTab || "expenses", s = sp(t);
+    const sets = {
+      expenses: [["Mar", 210], ["Apr", 3540], ["May", 90], ["Jun", 20], ["Jul", 196], ["Aug", 0]],
+      circles: [["Sep", 200], ["Oct", 200], ["Nov", 0]],
+      loans: [["Aug", 0], ["Sep", 75], ["Oct", 115], ["Nov", 0]],
+      aid: [["Aug", 0], ["Sep", 40], ["Oct", 25], ["Nov", 0]],
+      events: [["Venue", 2500], ["Catering", 1240], ["Photo", 300], ["Decor", 140]]
+    };
+    const caption = { expenses: "Spending over time (EUR groups only)", circles: "Your contributions per month", loans: "Repayments received and made", aid: "Your giving per month", events: "Ada's Wedding spend by category" }[t];
+    const d = sets[t], max = Math.max(...d.map(x => x[1]), 1);
+    return `
+      <header class="phead pad"><button class="icon-btn" data-go="home" aria-label="Back"><i data-lucide="arrow-left"></i></button>
+        <div><h1>Analytics</h1><p>Insights for each space</p></div></header>
+      <div class="stack pad ${s.cls}">
+        <div class="chips" role="tablist">${Object.keys(SPACES).map(k => `<button class="chip-btn" role="tab" data-stat="${k}" aria-pressed="${t === k}">${sp(k).name}</button>`).join("")}</div>
+        <div class="card">
+          <div class="row-head" style="margin-bottom:10px"><div class="dot soft-c"><i data-lucide="${s.icon}"></i></div><h2 style="font-size:16px">${caption}</h2></div>
+          <div class="chart" role="img" aria-label="${caption}">
+            ${d.map(([l, v]) => `<div class="col"><b>${v ? eur(v) : "–"}</b><i style="height:${Math.max(4, v / max * 100)}%"></i><span>${l}</span></div>`).join("")}
+          </div>
+        </div>
+        <div class="note"><i data-lucide="info"></i><span>Each tab reads only its own space, so figures from different kinds of money are never mixed in one chart.</span></div>
+      </div>`;
+  },
+
+  /* ---------- You: profile, balances per space, privacy ---------- */
+  you() {
+    const p = state.privacy, lbl = { nobody: "Nobody", trusted: "Trusted people only", shared: "Members of shared circles", groups: "Anyone in my groups" };
+    return `
+      <header class="phead hero pad">
+        <button class="icon-btn" data-go="home" aria-label="Back"><i data-lucide="arrow-left"></i></button>
+        <div style="flex:1"><h1>Profile</h1><p>Your personal information and settings</p></div></header>
+      <div class="stack pad">
+        <div class="card" style="display:flex;gap:14px;align-items:center"><div class="avatar">H</div>
+          <div><div style="font-size:20px;font-weight:700">${esc(state.user.name)}</div><div class="muted">${esc(state.user.email)}</div>
+          <span class="pill soft-c c-cir"><i data-lucide="shield-check"></i>Reliability 92</span></div></div>
+
+        <div class="card">
+          <div class="row-head" style="margin-bottom:10px"><i data-lucide="wallet"></i><h2 style="font-size:17px">Balances by space</h2></div>
+          <div class="note" style="margin-bottom:10px"><i data-lucide="info"></i><span>Shown per space and per currency. No conversion and no combined total.</span></div>
+          ${Object.keys(SPACES).map(k => { const s = sp(k), sm = spaceSummary(k); return `
+            <div class="list-item ${s.cls}" style="padding:9px 0;border-bottom:1px solid var(--line)"><div class="dot soft-c"><i data-lucide="${s.icon}"></i></div>
+              <div class="grow"><div class="t" style="font-size:15px">${s.name}</div></div><div class="right ${sm.cls}">${sm.val}</div></div>`; }).join("")}
+        </div>
+
+        <div class="card">
+          <div class="row-head" style="margin-bottom:10px"><i data-lucide="user-lock"></i><h2 style="font-size:17px">Who can ask me</h2><span class="spacer"></span>
+            <button class="btn btn-sm" data-act="privacy">Edit</button></div>
+          <div class="kv" style="padding:6px 0"><span class="muted">Loan requests</span><b>${lbl[p.loans]}</b></div>
+          <div class="kv" style="padding:6px 0"><span class="muted">Aid requests</span><b>${lbl[p.aid]}</b></div>
+          <div class="kv" style="padding:6px 0"><span class="muted">Direct messages</span><b>${lbl[p.direct]}</b></div>
+          <div class="kv" style="padding:6px 0"><span class="muted">Trusted people</span><b>${state.trusted.length}</b></div>
+        </div>
+
+        <div class="card">
+          <div class="kv" style="padding:6px 0"><span class="muted">Sign-in</span><b>Email + passkey</b></div>
+          <div class="kv" style="padding:6px 0"><span class="muted">Session timeout</span><b>15 minutes</b></div>
+          <button class="btn btn-sm" data-act="theme" style="margin-top:8px"><i data-lucide="sun-moon"></i>Switch theme</button>
+        </div>
+      </div>`;
+  }
+};
+
+function todo(k, title, sub, act) {
+  const s = sp(k);
+  const attr = act.startsWith("space:") ? `data-go="${act}"` : `data-act="${act}"`;
+  return `<button class="todo-item ${s.cls}" ${attr}><div class="dot soft-c"><i data-lucide="${s.icon}"></i></div>
+    <div class="grow"><b>${esc(title)}</b><small>${esc(sub)}</small></div><i data-lucide="chevron-right" class="muted"></i></button>`;
+}
+
+/* ---------- Space bodies ---------- */
+const spaceBody = {
+  expenses: () => `
+    <div class="pair"><div class="bal owed"><div class="t"><i data-lucide="trending-up"></i>Owed to you</div><div class="v">${state.expenses.owed}</div></div>
+      <div class="bal owe"><div class="t"><i data-lucide="trending-down"></i>You owe</div><div class="v">${state.expenses.owe}</div></div></div>
+    <div class="row-head"><h2>Your groups</h2><span class="spacer"></span><button class="btn btn-primary btn-sm" data-act="soon" data-msg="Your existing Create group modal opens here"><i data-lucide="plus"></i>Create group</button></div>
+    ${state.expenses.groups.map(g => `<div class="card tap" data-act="soon" data-msg="Opens your existing GroupDetails screen"><div class="list-item">
+      <div class="space-ic bg-c"><i data-lucide="${g.icon}"></i></div>
+      <div class="grow"><div class="t">${esc(g.n)}</div><small>${g.m} members · ${g.cur}</small></div>
+      <div class="right ${g.neg ? "neg" : "pos"}">${esc(g.s)}</div></div></div>`).join("")}`,
+
+  circles: () => { const c = state.circles[0]; return `
+    <div class="card"><div class="row-head"><h2 style="font-size:17px">${esc(c.n)}</h2><span class="spacer"></span>
+      ${c.paid ? `<span class="pill" style="background:var(--owed-soft);color:var(--owed)"><i data-lucide="check"></i>Paid</span>` : `<span class="pill soft-c"><i data-lucide="clock"></i>Due ${c.due}</span>`}</div>
+      <div class="kv" style="margin-top:10px"><span class="muted">Cycle ${c.cycle} of ${c.total}</span><b>€${c.amt} monthly</b></div>
+      <div class="bar" style="margin:8px 0"><i style="width:${pct(c.cycle, c.total)}%"></i></div>
+      <div class="kv"><span class="muted">This cycle's recipient</span><b>${c.next}</b></div>
+      <div class="kv"><span class="muted">Your payout</span><b>Slot ${c.slot} · €${c.amt * c.total}</b></div>
+      ${c.paid ? "" : `<button class="btn btn-primary" data-act="circle-pay" style="margin-top:12px;width:100%"><i data-lucide="send"></i>Pay €${c.amt} to ${c.next}</button>`}
+    </div>
+    <button class="card tap space wide" data-act="soon" data-msg="Start a circle form opens here"><div class="space-ic bg-c"><i data-lucide="plus"></i></div><div><h3>Start a circle</h3><div class="sub">Only people you invite can join</div></div></button>`; },
+
+  loans: () => state.loans.map(l => `
+    <div class="card"><div class="list-item">
+      <div class="dot soft-c"><i data-lucide="${l.dir === "lent" ? "arrow-up-right" : "arrow-down-left"}"></i></div>
+      <div class="grow"><div class="t">${l.dir === "lent" ? "You lent " + esc(l.who) : "You borrowed from " + esc(l.who)}</div><small>${esc(l.next)}</small></div>
+      <div class="right">€${l.out} left</div></div>
+      <div class="bar" style="margin-top:10px"><i style="width:${pct(l.amt - l.out, l.amt)}%"></i></div></div>`).join("") + `
+    <div class="note warn"><i data-lucide="user-lock"></i><span>Only ${state.privacy.loans === "trusted" ? "people on your trusted list" : "people allowed in your privacy settings"} can send you loan requests. Others are held for review.</span></div>
+    <button class="btn" data-act="privacy"><i data-lucide="settings-2"></i>Change who can ask</button>`,
+
+  aid: () => state.aid.map(a => `
+    <div class="card"><div class="row-head"><h2 style="font-size:17px">${esc(a.n)}</h2></div>
+      <div class="muted" style="font-size:13px;margin:4px 0 10px">${esc(a.group)} · ends ${a.ends} · verified by admin</div>
+      <div class="kv"><span class="muted">Raised in pledges</span><b>€${a.got} of €${a.target}</b></div>
+      <div class="bar" style="margin:8px 0"><i style="width:${pct(a.got, a.target)}%"></i></div>
+      <div class="kv"><span class="muted">Your pledge</span><b>€${a.mine}</b></div></div>`).join("") + `
+    <div class="note"><i data-lucide="users-round"></i><span>Aid requests are shared to a group, not sent to individuals. An admin checks each request first.</span></div>`,
+
+  events: () => { const e = state.events[0]; return `
+    <div class="card"><div class="row-head"><h2 style="font-size:17px">${esc(e.n)}</h2><span class="spacer"></span><span class="pill soft-c"><i data-lucide="clock"></i>${e.approvals} to approve</span></div>
+      <div class="kv" style="margin-top:10px"><span class="muted">Spent of budget</span><b>${eur(e.spent)} / ${eur(e.budget)}</b></div>
+      <div class="bar" style="margin:8px 0"><i style="width:${pct(e.spent, e.budget)}%"></i></div>
+      ${e.approvals ? `<div class="note warn"><i data-lucide="clock"></i><span>Kemi wants to spend €180 on the cake deposit.</span></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-sm" data-act="evt" data-ok="0">Reject</button><button class="btn btn-primary btn-sm" data-act="evt" data-ok="1">Approve</button></div>` : ""}
+    </div>`; }
+};
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+const actions = {
+  theme() {
+    const r = document.documentElement;
+    const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    r.dataset.theme = dark ? "light" : "dark";
+  },
+  soon(el) { closeSheet(); toast(el.dataset.msg || "Opens here", "arrow-right"); },
+  assistant() { toast("The AI assistant opens, scoped to the space you are in", "message-circle"); },
+  settle() { toast("Opens your existing Settle up modal for My Group", "arrow-right"); },
+
+  /* Context-aware + button: inside a space it offers that space's actions first */
+  plus() {
+    const inSpace = current.startsWith("space:") ? current.split(":")[1] : null;
+    const all = [
+      ["expenses", "Add an expense", "Quick add to one of your groups"],
+      ["circles", "Pay a contribution", "Family Ajo Circle · €200 due 10 Nov"],
+      ["loans", "Request or offer a loan", "Only to people who accept requests from you"],
+      ["aid", "Ask your group for help", "Reviewed by an admin first"],
+      ["events", "Log event spending", "Sent to the treasurer to approve"]
+    ];
+    const list = inSpace ? [...all.filter(a => a[0] === inSpace), ...all.filter(a => a[0] !== inSpace)] : all;
+    sheet({ title: "What do you want to do?",
+      body: list.map(([k, t, d], i) => `${inSpace && i === 1 ? `<div class="label">Other spaces</div>` : ""}
+        <button class="action ${sp(k).cls}" data-act="${k === "circles" ? "circle-pay" : "soon"}" data-msg="${esc(t)} form opens here">
+          <div class="dot soft-c"><i data-lucide="${sp(k).icon}"></i></div><div class="grow"><b>${t}</b><small>${d}</small></div><i data-lucide="chevron-right" class="muted"></i></button>`).join("") });
+  },
+
+  "circle-pay"() {
+    const c = state.circles[0];
+    sheet({ title: "Pay contribution",
+      body: `<div class="kv"><span class="muted">To</span><b>${c.next}</b></div><div class="kv"><span class="muted">Amount</span><b>€${c.amt}</b></div>
+        <div class="kv"><span class="muted">From space</span><b class="fg-c c-cir">Circles</b></div>
+        <div class="field"><span class="flabel">Payment method</span>
+          <label class="radio"><input type="radio" name="pm" value="PayPal" checked><span><b>PayPal</b><small>Captured server-side</small></span></label>
+          <label class="radio"><input type="radio" name="pm" value="Revolut"><span><b>Revolut</b><small>Opens the Revolut app</small></span></label>
+          <label class="radio"><input type="radio" name="pm" value="SEPA"><span><b>SEPA transfer</b><small>Shows ${c.next}'s IBAN</small></span></label></div>
+        <div class="note"><i data-lucide="shield"></i><span>This payment is recorded only in the Circles ledger. It cannot be used to settle an expense debt with ${c.next}.</span></div>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="payGo"><i data-lucide="fingerprint"></i>Confirm with passkey</button>`,
+      onMount: r => $("#payGo", r).addEventListener("click", () => {
+        c.paid = true; state.activity.unshift({ sp: "circles", t: `You paid ${c.next}`, a: `€${c.amt}`, d: "Just now" });
+        closeSheet(); render(); toast("Contribution recorded in Circles");
+      }) });
+  },
+
+  /* Requests inbox: trusted requests show normally, others are held */
+  requests() {
+    const lbl = { loans: "Loan request", aid: "Aid request" };
+    sheet({ title: "Requests",
+      body: state.requests.length ? state.requests.map(q => { const s = sp(q.kind); return `
+        <div class="card ${s.cls}" style="box-shadow:none">
+          <div class="list-item"><div class="dot soft-c"><i data-lucide="${s.icon}"></i></div>
+            <div class="grow"><div class="t" style="font-size:15px">${lbl[q.kind]} from ${esc(q.from)}</div><small>${esc(q.text)}</small></div><b>${esc(q.amt)}</b></div>
+          ${q.trusted ? "" : `<div class="note warn" style="margin-top:10px"><i data-lucide="shield-alert"></i><span>Held because ${esc(q.from)} is not on your trusted list. They have not been told it was held.</span></div>`}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button class="btn btn-sm" data-req="${q.id}" data-do="decline">Decline</button>
+            ${q.trusted ? `<button class="btn btn-primary btn-sm" data-req="${q.id}" data-do="view">View</button>`
+              : `<button class="btn btn-sm btn-danger" data-req="${q.id}" data-do="block"><i data-lucide="ban"></i>Block</button><button class="btn btn-sm" data-req="${q.id}" data-do="trust"><i data-lucide="user-check"></i>Trust and view</button>`}
+          </div></div>`; }).join("") : `<div class="muted" style="text-align:center;padding:20px">No requests waiting.</div>`,
+      onMount: r => r.querySelectorAll("[data-req]").forEach(b => b.addEventListener("click", () => {
+        const q = state.requests.find(x => x.id === b.dataset.req), d = b.dataset.do;
+        if (d === "trust") state.trusted.push(q.from);
+        state.requests = state.requests.filter(x => x !== q);
+        const msg = { decline: "Request declined", block: `${q.from} blocked. They can't send you requests.`, trust: `${q.from} added to trusted people`, view: "Opening request" }[d];
+        actions.requests(); render(); toast(msg);
+      })) });
+  },
+
+  /* Privacy settings: who can send each kind of request */
+  privacy() {
+    const opts = [["nobody", "Nobody", "Turn this off completely"], ["trusted", "Trusted people only", "People you've approved"], ["shared", "Members of shared circles", "People in a circle with you"], ["groups", "Anyone in my groups", "Includes expense groups"]];
+    const block = (key, title) => `<div class="field"><span class="flabel">${title}</span>
+      ${opts.map(([v, l, d]) => `<label class="radio"><input type="radio" name="${key}" value="${v}" ${state.privacy[key] === v ? "checked" : ""}><span><b>${l}</b><small>${d}</small></span></label>`).join("")}</div>`;
+    sheet({ title: "Who can ask me",
+      body: `<div class="note info"><i data-lucide="info"></i><span>Being in a group with someone lets you split bills with them. It does not let them ask you for money unless you allow it.</span></div>
+        ${block("loans", "Loan requests")}${block("aid", "Aid requests sent to me directly")}${block("direct", "Direct messages")}
+        <div class="field"><span class="flabel">Trusted people</span><div class="chips" style="flex-wrap:wrap">${state.trusted.map(t => `<span class="chip-btn" style="cursor:default">${esc(t)}</span>`).join("")}</div></div>
+        <label class="switch"><input type="checkbox" id="holdOthers" checked>Hold requests from everyone else for my review</label>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="pvSave">Save</button>`,
+      onMount: r => $("#pvSave", r).addEventListener("click", () => {
+        ["loans", "aid", "direct"].forEach(k => state.privacy[k] = $(`input[name=${k}]:checked`, r).value);
+        closeSheet(); render(); toast("Privacy settings saved");
+      }) });
+  },
+
+  /* Choose which spaces appear on Home */
+  customise() {
+    sheet({ title: "Customise Home",
+      body: `<p class="muted" style="margin:0">Show only the spaces you use. Hiding a space keeps its data safe.</p>
+        ${Object.keys(SPACES).map(k => `<label class="switch ${sp(k).cls}" style="padding:8px 0;border-bottom:1px solid var(--line)">
+          <input type="checkbox" value="${k}" ${state.hidden.includes(k) ? "" : "checked"} ${k === "expenses" ? "disabled" : ""}>
+          <span class="dot soft-c" style="width:30px;height:30px"><i data-lucide="${sp(k).icon}"></i></span>
+          <span style="flex:1"><b>${sp(k).name}</b><br><small class="muted">${sp(k).blurb}${k === "expenses" ? " · always on" : ""}</small></span></label>`).join("")}`,
+      foot: `<button class="btn btn-primary" id="cuSave">Done</button>`,
+      onMount: r => $("#cuSave", r).addEventListener("click", () => {
+        state.hidden = [...r.querySelectorAll("input[type=checkbox]:not(:checked)")].map(i => i.value);
+        closeSheet(); render(); toast("Home updated");
+      }) });
+  },
+
+  spaceInfo(el) {
+    const k = el.dataset.k, s = sp(k), db = ["expenses", "events"].includes(k) ? "default database" : "circles database";
+    sheet({ title: `About ${s.name}`,
+      body: `<p style="margin:0">${s.blurb}.</p>
+        <div class="note"><i data-lucide="database"></i><span>Stored in the ${db}. Same login as the rest of SplitSync.</span></div>
+        <div class="note"><i data-lucide="lock"></i><span>Balances here are calculated only from this space. Settling a debt here never changes a balance in another space.</span></div>`,
+      foot: `<button class="btn btn-primary" data-close>Got it</button>` });
+  },
+
+  evt(el) {
+    const e = state.events[0], ok = el.dataset.ok === "1";
+    if (ok) e.spent += 180; e.approvals = 0; render(); toast(ok ? "Spend approved" : "Spend rejected");
+  }
+};
+
+/* ==========================================================================
+   Router and events
+   ========================================================================== */
+let current = "home";
+function render() {
+  const [name, arg] = current.split(":");
+  $("#screen").innerHTML = name === "space" ? screens.space(arg) : screens[name]();
+  document.querySelectorAll(".nav [data-go]").forEach(b => b.setAttribute("aria-current", b.dataset.go === name || (name === "space" && b.dataset.go === "home") ? "page" : "false"));
+  icons();
+}
+function go(v) {
+  const [n, a] = (v || "home").split(":");
+  current = (screens[n] && (n !== "space" || SPACES[a])) ? v : "home";
+  try { history.replaceState(null, "", "#" + current.replace(":", "-")); } catch (e) {}
+  closeSheet(); render(); window.scrollTo(0, 0);
+}
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g) return go(g.dataset.go);
+  const f = e.target.closest("[data-filter]"); if (f) { state.actFilter = f.dataset.filter; return render(); }
+  const s = e.target.closest("[data-stat]"); if (s) { state.statTab = s.dataset.stat; return render(); }
+  const a = e.target.closest("[data-act]"); if (a && actions[a.dataset.act]) actions[a.dataset.act](a);
+});
+window.addEventListener("hashchange", () => go(location.hash.slice(1).replace("-", ":")));
+go((location.hash.slice(1) || "home").replace("-", ":"));
+</script>

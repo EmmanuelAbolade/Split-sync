@@ -1,0 +1,867 @@
+<title>SplitSync Circles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap">
+<!--
+  File: splitsync-circles.html
+  Purpose: Clickable UI mockup showing how SplitSync can absorb the financial
+           coordination features (events, refunds, ROSCA circles with payout
+           rotations, P2P soft loans, mutual aid) while keeping one login.
+  Architecture shown:
+    - Core (default Firestore DB): Groups, Event groups, Refunds
+    - Circles module (second named Firestore DB, same Firebase Auth): ROSCA, Loans, Aid
+    - Future service (separate, licensed partner): Escrow pots, Savings groups
+  Notes: Mock data only. No real payments, auth or network calls are made.
+         Icons are Lucide (same set as the React app via lucide-react).
+-->
+<style>
+/* Layout concept: app shell - sidebar on desktop, bottom tab bar on phone; cards by role, modals scroll inside */
+:root{
+  --bg:#f5f6fa; --surface:#ffffff; --surface-2:#eef0f6; --line:#dfe2ec;
+  --fg:#161a2b; --muted:#5d6480;
+  --teal:#0f9fae; --violet:#6a46d6; --accent:#5b45d0; --accent-soft:#ece8fc; --teal-soft:#e2f5f7;
+  --ok:#1a8a55; --ok-soft:#e3f4ea; --warn:#b26a00; --warn-soft:#fdf0dc; --bad:#c23b3b; --bad-soft:#fbe5e5;
+  --shadow:0 1px 2px rgba(22,26,43,.06),0 8px 24px rgba(22,26,43,.06);
+  --font-display:"Sora","Segoe UI",system-ui,sans-serif;
+  --font-body:"Manrope","Segoe UI",system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1020; --surface:#171a2e; --surface-2:#20243c; --line:#2c3150;
+  --fg:#eceefa; --muted:#9aa1c0;
+  --teal:#38c6d4; --violet:#9b80f5; --accent:#9d87ff; --accent-soft:#2a2550; --teal-soft:#16343b;
+  --ok:#4cc98a; --ok-soft:#173527; --warn:#f0ad4e; --warn-soft:#3a2c14; --bad:#f07878; --bad-soft:#3d1c22;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1020; --surface:#171a2e; --surface-2:#20243c; --line:#2c3150;
+  --fg:#eceefa; --muted:#9aa1c0;
+  --teal:#38c6d4; --violet:#9b80f5; --accent:#9d87ff; --accent-soft:#2a2550; --teal-soft:#16343b;
+  --ok:#4cc98a; --ok-soft:#173527; --warn:#f0ad4e; --warn-soft:#3a2c14; --bad:#f07878; --bad-soft:#3d1c22;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.2}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+svg.lucide{width:18px;height:18px;stroke-width:2;flex:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+
+/* ---------- Shell ---------- */
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100%}
+.side{background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--violet));display:grid;place-items:center;color:#fff}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:18px}
+.brand-name span{color:var(--violet)}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;border:0;background:none;cursor:pointer;text-align:left;color:var(--muted);font-weight:600}
+.nav-btn:hover{background:var(--surface-2);color:var(--fg)}
+.nav-btn[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.nav-btn .tag{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--teal-soft);color:var(--teal);padding:2px 6px;border-radius:6px}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.main{min-width:0;padding-block:24px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar h1{font-size:24px}
+.topbar .spacer{flex:1}
+.mobile-brand{display:none}
+.tabbar{display:none}
+
+/* ---------- Generic UI ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:9px 14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent);filter:brightness(1.08)}
+:root[data-theme="dark"] .btn-primary{color:#14112b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn-primary{color:#14112b}}
+.btn-ghost{border-color:transparent;background:none}
+.btn-sm{padding:6px 10px;font-size:13px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.icon-btn{width:38px;height:38px;padding:0}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.chip svg.lucide{width:13px;height:13px}
+.chip-ok{background:var(--ok-soft);color:var(--ok)}
+.chip-warn{background:var(--warn-soft);color:var(--warn)}
+.chip-bad{background:var(--bad-soft);color:var(--bad)}
+.chip-accent{background:var(--accent-soft);color:var(--accent)}
+.chip-teal{background:var(--teal-soft);color:var(--teal)}
+.chip-plain{background:var(--surface-2);color:var(--muted)}
+.db-tag{display:none;font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:6px;border:1px dashed currentColor}
+.show-arch .db-tag{display:inline-flex}
+.db-core{color:var(--teal)} .db-circles{color:var(--accent)} .db-future{color:var(--warn)}
+
+.section-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.section-head h2{font-size:17px}
+.section-head .muted{font-size:13px}
+.section-head .spacer{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);min-width:0}
+.card.clickable{cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+.card.clickable:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card-top{display:flex;align-items:flex-start;gap:12px}
+.avatar{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.av-teal{background:var(--teal-soft);color:var(--teal)}
+.av-violet{background:var(--accent-soft);color:var(--accent)}
+.av-warn{background:var(--warn-soft);color:var(--warn)}
+.av-ok{background:var(--ok-soft);color:var(--ok)}
+.card-title{font-weight:700;font-size:15px}
+.card-sub{font-size:13px;color:var(--muted)}
+.card-top .grow{flex:1;min-width:0}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.kv b{font-variant-numeric:tabular-nums}
+.big{font-family:var(--font-display);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.pos{color:var(--ok)} .neg{color:var(--bad)}
+.bar{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--violet))}
+.bar.warn>i{background:var(--warn)}
+.card-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+
+/* Summary strip */
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sum{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.sum .label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+
+/* Architecture banner */
+.arch{display:none;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:14px 16px;gap:10px;flex-direction:column}
+.show-arch .arch{display:flex}
+.arch-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px}
+.arch-box{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface-2);display:flex;align-items:center;gap:8px}
+
+/* Locked / future cards */
+.card.locked{background:repeating-linear-gradient(135deg,var(--surface),var(--surface) 10px,var(--surface-2) 10px,var(--surface-2) 20px)}
+
+/* Rotation timeline */
+.rotation{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.slot{min-width:92px;border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:4px;font-size:12px;background:var(--surface)}
+.slot .n{font-family:var(--font-display);font-weight:700;font-size:13px}
+.slot.done{background:var(--ok-soft);border-color:transparent}
+.slot.now{border:2px solid var(--accent);background:var(--accent-soft)}
+.slot.you{box-shadow:inset 0 0 0 1px var(--teal)}
+
+/* Lists */
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.row:last-child{border-bottom:0}
+.row .grow{flex:1;min-width:0}
+.row .grow small{display:block;color:var(--muted);font-size:12px}
+
+/* ---------- Modal (scrollable body) ---------- */
+.overlay{position:fixed;inset:0;background:rgba(10,12,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:18px;width:min(560px,100%);max-height:min(86vh,760px);display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.modal-head h3{font-size:17px;flex:1}
+.modal-body{padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;overscroll-behavior:contain}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.note{display:flex;gap:10px;font-size:13px;background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note.accent{background:var(--accent-soft);color:var(--accent)}
+
+/* Forms */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700}
+.field input,.field select,.field textarea{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;width:100%}
+.field textarea{min-height:80px;resize:vertical}
+.field .hint{font-size:12px;color:var(--muted)}
+.field .err{font-size:12px;color:var(--bad);display:none}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:var(--bad)}
+.field.invalid .err{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.toggle{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+.options{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.opt{border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;font-size:13px;background:var(--surface)}
+.opt input{margin-top:3px;accent-color:var(--accent)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt b{display:block;font-size:14px}
+
+/* Toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:60;display:flex;gap:8px;align-items:center;max-width:calc(100% - 32px)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr}
+  .side{display:none}
+  .mobile-brand{display:flex}
+  .summary{grid-template-columns:1fr 1fr}
+  .summary .sum:last-child{grid-column:1/-1}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:40;
+    padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .tabbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;cursor:pointer}
+  .tabbar button[aria-current="page"]{color:var(--accent)}
+  .two{grid-template-columns:1fr}
+  .overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:18px 18px 0 0;max-height:90vh;width:100%;padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell" id="app">
+  <!-- Sidebar navigation (desktop) -->
+  <aside class="side" aria-label="Main navigation">
+    <div class="brand"><div class="brand-mark"><i data-lucide="wallet"></i></div><div class="brand-name">Split<span>Sync</span></div></div>
+    <button class="nav-btn" data-view="groups"><i data-lucide="users"></i>Groups</button>
+    <button class="nav-btn" data-view="circles"><i data-lucide="refresh-ccw-dot"></i>Circles<span class="tag">New</span></button>
+    <button class="nav-btn" data-view="activity"><i data-lucide="activity"></i>Activity</button>
+    <button class="nav-btn" data-view="profile"><i data-lucide="shield-check"></i>Trust &amp; profile</button>
+    <div class="side-foot">
+      <label class="toggle"><input type="checkbox" id="archToggle">Show architecture</label>
+      <button class="btn btn-sm" id="themeBtn"><i data-lucide="sun-moon"></i>Switch theme</button>
+    </div>
+  </aside>
+
+  <!-- Main content area: views are rendered into #view -->
+  <main class="main">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="mobile-brand brand-name" style="align-items:center;gap:8px"><div class="brand-mark" style="width:30px;height:30px"><i data-lucide="wallet"></i></div>Split<span>Sync</span></div>
+        <h1 id="viewTitle">Groups</h1>
+        <div class="spacer"></div>
+        <button class="btn btn-sm mobile-only" id="archBtnMobile" hidden><i data-lucide="layers"></i>Architecture</button>
+        <button class="btn icon-btn" id="themeBtnTop" aria-label="Switch theme"><i data-lucide="sun-moon"></i></button>
+        <button class="btn btn-primary" id="primaryAction"><i data-lucide="plus"></i><span>New</span></button>
+      </div>
+
+      <!-- Architecture explainer, visible when "Show architecture" is on -->
+      <div class="arch" aria-label="Architecture">
+        <div class="arch-row"><b>One Firebase project</b><span class="muted">One login (Firebase Auth uid) shared by every module</span></div>
+        <div class="arch-row">
+          <span class="arch-box"><i data-lucide="database"></i><span><b>(default) DB</b> Groups, events, refunds</span><span class="db-tag db-core">core</span></span>
+          <span class="arch-box"><i data-lucide="database-zap"></i><span><b>circles DB</b> ROSCA, rotations, loans, aid</span><span class="db-tag db-circles">circles</span></span>
+          <span class="arch-box"><i data-lucide="lock"></i><span><b>Separate service</b> Escrow, pooled savings</span><span class="db-tag db-future">future</span></span>
+        </div>
+      </div>
+
+      <div id="view"></div>
+    </div>
+  </main>
+
+  <!-- Bottom tab bar (phone) -->
+  <nav class="tabbar" aria-label="Main navigation">
+    <button data-view="groups"><i data-lucide="users"></i>Groups</button>
+    <button data-view="circles"><i data-lucide="refresh-ccw-dot"></i>Circles</button>
+    <button data-view="activity"><i data-lucide="activity"></i>Activity</button>
+    <button data-view="profile"><i data-lucide="shield-check"></i>Trust</button>
+  </nav>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<script>
+/* ==========================================================================
+   Mock data
+   - groups / refunds live in the core (default) Firestore database
+   - circles (rosca, loans, aid) live in the named "circles" database
+   - every record references people by Firebase Auth uid, never a copy
+   ========================================================================== */
+const ME = { uid: "u_emmanuel", name: "Emmanuel" };
+
+const data = {
+  groups: [
+    { id: "g1", type: "household", name: "Galway Flat", members: 4, balance: 42.5, last: "Electricity bill, 2 days ago" },
+    { id: "g2", type: "trip", name: "Kerry Weekend", members: 5, balance: -18.2, last: "Fuel, 5 days ago" },
+    { id: "g3", type: "event", name: "Ada's Wedding", members: 9, balance: 0, budget: 6000, spent: 4180,
+      categories: [ { n: "Venue", b: 2500, s: 2500 }, { n: "Catering", b: 2000, s: 1240 }, { n: "Photo and video", b: 800, s: 300 }, { n: "Decor", b: 700, s: 140 } ],
+      pledges: [ { n: "Emmanuel", a: 600, paid: true }, { n: "Tolu", a: 1000, paid: true }, { n: "Kemi", a: 500, paid: false }, { n: "Uncle Femi", a: 1500, paid: true } ],
+      pendingSpend: { item: "Cake deposit", amount: 180, by: "Kemi" } }
+  ],
+  refunds: [
+    { id: "r1", group: "Galway Flat", title: "Tesco groceries (duplicate entry)", amount: 36.4, status: "pending", by: "Sean" }
+  ],
+  rosca: { id: "c1", name: "Family Ajo Circle", amount: 200, freq: "Monthly", cycle: 3, total: 6, due: "10 Nov",
+    order: ["Mum", "Bayo", "Tolu", "Kemi", "Emmanuel", "Seyi"], method: "Agreed order (vote)",
+    paid: { Mum: true, Bayo: true, Tolu: true, Kemi: true, Emmanuel: false, Seyi: false } },
+  loans: [
+    { id: "l1", dir: "lent", who: "Kemi", amount: 300, repaid: 150, next: "€75 on 30 Nov", plan: [ { d: "30 Sep", a: 75, s: "paid" }, { d: "31 Oct", a: 75, s: "paid" }, { d: "30 Nov", a: 75, s: "due" }, { d: "31 Dec", a: 75, s: "upcoming" } ] },
+    { id: "l2", dir: "borrowed", who: "Sean", amount: 120, repaid: 40, next: "€40 on 15 Nov", plan: [ { d: "15 Oct", a: 40, s: "paid" }, { d: "15 Nov", a: 40, s: "due" }, { d: "15 Dec", a: 40, s: "upcoming" } ] }
+  ],
+  aid: { id: "a1", title: "Support for the Okafor family", target: 1500, pledged: 1040, givers: 14, ends: "15 Nov", verified: true, group: "Cork Community" },
+  activity: [
+    { icon: "hand-coins", t: "Tolu received the cycle 3 pot (€1,200) in Family Ajo Circle", d: "Today" },
+    { icon: "receipt", t: "Sean requested a refund of €36.40 in Galway Flat", d: "Yesterday" },
+    { icon: "heart-handshake", t: "2 new pledges to Support for the Okafor family", d: "Yesterday" },
+    { icon: "badge-euro", t: "Kemi repaid €75 of her loan", d: "31 Oct" },
+    { icon: "check-check", t: "Ada's Wedding: Venue payment approved by treasurer", d: "28 Oct" }
+  ]
+};
+
+/* ==========================================================================
+   Helpers
+   ========================================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const eur = n => "€" + Math.abs(n).toLocaleString("en-IE", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const icons = () => window.lucide && lucide.createIcons();
+const pct = (a, b) => Math.min(100, Math.round((a / b) * 100));
+
+/** Shows a short confirmation message at the bottom of the screen. */
+function toast(msg, icon = "check-circle-2") {
+  const root = $("#toastRoot");
+  root.innerHTML = `<div class="toast" role="status"><i data-lucide="${icon}"></i>${esc(msg)}</div>`;
+  icons();
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => (root.innerHTML = ""), 3200);
+}
+
+/* ==========================================================================
+   Modal system - header, scrollable body, footer. Esc and backdrop close it.
+   ========================================================================== */
+function openModal({ title, icon = "info", body, foot = "", onMount }) {
+  const root = $("#modalRoot");
+  root.innerHTML = `
+    <div class="overlay" data-close>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+        <div class="modal-head"><div class="avatar av-violet" style="width:34px;height:34px"><i data-lucide="${icon}"></i></div>
+          <h3 id="mTitle">${title}</h3>
+          <button class="btn btn-ghost icon-btn" data-close aria-label="Close"><i data-lucide="x"></i></button></div>
+        <div class="modal-body">${body}</div>
+        ${foot ? `<div class="modal-foot">${foot}</div>` : ""}
+      </div>
+    </div>`;
+  icons();
+  root.querySelectorAll("[data-close]").forEach(el => el.addEventListener("click", e => { if (e.target === el || el.tagName === "BUTTON") closeModal(); }));
+  const first = root.querySelector(".modal-body input, .modal-body select, .modal-body textarea, .modal-foot .btn-primary");
+  first && first.focus();
+  onMount && onMount(root);
+}
+function closeModal() { $("#modalRoot").innerHTML = ""; }
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+/** Marks a field valid or invalid and returns the result. */
+function check(field, ok) { field.closest(".field").classList.toggle("invalid", !ok); return ok; }
+
+/**
+ * Simulated step-up authentication. Money actions (paying, lending, accepting
+ * terms) ask the user to re-confirm with their passkey (WebAuthn) first.
+ */
+function stepUp(summary, onDone) {
+  openModal({
+    title: "Confirm it's you", icon: "fingerprint",
+    body: `<div class="note accent"><i data-lucide="shield-check"></i><span>Money actions need a fresh passkey check, even inside an active session.</span></div>
+           <div class="list"><div class="row"><div class="grow">${summary}</div></div></div>`,
+    foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="passkeyBtn"><i data-lucide="fingerprint"></i>Use passkey</button>`,
+    onMount: r => $("#passkeyBtn", r).addEventListener("click", () => { closeModal(); onDone(); })
+  });
+}
+
+/* ==========================================================================
+   Views
+   ========================================================================== */
+const views = {
+  /* ---------- Groups (core DB) ---------- */
+  groups() {
+    const g = data.groups;
+    const owed = g.filter(x => x.balance > 0).reduce((a, x) => a + x.balance, 0);
+    const owe = g.filter(x => x.balance < 0).reduce((a, x) => a + x.balance, 0);
+    return `
+      <div class="summary">
+        <div class="sum"><div class="label">You are owed</div><div class="big pos">${eur(owed)}</div></div>
+        <div class="sum"><div class="label">You owe</div><div class="big neg">${eur(owe)}</div></div>
+        <div class="sum"><div class="label">Open refunds</div><div class="big">${data.refunds.filter(r => r.status === "pending").length}</div></div>
+      </div>
+
+      <div class="section-head"><h2>Your groups</h2><span class="db-tag db-core">default DB</span><span class="spacer"></span></div>
+      <div class="grid">
+        ${g.map(x => x.type === "event" ? eventCard(x) : groupCard(x)).join("")}
+      </div>
+
+      <div class="section-head"><h2>Refunds</h2><span class="muted">Reversing entries on the ledger, never deletions</span><span class="db-tag db-core">default DB</span><span class="spacer"></span>
+        <button class="btn btn-sm" data-act="newRefund"><i data-lucide="undo-2"></i>Request refund</button></div>
+      <div class="card"><div class="list">
+        ${data.refunds.map(r => `
+          <div class="row"><div class="avatar av-warn" style="width:34px;height:34px"><i data-lucide="undo-2"></i></div>
+            <div class="grow"><b>${esc(r.title)}</b><small>${esc(r.group)} · requested by ${esc(r.by)}</small></div>
+            <b class="num">${eur(r.amount)}</b>
+            ${r.status === "pending" ? `<button class="btn btn-sm" data-act="reviewRefund" data-id="${r.id}">Review</button>` : chip(r.status)}
+          </div>`).join("")}
+      </div></div>`;
+  },
+
+  /* ---------- Circles (named circles DB) ---------- */
+  circles() {
+    const c = data.rosca;
+    const paidCount = Object.values(c.paid).filter(Boolean).length;
+    const myPaid = c.paid[ME.name];
+    const youSlot = c.order.indexOf(ME.name) + 1;
+    return `
+      <div class="note"><i data-lucide="info"></i><span>Circles use your SplitSync login. Members pay each other directly through PayPal, Revolut or SEPA, and SplitSync keeps the record.</span></div>
+
+      <div class="section-head"><h2>Savings circles</h2><span class="muted">ROSCA / ajo / susu with payout rotation</span><span class="db-tag db-circles">circles DB</span></div>
+      <div class="grid">
+        <div class="card clickable" data-act="openRosca" tabindex="0">
+          <div class="card-top"><div class="avatar av-violet"><i data-lucide="refresh-ccw-dot"></i></div>
+            <div class="grow"><div class="card-title">${esc(c.name)}</div><div class="card-sub">${eur(c.amount)} ${c.freq.toLowerCase()} · ${c.total} members</div></div>
+            ${myPaid ? chip("paid") : `<span class="chip chip-warn"><i data-lucide="clock"></i>Due ${c.due}</span>`}</div>
+          <div class="kv"><span class="muted">Cycle ${c.cycle} of ${c.total}</span><b>${paidCount}/${c.total} paid</b></div>
+          <div class="bar"><i style="width:${pct(paidCount, c.total)}%"></i></div>
+          <div class="kv"><span class="muted">This cycle's recipient</span><b>${c.order[c.cycle - 1]}</b></div>
+          <div class="kv"><span class="muted">Your payout</span><b>Slot ${youSlot} · ${eur(c.amount * c.total)}</b></div>
+        </div>
+        <div class="card clickable" data-act="newCircle" tabindex="0" style="border-style:dashed;justify-content:center;align-items:center;text-align:center">
+          <div class="avatar av-violet"><i data-lucide="plus"></i></div>
+          <div class="card-title">Start a circle</div><div class="card-sub">Set the amount, members and payout order</div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2>Soft loans</h2><span class="muted">Interest-free, between two people</span><span class="db-tag db-circles">circles DB</span><span class="spacer"></span>
+        <button class="btn btn-sm" data-act="newLoan"><i data-lucide="hand-coins"></i>Request a loan</button></div>
+      <div class="grid">
+        ${data.loans.map(l => `
+          <div class="card clickable" data-act="openLoan" data-id="${l.id}" tabindex="0">
+            <div class="card-top"><div class="avatar ${l.dir === "lent" ? "av-ok" : "av-warn"}"><i data-lucide="${l.dir === "lent" ? "arrow-up-right" : "arrow-down-left"}"></i></div>
+              <div class="grow"><div class="card-title">${l.dir === "lent" ? "You lent " + esc(l.who) : "You borrowed from " + esc(l.who)}</div><div class="card-sub">Next: ${esc(l.next)}</div></div>
+              ${l.plan.some(p => p.s === "late") ? chip("late") : chip("on track")}</div>
+            <div class="kv"><span class="muted">Repaid</span><b>${eur(l.repaid)} of ${eur(l.amount)}</b></div>
+            <div class="bar"><i style="width:${pct(l.repaid, l.amount)}%"></i></div>
+          </div>`).join("")}
+      </div>
+
+      <div class="section-head"><h2>Mutual aid</h2><span class="muted">Pledges go straight to the person being helped</span><span class="db-tag db-circles">circles DB</span><span class="spacer"></span>
+        <button class="btn btn-sm" data-act="newAid"><i data-lucide="heart-handshake"></i>Ask for help</button></div>
+      <div class="grid">
+        <div class="card clickable" data-act="openAid" tabindex="0">
+          <div class="card-top"><div class="avatar av-teal"><i data-lucide="heart-handshake"></i></div>
+            <div class="grow"><div class="card-title">${esc(data.aid.title)}</div><div class="card-sub">${esc(data.aid.group)} · ends ${data.aid.ends}</div></div>
+            ${data.aid.verified ? `<span class="chip chip-teal"><i data-lucide="badge-check"></i>Verified</span>` : ""}</div>
+          <div class="kv"><span class="muted">${data.aid.givers} people pledged</span><b>${eur(data.aid.pledged)} of ${eur(data.aid.target)}</b></div>
+          <div class="bar"><i style="width:${pct(data.aid.pledged, data.aid.target)}%"></i></div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2>Coming later</h2><span class="muted">Needs a licensed partner to hold money</span><span class="db-tag db-future">separate service</span></div>
+      <div class="grid">
+        <div class="card locked clickable" data-act="future" data-kind="escrow" tabindex="0">
+          <div class="card-top"><div class="avatar av-warn"><i data-lucide="vault"></i></div>
+            <div class="grow"><div class="card-title">Protected circle pot</div><div class="card-sub">Contributions held, released when the cycle completes</div></div><span class="chip chip-plain"><i data-lucide="lock"></i>Later</span></div>
+        </div>
+        <div class="card locked clickable" data-act="future" data-kind="savings" tabindex="0">
+          <div class="card-top"><div class="avatar av-warn"><i data-lucide="piggy-bank"></i></div>
+            <div class="grow"><div class="card-title">Savings groups</div><div class="card-sub">A shared pot for a holiday or Christmas club</div></div><span class="chip chip-plain"><i data-lucide="lock"></i>Later</span></div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- Activity ---------- */
+  activity() {
+    return `<div class="card"><div class="list">
+      ${data.activity.map(a => `<div class="row"><div class="avatar av-violet" style="width:34px;height:34px"><i data-lucide="${a.icon}"></i></div>
+        <div class="grow">${esc(a.t)}</div><span class="muted" style="font-size:13px">${a.d}</span></div>`).join("")}
+    </div></div>`;
+  },
+
+  /* ---------- Trust and profile ---------- */
+  profile() {
+    const months = [ ["Jun", 3], ["Jul", 4], ["Aug", 4], ["Sep", 5], ["Oct", 5], ["Nov", 2] ];
+    return `
+      <div class="grid">
+        <div class="card">
+          <div class="card-top"><div class="avatar av-violet"><i data-lucide="shield-check"></i></div>
+            <div class="grow"><div class="card-title">Reliability score</div><div class="card-sub">Visible to members of your circles only</div></div><span class="chip chip-ok">Strong</span></div>
+          <div class="big">92 <span class="muted" style="font-size:14px;font-weight:500">/ 100</span></div>
+          <div class="bar"><i style="width:92%"></i></div>
+          <div class="kv"><span class="muted">Circle contributions on time</span><b>18 of 19</b></div>
+          <div class="kv"><span class="muted">Loan repayments on time</span><b>3 of 3</b></div>
+          <div class="kv"><span class="muted">Disputes raised against you</span><b>0</b></div>
+          <button class="btn btn-sm" data-act="scoreInfo"><i data-lucide="help-circle"></i>How this is calculated</button>
+        </div>
+        <div class="card">
+          <div class="card-top"><div class="avatar av-teal"><i data-lucide="bar-chart-3"></i></div>
+            <div class="grow"><div class="card-title">On-time payments</div><div class="card-sub">Last 6 months, all modules</div></div></div>
+          <div style="display:flex;align-items:flex-end;gap:10px;height:120px;padding-top:8px" role="img" aria-label="On-time payments per month">
+            ${months.map(([m, v]) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+              <span class="num" style="font-size:12px;font-weight:700">${v}</span>
+              <div style="width:100%;height:${v * 18}px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--violet),var(--teal))"></div>
+              <span class="muted" style="font-size:12px">${m}</span></div>`).join("")}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-top"><div class="avatar av-ok"><i data-lucide="user-round"></i></div>
+            <div class="grow"><div class="card-title">${ME.name}</div><div class="card-sub">One account across Groups and Circles</div></div></div>
+          <div class="kv"><span class="muted">Sign-in</span><b>Email + passkey</b></div>
+          <div class="kv"><span class="muted">Session timeout</span><b>15 minutes</b></div>
+          <div class="kv"><span class="muted">Payment methods</span><b>PayPal, Revolut, SEPA</b></div>
+        </div>
+      </div>`;
+  }
+};
+
+/* Card templates */
+function groupCard(x) {
+  const icon = x.type === "trip" ? "plane" : "home";
+  return `<div class="card clickable" data-act="openGroup" data-id="${x.id}" tabindex="0">
+    <div class="card-top"><div class="avatar av-teal"><i data-lucide="${icon}"></i></div>
+      <div class="grow"><div class="card-title">${esc(x.name)}</div><div class="card-sub">${x.members} members · ${esc(x.last)}</div></div></div>
+    <div class="kv"><span class="muted">${x.balance >= 0 ? "You are owed" : "You owe"}</span><b class="${x.balance >= 0 ? "pos" : "neg"}">${eur(x.balance)}</b></div>
+  </div>`;
+}
+function eventCard(x) {
+  const p = pct(x.spent, x.budget);
+  return `<div class="card clickable" data-act="openEvent" data-id="${x.id}" tabindex="0">
+    <div class="card-top"><div class="avatar av-violet"><i data-lucide="party-popper"></i></div>
+      <div class="grow"><div class="card-title">${esc(x.name)}</div><div class="card-sub">Event group · ${x.members} members</div></div>
+      ${x.pendingSpend ? `<span class="chip chip-warn"><i data-lucide="clock"></i>1 to approve</span>` : ""}</div>
+    <div class="kv"><span class="muted">Spent of budget</span><b>${eur(x.spent)} / ${eur(x.budget)}</b></div>
+    <div class="bar ${p > 90 ? "warn" : ""}"><i style="width:${p}%"></i></div>
+  </div>`;
+}
+function chip(s) {
+  const map = { paid: ["chip-ok", "check", "Paid"], "on track": ["chip-ok", "check", "On track"], late: ["chip-bad", "alert-triangle", "Late"],
+    approved: ["chip-ok", "check", "Approved"], rejected: ["chip-bad", "x", "Rejected"], due: ["chip-warn", "clock", "Due"], upcoming: ["chip-plain", "calendar", "Upcoming"] };
+  const [c, i, l] = map[s] || ["chip-plain", "circle", s];
+  return `<span class="chip ${c}"><i data-lucide="${i}"></i>${l}</span>`;
+}
+
+/* ==========================================================================
+   Actions (modals and flows)
+   ========================================================================== */
+const actions = {
+  openGroup(id) {
+    const g = data.groups.find(x => x.id === id);
+    openModal({ title: esc(g.name), icon: "users",
+      body: `<div class="note"><i data-lucide="info"></i><span>This is the existing SplitSync group screen: expenses, splits, receipts and Settle up stay exactly as they are today.</span></div>
+             <div class="kv"><span class="muted">Members</span><b>${g.members}</b></div>
+             <div class="kv"><span class="muted">${g.balance >= 0 ? "You are owed" : "You owe"}</span><b class="${g.balance >= 0 ? "pos" : "neg"}">${eur(g.balance)}</b></div>`,
+      foot: `<button class="btn" data-close>Close</button><button class="btn btn-primary" data-close><i data-lucide="arrow-right-left"></i>Settle up</button>` });
+  },
+
+  /* Event group: budget vs actual, pledges, treasurer approval */
+  openEvent(id) {
+    const e = data.groups.find(x => x.id === id);
+    const pledged = e.pledges.reduce((a, p) => a + p.a, 0);
+    openModal({ title: esc(e.name), icon: "party-popper",
+      body: `
+        <div class="two"><div class="sum"><div class="label">Budget</div><div class="big">${eur(e.budget)}</div></div>
+          <div class="sum"><div class="label">Pledged</div><div class="big">${eur(pledged)}</div></div></div>
+        <div><h3 style="font-size:15px;margin-bottom:8px">Budget by category</h3>
+          ${e.categories.map(c => `<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+            <div class="kv"><span>${c.n}</span><b>${eur(c.s)} / ${eur(c.b)}</b></div>
+            <div class="bar ${c.s >= c.b ? "warn" : ""}"><i style="width:${pct(c.s, c.b)}%"></i></div></div>`).join("")}</div>
+        ${e.pendingSpend ? `<div class="note warn"><i data-lucide="clock"></i><span><b>${esc(e.pendingSpend.by)}</b> wants to spend <b>${eur(e.pendingSpend.amount)}</b> on ${esc(e.pendingSpend.item)}. The treasurer must approve.</span></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-sm" id="rejectSpend"><i data-lucide="x"></i>Reject</button><button class="btn btn-sm btn-primary" id="approveSpend"><i data-lucide="check"></i>Approve</button></div>` : ""}
+        <div><h3 style="font-size:15px;margin-bottom:4px">Pledges</h3><div class="list">
+          ${e.pledges.map(p => `<div class="row"><div class="grow">${esc(p.n)}</div><b class="num">${eur(p.a)}</b>${chip(p.paid ? "paid" : "due")}</div>`).join("")}</div></div>`,
+      foot: `<button class="btn" data-close>Close</button><button class="btn btn-primary" id="addPledge"><i data-lucide="plus"></i>Add pledge</button>`,
+      onMount: r => {
+        const decide = ok => { e.spent += ok ? e.pendingSpend.amount : 0; delete e.pendingSpend; closeModal(); render(); toast(ok ? "Spend approved and logged against Catering" : "Spend rejected, Kemi has been notified"); };
+        $("#approveSpend", r)?.addEventListener("click", () => decide(true));
+        $("#rejectSpend", r)?.addEventListener("click", () => decide(false));
+        $("#addPledge", r).addEventListener("click", () => toast("Pledge form would open here"));
+      } });
+  },
+
+  /* Refund request with validation */
+  newRefund() {
+    openModal({ title: "Request a refund", icon: "undo-2",
+      body: `
+        <div class="field"><label for="rfExp">Expense</label>
+          <select id="rfExp"><option value="">Choose an expense</option><option value="45.00">Kerry Weekend · Fuel · €45.00</option><option value="60.00">Galway Flat · Electricity · €60.00</option></select>
+          <span class="err">Choose the expense you want refunded.</span></div>
+        <div class="field"><label for="rfAmt">Amount (€)</label><input id="rfAmt" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0.00">
+          <span class="hint" id="rfHint">Up to the expense total.</span><span class="err" id="rfErr">Enter an amount between €0.01 and the expense total.</span></div>
+        <div class="field"><label for="rfReason">Reason</label>
+          <select id="rfReason"><option value="">Choose a reason</option><option>Duplicate entry</option><option>Overpaid</option><option>Event cancelled</option><option>Wrong amount</option></select>
+          <span class="err">Choose a reason.</span></div>
+        <div class="note"><i data-lucide="file-clock"></i><span>The original expense is kept. A linked reversing entry is added once the payer accepts.</span></div>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="rfSubmit">Send request</button>`,
+      onMount: r => {
+        $("#rfExp", r).addEventListener("change", e => { $("#rfHint", r).textContent = e.target.value ? `Up to €${e.target.value}.` : "Up to the expense total."; });
+        $("#rfSubmit", r).addEventListener("click", () => {
+          const exp = $("#rfExp", r), amt = $("#rfAmt", r), rs = $("#rfReason", r);
+          const max = parseFloat(exp.value || "0"), v = parseFloat(amt.value);
+          const ok = [check(exp, !!exp.value), check(amt, v > 0 && v <= max && /^\d+(\.\d{1,2})?$/.test(amt.value)), check(rs, !!rs.value)].every(Boolean);
+          if (!ok) return;
+          data.refunds.push({ id: "r" + Date.now(), group: exp.options[exp.selectedIndex].text.split(" · ")[0], title: rs.value, amount: v, status: "pending", by: ME.name });
+          closeModal(); render(); toast("Refund request sent to the payer");
+        });
+      } });
+  },
+  reviewRefund(id) {
+    const rf = data.refunds.find(x => x.id === id);
+    openModal({ title: "Review refund", icon: "undo-2",
+      body: `<div class="kv"><span class="muted">Requested by</span><b>${esc(rf.by)}</b></div>
+             <div class="kv"><span class="muted">Group</span><b>${esc(rf.group)}</b></div>
+             <div class="kv"><span class="muted">Reason</span><b>${esc(rf.title)}</b></div>
+             <div class="kv"><span class="muted">Amount</span><b>${eur(rf.amount)}</b></div>
+             <div class="note accent"><i data-lucide="sparkles"></i><span>AI check: an identical Tesco expense of €36.40 was added 2 minutes apart on 1 Nov. This looks like a duplicate.</span></div>
+             <div class="note"><i data-lucide="info"></i><span>Only the person who was paid, or a group admin, can accept a refund.</span></div>`,
+      foot: `<button class="btn" id="rfReject">Reject</button><button class="btn btn-primary" id="rfAccept">Accept refund</button>`,
+      onMount: r => {
+        const done = s => { rf.status = s; closeModal(); render(); toast(s === "approved" ? "Refund accepted, balances updated" : "Refund rejected"); };
+        $("#rfAccept", r).addEventListener("click", () => done("approved"));
+        $("#rfReject", r).addEventListener("click", () => done("rejected"));
+      } });
+  },
+
+  /* ROSCA detail: rotation, contributions, pay, swap */
+  openRosca() {
+    const c = data.rosca;
+    openModal({ title: esc(c.name), icon: "refresh-ccw-dot",
+      body: `
+        <div class="two"><div class="sum"><div class="label">Each cycle</div><div class="big">${eur(c.amount)}</div></div>
+          <div class="sum"><div class="label">Pot per payout</div><div class="big">${eur(c.amount * c.total)}</div></div></div>
+        <div><h3 style="font-size:15px;margin-bottom:8px">Payout rotation</h3>
+          <div class="rotation">${c.order.map((n, i) => {
+            const cls = i + 1 < c.cycle ? "done" : i + 1 === c.cycle ? "now" : "";
+            return `<div class="slot ${cls} ${n === ME.name ? "you" : ""}"><span class="n">Cycle ${i + 1}</span><span>${n === ME.name ? "You" : esc(n)}</span>
+              <span class="muted">${i + 1 < c.cycle ? "Received" : i + 1 === c.cycle ? "This month" : "Upcoming"}</span></div>`; }).join("")}</div>
+          <p class="muted" style="font-size:12px;margin:6px 0 0">Order method: ${esc(c.method)}. The order and any draw seed are stored on the ledger.</p></div>
+        <div><h3 style="font-size:15px;margin-bottom:4px">Cycle ${c.cycle} contributions to ${c.order[c.cycle - 1]}</h3><div class="list">
+          ${c.order.filter((n, i) => i !== c.cycle - 1).map(n => `<div class="row"><div class="grow">${n === ME.name ? "You" : esc(n)}</div>${chip(c.paid[n] ? "paid" : "due")}</div>`).join("")}</div></div>
+        <div class="note accent"><i data-lucide="sparkles"></i><span>Circle health: 18 of 18 contributions were on time in cycles 1 and 2. Projected completion: April 2027.</span></div>`,
+      foot: `<button class="btn" id="swapBtn"><i data-lucide="arrow-left-right"></i>Request swap</button>
+             ${c.paid[ME.name] ? `<button class="btn btn-primary" data-close>Done</button>` : `<button class="btn btn-primary" id="payBtn"><i data-lucide="send"></i>Pay ${eur(c.amount)} to ${c.order[c.cycle - 1]}</button>`}`,
+      onMount: r => {
+        $("#payBtn", r)?.addEventListener("click", () => actions.payContribution());
+        $("#swapBtn", r).addEventListener("click", () => actions.swapSlot());
+      } });
+  },
+  payContribution() {
+    const c = data.rosca, to = c.order[c.cycle - 1];
+    openModal({ title: "Pay contribution", icon: "send",
+      body: `<div class="kv"><span class="muted">To</span><b>${to}</b></div><div class="kv"><span class="muted">Amount</span><b>${eur(c.amount)}</b></div>
+        <div class="field"><label>Payment method</label><div class="options">
+          <label class="opt"><input type="radio" name="pm" value="PayPal" checked><span><b>PayPal</b>Captured server-side</span></label>
+          <label class="opt"><input type="radio" name="pm" value="Revolut"><span><b>Revolut</b>Opens the Revolut app</span></label>
+          <label class="opt"><input type="radio" name="pm" value="SEPA"><span><b>SEPA transfer</b>Shows ${to}'s IBAN</span></label></div></div>
+        <div class="note"><i data-lucide="lock"></i><span>A pending lock stops you paying twice while the payment is in progress.</span></div>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="pmGo">Continue</button>`,
+      onMount: r => $("#pmGo", r).addEventListener("click", () => {
+        const m = $("input[name=pm]:checked", r).value;
+        stepUp(`Pay <b>${eur(c.amount)}</b> to <b>${to}</b> with ${m}`, () => {
+          c.paid[ME.name] = true;
+          data.activity.unshift({ icon: "send", t: `You paid ${eur(c.amount)} to ${to} in ${c.name} (${m})`, d: "Just now" });
+          render(); toast(m === "PayPal" ? "Payment captured and recorded" : `Marked pending until ${to} confirms receipt`);
+        });
+      }) });
+  },
+  swapSlot() {
+    const c = data.rosca;
+    const others = c.order.filter((n, i) => n !== ME.name && i + 1 > c.cycle);
+    openModal({ title: "Request a slot swap", icon: "arrow-left-right",
+      body: `<p style="margin:0">You are in slot ${c.order.indexOf(ME.name) + 1}. A swap only happens when the other member accepts.</p>
+        <div class="field"><label for="swapWith">Swap with</label><select id="swapWith"><option value="">Choose a member</option>
+          ${others.map(n => `<option>${esc(n)} (slot ${c.order.indexOf(n) + 1})</option>`).join("")}</select><span class="err">Choose who to swap with.</span></div>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="swapGo">Send request</button>`,
+      onMount: r => $("#swapGo", r).addEventListener("click", () => {
+        const s = $("#swapWith", r); if (!check(s, !!s.value)) return;
+        closeModal(); toast(`Swap request sent to ${s.value.split(" (")[0]}`);
+      }) });
+  },
+
+  /* Create circle with validation */
+  newCircle() {
+    openModal({ title: "Start a savings circle", icon: "refresh-ccw-dot",
+      body: `
+        <div class="field"><label for="ncName">Circle name</label><input id="ncName" maxlength="40" placeholder="e.g. Cork Ajo 2027"><span class="err">Use 3 to 40 characters.</span></div>
+        <div class="two">
+          <div class="field"><label for="ncAmt">Amount per cycle (€)</label><input id="ncAmt" type="number" min="10" max="2000" step="5" value="100"><span class="err">Between €10 and €2,000.</span></div>
+          <div class="field"><label for="ncMem">Members</label><input id="ncMem" type="number" min="3" max="20" value="6"><span class="err">Between 3 and 20 members.</span></div></div>
+        <div class="two">
+          <div class="field"><label for="ncFreq">Frequency</label><select id="ncFreq"><option>Weekly</option><option>Fortnightly</option><option selected>Monthly</option></select></div>
+          <div class="field"><label for="ncStart">First contribution</label><input id="ncStart" type="date"><span class="err">Choose a date from tomorrow onwards.</span></div></div>
+        <div class="field"><label>Payout order</label><div class="options">
+          <label class="opt"><input type="radio" name="ord" value="Random draw" checked><span><b>Random draw</b>Seed saved for fairness</span></label>
+          <label class="opt"><input type="radio" name="ord" value="Agreed order"><span><b>Agreed order</b>Members vote</span></label>
+          <label class="opt"><input type="radio" name="ord" value="By trust score"><span><b>By trust score</b>Reliable members first</span></label></div></div>
+        <label class="toggle"><input type="checkbox" id="ncDeposit" checked>New members with no history need a guarantor for early slots</label>
+        <div class="note" id="ncPreview"><i data-lucide="calculator"></i><span></span></div>
+        <label class="toggle"><input type="checkbox" id="ncAgree">I agree to the circle rules and understand payments go directly between members</label>
+        <span class="field"><span class="err" id="ncAgreeErr">You need to accept the rules to continue.</span></span>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="ncGo">Create and invite</button>`,
+      onMount: r => {
+        const d = new Date(); d.setDate(d.getDate() + 1);
+        const minDate = d.toISOString().slice(0, 10);
+        $("#ncStart", r).min = minDate; $("#ncStart", r).value = minDate;
+        const prev = () => { const a = +$("#ncAmt", r).value || 0, m = +$("#ncMem", r).value || 0;
+          $("#ncPreview span", r).innerHTML = `Each payout is <b>${eur(a * m)}</b>. The circle runs for <b>${m}</b> cycles (${$("#ncFreq", r).value.toLowerCase()}).`; };
+        ["#ncAmt", "#ncMem", "#ncFreq"].forEach(s => $(s, r).addEventListener("input", prev)); prev();
+        $("#ncGo", r).addEventListener("click", () => {
+          const n = $("#ncName", r), a = $("#ncAmt", r), m = $("#ncMem", r), st = $("#ncStart", r), ag = $("#ncAgree", r);
+          const nameOk = n.value.trim().length >= 3 && n.value.trim().length <= 40;
+          const ok = [check(n, nameOk), check(a, +a.value >= 10 && +a.value <= 2000), check(m, Number.isInteger(+m.value) && +m.value >= 3 && +m.value <= 20), check(st, st.value >= minDate)].every(Boolean);
+          $("#ncAgreeErr", r).parentElement.classList.toggle("invalid", !ag.checked);
+          if (!ok || !ag.checked) return;
+          closeModal(); toast(`${n.value.trim()} created. Invite link copied.`, "link");
+        });
+      } });
+  },
+
+  /* Loan detail */
+  openLoan(id) {
+    const l = data.loans.find(x => x.id === id);
+    openModal({ title: l.dir === "lent" ? `Loan to ${esc(l.who)}` : `Loan from ${esc(l.who)}`, icon: "hand-coins",
+      body: `<div class="two"><div class="sum"><div class="label">Amount</div><div class="big">${eur(l.amount)}</div></div>
+               <div class="sum"><div class="label">Outstanding</div><div class="big">${eur(l.amount - l.repaid)}</div></div></div>
+        <div><h3 style="font-size:15px;margin-bottom:4px">Repayment schedule</h3><div class="list">
+          ${l.plan.map(p => `<div class="row"><div class="grow">${p.d}</div><b class="num">${eur(p.a)}</b>${chip(p.s)}</div>`).join("")}</div></div>
+        <div class="note"><i data-lucide="scale"></i><span>Interest-free. Both of you accepted these terms on ${l.plan[0].d.split(" ")[1] === "Sep" ? "28 Aug" : "1 Oct"}.</span></div>`,
+      foot: l.dir === "lent"
+        ? `<button class="btn" id="nudge"><i data-lucide="bell"></i>Send friendly reminder</button><button class="btn btn-primary" data-close>Done</button>`
+        : `<button class="btn" id="resched"><i data-lucide="calendar-clock"></i>Ask to reschedule</button><button class="btn btn-primary" id="repay"><i data-lucide="send"></i>Repay ${eur(l.plan.find(p => p.s === "due").a)}</button>`,
+      onMount: r => {
+        $("#nudge", r)?.addEventListener("click", () => { closeModal(); toast(`Reminder sent to ${l.who}`, "bell"); });
+        $("#resched", r)?.addEventListener("click", () => { closeModal(); toast(`Reschedule request sent to ${l.who}`); });
+        $("#repay", r)?.addEventListener("click", () => {
+          const due = l.plan.find(p => p.s === "due");
+          stepUp(`Repay <b>${eur(due.a)}</b> to <b>${esc(l.who)}</b>`, () => {
+            due.s = "paid"; l.repaid += due.a;
+            const nx = l.plan.find(p => p.s === "upcoming"); if (nx) { nx.s = "due"; l.next = `${eur(nx.a)} on ${nx.d}`; } else l.next = "Fully repaid";
+            render(); toast("Repayment recorded");
+          });
+        });
+      } });
+  },
+
+  /* New loan request with validation and schedule preview */
+  newLoan() {
+    openModal({ title: "Request a soft loan", icon: "hand-coins",
+      body: `
+        <div class="field"><label for="lnWho">Ask</label><select id="lnWho"><option value="">Choose a person</option><option>Tolu</option><option>Kemi</option><option>Sean</option></select><span class="err">Choose who you are asking.</span></div>
+        <div class="two">
+          <div class="field"><label for="lnAmt">Amount (€)</label><input id="lnAmt" type="number" min="10" step="5" placeholder="150"><span class="hint">Your limit is €500, based on repayment history.</span><span class="err">Between €10 and your €500 limit.</span></div>
+          <div class="field"><label for="lnN">Repay in</label><select id="lnN"><option value="2">2 months</option><option value="3" selected>3 months</option><option value="4">4 months</option><option value="6">6 months</option></select></div></div>
+        <div class="field"><label for="lnWhy">What it's for</label><input id="lnWhy" maxlength="80" placeholder="e.g. Car repair before payday"><span class="err">Add a short reason (at least 5 characters).</span></div>
+        <div class="note" id="lnPrev"><i data-lucide="calendar-range"></i><span>Enter an amount to see the repayment plan.</span></div>
+        <div class="note warn"><i data-lucide="scale"></i><span>Soft loans are interest-free. SplitSync records the agreement and does not lend money.</span></div>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="lnGo">Send request</button>`,
+      onMount: r => {
+        const prev = () => { const a = +$("#lnAmt", r).value, n = +$("#lnN", r).value;
+          $("#lnPrev span", r).innerHTML = a > 0 ? `<b>${n}</b> monthly repayments of <b>${eur(Math.round((a / n) * 100) / 100)}</b>, starting next month.` : "Enter an amount to see the repayment plan."; };
+        ["#lnAmt", "#lnN"].forEach(s => $(s, r).addEventListener("input", prev));
+        $("#lnGo", r).addEventListener("click", () => {
+          const w = $("#lnWho", r), a = $("#lnAmt", r), y = $("#lnWhy", r);
+          const ok = [check(w, !!w.value), check(a, +a.value >= 10 && +a.value <= 500), check(y, y.value.trim().length >= 5)].every(Boolean);
+          if (!ok) return;
+          stepUp(`Send a loan request for <b>${eur(+a.value)}</b> to <b>${esc(w.value)}</b> and accept the repayment terms`, () => toast(`Loan request sent to ${w.value}`));
+        });
+      } });
+  },
+
+  /* Mutual aid detail and pledge */
+  openAid() {
+    const a = data.aid;
+    openModal({ title: esc(a.title), icon: "heart-handshake",
+      body: `<div class="two"><div class="sum"><div class="label">Pledged</div><div class="big">${eur(a.pledged)}</div></div>
+               <div class="sum"><div class="label">Target</div><div class="big">${eur(a.target)}</div></div></div>
+        <div class="bar"><i style="width:${pct(a.pledged, a.target)}%"></i></div>
+        <div class="note"><i data-lucide="eye-off"></i><span>The reason for this request is private. A group admin verified it before it was shared.</span></div>
+        <div class="field"><label for="aidAmt">Your pledge (€)</label><input id="aidAmt" type="number" min="1" step="1" placeholder="25"><span class="err">Enter a whole amount of €1 or more.</span></div>
+        <div class="options">${[10, 25, 50, 100].map(v => `<button class="btn btn-sm" type="button" data-quick="${v}">${eur(v)}</button>`).join("")}</div>
+        <label class="toggle"><input type="checkbox" id="aidAnon" checked>Hide my name and amount from other members</label>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="aidGo">Pledge</button>`,
+      onMount: r => {
+        r.querySelectorAll("[data-quick]").forEach(b => b.addEventListener("click", () => { $("#aidAmt", r).value = b.dataset.quick; }));
+        $("#aidGo", r).addEventListener("click", () => {
+          const f = $("#aidAmt", r); if (!check(f, Number.isInteger(+f.value) && +f.value >= 1)) return;
+          const anon = $("#aidAnon", r).checked;
+          a.pledged += +f.value; a.givers += 1; closeModal(); render();
+          toast(anon ? "Anonymous pledge saved. Pay it directly to the family." : "Pledge saved. Pay it directly to the family.");
+        });
+      } });
+  },
+  newAid() {
+    openModal({ title: "Ask your community for help", icon: "heart-handshake",
+      body: `
+        <div class="field"><label for="naGroup">Share with</label><select id="naGroup"><option value="">Choose a group</option><option>Cork Community</option><option>Family Ajo Circle</option></select><span class="err">Choose a group.</span></div>
+        <div class="field"><label for="naTitle">Title</label><input id="naTitle" maxlength="60" placeholder="e.g. Help with travel home for a funeral"><span class="err">Use 5 to 60 characters.</span></div>
+        <div class="two">
+          <div class="field"><label for="naTarget">Target (€)</label><input id="naTarget" type="number" min="20" max="10000" placeholder="800"><span class="err">Between €20 and €10,000.</span></div>
+          <div class="field"><label for="naEnd">Ends</label><select id="naEnd"><option>In 7 days</option><option selected>In 14 days</option><option>In 30 days</option></select></div></div>
+        <div class="field"><label for="naWhy">Private note for the admin</label><textarea id="naWhy" placeholder="Only the group admin sees this"></textarea><span class="hint">Never shown to other members.</span></div>
+        <div class="note accent"><i data-lucide="badge-check"></i><span>An admin reviews every request before members see it. This protects the group from duplicate or false requests.</span></div>`,
+      foot: `<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="naGo">Send for review</button>`,
+      onMount: r => $("#naGo", r).addEventListener("click", () => {
+        const g = $("#naGroup", r), t = $("#naTitle", r), tg = $("#naTarget", r);
+        const ok = [check(g, !!g.value), check(t, t.value.trim().length >= 5), check(tg, +tg.value >= 20 && +tg.value <= 10000)].every(Boolean);
+        if (!ok) return; closeModal(); toast("Request sent to the group admin for review");
+      }) });
+  },
+
+  /* Future (escrow / savings) explainer */
+  future(_, el) {
+    const kind = el.dataset.kind;
+    const escrow = kind === "escrow";
+    openModal({ title: escrow ? "Protected circle pot" : "Savings groups", icon: escrow ? "vault" : "piggy-bank",
+      body: `<p style="margin:0">${escrow
+          ? "Contributions would go into a held account and be released to the recipient only when everyone has paid. This removes the 'I paid but they never got it' problem."
+          : "Members would save into one shared pot toward a goal, with withdrawals approved by two of three officers."}</p>
+        <div class="note warn"><i data-lucide="landmark"></i><span>Holding money is regulated activity (PSD2 and e-money rules in Ireland). This feature needs a licensed partner such as Stripe Connect or Mangopay and identity checks.</span></div>
+        <div class="note"><i data-lucide="server"></i><span>It would run as a separate service with its own backend, so a bug in SplitSync can never sit next to held funds. You would still sign in with the same account.</span></div>`,
+      foot: `<button class="btn" data-close>Close</button><button class="btn btn-primary" id="notify"><i data-lucide="bell"></i>Notify me</button>`,
+      onMount: r => $("#notify", r).addEventListener("click", () => { closeModal(); toast("We'll let you know when it's available", "bell"); }) });
+  },
+
+  scoreInfo() {
+    openModal({ title: "How your score works", icon: "shield-check",
+      body: `<div class="list">
+          <div class="row"><div class="grow"><b>On-time contributions</b><small>Circle payments made by the due date</small></div><b>50%</b></div>
+          <div class="row"><div class="grow"><b>Loan repayments</b><small>Instalments paid on schedule</small></div><b>30%</b></div>
+          <div class="row"><div class="grow"><b>History length</b><small>Months of activity in SplitSync</small></div><b>10%</b></div>
+          <div class="row"><div class="grow"><b>Upheld disputes</b><small>Disputes decided against you</small></div><b>10%</b></div></div>
+        <div class="note"><i data-lucide="eye"></i><span>Only members of circles you share can see your score. It is never used for anything outside SplitSync.</span></div>`,
+      foot: `<button class="btn btn-primary" data-close>Got it</button>` });
+  }
+};
+
+/* ==========================================================================
+   Router, primary action and event wiring
+   ========================================================================== */
+const meta = {
+  groups: { title: "Groups", primary: ["New group", () => toast("The existing Create group modal opens here")] },
+  circles: { title: "Circles", primary: ["Start a circle", () => actions.newCircle()] },
+  activity: { title: "Activity", primary: null },
+  profile: { title: "Trust & profile", primary: null }
+};
+let current = "groups";
+
+function render() {
+  $("#view").innerHTML = views[current]();
+  $("#viewTitle").textContent = meta[current].title;
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-current", b.dataset.view === current ? "page" : "false"));
+  const p = meta[current].primary, btn = $("#primaryAction");
+  btn.hidden = !p; if (p) btn.querySelector("span").textContent = p[0];
+  icons();
+}
+function go(v) { if (!views[v]) v = "groups"; current = v; try { history.replaceState(null, "", "#" + v); } catch (e) {} render(); window.scrollTo(0, 0); }
+
+document.addEventListener("click", e => {
+  const nav = e.target.closest("[data-view]"); if (nav) return go(nav.dataset.view);
+  const act = e.target.closest("[data-act]"); if (act && actions[act.dataset.act]) actions[act.dataset.act](act.dataset.id, act);
+});
+document.addEventListener("keydown", e => {
+  const act = e.target.closest?.("[data-act]");
+  if (act && (e.key === "Enter" || e.key === " ") && act.tagName !== "BUTTON") { e.preventDefault(); actions[act.dataset.act](act.dataset.id, act); }
+});
+$("#primaryAction").addEventListener("click", () => meta[current].primary && meta[current].primary[1]());
+
+/* Theme toggle: flips between light and dark, overriding the system setting */
+function toggleTheme() {
+  const root = document.documentElement;
+  const isDark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = isDark ? "light" : "dark";
+}
+$("#themeBtn").addEventListener("click", toggleTheme);
+$("#themeBtnTop").addEventListener("click", toggleTheme);
+
+/* Architecture labels toggle (sidebar checkbox, or button on phone) */
+const setArch = on => { $("#app").classList.toggle("show-arch", on); $("#archToggle").checked = on; };
+$("#archToggle").addEventListener("change", e => setArch(e.target.checked));
+const archMobile = $("#archBtnMobile");
+const mq = matchMedia("(max-width:820px)");
+const syncMobile = () => { archMobile.hidden = !mq.matches; };
+mq.addEventListener ? mq.addEventListener("change", syncMobile) : mq.addListener(syncMobile); syncMobile();
+archMobile.addEventListener("click", () => setArch(!$("#app").classList.contains("show-arch")));
+
+window.addEventListener("hashchange", () => go(location.hash.slice(1)));
+go(location.hash.slice(1) || "groups");
+</script>
