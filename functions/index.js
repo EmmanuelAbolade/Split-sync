@@ -196,7 +196,11 @@ exports.getIban = functions.https.onCall(
     }
 
     // Bank details live in the owner-only private doc (legacy data migrated on read)
-    const { ref: privRef, data } = await privateData.loadPrivate(db, FieldValue, userId);
+    const { ref: privRef, data: loaded } = await privateData.loadPrivate(db, FieldValue, userId);
+    // Pre-Feb-2026 accounts stored the IBAN in plain text — encrypt it now
+    const data = await privateData.upgradePlainIban(
+      privRef, FieldValue, loaded, (p) => iban.encryptV2(p, ibanEncryptionKey.value()), iban.normaliseIban
+    );
     const stored = data.paymentMethods?.encryptedIBAN || null;
     if (!stored) return { iban: null };
 
@@ -226,7 +230,7 @@ exports.getIban = functions.https.onCall(
 // Returns the payment options of every current member of a group the caller
 // belongs to: PayPal/Revolut usernames, BIC and whether a bank account exists.
 // Never returns IBANs (see getIban) or phone numbers.
-exports.getGroupPaymentMethods = functions.https.onCall(async (request) => {
+exports.getGroupPaymentMethods = functions.https.onCall({ secrets: [ibanEncryptionKey] }, async (request) => {
   if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'You must be signed in.');
   }
@@ -242,7 +246,11 @@ exports.getGroupPaymentMethods = functions.https.onCall(async (request) => {
   }
   const entries = await Promise.all(members.map(async (m) => {
     try {
-      const { data } = await privateData.loadPrivate(db, FieldValue, m.userId);
+      const { ref, data: loaded } = await privateData.loadPrivate(db, FieldValue, m.userId);
+      // Encrypt any pre-Feb-2026 plain-text IBAN while we're here
+      const data = await privateData.upgradePlainIban(
+        ref, FieldValue, loaded, (p) => iban.encryptV2(p, ibanEncryptionKey.value()), iban.normaliseIban
+      );
       return [m.userId, privateData.publicPaymentView(data.paymentMethods)];
     } catch (err) {
       console.warn('getGroupPaymentMethods failed for', m.userId, err.message);

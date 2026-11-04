@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { calculateBalances, calculateSettlements } from '../utils/balanceCalculator';
@@ -99,6 +99,17 @@ export default function Analytics() {
   const [expenses, setExpenses] = useState([]);   // all expenses across all groups
   const [groups,   setGroups]   = useState([]);   // all user groups
   const [members,  setMembers]  = useState({});   // userId → displayName
+  const [formerIds, setFormerIds] = useState(() => new Set()); // users no longer in the group
+
+  // Short, safe label for charts: first name, capped length, "(left)" for former members.
+  // Never falls back to a raw user ID (long unbroken IDs broke the mobile layout).
+  const labelFor = (uid) => {
+    const full = members[uid] || 'Former member';
+    if (full === 'Former member') return full;
+    const first = full.split(' ')[0];
+    const short = first.length > 12 ? `${first.slice(0, 11)}…` : first;
+    return formerIds.has(uid) ? `${short} (left)` : short;
+  };
   const [selectedGroupId, setSelectedGroupId] = useState('all'); // group filter
 
   // ── Fetch all data ──────────────────────────────────────────────────────────
@@ -118,19 +129,25 @@ export default function Analytics() {
           .filter(g => isActiveMember(g, user.uid)); // exclude groups the user left
         setGroups(groupList);
 
-        // 2. Build a userId→name map from all members across groups
+        // 2. Build a userId→name map from all members across groups.
+        //    People who left keep their name via formerMembers ("(left)").
         const nameMap = {};
+        const former = new Set();
         groupList.forEach(g => {
           (g.members || []).forEach(m => {
-            if (!nameMap[m.userId]) nameMap[m.userId] = m.name || m.email || 'Unknown';
+            if (!nameMap[m.userId]) nameMap[m.userId] = m.name || m.email || 'Member';
+          });
+        });
+        groupList.forEach(g => {
+          (g.formerMembers || []).forEach(m => {
+            if (!nameMap[m.userId]) { nameMap[m.userId] = m.name || m.email || 'Former member'; former.add(m.userId); }
           });
         });
         // Also add current user
         nameMap[user.uid] = user.displayName || user.email || 'You';
-        setMembers(nameMap);
 
         // 3. Fetch all expenses for those groups
-        if (groupList.length === 0) { setLoading(false); return; }
+        if (groupList.length === 0) { setMembers(nameMap); setFormerIds(former); setLoading(false); return; }
 
         const allExpenses = [];
         for (const g of groupList) {
@@ -139,6 +156,25 @@ export default function Analytics() {
           );
           eSnap.docs.forEach(d => allExpenses.push({ id: d.id, groupName: g.name, ...d.data() }));
         }
+        // 4. Anyone referenced by an expense but no longer in the group (left
+        //    before name snapshots existed, or deleted their account): look up
+        //    their profile; otherwise show "Former member" — never a raw user ID.
+        const unknown = new Set();
+        allExpenses.forEach(e => {
+          [e.paidBy, ...(e.participants || [])].forEach(uid => { if (uid && !nameMap[uid]) unknown.add(uid); });
+        });
+        await Promise.all([...unknown].map(async (uid) => {
+          try {
+            const snap = await getDoc(doc(db, 'users', uid));
+            const d = snap.exists() ? snap.data() : null;
+            nameMap[uid] = d?.displayName || d?.fullName || 'Former member';
+          } catch {
+            nameMap[uid] = 'Former member';
+          }
+          former.add(uid);
+        }));
+        setMembers(nameMap);
+        setFormerIds(former);
         setExpenses(allExpenses);
       } catch (err) {
         console.error('Analytics fetch error:', err);
@@ -213,22 +249,32 @@ export default function Analytics() {
 
   // 4. Per-person balance across all groups (bar chart)
   const perPersonData = useMemo(() => {
-    const netBalances = {};
+    // Balances in different currencies are never added together: with several
+    // currencies in view, each person gets one bar per currency.
+    const currencies = new Set(filteredGroups.map(g => g.currency || 'EUR'));
+    const multi = currencies.size > 1;
+    const net = {}; // "uid|currency" → balance
     filteredGroups.forEach(g => {
       const gExpenses = filteredExpenses.filter(e => e.groupId === g.id);
       const balances  = calculateBalances(gExpenses, g.members || []);
       Object.entries(balances).forEach(([uid, bal]) => {
-        netBalances[uid] = (netBalances[uid] || 0) + bal;
+        const key = `${uid}|${g.currency || 'EUR'}`;
+        net[key] = (net[key] || 0) + bal;
       });
     });
-    return Object.entries(netBalances)
-      .map(([uid, balance]) => ({
-        name:    (members[uid] || uid).split(' ')[0], // first name only
-        balance: parseFloat(balance.toFixed(2)),
-        isYou:   uid === user?.uid,
-      }))
+    return Object.entries(net)
+      .filter(([, balance]) => Math.abs(balance) > 0.005)
+      .map(([key, balance]) => {
+        const [uid, cur] = key.split('|');
+        return {
+          name:    multi ? `${labelFor(uid)} · ${cur}` : labelFor(uid),
+          balance: parseFloat(balance.toFixed(2)),
+          isYou:   uid === user?.uid,
+        };
+      })
       .sort((a, b) => b.balance - a.balance);
-  }, [filteredGroups, filteredExpenses, members, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredGroups, filteredExpenses, members, formerIds, user]);
 
   // 5. Who owes who — aggregate across all groups
   const settlements = useMemo(() => {
@@ -241,9 +287,10 @@ export default function Analytics() {
     });
     // Consolidate: merge same from→to pairs
     const consolidated = {};
-    allSettlements.forEach(({ from, to, amount }) => {
-      const key = `${from}→${to}`;
-      consolidated[key] = { from, to, amount: (consolidated[key]?.amount || 0) + amount };
+    // Same people in different currencies stay separate rows (never add EUR to GBP)
+    allSettlements.forEach(({ from, to, amount, currency }) => {
+      const key = `${from}→${to}|${currency}`;
+      consolidated[key] = { from, to, currency, amount: (consolidated[key]?.amount || 0) + amount };
     });
     return Object.values(consolidated)
       .sort((a, b) => b.amount - a.amount)
@@ -531,7 +578,7 @@ export default function Analytics() {
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} className="dark:opacity-20" />
                   <XAxis type="number" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => activeCurrency ? `${activeCurrency} ${v}` : `${v}`} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} width={55} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} width={96} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar
                     dataKey="balance"
@@ -569,8 +616,8 @@ export default function Analytics() {
           ) : (
             <div className="space-y-3">
               {settlements.map((s, i) => {
-                const fromName = (members[s.from] || s.from).split(' ')[0];
-                const toName   = (members[s.to]   || s.to).split(' ')[0];
+                const fromName = labelFor(s.from);
+                const toName   = labelFor(s.to);
                 const pct      = Math.min(100, (s.amount / settlements[0].amount) * 100);
                 return (
                   <div
@@ -579,20 +626,20 @@ export default function Analytics() {
                     style={{ animationDelay: `${500 + i * 60}ms`, animationFillMode: 'both' }}
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-sm min-w-0">
                         {/* From avatar */}
-                        <span className="w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center">
+                        <span className="w-7 h-7 shrink-0 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center">
                           {fromName[0]?.toUpperCase()}
                         </span>
-                        <span className="font-medium text-gray-700 dark:text-gray-200">{fromName}</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-200 truncate">{fromName}</span>
                         <ArrowLeftRight size={13} className="text-gray-400" />
-                        <span className="font-medium text-gray-700 dark:text-gray-200">{toName}</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-200 truncate">{toName}</span>
                         {/* To avatar */}
-                        <span className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center justify-center">
+                        <span className="w-7 h-7 shrink-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center justify-center">
                           {toName[0]?.toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-bold text-gray-800 dark:text-white text-sm">
+                      <span className="font-bold text-gray-800 dark:text-white text-sm shrink-0 ml-2">
                         {fmt(s.amount, s.currency || activeCurrency || '')}
                       </span>
                     </div>

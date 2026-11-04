@@ -727,3 +727,70 @@ describe('Analytics - Groups count card', () => {
     });
   });
 });
+
+// ---------------------------------------------------------------------------
+// Regression: people who left a group used to appear as raw 28-character user
+// IDs in Per-Person Balance and Who Owes Who, breaking the mobile layout.
+// ---------------------------------------------------------------------------
+
+describe('Analytics - names of people who left', () => {
+  const LONG_ID = 'Xq9ZkP2mL7vBn4Rt8Wc1Hy6JsDfA'; // looks like a Firebase uid
+
+  const setupWithLeaver = (group, userDoc) => {
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([group]))
+      .mockResolvedValueOnce(expenseSnap([
+        makeExpense({ paidBy: 'user-001', participants: ['user-001', LONG_ID], splits: { 'user-001': 25, [LONG_ID]: 25 } }),
+      ]));
+    mockGetDoc.mockResolvedValue(userDoc);
+    mockCalculateBalances.mockReturnValue({ 'user-001': 25, [LONG_ID]: -25 });
+    mockCalculateSettlements.mockReturnValue([{ from: LONG_ID, to: 'user-001', amount: 25 }]);
+  };
+
+  beforeEach(() => jest.clearAllMocks());
+
+  test('shows the formerMembers name marked "(left)" instead of the user ID', async () => {
+    setupWithLeaver({
+      id: 'grp-1', name: 'House', currency: 'EUR', memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice' }],
+      formerMembers: [{ userId: LONG_ID, name: 'Carol Smith', reason: 'left' }],
+    }, { exists: () => false, data: () => ({}) });
+    render(<Analytics />);
+    await waitFor(() => expect(screen.getAllByText('Carol (left)').length).toBeGreaterThan(0));
+    expect(screen.queryByText(new RegExp(LONG_ID))).not.toBeInTheDocument();
+    expect(mockGetDoc).not.toHaveBeenCalled(); // name already known
+  });
+
+  test('looks up the profile of someone with no snapshot, else shows "Former member"', async () => {
+    setupWithLeaver({
+      id: 'grp-1', name: 'House', currency: 'EUR', memberIds: ['user-001'],
+      members: [{ userId: 'user-001', name: 'Alice' }],
+    }, { exists: () => false, data: () => ({}) }); // account deleted
+    render(<Analytics />);
+    await waitFor(() => expect(screen.getAllByText('Former member').length).toBeGreaterThan(0));
+    expect(screen.queryByText(new RegExp(LONG_ID))).not.toBeInTheDocument();
+  });
+});
+
+describe('Analytics - Who Owes Who keeps currencies separate', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('the same two people in EUR and GBP groups get two rows, never one summed amount', async () => {
+    const members = [{ userId: 'user-001', name: 'Alice' }, { userId: 'user-002', name: 'Bob' }];
+    mockGetDocs
+      .mockResolvedValueOnce(groupSnap([
+        { id: 'g-eur', name: 'Trip', currency: 'EUR', memberIds: ['user-001', 'user-002'], members },
+        { id: 'g-gbp', name: 'Flat', currency: 'GBP', memberIds: ['user-001', 'user-002'], members },
+      ]))
+      .mockResolvedValueOnce(expenseSnap([makeExpense({ id: 'a', groupId: 'g-eur' })]))
+      .mockResolvedValueOnce(expenseSnap([makeExpense({ id: 'b', groupId: 'g-gbp' })]));
+    mockCalculateBalances.mockReturnValue({ 'user-001': 10, 'user-002': -10 });
+    mockCalculateSettlements.mockReturnValue([{ from: 'user-002', to: 'user-001', amount: 10 }]);
+    render(<Analytics />);
+    await waitFor(() => expect(screen.getAllByText('Bob').length).toBe(2)); // two rows
+    const amounts = screen.getAllByText(/10\.00/).map(el => el.textContent);
+    expect(amounts.some(t => /EUR|€/.test(t))).toBe(true);
+    expect(amounts.some(t => /GBP|£/.test(t))).toBe(true);
+    expect(screen.queryByText(/20\.00/)).not.toBeInTheDocument(); // not summed
+  });
+});

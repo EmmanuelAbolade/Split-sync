@@ -11,6 +11,7 @@ function fakeDb(initial) {
   const deepMerge = (a, b) => {
     const out = { ...a };
     for (const [k, v] of Object.entries(b)) {
+      if (v === DELETE) { delete out[k]; continue; }
       out[k] = v && typeof v === 'object' && !Array.isArray(v) && a?.[k] && typeof a[k] === 'object'
         ? deepMerge(a[k], v) : v;
     }
@@ -57,4 +58,22 @@ test('loadPrivate leaves already-migrated users untouched', async () => {
   const { data } = await pd.loadPrivate(db, FieldValue, 'u2');
   assert.strictEqual(data.paymentMethods.paypalUsername, 'b');
   assert.deepStrictEqual(db.store['users/u2'], { displayName: 'B' });
+});
+
+test('upgradePlainIban encrypts a pre-2026 plain-text IBAN and deletes the plain copy', async () => {
+  const db = fakeDb({ 'users/u3/private/details': { paymentMethods: { paypalUsername: 'c', iban: 'ie29 aibk 9311 5212 3456 78' } } });
+  const ref = db.doc('users/u3/private/details');
+  const norm = (x) => x.replace(/\s+/g, '').toUpperCase();
+  const data = await pd.upgradePlainIban(ref, FieldValue, { paymentMethods: db.store['users/u3/private/details'].paymentMethods }, (x) => 'v2:enc(' + x + ')', norm);
+  assert.deepStrictEqual(data.paymentMethods, { paypalUsername: 'c', encryptedIBAN: 'v2:enc(IE29AIBK93115212345678)' });
+  assert.deepStrictEqual(db.store['users/u3/private/details'].paymentMethods, { paypalUsername: 'c', encryptedIBAN: 'v2:enc(IE29AIBK93115212345678)' });
+  assert.strictEqual(pd.publicPaymentView({ iban: 'IE29' }).hasIban, true);
+});
+
+test('upgradePlainIban leaves already-encrypted IBANs alone', async () => {
+  const db = fakeDb({});
+  const ref = db.doc('users/u4/private/details');
+  const input = { paymentMethods: { encryptedIBAN: 'v2:x' } };
+  assert.strictEqual(await pd.upgradePlainIban(ref, FieldValue, input, () => 'never', (x) => x), input);
+  assert.ok(!('users/u4/private/details' in db.store));
 });

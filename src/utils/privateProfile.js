@@ -7,6 +7,7 @@
 import { doc, getDoc, setDoc, updateDoc, deleteField } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import app, { db } from '../services/firebase';
+import { encryptIban } from './ibanService';
 
 const privateRef = (uid) => doc(db, 'users', uid, 'private', 'details');
 
@@ -36,6 +37,21 @@ export async function loadMyPrivateDetails(uid) {
       });
     } catch (err) {
       console.warn('Private data migration failed:', err?.code || err?.message);
+    }
+  }
+
+  // Accounts from before Feb 2026 saved the IBAN in plain text (paymentMethods.iban).
+  // Encrypt it server-side and delete the plain copy.
+  const pm = data.paymentMethods || {};
+  if (pm.iban && !pm.encryptedIBAN) {
+    try {
+      const encryptedIBAN = await encryptIban(pm.iban);
+      await setDoc(privateRef(uid), { paymentMethods: { encryptedIBAN, iban: deleteField() } }, { merge: true });
+      const rest = { ...pm };
+      delete rest.iban;
+      data.paymentMethods = { ...rest, encryptedIBAN };
+    } catch (err) {
+      console.warn('Plain IBAN upgrade failed:', err?.code || err?.message);
     }
   }
   return data;

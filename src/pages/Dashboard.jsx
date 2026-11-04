@@ -165,8 +165,9 @@ export default function Dashboard() {
 
           // Check if user has at least one payment method (stored privately)
           const { paymentMethods: pm } = await loadMyPrivateDetails(user.uid);
+          // pm.iban: plain-text IBAN saved by versions before Feb 2026 (being encrypted on load)
           const hasPayment =
-            !!pm?.paypalUsername || !!pm?.revolutUsername || !!pm?.encryptedIBAN;
+            !!pm?.paypalUsername || !!pm?.revolutUsername || !!pm?.encryptedIBAN || !!pm?.iban;
 
           setHasPayment(hasPayment);
 

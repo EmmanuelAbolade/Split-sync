@@ -17,7 +17,7 @@
 | Docs | Doxygen: https://splitsync-docs.netlify.app · Coverage: https://splitsync-coverage-test.netlify.app · Showcase: https://showcase.setu.ie/C00288657/index.html · Screencast: https://youtu.be/7uat5PeTsrI |
 | Formal docs in repo | `docs/` — Research Document, Functional Specification, Design Document, Project Report (PDFs), screenshots, `docs/index.html` showcase page |
 | Size | ~38k lines of JS/JSX in `src/` + `functions/`; 191 commits (2025-11-25 → 2026-04-20) plus uncommitted work |
-| Tests | 58 Jest suites / 1,483 tests (84.1% line coverage), 9 Cloud Functions unit tests, 31 Firestore rules emulator tests; all passing as of 2026-11-04 |
+| Tests | 58 Jest suites / 1,487 tests (~84% line coverage), 11 Cloud Functions unit tests, 31 Firestore rules emulator tests; all passing as of 2026-11-04 |
 | Licence | Apache 2.0 |
 
 ---
@@ -204,7 +204,7 @@ Ordered by importance.
 5. `pendingPayments` read allows `resource == null`, which lets anyone probe whether a document ID exists. Low risk.
 6. Group documents are readable by any signed-in user who knows the ID (needed for invite previews). Member names and emails are exposed to anyone holding an invite link.
 7. Any signed-in user can *create* a notification for anyone (needed for expense/payment notifications). This could be abused for spam; moving notification creation into Cloud Functions would fix it.
-8. **Unidentified API key `splitsync-web-key`** in Google Cloud. It is either the receipt-scanner (Vision) key or unused. To check: `firebase functions:secrets:access GOOGLE_VISION_API_KEY` and compare it with the key shown in the console. If it doesn't match, the key is unused and can be deleted. If it does, restrict it to the Cloud Vision API only (no website restriction). Claude's session isn't allowed to read secret values.
+8. **`splitsync-web-key` API key is unused.** The user confirmed it doesn't match the receipt-scanner key, so it can be deleted in Google Cloud Console → APIs & Services → Credentials.
 9. `firebase-admin` 13 → 14 (major) upgrade not done.
 10. Receipt OCR is heuristic (first line as merchant, dd/mm/yyyy dates only). PayPal is sandbox-only.
 11. One Jest test failed once in five coverage runs on 2026-11-03 and passed on every rerun since (timing flake; name not captured).
@@ -233,7 +233,7 @@ Status at the end of 2026-11-04: **fully deployed** (functions incl. `getGroupPa
 - [x] Hosting deployed to https://splitsync-dev.web.app.
 - [x] Assistant verified by sending the exact production request (model, settings, new prompt) to the Claude API: HTTP 200, accurate answer about personal trackers and leaving groups, prompt cache written (3,935 tokens). An in-browser check was not possible (Chrome extension not connected), so try the chat once on the live site.
 - [x] GitHub repo made **public** (2026-11-04) with homepage, topics and a README Highlights section; Firebase web key restricted to the app domains and localhost by the user.
-- [ ] Identify or delete the `splitsync-web-key` API key (§11.8).
+- [ ] Delete the unused `splitsync-web-key` API key (§11.8). This is a user action in the Google Cloud console.
 
 Order matters: secrets → functions → hosting. Until hosting is deployed, users run the previous client against the new rules. That is safe: its queries still pass the rules, and its destructive old account-deletion path is now blocked, because its cross-group expense query is denied.
 
@@ -311,6 +311,16 @@ Deployed: Firestore rules, all functions, hosting (after the user created the tw
 | AI assistant | Did not know payment details are now private | Prompt updated |
 
 Results: Jest 58 suites / 1,483 tests, functions 9/9, rules 31/31, lint clean on changed files, build compiles. Deployed functions, rules and hosting; the new functions were checked live (they reject callers who aren't signed in).
+
+### 2026-11-04 (later): payment banner and Analytics names
+
+| Report | Cause | Fix |
+|---|---|---|
+| "Payment method not set" banner keeps showing although a payment method exists | Accounts that saved bank details before 5 Feb 2026 have the IBAN in **plain text** as `paymentMethods.iban`. The Dashboard (and `hasIban` for Settle Up) only recognised `encryptedIBAN`, so those users got the banner, other members saw no Bank Transfer option, and the IBAN sat unencrypted | Dashboard counts `iban`. Plain IBANs are now encrypted (v2) and the plain copy deleted: by the client on load (`loadMyPrivateDetails`) and by the server in `getIban`/`getGroupPaymentMethods` (`privateData.upgradePlainIban`), which covers users who never sign in |
+| Analytics "Per-Person Balance" / "Who Owes Who" show a long reference that breaks the mobile layout on some accounts | Names came only from current group members; anyone who had left (or deleted their account) fell back to their raw 28-character user ID. Only accounts sharing a group with a former member were affected | Names resolve via current members → `formerMembers` ("Name (left)") → profile lookup → "Former member". Labels are capped at 12 characters and truncate; never a raw ID |
+| (found while fixing) Who Owes Who merged the same two people's debts across **different currencies** and dropped the currency | Consolidation key ignored currency | Rows are kept per currency. Per-Person Balance shows one bar per person per currency when "All groups" mixes currencies |
+
+Tests: +3 Analytics regression tests, +1 private-profile test, +2 functions tests. Jest 58 suites / 1,487, functions 11/11. Deployed `getIban`, `getGroupPaymentMethods` (now uses `IBAN_ENCRYPTION_KEY`) and hosting.
 
 ---
 

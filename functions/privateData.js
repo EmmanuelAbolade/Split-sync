@@ -36,8 +36,31 @@ function publicPaymentView(pm = {}) {
     paypalUsername:  pm.paypalUsername || null,
     revolutUsername: pm.revolutUsername || null,
     bic:             pm.bic || null,
-    hasIban:         !!pm.encryptedIBAN,
+    hasIban:         !!(pm.encryptedIBAN || pm.iban),
   };
+}
+
+/**
+ * Versions of the app before Feb 2026 saved the IBAN in plain text as
+ * paymentMethods.iban. Encrypt it (v2) and delete the plain copy.
+ * @param {function(string): string} encrypt  plain → v2 ciphertext
+ * @returns {Promise<object>} data with paymentMethods upgraded
+ */
+async function upgradePlainIban(privRef, FieldValue, data, encrypt, normalise) {
+  const pm = data.paymentMethods || {};
+  if (!pm.iban || pm.encryptedIBAN) return data;
+  const clean = normalise(pm.iban);
+  if (!clean) return data;
+  const encryptedIBAN = encrypt(clean);
+  try {
+    await privRef.set({ paymentMethods: { encryptedIBAN, iban: FieldValue.delete() } }, { merge: true });
+  } catch (err) {
+    console.warn('plain IBAN upgrade failed:', err.message);
+    return data;
+  }
+  const rest = { ...pm };
+  delete rest.iban;
+  return { ...data, paymentMethods: { ...rest, encryptedIBAN } };
 }
 
 /**
@@ -66,4 +89,4 @@ async function loadPrivate(db, FieldValue, uid) {
   return { ref: privRef, data };
 }
 
-module.exports = { PRIVATE_FIELDS, privatePath, mergePrivate, hasLegacyFields, publicPaymentView, loadPrivate };
+module.exports = { PRIVATE_FIELDS, privatePath, mergePrivate, hasLegacyFields, publicPaymentView, loadPrivate, upgradePlainIban };

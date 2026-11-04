@@ -71,3 +71,16 @@ test('fetchGroupPaymentMethods returns the server map, or {} on failure', async 
   await expect(fetchGroupPaymentMethods('g1')).resolves.toEqual({});
   spy.mockRestore();
 });
+
+test('encrypts a pre-2026 plain-text IBAN on load and deletes the plain copy', async () => {
+  mockDocs['users/u5'] = { displayName: 'E' };
+  mockDocs['users/u5/private/details'] = { paymentMethods: { iban: 'IE29AIBK93115212345678', bic: 'AIBKIE2D' } };
+  mockCallable.mockResolvedValueOnce({ data: { encryptedIBAN: 'v2:enc' } }); // encryptIban
+  const data = await loadMyPrivateDetails('u5');
+  expect(data.paymentMethods).toEqual({ bic: 'AIBKIE2D', encryptedIBAN: 'v2:enc' });
+  expect(mockSetDoc).toHaveBeenCalledWith(
+    { path: 'users/u5/private/details' },
+    { paymentMethods: { encryptedIBAN: 'v2:enc', iban: '__delete__' } },
+    { merge: true }
+  );
+});
