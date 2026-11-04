@@ -85,6 +85,15 @@ jest.mock('../utils/ibanService', () => ({
   encryptIban: async (v) => `encrypted-${v}`,
 }));
 
+// Payment methods are saved to the owner-only private profile doc. The save
+// is routed through mockUpdateDoc so the success/error-path tests below keep
+// exercising the real Profile error handling.
+jest.mock('../utils/privateProfile', () => ({
+  loadMyPrivateDetails: async () => ({ paymentMethods: {}, phoneNumber: '' }),
+  saveMyPaymentMethods: (...a) => mockUpdateDoc(...a),
+  saveMyPhoneNumber:    async () => {},
+}));
+
 const mockAuthenticateWithBiometric  = jest.fn();
 const mockIsBiometricAvailable       = jest.fn(() => false);
 const mockIsBiometricEnabledOnDevice = jest.fn(() => false);
@@ -149,7 +158,7 @@ const openPaymentEditing = async () => {
 describe('Profile extra - handleSavePaymentMethods success', () => {
   beforeEach(() => { jest.clearAllMocks(); defaultSetup(); mockDecryptData.mockReturnValue(''); });
 
-  test('Calls updateDoc on valid PayPal save', async () => {
+  test('Saves payment methods to the private profile on valid PayPal save', async () => {
     render(<Profile />);
     await openPaymentEditing();
     const inputs = screen.getAllByPlaceholderText('username');

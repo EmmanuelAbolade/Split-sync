@@ -1,8 +1,6 @@
 // src/components/SepaPaymentModal.jsx - IMPROVED VERSION
 import { useState, useEffect } from 'react';
 import { X, CreditCard, Shield, AlertCircle, CheckCircle, Loader, Info } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
 import { 
   processSepaPayment, 
   generatePaymentReference,
@@ -12,6 +10,7 @@ import {
   calculatePaymentFee
 } from '../utils/sepaPayment';
 import { fetchIban } from '../utils/ibanService';
+import { loadMyPrivateDetails } from '../utils/privateProfile';
 import { authenticateWithBiometric } from '../utils/biometric';
 
 export default function SepaPaymentModal({ 
@@ -35,16 +34,14 @@ export default function SepaPaymentModal({
       
       setLoadingPaymentData(true);
       try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          const methods = data.paymentMethods ? { ...data.paymentMethods } : null;
-          // Own IBAN is decrypted server-side (the browser holds no key)
-          if (methods?.encryptedIBAN) {
-            methods.iban = await fetchIban(currentUser.uid);
-          }
-          setSenderPaymentMethods(methods);
+        // Own payment methods live in the private profile doc
+        const { paymentMethods } = await loadMyPrivateDetails(currentUser.uid);
+        const methods = paymentMethods && Object.keys(paymentMethods).length ? { ...paymentMethods } : null;
+        // Own IBAN is decrypted server-side (the browser holds no key)
+        if (methods?.encryptedIBAN) {
+          methods.iban = await fetchIban(currentUser.uid);
         }
+        setSenderPaymentMethods(methods);
       } catch (error) {
         console.error('Error fetching sender payment methods:', error);
         setError('Could not load your payment information');

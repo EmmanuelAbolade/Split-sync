@@ -67,8 +67,8 @@ Charts for Spending Over Time, Monthly Summary, Category Breakdown, Per-Person B
 
 PROFILE (YOU)
 Shows Owed to You and You Owe per currency; tap either card for a breakdown by group and person. Change your photo here.
-Payment Settings (requires your fingerprint/Face ID or password to view or edit): PayPal.me username (up to 20 characters), Revolut username (up to 30), and bank details: IBAN (up to 34) with optional BIC/SWIFT (8 or 11 characters). Your IBAN is encrypted on Split-Sync's secure server before it is stored and is only ever shown to you and to people you share a group with. You only need one payment method; more gives people more options.
-Add your phone number so friends can find you with Contact Sync.
+Payment Settings (requires your fingerprint/Face ID or password to view or edit): PayPal.me username (up to 20 characters), Revolut username (up to 30), and bank details: IBAN (up to 34) with optional BIC/SWIFT (8 or 11 characters). Your payment details are private: they are stored separately from your public profile, and only people who share a group with you can see the payment options they need to pay you. Your IBAN is also encrypted on Split-Sync's secure server. Not even Split-Sync admins can see your payment details. You only need one payment method; more gives people more options.
+Add your phone number so friends can find you with Contact Sync. Your number itself is kept private; only a scrambled (hashed) version is used for matching.
 
 SETTINGS
 Profile: change your display name (up to 50 characters); it updates in all your groups automatically.

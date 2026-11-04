@@ -146,3 +146,61 @@ test('an unrelated user cannot update someone else\'s notification', async () =>
 test('owner marks own notification read', async () => {
   await assertSucceeds(updateDoc(doc(as(BOB), 'notifications/n-payee'), { read: true }));
 });
+
+// ── Private profile details (payment methods, phone number) ──────────────────
+test('private details: owner only — not other users, not even admins', async () => {
+  await assertSucceeds(setDoc(doc(as(BOB), 'users/bob/private/details'), { paymentMethods: { paypalUsername: 'bob' }, phoneNumber: '+353' }));
+  await assertSucceeds(getDoc(doc(as(BOB), 'users/bob/private/details')));
+  await assertFails(getDoc(doc(as(ALICE), 'users/bob/private/details')));
+  await assertFails(getDoc(doc(as(ADMIN, { admin: true }), 'users/bob/private/details')));
+  await assertFails(setDoc(doc(as(ALICE), 'users/bob/private/details'), { phoneNumber: 'x' }));
+});
+test('public profile cannot store payment details or a plain phone number', async () => {
+  await assertFails(setDoc(doc(as(CAROL), 'users/carol'), { displayName: 'C', paymentMethods: {} }));
+  await assertSucceeds(setDoc(doc(as(CAROL), 'users/carol'), { displayName: 'C', phoneHash: 'abc' }));
+  await assertFails(updateDoc(doc(as(BOB), 'users/bob'), { phoneNumber: '+353' }));
+  await assertFails(updateDoc(doc(as(BOB), 'users/bob'), { paymentMethods: { paypalUsername: 'bob' } }));
+});
+test('legacy public profile: fields can be removed, other edits still work', async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'users/carol'), { displayName: 'C', phoneNumber: '+1', paymentMethods: { paypalUsername: 'c' } });
+  });
+  await assertSucceeds(updateDoc(doc(as(CAROL), 'users/carol'), { displayName: 'Carol' })); // untouched legacy fields OK
+  await assertFails(updateDoc(doc(as(CAROL), 'users/carol'), { phoneNumber: '+2' }));        // cannot change them
+  const { deleteField } = require('firebase/firestore');
+  await assertSucceeds(updateDoc(doc(as(CAROL), 'users/carol'), { phoneNumber: deleteField(), paymentMethods: deleteField() }));
+});
+
+// ── Admin moderation (Taskmaster) ────────────────────────────────────────────
+test('admin may rename a group but not change its members', async () => {
+  const admin = as(ADMIN, { admin: true });
+  await assertSucceeds(updateDoc(doc(admin, 'groups/g1'), { name: '[Removed by moderator]', moderatedAt: new Date(), moderatedBy: ADMIN }));
+  await assertFails(updateDoc(doc(admin, 'groups/g1'), { createdBy: ADMIN }));
+});
+test('admin may only soft-remove an expense', async () => {
+  const admin = as(ADMIN, { admin: true });
+  await assertSucceeds(updateDoc(doc(admin, 'expenses/e1'), { status: 'deleted', deletedAt: new Date(), deletedBy: ADMIN, moderated: true }));
+  await assertFails(updateDoc(doc(admin, 'expenses/e2'), { amount: 0 }));
+  await assertFails(updateDoc(doc(admin, 'expenses/e2'), { status: 'archived' }));
+});
+test('admin may delete invitations; other non-senders may not', async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'invitations/i1'), { fromUserId: ALICE, toUserId: BOB, status: 'pending' });
+  });
+  await assertFails(deleteDoc(doc(as(MALLORY), 'invitations/i1')));
+  await assertSucceeds(deleteDoc(doc(as(ADMIN, { admin: true }), 'invitations/i1')));
+});
+
+test('joining cannot be combined with other changes', async () => {
+  // A non-member "joins" but also renames the group / takes ownership / removes members
+  await assertFails(updateDoc(doc(as(MALLORY), 'groups/g1'), { memberIds: arrayUnion(MALLORY), members: arrayUnion({ userId: MALLORY }), name: 'Hijacked' }));
+  await assertFails(updateDoc(doc(as(MALLORY), 'groups/g1'), { memberIds: arrayUnion(MALLORY), members: arrayUnion({ userId: MALLORY }), createdBy: MALLORY }));
+  await assertFails(updateDoc(doc(as(MALLORY), 'groups/g1'), { memberIds: [MALLORY], members: [{ userId: MALLORY }] }));
+  // Adding someone else instead of yourself
+  await assertFails(updateDoc(doc(as(CAROL), 'groups/g1'), { memberIds: arrayUnion(CAROL), members: arrayUnion({ userId: MALLORY }) }));
+});
+test('rejoin via invitation acceptance (with updatedAt and formerMembers cleanup) is allowed', async () => {
+  await assertSucceeds(updateDoc(doc(as(CAROL), 'groups/g1'), {
+    memberIds: arrayUnion(CAROL), members: arrayUnion({ userId: CAROL, name: 'Carol' }), formerMembers: [], updatedAt: new Date(),
+  }));
+});

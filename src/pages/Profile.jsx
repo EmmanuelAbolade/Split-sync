@@ -15,6 +15,7 @@ import CloudinaryUpload from '../components/CloudinaryUpload';
 import { validateIBAN } from '../utils/encryption';
 // IBANs are encrypted/decrypted server-side — the browser holds no key
 import { encryptIban, fetchIban } from '../utils/ibanService';
+import { loadMyPrivateDetails, saveMyPaymentMethods, saveMyPhoneNumber } from '../utils/privateProfile';
 import { 
   authenticateWithBiometric,
   isBiometricAvailable,
@@ -88,11 +89,12 @@ export default function Profile() {
       if (!user?.uid) return;
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
+        // Phone number is private (owner-only doc); legacy values migrate on load
+        const priv = await loadMyPrivateDetails(user.uid);
         if (userDoc.exists()) {
-          const data = userDoc.data();
-          setUserData(data);
-          setPhoneNumber(data.phoneNumber || '');
+          setUserData({ ...userDoc.data(), phoneNumber: priv.phoneNumber });
         }
+        setPhoneNumber(priv.phoneNumber || '');
       } catch (err) {
         console.error('Error loading user data:', err);
       }
@@ -131,12 +133,10 @@ export default function Profile() {
     const fetchUserData = async () => {
       if (!user) return;
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setUserData(data);
-          if (data.paymentMethods) {
-            const methods = data.paymentMethods;
+        // Payment methods are private (owner-only doc); legacy values migrate on load
+        const { paymentMethods: privateMethods } = await loadMyPrivateDetails(user.uid);
+          if (privateMethods && Object.keys(privateMethods).length > 0) {
+            const methods = privateMethods;
             if (methods.encryptedIBAN) {
               try {
                 const decryptedIBAN = (await fetchIban(user.uid)) || '';
@@ -159,7 +159,6 @@ export default function Profile() {
               setPaymentMethods(methods);
             }
           }
-        }
       } catch (err) {
         console.error('Error fetching user data:', err);
       }
@@ -187,11 +186,14 @@ export default function Profile() {
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const phoneHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      // The hash stays on the public profile for contact discovery;
+      // the plain number is stored privately.
       await updateDoc(doc(db, 'users', user.uid), {
-        phoneNumber: cleanPhone,
         phoneHash: phoneHash,
         updatedAt: new Date(),
       });
+      await saveMyPhoneNumber(user.uid, cleanPhone);
+      setUserData(prev => ({ ...prev, phoneNumber: cleanPhone }));
       setPhoneSuccess('Phone number saved! Friends can now find you via contacts.');
       setEditingPhone(false);
       setTimeout(() => setPhoneSuccess(''), 4000);
@@ -356,7 +358,6 @@ export default function Profile() {
           displayName: user.displayName || user.email.split('@')[0],
           photoURL: user.photoURL || null,
           createdAt: new Date(),
-          paymentMethods: cleanedPaymentMethods,
           updatedAt: new Date(),
           defaultCurrency: 'EUR',
           allowContactSync: false,
@@ -365,12 +366,11 @@ export default function Profile() {
           onboardingCompleted: false,
           isActive: true
         });
-      } else {
-        await updateDoc(userDocRef, { paymentMethods: cleanedPaymentMethods, updatedAt: new Date() });
       }
+      // Payment methods are stored privately (owner-only doc)
+      await saveMyPaymentMethods(user.uid, cleanedPaymentMethods);
       setPaymentSuccess(true);
       setEditingPayment(false);
-      setUserData(prev => ({ ...prev, paymentMethods: cleanedPaymentMethods }));
       setTimeout(() => setPaymentSuccess(false), 3000);
     } catch (err) {
       console.error('Payment save error:', err);

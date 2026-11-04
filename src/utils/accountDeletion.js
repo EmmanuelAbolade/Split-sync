@@ -165,5 +165,6 @@ export async function deleteAccountData(user) {
     const s = await getDocs(query(collection(db, 'pendingPayments'), where('fromUserId', '==', uid)));
     await deleteDocsInBatches(s.docs.map(d => d.ref));
   });
+  await cleanup('private details', () => deleteDoc(doc(db, 'users', uid, 'private', 'details')));
   await cleanup('user profile', () => deleteDoc(doc(db, 'users', uid)));
 }

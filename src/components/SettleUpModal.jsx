@@ -5,12 +5,12 @@ import { db } from '../services/firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark, QrCode, Smartphone, ChevronDown } from 'lucide-react';
-import { getDoc } from 'firebase/firestore';
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { authenticateWithBiometric } from '../utils/biometric';
 import { fetchIban } from '../utils/ibanService';
+import { fetchGroupPaymentMethods } from '../utils/privateProfile';
 import { createNotification, recordPaymentSent } from '../stores/notificationsStore';
 import QRCodeCanvas from './QRCodeCanvas';
 
@@ -87,21 +87,18 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       
       setLoadingPaymentMethods(true);
       try {
-        const recipientDoc = await getDoc(doc(db, 'users', settlement.to));
-        if (recipientDoc.exists()) {
-          const data = recipientDoc.data();
-          // Spread into a new object so we never mutate Firestore data directly.
-          // getAvailablePaymentMethods checks for paymentMethods.iban (plain text).
-          // The IBAN is stored encrypted as encryptedIBAN, so decrypt it here and
-          // expose it under the iban key so the Bank Transfer option renders correctly.
-          const raw = data.paymentMethods ? { ...data.paymentMethods } : null;
-          if (raw?.encryptedIBAN) {
-            // Decrypted server-side; only returned because we share this group
-            const plain = await fetchIban(settlement.to, group?.id);
-            if (plain) raw.iban = plain;
-          }
-          setRecipientPaymentMethods(raw);
+        // Payment details are private. The server returns the recipient's
+        // payment options (no IBAN) because we share this group; the IBAN is
+        // fetched separately and exposed under .iban, which
+        // getAvailablePaymentMethods uses to show the Bank Transfer option.
+        const all = await fetchGroupPaymentMethods(group?.id);
+        const view = all[settlement.to];
+        const raw = view ? { ...view } : null;
+        if (raw?.hasIban) {
+          const plain = await fetchIban(settlement.to, group?.id);
+          if (plain) raw.iban = plain;
         }
+        setRecipientPaymentMethods(raw);
       } catch (error) {
         console.error('Error fetching payment methods:', error);
       } finally {
@@ -1008,7 +1005,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                     </div>
 
                     {/* SEPA simulation button — only shown if recipient has IBAN set */}
-                    {recipientPaymentMethods?.encryptedIBAN && (
+                    {(recipientPaymentMethods?.hasIban || recipientPaymentMethods?.encryptedIBAN) && (
                       <div className="px-4 py-4 bg-white dark:bg-gray-800">
                         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
                           SEPA Bank Transfer Simulation

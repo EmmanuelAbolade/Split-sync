@@ -25,7 +25,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:rules": "firebase emulators:exec --only firestore --project demo-splitsync \"npm --prefix firestore-tests test\"",
-    "test:functions": "node --test functions/iban.test.js"
+    "test:functions": "node --test functions/iban.test.js functions/privateData.test.js"
   },
   "jest": {
     "transformIgnorePatterns": [

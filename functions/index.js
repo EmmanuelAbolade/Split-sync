@@ -10,6 +10,8 @@ const { defineSecret } = require('firebase-functions/params');
 admin.initializeApp();
 
 const iban = require('./iban');
+const privateData = require('./privateData');
+const { FieldValue } = require('firebase-admin/firestore');
 const { buildSystemPrompt } = require('./assistantPrompt');
 
 const googleVisionApiKey = defineSecret('GOOGLE_VISION_API_KEY');
@@ -193,9 +195,9 @@ exports.getIban = functions.https.onCall(
       }
     }
 
-    const userRef  = db.doc(`users/${userId}`);
-    const userSnap = await userRef.get();
-    const stored   = userSnap.exists ? userSnap.data()?.paymentMethods?.encryptedIBAN : null;
+    // Bank details live in the owner-only private doc (legacy data migrated on read)
+    const { ref: privRef, data } = await privateData.loadPrivate(db, FieldValue, userId);
+    const stored = data.paymentMethods?.encryptedIBAN || null;
     if (!stored) return { iban: null };
 
     let result;
@@ -209,9 +211,9 @@ exports.getIban = functions.https.onCall(
     // Upgrade legacy ciphertext so the old (publicly bundled) key stops mattering
     if (result.legacy) {
       try {
-        await userRef.update({
-          'paymentMethods.encryptedIBAN': iban.encryptV2(result.iban, ibanEncryptionKey.value()),
-        });
+        await privRef.set({
+          paymentMethods: { encryptedIBAN: iban.encryptV2(result.iban, ibanEncryptionKey.value()) },
+        }, { merge: true });
       } catch (err) {
         console.warn('getIban re-encrypt failed for', userId, err.message);
       }
@@ -220,6 +222,35 @@ exports.getIban = functions.https.onCall(
     return { iban: result.iban };
   }
 );
+
+// Returns the payment options of every current member of a group the caller
+// belongs to: PayPal/Revolut usernames, BIC and whether a bank account exists.
+// Never returns IBANs (see getIban) or phone numbers.
+exports.getGroupPaymentMethods = functions.https.onCall(async (request) => {
+  if (!request.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'You must be signed in.');
+  }
+  const { groupId } = request.data || {};
+  if (!groupId || typeof groupId !== 'string') {
+    throw new functions.https.HttpsError('invalid-argument', 'groupId is required.');
+  }
+  const db = admin.firestore();
+  const groupSnap = await db.doc(`groups/${groupId}`).get();
+  const members = groupSnap.exists ? (groupSnap.data().members || []) : [];
+  if (!members.some(m => m.userId === request.auth.uid)) {
+    throw new functions.https.HttpsError('permission-denied', 'You are not a member of this group.');
+  }
+  const entries = await Promise.all(members.map(async (m) => {
+    try {
+      const { data } = await privateData.loadPrivate(db, FieldValue, m.userId);
+      return [m.userId, privateData.publicPaymentView(data.paymentMethods)];
+    } catch (err) {
+      console.warn('getGroupPaymentMethods failed for', m.userId, err.message);
+      return [m.userId, null];
+    }
+  }));
+  return { methods: Object.fromEntries(entries) };
+});
 
 
 // ─── scanReceipt — Google Cloud Vision OCR ────────────────────────────────────

@@ -14,6 +14,7 @@ import NotificationsDropdown from '../components/NotificationsDropdown';
 import { useNotificationsStore } from '../stores/notificationsStore';
 import { calculateBalances, getUserBalanceSummary } from '../utils/balanceCalculator';
 import { isActiveMember } from '../utils/memberDirectory';
+import { loadMyPrivateDetails } from '../utils/privateProfile';
 
 // Icon name to component mapping
 const ICON_MAP = {
@@ -162,8 +163,8 @@ export default function Dashboard() {
           const data = userDoc.data();
           setUserData(data);
 
-          // Check if user has at least one payment method
-          const pm = data?.paymentMethods;
+          // Check if user has at least one payment method (stored privately)
+          const { paymentMethods: pm } = await loadMyPrivateDetails(user.uid);
           const hasPayment =
             !!pm?.paypalUsername || !!pm?.revolutUsername || !!pm?.encryptedIBAN;
 

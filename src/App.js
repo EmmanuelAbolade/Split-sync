@@ -3,7 +3,7 @@ import { useNotificationsStore } from './stores/notificationsStore';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './services/firebase';
 import { useAuthStore } from './stores/authStore';
 import JoinGroup          from './pages/JoinGroup';
@@ -83,6 +83,16 @@ function App() {
             if (snap.exists() && snap.data().isActive === false) {
               try { sessionStorage.setItem('accountSuspended', '1'); } catch { /* ignore */ }
               signOut(auth);
+              return;
+            }
+            // Record activity for the admin "Active (7 days)" stat — once per day per device
+            const today = new Date().toISOString().slice(0, 10);
+            let last = null;
+            try { last = localStorage.getItem(`lastActive:${user.uid}`); } catch { /* ignore */ }
+            if (snap.exists() && last !== today) {
+              updateDoc(doc(db, 'users', user.uid), { lastActive: serverTimestamp() })
+                .then(() => { try { localStorage.setItem(`lastActive:${user.uid}`, today); } catch { /* ignore */ } })
+                .catch(() => { /* non-critical */ });
             }
           })
           .catch(() => { /* non-blocking — never stop sign-in on a lookup failure */ });

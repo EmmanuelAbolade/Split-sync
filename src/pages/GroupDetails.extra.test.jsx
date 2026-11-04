@@ -109,6 +109,12 @@ jest.mock('../utils/invitationSystem', () => ({
   sendInvitation:       (...a) => mockSendInvitation(...a),
 }));
 
+// Members' payment options come from the getGroupPaymentMethods Cloud Function
+let mockGroupPaymentMethods = {};
+jest.mock('../utils/privateProfile', () => ({
+  fetchGroupPaymentMethods: async () => mockGroupPaymentMethods,
+}));
+
 const mockCalculateBalances     = jest.fn();
 const mockCalculateSettlements  = jest.fn();
 const mockGetUserBalanceSummary = jest.fn();
@@ -365,13 +371,13 @@ describe('GroupDetails Extra - fetchPaymentMethods doc exists', () => {
     mockGetUserBalanceSummary.mockReturnValue({ status: 'settled', amount: 0, message: 'All settled up!' });
   });
 
-  test('Loads payment methods when user doc exists', async () => {
-    const userDocWithMethods = {
-      exists: () => true,
-      data: () => ({ paymentMethods: { encryptedIBAN: 'ENC_IBAN' } }),
-    };
+  afterEach(() => { mockGroupPaymentMethods = {}; });
+
+  test('Shows SEPA Ready for members whose server-side payment view has a bank account', async () => {
+    // The server returns hasIban (never the IBAN or its ciphertext)
+    mockGroupPaymentMethods = { 'user-456': { paypalUsername: null, revolutUsername: null, bic: null, hasIban: true } };
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
-              .mockResolvedValue(userDocWithMethods);
+              .mockResolvedValue({ exists: () => false, data: () => ({}) });
     let callCount = 0;
     mockOnSnapshot.mockImplementation((q, cb) => {
       callCount++;

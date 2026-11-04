@@ -63,6 +63,26 @@ jest.mock('../utils/ibanService', () => ({
   fetchIban: async () => 'DECRYPTED-enc-iban-data',
 }));
 
+// Recipient payment options come from the getGroupPaymentMethods Cloud
+// Function (server-side group check). The mock reuses each test's getDoc
+// fixture ({ paymentMethods }) so existing scenarios keep their meaning, and
+// returns the server's shape: no ciphertext, just hasIban.
+jest.mock('../utils/privateProfile', () => ({
+  fetchGroupPaymentMethods: async () => {
+    const { getDoc } = require('firebase/firestore');
+    const snap = await getDoc();
+    const pm = snap?.exists?.() ? snap.data()?.paymentMethods : null;
+    if (!pm) return {};
+    const view = {
+      paypalUsername: pm.paypalUsername || null,
+      revolutUsername: pm.revolutUsername || null,
+      bic: pm.bic || null,
+      hasIban: !!pm.encryptedIBAN,
+    };
+    return new Proxy({}, { get: () => view }); // any member id → this view
+  },
+}));
+
 // Return empty array to prevent crash from .length on undefined
 jest.mock('../utils/paymentLinks', () => ({
   generatePayPalLink: jest.fn(() => 'https://paypal.me/bob_paypal'),

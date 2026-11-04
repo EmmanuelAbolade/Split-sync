@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove, arrayUnion } from 'firebase/firestore';
 import { findMember, getMemberName, isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
 import useFormerMemberNames from '../hooks/useFormerMemberNames';
+import { fetchGroupPaymentMethods } from '../utils/privateProfile';
 import { authenticateWithBiometric, isBiometricEnabledOnDevice } from '../utils/biometric';
 import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -235,24 +236,15 @@ export default function GroupDetails() {
   useEffect(() => {
     if (!group?.members) return;
 
+    // Payment details are private; the server returns members' payment
+    // options (no IBANs) only because we are in this group.
     const fetchPaymentMethods = async () => {
-      const methods = {};
-      for (const member of group.members) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', member.userId));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            methods[member.userId] = data.paymentMethods || null;
-          }
-        } catch (error) {
-          console.error(`Error fetching payment methods for ${member.userId}:`, error);
-        }
-      }
-      setMemberPaymentMethods(methods);
+      if (!group.members.some(m => m.userId === user?.uid)) return;
+      setMemberPaymentMethods(await fetchGroupPaymentMethods(groupId));
     };
 
     fetchPaymentMethods();
-  }, [group?.members]);
+  }, [group?.members, groupId, user?.uid]);
 
   // Fetch expenses in real-time (onSnapshot) and sort by date descending
   useEffect(() => {
@@ -1235,7 +1227,7 @@ export default function GroupDetails() {
                     <p className="font-medium text-gray-900 dark:text-white">{member.name}</p>
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-gray-500 dark:text-gray-400">{member.email}</p>
-                      {memberPaymentMethods[member.userId]?.encryptedIBAN && (
+                      {(memberPaymentMethods[member.userId]?.hasIban || memberPaymentMethods[member.userId]?.encryptedIBAN) && (
                         <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded border border-green-200 dark:border-green-800">
                           <Landmark size={12} />
                           <span>SEPA Ready</span>

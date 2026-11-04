@@ -120,9 +120,8 @@ export default function Login() {
             expenses: true
           },
           
-          // Payment methods (empty initially)
-          paymentMethods: {},
-          
+          // Payment methods are stored privately in users/{uid}/private/details
+
           // Onboarding
           onboardingCompleted: false,
           
