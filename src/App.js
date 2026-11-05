@@ -22,12 +22,32 @@ import SplitSyncChat      from './components/SplitSyncChat';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 import Taskmaster from './pages/Taskmaster';
+import { rememberRedirect, peekRedirect, clearRedirect } from './utils/postAuthRedirect';
+
+// Sends a signed-out visitor to /login, remembering the page they were trying
+// to open (for example an invite link) so they return to it after signing in.
+// rememberRedirect is idempotent, so calling it during render is safe.
+function LoginRedirect() {
+  const location = useLocation();
+  rememberRedirect(location.pathname + location.search);
+  return <Navigate to="/login" replace />;
+}
+
+// Used on the auth pages once the user is signed in: go to the remembered
+// page if there is one, otherwise the dashboard.
+function AfterAuthRedirect() {
+  return <Navigate to={peekRedirect()} replace />;
+}
 
 // Layout wrapper for protected routes — renders bottom nav, session timeout, and AI chatbot
 function ProtectedLayout({ children }) {
   const location = useLocation();
   const { user } = useAuthStore();
   const { subscribeToNotifications } = useNotificationsStore();
+
+  // The user is inside the app now, so any remembered post-sign-in target
+  // has been used (or is no longer wanted).
+  useEffect(() => { clearRedirect(); }, []);
 
   // Subscribe to notifications at the app level — not just on Dashboard.
   // Ensures payment_log and other notifications update in real time
@@ -120,15 +140,15 @@ function App() {
         {/* Public routes */}
         <Route
           path="/login"
-          element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />}
+          element={!isAuthenticated ? <Login /> : <AfterAuthRedirect />}
         />
         <Route
           path="/register"
-          element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />}
+          element={!isAuthenticated ? <Register /> : <AfterAuthRedirect />}
         />
         <Route
           path="/forgot-password"
-          element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />}
+          element={!isAuthenticated ? <ForgotPassword /> : <AfterAuthRedirect />}
         />
 
         {/* Protected routes with bottom nav, session timeout, and chatbot */}
@@ -138,7 +158,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><Dashboard /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -149,7 +169,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><Activity /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -160,7 +180,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><Analytics /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -171,7 +191,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><QuickAdd /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -182,7 +202,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><Profile /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -193,7 +213,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><Settings /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -205,7 +225,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><GroupDetails /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -216,7 +236,7 @@ function App() {
             isAuthenticated ? (
               <ProtectedLayout><JoinGroup /></ProtectedLayout>
             ) : (
-              <Navigate to="/login" />
+              <LoginRedirect />
             )
           }
         />
@@ -232,7 +252,7 @@ function App() {
         />
         <Route
         path="/taskmaster"
-        element={isAuthenticated ? <Taskmaster /> : <Navigate to="/login" />}
+        element={isAuthenticated ? <Taskmaster /> : <LoginRedirect />}
       />
 
       </Routes>

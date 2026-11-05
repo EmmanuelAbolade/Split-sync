@@ -17,14 +17,14 @@
 | Docs | Doxygen: https://splitsync-docs.netlify.app · Coverage: https://splitsync-coverage-test.netlify.app · Showcase: https://showcase.setu.ie/C00288657/index.html · Screencast: https://youtu.be/7uat5PeTsrI |
 | Formal docs in repo | `docs/` — Research Document, Functional Specification, Design Document, Project Report (PDFs), screenshots, `docs/index.html` showcase page |
 | Size | ~38k lines of JS/JSX in `src/` + `functions/`; 191 commits (2025-11-25 → 2026-04-20) plus uncommitted work |
-| Tests | 58 Jest suites / 1,487 tests (~84% line coverage), 11 Cloud Functions unit tests, 31 Firestore rules emulator tests; all passing as of 2026-11-04 |
+| Tests | 60 Jest suites / 1,550 tests (85.1% line coverage; `App.js` 100%), 11 Cloud Functions unit tests, 31 Firestore rules emulator tests; all passing as of 2026-11-05 |
 | Licence | Apache 2.0 |
 
 ---
 
 ## 2. Tech stack
 
-**Frontend:** React 19 (Create React App / `react-scripts` 5), React Router 7, Zustand 5 (state), Tailwind CSS 3 (with `dark:` class strategy), lucide-react icons, Recharts 3 (analytics), qrcode / qrcode.react, crypto-js (legacy, server-side migration only), tesseract.js (legacy OCR, superseded by Cloud Vision), `@paypal/react-paypal-js`.
+**Frontend:** React 19 (Create React App / `react-scripts` 5), React Router 7 (`react-router-dom` 7.18.4; all direct dependencies are pinned to exact versions from Phase 0.5), Zustand 5 (state), Tailwind CSS 3 (with `dark:` class strategy), lucide-react icons, Recharts 3 (analytics), qrcode / qrcode.react, crypto-js (legacy, server-side migration only), tesseract.js (legacy OCR, superseded by Cloud Vision), `@paypal/react-paypal-js`.
 
 **Backend (Firebase):** Firebase Auth (email/password + Google), Cloud Firestore (real-time `onSnapshot` everywhere), Cloud Functions v2 (Node 22), Firebase Hosting. Cloudinary (unsigned upload preset) stores profile photos and receipt images.
 
@@ -173,7 +173,7 @@ Tested against the Firestore emulator by `firestore-tests/rules.test.js` (31 tes
 npm install                     # root (React app)
 cd functions && npm install     # Cloud Functions
 npm start                       # dev server
-CI=true npx react-scripts test --watchAll=false   # full Jest suite (54 suites)
+CI=true npx react-scripts test --watchAll=false   # full Jest suite (60 suites)
 npm run test:functions          # Cloud Functions IBAN crypto unit tests (node --test)
 npm run test:rules              # Firestore rules on the emulator (needs Java; first: cd firestore-tests && npm install)
 npm run build                   # production build → build/
@@ -187,7 +187,7 @@ Env (`.env`, git-ignored): `REACT_APP_FIREBASE_*` (api key, auth domain, project
 
 Windows note: `firebase emulators:exec` can leave the Firestore emulator (java.exe) running and holding port 8080; stop it before re-running `npm run test:rules`.
 
-Testing notes: CRA's Jest uses `resetMocks: true`, so module-level `jest.fn(impl)` implementations are wiped before each test. Use plain functions inside `jest.mock` factories, or set implementations in `beforeEach`. Page tests mock `react-router-dom` per file, so any new router hook must be added to those mocks (GroupDetails tests now stub `useLocation`).
+Testing notes: CRA's Jest uses `resetMocks: true`, so module-level `jest.fn(impl)` implementations are wiped before each test. Use plain functions inside `jest.mock` factories, or set implementations in `beforeEach`. Page tests mock `react-router-dom` per file, so any new router hook must be added to those mocks (GroupDetails tests now stub `useLocation`). `src/__mocks__/react-router-dom.js` replaces the router in every test automatically (CRA's Jest root is `src/`); `src/App.test.js` opts out with `jest.mock('react-router-dom', () => jest.requireActual('react-router-dom'))` to test real routing. Two settings make the real React Router 7 load under CRA's Jest 27: a `moduleNameMapper` entry for `react-router/dom` in `package.json` (Jest 27 can't resolve package `exports` subpaths) and a `TextEncoder`/`TextDecoder` polyfill in `src/setupTests.js`. Neither affects the production build.
 
 The production build has 6 ESLint warnings that predate 2026-11-03 (hook deps in AddExpenseModal, InvitationNotification, QuickAddMembers, GroupDetails; one missing default case). `CI=true npm run build` turns warnings into errors.
 
@@ -207,7 +207,8 @@ Ordered by importance.
 8. **`splitsync-web-key` API key is unused.** The user confirmed it doesn't match the receipt-scanner key, so it can be deleted in Google Cloud Console → APIs & Services → Credentials.
 9. `firebase-admin` 13 → 14 (major) upgrade not done.
 10. Receipt OCR is heuristic (first line as merchant, dd/mm/yyyy dates only). PayPal is sandbox-only.
-11. One Jest test failed once in five coverage runs on 2026-11-03 and passed on every rerun since (timing flake; name not captured).
+11. ~~Intermittent Jest failure~~ Identified and fixed on 2026-11-04 (Phase 0.5 branch): `sepaPayment.test.js` "Generates payment reference if not provided" didn't pin `Math.random`, so the simulated 5% payment failure hit it about 1 run in 20.
+12. `npm audit` (report only, 2026-11-04): app 70 findings, functions 38, all transitive, almost all from the `react-scripts` 5 toolchain (webpack, jest, svgo, workbox) and `firebase-admin`'s Google Cloud dependencies. Nothing reachable from the shipped bundle was identified. The fix is a toolchain migration away from CRA (planned later), never `npm audit fix --force`.
 
 Resolved: expense read access, IBAN key exposure, notification tampering, Taskmaster suspend, legacy `memberIds` (self-healing), the Gemini key (deleted by the user), Firebase web key restricted to the app's domains (by the user), **public-profile exposure of payment details and phone numbers (2026-11-04)**, **join-and-hijack via the group join rule (2026-11-04)**, **non-functional Taskmaster sections (2026-11-04)**, and coverage back to 84.1%.
 
@@ -234,6 +235,8 @@ Status at the end of 2026-11-04: **fully deployed** (functions incl. `getGroupPa
 - [x] Assistant verified by sending the exact production request (model, settings, new prompt) to the Claude API: HTTP 200, accurate answer about personal trackers and leaving groups, prompt cache written (3,935 tokens). An in-browser check was not possible (Chrome extension not connected), so try the chat once on the live site.
 - [x] GitHub repo made **public** (2026-11-04) with homepage, topics and a README Highlights section; Firebase web key restricted to the app domains and localhost by the user.
 - [ ] Delete the unused `splitsync-web-key` API key (§11.8). This is a user action in the Google Cloud console.
+- [x] **Circles Phase 0.5** verified by the user on localhost (invite link resumes after sign-in with a real group), approved, merged to `master` and hosting deployed (2026-11-05). No rules or Functions changes in this phase.
+- [ ] **Preview channels can't sign in**: the Firebase web key's website restriction blocks `splitsync-dev--*.web.app` ("Requests from referer … are blocked"). Before the next preview review the user should add `https://splitsync-dev--*.web.app/*` to the key in Google Cloud Console (and the specific preview domain to Auth → Authorized domains if Google sign-in is needed there). Localhost works meanwhile.
 
 Order matters: secrets → functions → hosting. Until hosting is deployed, users run the previous client against the new rules. That is safe: its queries still pass the rules, and its destructive old account-deletion path is now blocked, because its cross-group expense query is denied.
 
@@ -321,6 +324,21 @@ Results: Jest 58 suites / 1,483 tests, functions 9/9, rules 31/31, lint clean on
 | (found while fixing) Who Owes Who merged the same two people's debts across **different currencies** and dropped the currency | Consolidation key ignored currency | Rows are kept per currency. Per-Person Balance shows one bar per person per currency when "All groups" mixes currencies |
 
 Tests: +3 Analytics regression tests, +1 private-profile test, +2 functions tests. Jest 58 suites / 1,487, functions 11/11. Deployed `getIban`, `getGroupPaymentMethods` (now uses `IBAN_ENCRYPTION_KEY`) and hosting.
+
+### 2026-11-04 (Circles Phase 0 and 0.5)
+
+Phase 0 (committed `d3745ea`): Circles research and design docs in `docs/circles/` (audit, design, references; private study checklist git-ignored).
+
+Phase 0.5 (branch `feature/circles-0.5`; verified by the user on localhost, merged and deployed 2026-11-05):
+
+| Area | Problem | Change |
+|---|---|---|
+| Invite links | A signed-out person opening `/invite/{id}` was sent to Login and then always to the Dashboard, so the invite was lost (also after registering) | New `src/utils/postAuthRedirect.js`: protected routes remember the requested path in sessionStorage (`splitsync.postAuthRedirect`); Login (email and Google) and Register return there with `replace`. Only safe internal paths are accepted: no `//`, backslashes, control characters, absolute or `javascript:` URLs, or auth pages; anything else goes to `/dashboard`. The target is read before the async sign-in (biometric prompt race) and cleared when the app shell mounts |
+| Routing tests | `App.js` had 0% coverage | `src/App.test.js` (36 tests, real router): every guard both ways, `/` and `*`, remember/resume/clear, unsafe targets, bottom nav hidden on group and invite pages, Taskmaster outside the shell, suspension sign-out, once-a-day `lastActive`, lookup failure doesn't block sign-in. `App.js` is now at 100% lines |
+| Dependencies | `react-router-dom` 7.x advisories (fixed in later 7.18 releases); `^` ranges everywhere | `react-router-dom` 7.18.4 (non-breaking, within 7.x; 7.18.5 skipped as only 8 days old); every direct dependency in the app, `functions/` and `firestore-tests/` pinned to its exact installed version |
+| Flaky test | See §11.11 | `Math.random` pinned in that test |
+
+Results: Jest 60 suites / 1,550 tests passing, 85.1% lines; functions 11/11; rules 31/31; lint 0 errors on changed files; build compiles (+1.2 kB gzip). Preview deployed; the live site is unchanged.
 
 ---
 

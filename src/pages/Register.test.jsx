@@ -254,7 +254,17 @@ describe('Register - Successful registration', () => {
     render(<Register />);
     fillForm();
     submitForm();
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true }));
+  });
+
+  // Regression: a new user arriving from an invite link should reach that group
+  test('Returns to a remembered invite link after registration', async () => {
+    sessionStorage.setItem('splitsync.postAuthRedirect', '/invite/group-42');
+    render(<Register />);
+    fillForm();
+    submitForm();
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/invite/group-42', { replace: true }));
+    sessionStorage.clear();
   });
 
   test('Shows loading state while registering', async () => {
