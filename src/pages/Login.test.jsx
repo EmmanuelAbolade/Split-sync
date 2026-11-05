@@ -187,7 +187,24 @@ describe('Login - Email/password successful login', () => {
   test('Navigates to /dashboard after successful login', async () => {
     render(<Login />);
     fillAndSubmit();
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true }));
+  });
+
+  // Regression: an invite link opened while signed out used to be lost at login
+  test('Returns to a remembered invite link after successful login', async () => {
+    sessionStorage.setItem('splitsync.postAuthRedirect', '/invite/group-42');
+    render(<Login />);
+    fillAndSubmit();
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/invite/group-42', { replace: true }));
+    sessionStorage.clear();
+  });
+
+  test('Ignores an unsafe remembered target and goes to /dashboard', async () => {
+    sessionStorage.setItem('splitsync.postAuthRedirect', '//evil.example');
+    render(<Login />);
+    fillAndSubmit();
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true }));
+    sessionStorage.clear();
   });
 
   test('Shows loading state while logging in', async () => {
@@ -260,7 +277,7 @@ describe('Login - Biometric authentication', () => {
     mockAuthenticateWithBiometric.mockResolvedValue(true);
     render(<Login />);
     fillAndSubmit();
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true }));
   });
 
   test('Shows biometric error when biometric fails', async () => {
@@ -329,7 +346,7 @@ describe('Login - Google sign-in', () => {
     mockGetDoc.mockResolvedValue({ exists: () => false });
     render(<Login />);
     fireEvent.click(screen.getByText('Continue with Google'));
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard'));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true }));
   });
 
   test('Shows popup-closed error', async () => {

@@ -24,3 +24,7 @@ global.IntersectionObserver = class IntersectionObserver {
   takeRecords() { return []; }
   unobserve() {}
 };
+// React Router 7 expects TextEncoder/TextDecoder, which this jsdom lacks
+const { TextEncoder, TextDecoder } = require('util');
+if (!global.TextEncoder) global.TextEncoder = TextEncoder;
+if (!global.TextDecoder) global.TextDecoder = TextDecoder;

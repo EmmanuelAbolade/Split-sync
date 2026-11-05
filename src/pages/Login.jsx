@@ -7,6 +7,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuthStore } from '../stores/authStore';
 import { Eye, EyeOff } from 'lucide-react';
 import { isBiometricEnabledOnDevice, authenticateWithBiometric } from '../utils/biometric';
+import { peekRedirect } from '../utils/postAuthRedirect';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -31,6 +32,8 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    // Captured before signing in: where to go afterwards (for example an invite link)
+    const target = peekRedirect();
 
     try {
       // Step 1: Authenticate with Firebase (email + password)
@@ -55,9 +58,9 @@ export default function Login() {
         }
       }
       
-      // Step 4: All good - proceed to dashboard
+      // Step 4: All good - continue to the remembered page or the dashboard
       setUser(result.user);
-      navigate('/dashboard');
+      navigate(target, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
       if (err.code === 'auth/invalid-credential') {
@@ -78,6 +81,8 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     setError('');
     setLoading(true);
+    // Captured before the popup: where to go afterwards (for example an invite link)
+    const target = peekRedirect();
 
     try {
       console.log('🔵 Starting Google sign-in...');
@@ -176,7 +181,7 @@ export default function Login() {
       // Step 5: All good - proceed to dashboard
       console.log('✅ Login complete, navigating to dashboard');
       setUser(user);
-      navigate('/dashboard');
+      navigate(target, { replace: true });
       
     } catch (err) {
       console.error('❌ Google sign-in error:', err);

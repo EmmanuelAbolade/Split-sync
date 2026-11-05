@@ -6,6 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import PasswordStrength from '../components/PasswordStrength';
+import { peekRedirect } from '../utils/postAuthRedirect';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function Register() {
@@ -23,6 +24,8 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    // Captured before creating the account: where to go afterwards (for example an invite link)
+    const target = peekRedirect();
 
     // Validation
     if (password !== confirmPassword) {
@@ -57,7 +60,7 @@ export default function Register() {
       });
 
       setUser(result.user);
-      navigate('/dashboard');
+      navigate(target, { replace: true });
     } catch (err) {
       console.error('Registration error:', err);
       if (err.code === 'auth/email-already-in-use') {

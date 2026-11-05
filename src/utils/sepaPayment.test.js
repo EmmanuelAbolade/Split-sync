@@ -197,6 +197,9 @@ describe('SEPA Payment - Payment Processing', () => {
   });
 
   test('Generates payment reference if not provided', async () => {
+    // Mock Math.random to ensure success (> 0.05); unpinned, this failed about 1 run in 20
+    const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+
     const paymentData = {
       amount: 50,
       fromUserId: 'user1',
@@ -208,6 +211,7 @@ describe('SEPA Payment - Payment Processing', () => {
     const result = await processSepaPayment(paymentData);
 
     expect(result.reference).toMatch(/^SEPA-/);
+    mockRandom.mockRestore();
   });
 
   test('Includes estimated arrival time', async () => {
