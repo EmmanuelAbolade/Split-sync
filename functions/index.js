@@ -13,6 +13,7 @@ const iban = require('./iban');
 const privateData = require('./privateData');
 const { FieldValue } = require('firebase-admin/firestore');
 const { buildSystemPrompt } = require('./assistantPrompt');
+const { requireFlag } = require('./core/flags');
 
 const googleVisionApiKey = defineSecret('GOOGLE_VISION_API_KEY');
 const ibanEncryptionKey  = defineSecret('IBAN_ENCRYPTION_KEY'); // 32-byte hex, AES-256-GCM
@@ -28,9 +29,20 @@ const paypalClientSecret = defineSecret('PAYPAL_CLIENT_SECRET');
 // Accepts: { orderId: string }
 // Returns: { success: boolean, orderId: string, status: string }
 
+// PayPal Checkout stays sandbox-only (11-payments.md §2.1): no payee is set,
+// so a live capture would pay SplitSync's own merchant account. Moving to live
+// needs a deliberate code change here and a review.
+const PAYPAL_API_HOST = 'api-m.sandbox.paypal.com';
+function assertPayPalSandbox(host = PAYPAL_API_HOST) {
+  if (host !== 'api-m.sandbox.paypal.com') {
+    throw new functions.https.HttpsError('failed-precondition', 'PayPal Checkout is only available as a sandbox demo.');
+  }
+}
+
 exports.capturePayPalOrder = functions.https.onCall(
   { secrets: [paypalClientId, paypalClientSecret] },
   async (request) => {
+    assertPayPalSandbox();
 
     // Require authentication
     if (!request.auth) {
@@ -38,6 +50,13 @@ exports.capturePayPalOrder = functions.https.onCall(
         'unauthenticated',
         'You must be signed in to complete a payment.'
       );
+    }
+
+    // The PayPal demo is hidden unless paymentDemosEnabled is on; enforce it here too.
+    try {
+      await requireFlag(admin.firestore(), 'paymentDemosEnabled', request.auth.uid);
+    } catch (e) {
+      throw new functions.https.HttpsError('failed-precondition', 'The PayPal demo is turned off.');
     }
 
     const { orderId } = request.data || {};
@@ -58,7 +77,7 @@ exports.capturePayPalOrder = functions.https.onCall(
 
     const accessToken = await new Promise((resolve, reject) => {
       const options = {
-        hostname: 'api-m.sandbox.paypal.com',
+        hostname: PAYPAL_API_HOST,
         path:     '/v1/oauth2/token',
         method:   'POST',
         headers: {
@@ -103,7 +122,7 @@ exports.capturePayPalOrder = functions.https.onCall(
 
     const captureResult = await new Promise((resolve, reject) => {
       const options = {
-        hostname: 'api-m.sandbox.paypal.com',
+        hostname: PAYPAL_API_HOST,
         path:     `/v2/checkout/orders/${orderId}/capture`,
         method:   'POST',
         headers: {
@@ -458,3 +477,6 @@ exports.splitSyncChat = functions.https.onCall(
 // Shared money-pipeline helpers live in functions/core/.
 exports.stepUp = require('./stepUp');
 exports.admin = { setFlag: require('./admin/setFlag').callable };
+// Phase 1B: settle-up on the server (settlements-start, -claim, -confirm,
+// -decline, -receive, -cancel, and the onExpenseCreated trigger).
+exports.settlements = require('./settlements');

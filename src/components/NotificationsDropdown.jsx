@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { X, Check, Trash2, Bell, DollarSign, Receipt, Users, CheckCircle2, XCircle, Clock, AlertCircle } from 'lucide-react';
 import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived } from '../stores/notificationsStore';
 import { useNavigate } from 'react-router-dom';
+import useStepUp from '../hooks/useStepUp';
+import { confirmParams, settlementErrorMessage } from '../utils/settlements';
 
 const NOTIFICATION_ICONS = {
   payment: DollarSign,
@@ -24,6 +26,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
   const [actionLoading, setActionLoading] = useState({});
   const [actionError, setActionError] = useState({});
   const [actionDone, setActionDone] = useState({});
+  const { requestStepUp, stepUpSheet } = useStepUp();
 
   const handleNotificationClick = (notification) => {
     // Do not navigate on action-required notifications — buttons handle those
@@ -35,20 +38,20 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
     onClose();
   };
 
-  // Payee confirms they received the payment.
+  // Payee confirms they received the payment. This changes balances, so the
+  // server needs a "Confirm it's you" token bound to this notification.
   // notification.id IS the payeeNotifId that confirmPaymentReceived expects.
   const handleConfirmPayment = async (e, notification) => {
     e.stopPropagation();
     setActionError(prev => ({ ...prev, [notification.id]: null }));
     setActionLoading(prev => ({ ...prev, [notification.id]: 'confirming' }));
     try {
-      await confirmPaymentReceived(notification.id);
+      const token = await requestStepUp('settlements.confirm', confirmParams(notification.id));
+      if (!token) return; // cancelled
+      await confirmPaymentReceived(notification.id, token);
       setActionDone(prev => ({ ...prev, [notification.id]: 'confirmed' }));
     } catch (err) {
-      console.error('Error confirming payment:', err);
-      const msg = err?.code === 'permission-denied'
-        ? 'Permission denied. Please ensure Firestore rules are deployed.'
-        : (err?.message || 'Failed to confirm. Please try again.');
+      const msg = settlementErrorMessage(err, 'Failed to confirm. Please try again.');
       setActionError(prev => ({ ...prev, [notification.id]: msg }));
     } finally {
       setActionLoading(prev => ({ ...prev, [notification.id]: null }));
@@ -64,10 +67,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
       await declinePaymentReceived(notification.id);
       setActionDone(prev => ({ ...prev, [notification.id]: 'declined' }));
     } catch (err) {
-      console.error('Error declining payment:', err);
-      const msg = err?.code === 'permission-denied'
-        ? 'Permission denied. Please ensure Firestore rules are deployed.'
-        : (err?.message || 'Failed to decline. Please try again.');
+      const msg = settlementErrorMessage(err, 'Failed to decline. Please try again.');
       setActionError(prev => ({ ...prev, [notification.id]: msg }));
     } finally {
       setActionLoading(prev => ({ ...prev, [notification.id]: null }));
@@ -275,6 +275,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
           )}
         </div>
       </div>
+      {stepUpSheet}
     </>
   );
 }

@@ -27,7 +27,7 @@
     "eject": "react-scripts eject",
     "test:rules": "firebase emulators:exec --only firestore --project demo-splitsync \"npm --prefix firestore-tests test\"",
     "test:functions": "node --test functions/iban.test.js functions/privateData.test.js functions/core/core.test.js",
-    "test:functions:emulator": "firebase emulators:exec --only firestore --project demo-splitsync \"node --test functions/test/integration/*.test.js\""
+    "test:functions:emulator": "firebase emulators:exec --only firestore --project demo-splitsync \"node --test --test-concurrency=1 functions/test/integration/*.test.js\""
   },
   "jest": {
     "transformIgnorePatterns": [

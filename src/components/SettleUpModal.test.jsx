@@ -53,9 +53,46 @@ jest.mock('../stores/notificationsStore', () => ({
   recordPaymentSent: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('../utils/biometric', () => ({
-  authenticateWithBiometric: jest.fn(() => Promise.resolve(true)),
+// Phase 1B: settle-up goes through the settlements Functions, and recording a
+// payment as the payee needs "Confirm it's you". Plain functions and arrays
+// (not jest.fn) so CRA's resetMocks does not clear them between tests.
+let mockStepUpToken = 'tok';
+const mockStepUpCalls = [];
+// Payment demos switch (admin panel); on by default so the demo tests below run
+let mockDemosOn = true;
+jest.mock('../hooks/useFeatureFlags', () => ({
+  __esModule: true,
+  default: () => ({ loading: false, isEnabled: (name) => name === 'paymentDemosEnabled' && mockDemosOn }),
 }));
+
+jest.mock('../hooks/useStepUp', () => ({
+  __esModule: true,
+  default: () => ({
+    requestStepUp: (action, params) => { mockStepUpCalls.push([action, params]); return Promise.resolve(mockStepUpToken); },
+    stepUpSheet: null,
+  }),
+}));
+const mockSettlementCalls = [];
+let mockReceiveError = null;
+jest.mock('../utils/settlements', () => {
+  const actual = jest.requireActual('../utils/settlements');
+  return {
+    receiveParams: actual.receiveParams,
+    settlementErrorMessage: actual.settlementErrorMessage,
+    startSettlement: (data) => { mockSettlementCalls.push(['start', data]); return Promise.resolve({ status: 'started' }); },
+    receiveSettlement: (data, token) => {
+      mockSettlementCalls.push(['receive', data, token]);
+      return mockReceiveError ? Promise.reject(mockReceiveError) : Promise.resolve({ status: 'confirmed' });
+    },
+  };
+});
+jest.mock('../utils/stepUp', () => ({ newIdempotencyKey: () => 'idem-key-0000000001' }));
+beforeEach(() => {
+  mockStepUpToken = 'tok';
+  mockStepUpCalls.length = 0;
+  mockSettlementCalls.length = 0;
+  mockReceiveError = null;
+});
 
 // The recipient's IBAN is decrypted server-side (ibanService.fetchIban → getIban
 // Cloud Function) and exposed under .iban. Plain function so resetMocks keeps it.
@@ -375,8 +412,9 @@ describe('SettleUpModal - Manual Settlement (Payer)', () => {
     sessionStorage.clear();
   });
 
-  test('calls addDoc and shows success screen when payer confirms payment sent', async () => {
+  test('claims the payment (no direct write) and shows success when payer confirms payment sent', async () => {
     const { addDoc } = require('firebase/firestore');
+    const { recordPaymentSent } = require('../stores/notificationsStore');
     renderModal();
     // Switch to Paid Offline mode to reveal the manual confirm button
     await waitFor(() => screen.getByRole('button', { name: /Paid Offline/i }));
@@ -391,10 +429,16 @@ describe('SettleUpModal - Manual Settlement (Payer)', () => {
       );
     });
 
-    await waitFor(() => expect(addDoc).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledTimes(1));
+    expect(recordPaymentSent).toHaveBeenCalledWith({
+      payeeId: 'user-2', groupId: 'group-1', amount: 45.5, method: 'manual', idempotencyKey: 'idem-key-0000000001',
+    });
+    expect(addDoc).not.toHaveBeenCalled();
+    expect(mockStepUpCalls).toEqual([]); // the payer is not asked to step up
     await waitFor(() =>
       expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
     );
+    expect(screen.getByText(/Bob has been notified and will confirm receipt/)).toBeInTheDocument();
   });
 });
 
@@ -409,9 +453,6 @@ describe('SettleUpModal - Manual Settlement (Receiver)', () => {
     deleteDoc.mockResolvedValue(undefined);
     jest.clearAllMocks();
     sessionStorage.clear();
-    // Ensure biometric mock always resolves true for this suite
-    const { authenticateWithBiometric } = require('../utils/biometric');
-    authenticateWithBiometric.mockResolvedValue(true);
   });
 
   test('shows confirmation dialog on first click', async () => {
@@ -434,7 +475,7 @@ describe('SettleUpModal - Manual Settlement (Receiver)', () => {
     );
   });
 
-  test('calls addDoc after receiver clicks Confirm Receipt', async () => {
+  test('records the payment on the server after "Confirm it\'s you" when receiver clicks Confirm Receipt', async () => {
     const { addDoc } = require('firebase/firestore');
     renderModal(receiverProps);
     await waitFor(() =>
@@ -452,14 +493,16 @@ describe('SettleUpModal - Manual Settlement (Receiver)', () => {
       screen.getByRole('button', { name: /Confirm Receipt/i })
     );
 
-    // Second click — triggers biometric then records
+    // Second click — "Confirm it's you", then the server records it
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
     });
 
-    await waitFor(() => expect(addDoc).toHaveBeenCalledTimes(1), {
-      timeout: 3000,
-    });
+    const params = { groupId: 'group-1', fromUid: 'user-1', amount: 45.5, idempotencyKey: 'idem-key-0000000001' };
+    expect(mockStepUpCalls).toEqual([['settlements.receive', { groupId: 'group-1', fromUid: 'user-1', amountMinor: 4550, idempotencyKey: 'idem-key-0000000001' }]]);
+    await waitFor(() => expect(mockSettlementCalls).toEqual([['receive', params, 'tok']]));
+    expect(addDoc).not.toHaveBeenCalled();
+    expect(await screen.findByText(/Payment Recorded!/i)).toBeInTheDocument();
   });
 });
 
@@ -551,6 +594,11 @@ describe('SettleUpModal - Pending Payment Flow', () => {
     await waitFor(() =>
       expect(recordPaymentSent).toHaveBeenCalledTimes(1)
     );
+    expect(recordPaymentSent).toHaveBeenCalledWith({
+      payeeId: 'user-2', groupId: 'group-1', amount: 45.5, method: 'paypal', idempotencyKey: 'idem-key-0000000001',
+    });
+    const { deleteDoc } = require('firebase/firestore');
+    expect(deleteDoc).not.toHaveBeenCalled(); // the server keeps the lock until the payee answers
     // Success screen shows Payment Sent! heading
     await waitFor(() =>
       expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
@@ -562,6 +610,28 @@ describe('SettleUpModal - Pending Payment Flow', () => {
 // 8. Error handling
 // ---------------------------------------------------------------------------
 
+describe('SettleUpModal - Claimed payment waiting for the payee', () => {
+  beforeEach(() => {
+    const { onSnapshot } = require('firebase/firestore');
+    onSnapshot.mockImplementation((_ref, callback) => {
+      if (typeof callback === 'function') {
+        callback({ exists: () => true, data: () => ({
+          groupId: 'group-1', fromUserId: 'user-1', toUserId: 'user-2', toName: 'Bob',
+          amount: 45.5, currency: 'EUR', method: 'revolut', status: 'claimed', timestamp: Date.now(),
+        }) });
+      }
+      return () => {};
+    });
+  });
+  afterEach(() => sessionStorage.clear());
+
+  test('does not ask "did you complete the payment?" again; explains it is awaiting confirmation', async () => {
+    renderModal();
+    expect(await screen.findByText(/is awaiting confirmation/)).toBeInTheDocument();
+    expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument();
+  });
+});
+
 describe('SettleUpModal - Error Handling', () => {
   beforeEach(() => {
     const { setDoc, deleteDoc } = require('firebase/firestore');
@@ -571,9 +641,9 @@ describe('SettleUpModal - Error Handling', () => {
     sessionStorage.clear();
   });
 
-  test('shows error message when addDoc fails during settlement', async () => {
-    const { addDoc } = require('firebase/firestore');
-    addDoc.mockRejectedValueOnce(new Error('Firestore write failed'));
+  test('shows error message when the claim fails during settlement', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    recordPaymentSent.mockRejectedValueOnce(new Error('network down'));
 
     renderModal();
     // Switch to Paid Offline mode to reveal the manual confirm button
@@ -753,9 +823,9 @@ describe('SettleUpModal - handleMarkAsPaid errors', () => {
 
   afterEach(() => sessionStorage.clear());
 
-  test('shows permission-denied error when recordPaymentSent is rejected with that code', async () => {
+  test('shows a not-allowed error when the server refuses the claim', async () => {
     const { recordPaymentSent } = require('../stores/notificationsStore');
-    const err = Object.assign(new Error('denied'), { code: 'permission-denied' });
+    const err = Object.assign(new Error('denied'), { code: 'functions/permission-denied' });
     recordPaymentSent.mockRejectedValueOnce(err);
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
@@ -765,7 +835,7 @@ describe('SettleUpModal - handleMarkAsPaid errors', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByText('Permission denied. Please ensure you are signed in and try again.')
+        screen.getByText('You are not allowed to do this.')
       ).toBeInTheDocument()
     );
     consoleSpy.mockRestore();
@@ -786,6 +856,19 @@ describe('SettleUpModal - handleMarkAsPaid errors', () => {
     consoleSpy.mockRestore();
   });
 
+  test('shows the server explanation, e.g. a claim already waiting', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    recordPaymentSent.mockRejectedValueOnce(Object.assign(new Error('A payment to this person is already waiting for confirmation.'), { code: 'functions/failed-precondition' }));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderModal();
+    await waitFor(() => screen.getByRole('button', { name: /Mark as Paid/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
+    });
+    expect(await screen.findByText('A payment to this person is already waiting for confirmation.')).toBeInTheDocument();
+    consoleSpy.mockRestore();
+  });
+
   test('closes pending dialog when X button is clicked', async () => {
     renderModal();
     await waitFor(() => screen.getByText(/Did you complete the payment/i));
@@ -800,18 +883,16 @@ describe('SettleUpModal - handleMarkAsPaid errors', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 13. Biometric failure paths (lines 252-262)
+// 13. "Confirm it's you" failure paths (receiver recording a payment)
 // ---------------------------------------------------------------------------
 
-describe('SettleUpModal - Biometric failure paths', () => {
+describe('SettleUpModal - Step-up failure paths', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
   });
 
-  test('shows cancellation error when biometric returns false', async () => {
-    const { authenticateWithBiometric } = require('../utils/biometric');
-    authenticateWithBiometric.mockResolvedValueOnce(false);
+  const openAndConfirmReceipt = async () => {
     renderModal(receiverProps);
     await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
     await act(async () => {
@@ -821,32 +902,25 @@ describe('SettleUpModal - Biometric failure paths', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
     });
-    await waitFor(() =>
-      expect(
-        screen.getByText(/Biometric authentication was cancelled or failed/i)
-      ).toBeInTheDocument()
-    );
+  };
+
+  test('nothing is recorded when "Confirm it\'s you" is cancelled', async () => {
+    mockStepUpToken = null;
+    await openAndConfirmReceipt();
+    expect(await screen.findByText('Confirmation was cancelled. Please try again.')).toBeInTheDocument();
+    expect(mockSettlementCalls).toEqual([]);
   });
 
-  test('shows authentication error when biometric throws', async () => {
-    const { authenticateWithBiometric } = require('../utils/biometric');
-    authenticateWithBiometric.mockRejectedValueOnce(new Error('WebAuthn not supported'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    });
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Receipt/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
-    });
-    await waitFor(() =>
-      expect(
-        screen.getByText(/Authentication failed. Please enable biometric/i)
-      ).toBeInTheDocument()
-    );
-    consoleSpy.mockRestore();
+  test('shows the server explanation when recording is refused', async () => {
+    mockReceiveError = Object.assign(new Error('That is more than is owed. Please check the amount.'), { code: 'functions/invalid-argument' });
+    await openAndConfirmReceipt();
+    expect(await screen.findByText('That is more than is owed. Please check the amount.')).toBeInTheDocument();
+  });
+
+  test('shows a generic error for unexpected failures', async () => {
+    mockReceiveError = new Error('socket hang up');
+    await openAndConfirmReceipt();
+    expect(await screen.findByText('Failed to record settlement. Please try again.')).toBeInTheDocument();
   });
 });
 
@@ -858,8 +932,6 @@ describe('SettleUpModal - Receiver confirmation dialog detail', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    const { authenticateWithBiometric } = require('../utils/biometric');
-    authenticateWithBiometric.mockResolvedValue(true);
   });
 
   test('confirmation dialog shows From, To, and Amount', async () => {
@@ -944,22 +1016,26 @@ describe('SettleUpModal - SEPA payment flow', () => {
     expect(screen.getByTestId('sepa-modal')).toBeInTheDocument();
   });
 
-  test('SEPA success callback calls addDoc directly and shows success screen', async () => {
+  test('SEPA demo success is recorded as a claim the payee confirms', async () => {
     const { addDoc } = require('firebase/firestore');
+    const { recordPaymentSent } = require('../stores/notificationsStore');
     renderModal();
     await expandAndClickSEPA();
     await act(async () => {
       fireEvent.click(screen.getByText('Complete SEPA'));
     });
-    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledWith({
+      payeeId: 'user-2', groupId: 'group-1', amount: 50, method: 'sepa', idempotencyKey: 'idem-key-0000000001',
+    }));
+    expect(addDoc).not.toHaveBeenCalled();
     await waitFor(() =>
       expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
     );
   });
 
-  test('SEPA success shows error when addDoc fails', async () => {
-    const { addDoc } = require('firebase/firestore');
-    addDoc.mockRejectedValueOnce(new Error('Firestore write failed'));
+  test('SEPA success shows error when the claim fails', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    recordPaymentSent.mockRejectedValueOnce(new Error('Network error'));
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
     await expandAndClickSEPA();
@@ -968,24 +1044,7 @@ describe('SettleUpModal - SEPA payment flow', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByText('Payment processed but failed to update balances. Please try again.')
-      ).toBeInTheDocument()
-    );
-    consoleSpy.mockRestore();
-  });
-
-  test('SEPA success shows error when createNotification fails', async () => {
-    const { createNotification } = require('../stores/notificationsStore');
-    createNotification.mockRejectedValueOnce(new Error('Network error'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await expandAndClickSEPA();
-    await act(async () => {
-      fireEvent.click(screen.getByText('Complete SEPA'));
-    });
-    await waitFor(() =>
-      expect(
-        screen.getByText('Payment processed but failed to update balances. Please try again.')
+        screen.getByText('Payment processed but could not be recorded. Please try again.')
       ).toBeInTheDocument()
     );
     consoleSpy.mockRestore();
@@ -1082,6 +1141,15 @@ describe('SettleUpModal - Payment link click and options section', () => {
     expect(stored.method).toBe('paypal');
   });
 
+  test('a payment link starts the payment on the server (for the "did you pay?" prompt)', async () => {
+    renderModal();
+    await waitFor(() => screen.getByText('Revolut'));
+    fireEvent.click(screen.getByText('Revolut'));
+    expect(mockSettlementCalls).toEqual([['start', { groupId: 'group-1', toUid: 'user-2', amount: 45.5, method: 'revolut' }]]);
+    const { setDoc } = require('firebase/firestore');
+    expect(setDoc).not.toHaveBeenCalled();
+  });
+
   test('stores revolut method when Revolut link is clicked', async () => {
     renderModal();
     await waitFor(() => screen.getByText('Revolut'));
@@ -1152,17 +1220,20 @@ describe('SettleUpModal - PayPal demo panel', () => {
     expect(screen.getByText('Enter an amount above to continue')).toBeInTheDocument();
   });
 
-  test('onPayPalApprove records settlement with PayPal order ID and shows success', async () => {
+  test('onPayPalApprove claims the payment with the PayPal order ID and shows success', async () => {
     const { addDoc } = require('firebase/firestore');
+    const { recordPaymentSent } = require('../stores/notificationsStore');
     renderModal();
     await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
     expandDemoPanel();
     await act(async () => {
       fireEvent.click(screen.getByTestId('paypal-approve'));
     });
-    await waitFor(() => expect(addDoc).toHaveBeenCalled());
-    const [[, data]] = addDoc.mock.calls;
-    expect(data).toMatchObject({ paypalOrderId: 'capture-123', paymentMethod: 'paypal' });
+    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledWith({
+      payeeId: 'user-2', groupId: 'group-1', amount: 45.5, method: 'paypal',
+      idempotencyKey: 'idem-key-0000000001', paypalOrderId: 'capture-123',
+    }));
+    expect(addDoc).not.toHaveBeenCalled();
     await waitFor(() =>
       expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
     );
@@ -1180,9 +1251,9 @@ describe('SettleUpModal - PayPal demo panel', () => {
     consoleSpy.mockRestore();
   });
 
-  test('onPayPalApprove shows error when recordSettlement fails', async () => {
-    const { addDoc } = require('firebase/firestore');
-    addDoc.mockRejectedValueOnce(new Error('Firestore error'));
+  test('onPayPalApprove shows error when the claim fails', async () => {
+    const { recordPaymentSent } = require('../stores/notificationsStore');
+    recordPaymentSent.mockRejectedValueOnce(new Error('Server error'));
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     renderModal();
     await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
@@ -1279,5 +1350,21 @@ describe('SettleUpModal - Receiver QR panel tabs', () => {
     expect(screen.getByText(/Show this screen to/i)).toBeInTheDocument();
     // Alice may appear multiple times in the UI — just verify at least one instance
     expect(screen.getAllByText(/Alice/i).length).toBeGreaterThan(0);
+  });
+});
+
+describe('SettleUpModal - payment demos switch', () => {
+  afterEach(() => { mockDemosOn = true; });
+
+  test('the PayPal and SEPA demo panel is hidden while paymentDemosEnabled is off', () => {
+    mockDemosOn = false;
+    renderModal();
+    expect(screen.queryByText('Future feature - Settlement Payment Flow')).not.toBeInTheDocument();
+  });
+
+  test('the demo panel shows while paymentDemosEnabled is on', () => {
+    mockDemosOn = true;
+    renderModal();
+    expect(screen.getByText('Future feature - Settlement Payment Flow')).toBeInTheDocument();
   });
 });

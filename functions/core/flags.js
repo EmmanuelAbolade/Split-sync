@@ -16,6 +16,7 @@ const FLAG_NAMES = [
   'loansEnabled',
   'aidEnabled',
   'trustEnabled',
+  'paymentDemosEnabled',  // PayPal sandbox + SEPA simulation in Settle Up
 ];
 
 const MAX_ALLOW_UIDS = 50;

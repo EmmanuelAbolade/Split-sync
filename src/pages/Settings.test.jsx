@@ -439,19 +439,11 @@ describe('Settings - Biometric toggle', () => {
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('Settings - Passkeys for money actions (Circles flag)', () => {
-  afterEach(() => { mockFlagsOn = false; });
-
-  test('Hidden while the Circles flag is off (production default)', () => {
+describe('Settings - Passkeys for money actions', () => {
+  test('Shown to everyone, whatever the Circles flag says', () => {
     mockFlagsOn = false;
     render(<Settings />);
-    expect(screen.queryByTestId('passkeys-card')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Toggle biometric authentication')).toBeInTheDocument();
-  });
-
-  test('Shown when the Circles flag is on for this user', () => {
-    mockFlagsOn = true;
-    render(<Settings />);
     expect(screen.getByTestId('passkeys-card')).toBeInTheDocument();
+    expect(screen.getByLabelText('Toggle biometric authentication')).toBeInTheDocument();
   });
 });

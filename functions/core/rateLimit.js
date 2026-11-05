@@ -11,6 +11,7 @@ const LIMITS = {
   stepUpComplete:{ max: 10, windowSec: 60 },
   stepUpRegister:{ max: 5,  windowSec: 600 },
   adminSetFlag:  { max: 20, windowSec: 60 },
+  settlements:   { max: 20, windowSec: 60 },
 };
 
 function windowStart(nowMs, windowSec) {

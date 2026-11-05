@@ -34,7 +34,7 @@ test('lists every flag with its current state', async () => {
   render(<FeatureFlagsPanel />);
   expect(await screen.findByText('circlesEnabled')).toBeInTheDocument();
   expect(screen.getByText('Testers only (1)')).toBeInTheDocument();
-  expect(screen.getAllByText('Off').length).toBe(6);
+  expect(screen.getAllByText('Off').length).toBe(7);
   expect(screen.getByLabelText('Testers (user IDs, one per line, up to 50)', { selector: '#uids-circlesEnabled' })).toHaveValue('tester1');
 });
 
@@ -75,7 +75,7 @@ test('a load failure is shown and the flags read as off', async () => {
   mockGetDocFails = true;
   render(<FeatureFlagsPanel />);
   expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the flags.');
-  expect(screen.getAllByText('Off').length).toBe(7);
+  expect(screen.getAllByText('Off').length).toBe(8);
   mockGetDocFails = false;
   fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
   expect(await screen.findByText('Testers only (1)')).toBeInTheDocument();

@@ -47,6 +47,17 @@ jest.mock('../stores/authStore', () => {
 const mockNotificationsStore = { notifications: [] };
 const mockConfirmPayment = jest.fn();
 const mockDeclinePayment = jest.fn();
+// Phase 1B: "Confirm it's you" and the settlements Functions
+jest.mock('../hooks/useStepUp', () => ({
+  __esModule: true,
+  default: () => ({ requestStepUp: () => Promise.resolve('tok'), stepUpSheet: null }),
+}));
+jest.mock('../utils/settlements', () => ({
+  cancelSettlement: () => Promise.resolve({ status: 'cancelled' }),
+  confirmParams: (id) => ({ notificationId: id }),
+  settlementErrorMessage: (_e, fallback) => fallback || 'That did not work. Please try again.',
+}));
+
 jest.mock('../stores/notificationsStore', () => ({
   useNotificationsStore:    () => mockNotificationsStore,
   confirmPaymentReceived:   (...a) => mockConfirmPayment(...a),
@@ -305,7 +316,7 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('Confirm Received'));
     });
-    expect(mockConfirmPayment).toHaveBeenCalledWith('notif-1');
+    expect(mockConfirmPayment).toHaveBeenCalledWith('notif-1', 'tok');
   });
 
   test('Calls declinePaymentReceived when Did Not Receive is clicked', async () => {

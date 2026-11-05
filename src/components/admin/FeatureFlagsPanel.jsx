@@ -19,6 +19,7 @@ const DESCRIPTIONS = {
   loansEnabled: 'Loans space: interest-free loans between people who know each other.',
   aidEnabled: 'Aid space: group support requests.',
   trustEnabled: 'Trust score and per-space Stats.',
+  paymentDemosEnabled: 'PayPal sandbox and SEPA simulation demos in Settle Up. Off hides them; no real money moves either way.',
 };
 
 /** Splits a comma, space or newline separated list into unique, non-empty uids. */

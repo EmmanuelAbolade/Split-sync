@@ -35,6 +35,24 @@ jest.mock('../stores/notificationsStore', () => ({
   declinePaymentReceived:   (...a) => mockDeclinePayment(...a),
 }));
 
+// "Confirm it's you": resolves with a token unless a test says otherwise
+let mockStepUpToken = 'tok';
+const mockStepUpCalls = [];
+jest.mock('../hooks/useStepUp', () => ({
+  __esModule: true,
+  default: () => ({
+    requestStepUp: (action, params) => { mockStepUpCalls.push([action, params]); return Promise.resolve(mockStepUpToken); },
+    stepUpSheet: null,
+  }),
+}));
+jest.mock('../utils/settlements', () => ({
+  confirmParams: (id) => ({ notificationId: id }),
+  settlementErrorMessage: jest.requireActual('../utils/settlements').settlementErrorMessage,
+}));
+jest.mock('../services/firebase', () => ({ __esModule: true, default: {}, db: {} }));
+
+beforeEach(() => { mockStepUpToken = 'tok'; mockStepUpCalls.length = 0; });
+
 import NotificationsDropdown from './NotificationsDropdown';
 
 // ---------------------------------------------------------------------------
@@ -264,7 +282,25 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('Confirm Received'));
     });
-    expect(mockConfirmPayment).toHaveBeenCalledWith('notif-pay');
+    expect(mockStepUpCalls).toEqual([['settlements.confirm', { notificationId: 'notif-pay' }]]);
+    expect(mockConfirmPayment).toHaveBeenCalledWith('notif-pay', 'tok');
+  });
+
+  test('Does not confirm when the step-up is cancelled', async () => {
+    mockStepUpToken = null;
+    render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
+    fireEvent.click(screen.getByText('Confirm Received'));
+    await waitFor(() => expect(mockStepUpCalls).toHaveLength(1));
+    expect(mockConfirmPayment).not.toHaveBeenCalled();
+    expect(screen.getByText('Confirm Received')).toBeInTheDocument();
+  });
+
+  test('Declining needs no step-up', async () => {
+    mockDeclinePayment.mockResolvedValue({});
+    render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
+    fireEvent.click(screen.getByText('Did Not Receive'));
+    await waitFor(() => expect(mockDeclinePayment).toHaveBeenCalled());
+    expect(mockStepUpCalls).toEqual([]);
   });
 
   test('Calls declinePaymentReceived when Did Not Receive is clicked', async () => {
@@ -298,26 +334,33 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     );
   });
 
-  test('Shows error message when confirm fails', async () => {
+  test('Shows a generic message when confirm fails unexpectedly', async () => {
     mockConfirmPayment.mockRejectedValue(new Error('Network error'));
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
       fireEvent.click(screen.getByText('Confirm Received'));
     });
     await waitFor(() =>
-      expect(screen.getByText('Network error')).toBeInTheDocument()
+      expect(screen.getByText('Failed to confirm. Please try again.')).toBeInTheDocument()
     );
   });
 
-  test('Shows permission denied message for Firestore permission errors', async () => {
-    const permError = Object.assign(new Error('Permission denied'), { code: 'permission-denied' });
+  test('Shows the server explanation when the payment cannot be confirmed', async () => {
+    mockConfirmPayment.mockRejectedValue(Object.assign(new Error('This payment has already been answered.'), { code: 'functions/failed-precondition' }));
+    render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
+    fireEvent.click(screen.getByText('Confirm Received'));
+    expect(await screen.findByText('This payment has already been answered.')).toBeInTheDocument();
+  });
+
+  test('Shows a not-allowed message for permission errors', async () => {
+    const permError = Object.assign(new Error('Permission denied'), { code: 'functions/permission-denied' });
     mockConfirmPayment.mockRejectedValue(permError);
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
       fireEvent.click(screen.getByText('Confirm Received'));
     });
     await waitFor(() =>
-      expect(screen.getByText(/Permission denied/)).toBeInTheDocument()
+      expect(screen.getByText('You are not allowed to do this.')).toBeInTheDocument()
     );
   });
 });

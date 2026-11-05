@@ -11,6 +11,7 @@ export const FLAG_NAMES = [
   'loansEnabled',
   'aidEnabled',
   'trustEnabled',
+  'paymentDemosEnabled',
 ];
 
 /**
