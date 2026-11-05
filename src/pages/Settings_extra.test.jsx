@@ -81,6 +81,13 @@ jest.mock('../components/QRCodeModal',    () => () => null);
 jest.mock('../components/InfoHubModal',   () => () => null);
 jest.mock('../components/DarkModeToggle', () => () => <div data-testid="dark-mode-toggle" />);
 
+// Circles flags: off unless a test switches them on
+let mockFlagsOn = false;
+jest.mock('../hooks/useFeatureFlags', () => ({
+  useFeatureFlags: () => ({ loading: false, isEnabled: () => mockFlagsOn }),
+}));
+jest.mock('../components/PasskeysCard', () => () => <div data-testid="passkeys-card" />);
+
 jest.mock('../hooks/useSessionTimeout', () => ({
   useSessionTimeout: () => ({ timeoutSetting: 15, updateTimeoutSetting: jest.fn() }),
 }));

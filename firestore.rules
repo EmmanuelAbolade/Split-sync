@@ -191,7 +191,28 @@ service cloud.firestore {
       );
     }
 
-    
+    // ===== CIRCLES FOUNDATIONS (Phase 1) =====
+    // Feature flags: everyone signed in may read them to decide what to show.
+    // Only the admin-setFlag Function writes them; every Function re-checks.
+    match /config/features {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Server-only (Cloud Functions with the Admin SDK). The fallback below
+    // would deny these anyway; they are listed so the intent is explicit.
+    match /stepUpCredentials/{id} { allow read, write: if false; }
+    match /stepUpChallenges/{id}  { allow read, write: if false; }
+    match /stepUpTokens/{id}      { allow read, write: if false; }
+    match /idempotency/{id}       { allow read, write: if false; }
+    match /rateLimits/{id}        { allow read, write: if false; }
+
+    // Audit trail: platform admins may read; nobody may change it.
+    match /auditLog/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     // ===== FALLBACK RULE (MUST BE LAST!) =====
     match /{document=**} {
       allow read, write: if false;

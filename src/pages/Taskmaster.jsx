@@ -12,7 +12,7 @@ import {
   Bell, LogOut, RefreshCw, Search, AlertCircle,
   CheckCircle2, XCircle, Trash2, Ban, Eye,
   BarChart2, Database, Server, ChevronRight,
-  ArrowLeft, User, Mail, Calendar, Clock, ExternalLink, MessageSquare, Pencil,
+  ArrowLeft, User, Mail, Calendar, Clock, ExternalLink, MessageSquare, Pencil, Flag,
 } from 'lucide-react';
 import { auth, db } from '../services/firebase';
 import {
@@ -24,6 +24,7 @@ import {
   computeFinancials, summariseGroups, scanContent, monthlyGrowth,
   findExpiredInvitations, countActiveUsers, sortByCreatedDesc,
 } from '../utils/adminStats';
+import FeatureFlagsPanel from '../components/admin/FeatureFlagsPanel';
 
 const PROJECT_ID = process.env.REACT_APP_FIREBASE_PROJECT_ID || 'splitsync-dev';
 const CONSOLE = `https://console.firebase.google.com/project/${PROJECT_ID}`;
@@ -38,6 +39,7 @@ const NAV_ITEMS = [
   { id: 'financial', label: 'Financial Oversight',  icon: DollarSign },
   { id: 'moderation',label: 'Content Moderation',   icon: Shield },
   { id: 'comms',     label: 'Notifications',         icon: Bell },
+  { id: 'flags',     label: 'Feature Flags',         icon: Flag },
 ];
 
 const docsOf = (snap) => snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -935,6 +937,7 @@ export default function Taskmaster() {
           {section === 'financial'  && <FinancialOversight />}
           {section === 'moderation' && <ContentModeration />}
           {section === 'comms'      && <Communications />}
+          {section === 'flags'      && <FeatureFlagsPanel />}
         </main>
       </div>
     </div>

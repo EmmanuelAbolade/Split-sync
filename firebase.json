@@ -13,9 +13,18 @@
       ]
     }
   ],
-  "firestore": {
-    "rules": "firestore.rules"
-  },
+  "firestore": [
+    {
+      "database": "(default)",
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json"
+    },
+    {
+      "database": "circles",
+      "rules": "firestore.circles.rules",
+      "indexes": "firestore.circles.indexes.json"
+    }
+  ],
   "hosting": {
     "public": "build",
     "ignore": [

@@ -17,7 +17,7 @@
 | Docs | Doxygen: https://splitsync-docs.netlify.app · Coverage: https://splitsync-coverage-test.netlify.app · Showcase: https://showcase.setu.ie/C00288657/index.html · Screencast: https://youtu.be/7uat5PeTsrI |
 | Formal docs in repo | `docs/` — Research Document, Functional Specification, Design Document, Project Report (PDFs), screenshots, `docs/index.html` showcase page |
 | Size | ~38k lines of JS/JSX in `src/` + `functions/`; 191 commits (2025-11-25 → 2026-04-20) plus uncommitted work |
-| Tests | 60 Jest suites / 1,550 tests (85.1% line coverage; `App.js` 100%), 11 Cloud Functions unit tests, 31 Firestore rules emulator tests; all passing as of 2026-11-05 |
+| Tests | `master`: 60 Jest suites / 1,550 tests (85.1% lines), 11 Functions unit tests, 31 rules tests. Branch `feature/circles-1`: 67 suites / 1,596 tests (85.8%), 27 Functions unit + 20 emulator tests, 48 rules tests. All passing as of 2026-11-05 |
 | Licence | Apache 2.0 |
 
 ---
@@ -26,7 +26,7 @@
 
 **Frontend:** React 19 (Create React App / `react-scripts` 5), React Router 7 (`react-router-dom` 7.18.4; all direct dependencies are pinned to exact versions from Phase 0.5), Zustand 5 (state), Tailwind CSS 3 (with `dark:` class strategy), lucide-react icons, Recharts 3 (analytics), qrcode / qrcode.react, crypto-js (legacy, server-side migration only), tesseract.js (legacy OCR, superseded by Cloud Vision), `@paypal/react-paypal-js`.
 
-**Backend (Firebase):** Firebase Auth (email/password + Google), Cloud Firestore (real-time `onSnapshot` everywhere), Cloud Functions v2 (Node 22), Firebase Hosting. Cloudinary (unsigned upload preset) stores profile photos and receipt images.
+**Backend (Firebase):** Firebase Auth (email/password + Google), Cloud Firestore (real-time `onSnapshot` everywhere), Cloud Functions v2 (Node 22), Firebase Hosting. From Circles Phase 1: a second Firestore database `circles` (europe-west1, same as `(default)`; billed from the first read because only one database per project gets the free allowance), Zod 4.6.7 (Function input validation), SimpleWebAuthn 14 (server-verified passkeys), App Check in monitor mode (off until a reCAPTCHA Enterprise site key is configured). Cloudinary (unsigned upload preset) stores profile photos and receipt images.
 
 **External APIs:** Google Cloud Vision (receipt OCR), Anthropic Claude API (in-app assistant), PayPal REST API sandbox (server-side capture), PayPal.me / Revolut.me deep links, SEPA (demo simulation).
 
@@ -174,7 +174,8 @@ npm install                     # root (React app)
 cd functions && npm install     # Cloud Functions
 npm start                       # dev server
 CI=true npx react-scripts test --watchAll=false   # full Jest suite (60 suites)
-npm run test:functions          # Cloud Functions IBAN crypto unit tests (node --test)
+npm run test:functions          # Cloud Functions unit tests: IBAN, private data, core pipeline helpers (node --test)
+npm run test:functions:emulator # step-up, idempotency, rate limit, admin flags on the Firestore emulator
 npm run test:rules              # Firestore rules on the emulator (needs Java; first: cd firestore-tests && npm install)
 npm run build                   # production build → build/
 firebase deploy --only hosting
@@ -236,7 +237,11 @@ Status at the end of 2026-11-04: **fully deployed** (functions incl. `getGroupPa
 - [x] GitHub repo made **public** (2026-11-04) with homepage, topics and a README Highlights section; Firebase web key restricted to the app domains and localhost by the user.
 - [ ] Delete the unused `splitsync-web-key` API key (§11.8). This is a user action in the Google Cloud console.
 - [x] **Circles Phase 0.5** verified by the user on localhost (invite link resumes after sign-in with a real group), approved, merged to `master` and hosting deployed (2026-11-05). No rules or Functions changes in this phase.
-- [ ] **Preview channels can't sign in**: the Firebase web key's website restriction blocks `splitsync-dev--*.web.app` ("Requests from referer … are blocked"). Before the next preview review the user should add `https://splitsync-dev--*.web.app/*` to the key in Google Cloud Console (and the specific preview domain to Auth → Authorized domains if Google sign-in is needed there). Localhost works meanwhile.
+- [x] **Preview sign-in fixed (2026-11-05).** The Firebase web key ("Browser key (auto created by Firebase)", starts `AIzaSyDo`, ends `IUxE`) only allows listed websites, and Google rejects mid-name wildcards such as `splitsync-dev--*.web.app`, so each preview address must be added exactly. The user added `https://splitsync-dev--circles-0-5-jliv3m33.web.app/*`; verified that sign-in requests from it now reach Firebase. While saving, the user also confirmed the key no longer allows the Gemini API (one call on 2026-11-04 from the deleted Gemini key; harmless).
+- [x] **Preview channel convention (agreed 2026-11-05):** one fixed channel `circles-review` for every Circles phase: https://splitsync-dev--circles-review-cijsoz51.web.app (`firebase hosting:channel:deploy circles-review --expires 30d`; redeploying keeps the address).
+- [x] User added the circles-review address to the web key and removed circles-0-5 (2026-11-05); sign-in from the preview verified.
+- [x] **Circles Phase 1 backend deployed (2026-11-05, approved):** `circles` database created (europe-west1, delete protection ON); rules and indexes deployed for both databases; new functions `stepUp-*` (6) and `admin-setFlag` created (existing functions untouched; new ones verified to reject callers who are not signed in). No flags set, so users see no change. Front end merged to master and deployed to live hosting the same day after approval.
+- [ ] Optional, user: App Check monitor mode needs a reCAPTCHA Enterprise key (Google Cloud console) registered in Firebase App Check, then `REACT_APP_RECAPTCHA_ENTERPRISE_SITE_KEY` in `.env` (a public site key). Until then App Check stays off.
 
 Order matters: secrets → functions → hosting. Until hosting is deployed, users run the previous client against the new rules. That is safe: its queries still pass the rules, and its destructive old account-deletion path is now blocked, because its cross-group expense query is denied.
 
@@ -341,6 +346,22 @@ Phase 0.5 (branch `feature/circles-0.5`; verified by the user on localhost, merg
 Results: Jest 60 suites / 1,550 tests passing, 85.1% lines; functions 11/11; rules 31/31; lint 0 errors on changed files; build compiles (+1.2 kB gzip). Preview deployed; the live site is unchanged.
 
 ---
+
+### 2026-11-05 (Circles Phase 1: foundations; approved and live)
+
+Branch `feature/circles-1`. Everything is additive and invisible with flags off.
+
+| Area | What was built |
+|---|---|
+| Server core (`functions/core/`) | `errors` (safe messages, internal errors never leak), `schemas` (Zod: amounts as integer minor units, EUR/USD/GBP, safe ids, idempotency keys), `flags` (server-enforced, fail closed, 30 s cache), `authz` (auth, admin claim, recent sign-in via `auth_time`), `rateLimit` (fixed window per user and action), `idempotency` (result stored in the same transaction; same key with a different request refused), `ledger` (append-only entry validation, currency must match the container, per-container and per-currency sums with reversals), `audit` (uids only; names, emails, IBANs, notes and tokens stripped), `canonical` (deterministic JSON and action hash shared with the browser) |
+| Step-up (`functions/stepUp/`) | Callables `stepUp-begin/complete/registerBegin/registerComplete/listCredentials/removeCredential`. Challenge bound to the exact action (2 min, single use); token bound to uid and action hash (5 min, single use, stored only as its SHA-256). Passkeys verified on the server (SimpleWebAuthn, user verification required); fallback is a sign-in under 5 minutes old. Adding or removing a passkey needs a recent sign-in, so a stolen session cannot add its own. Passkeys work per site (live, firebaseapp.com, localhost:3000 and this project's preview channels) |
+| Admin flags | `admin-setFlag` (admin claim, validated, audit-logged); Taskmaster → Feature Flags (`src/components/admin/FeatureFlagsPanel.jsx`) with on-for-everyone and a tester allow-list |
+| Rules | `firestore.rules`: `config/features` readable when signed in, server-only step-up/idempotency/rate-limit collections, admin-readable `auditLog`. New `firestore.circles.rules` for the `circles` database, from the design with three tightenings: invites can be fetched by id but not listed; privacy settings need all four values; trusted/blocked entries hold only `addedAt`. `firebase.json` now lists both databases with index files (production had no custom indexes, so none can be lost) |
+| Client | `src/config/featureFlags.js`, `src/config/spaces.js` (space registry; missing `spaceId` means Expenses), `useFeatureFlags` (live, off while loading or on error), `services/circlesDb.js` (lazy), `services/appCheck.js` (monitor mode, only with a site key), `utils/stepUp.js`, `StepUpSheet` (Confirm it's you: passkey or sign in again), `PasskeysCard` in Settings → Security (shown only when `circlesEnabled` is on for that user) |
+
+Review: tested on the preview (tester flag, passkey add and remove, a non-tester sees no card). Following review, removing a passkey now needs a second click ("Yes, remove" / "Keep it"; the row turns red). The old circles-0-5 preview address is confirmed blocked on the API key.
+
+Tests: Jest 67 suites / 1,597 tests, 85.8% lines; functions unit 27/27; functions emulator 20/20 (incl. concurrent idempotency, token replay, wrong user, wrong action, expiry, the real SimpleWebAuthn rejecting a forged response); rules 48/48 (31 existing + 3 default additions + 14 circles). The circles rules are tested on the emulator's default database because the test library cannot address a named one; the rules never refer to the database name. Lint clean on new files (the Settings test files had the same 18 lint errors on master). Build compiles (+10.2 kB gzip). New dependencies: `zod` 4.6.7, `@simplewebauthn/server` 14.0.3 (functions), `@simplewebauthn/browser` 14.0.0 (app); no new audit findings.
 
 ## 15. Maintaining this document
 

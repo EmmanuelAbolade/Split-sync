@@ -1,0 +1,48 @@
+[
+  {
+    "action": "circles.claimContribution",
+    "params": {
+      "circleId": "c1",
+      "cycle": 2,
+      "method": "revolut",
+      "idempotencyKey": "3f2b6c1e-9a4d-4c2e-8b1a-0f6d2e7c9a10"
+    },
+    "hash": "96389c95baf210f3fb894674dd9584a1bfede2a5c3b4d454f83527ffa0aa26c1"
+  },
+  {
+    "action": "loans.requestLoan",
+    "params": {
+      "lenderUid": "bob",
+      "amountMinor": 25000,
+      "currency": "EUR",
+      "instalments": 3,
+      "frequency": "monthly",
+      "purpose": "Rent été \"quoted\"",
+      "idempotencyKey": "abcdefghijklmnop"
+    },
+    "hash": "070c64c10ecc639f0ee86a9cc39ca0e8d215d0686fd7d3cb15aa221b50a83fb0"
+  },
+  {
+    "action": "empty",
+    "params": {},
+    "hash": "1d872991d738e0f711bc13aa8fb3003b2cbafa7bc322bfbe09b18fd8ff23df19"
+  },
+  {
+    "action": "nested",
+    "params": {
+      "z": [
+        3,
+        1,
+        {
+          "b": true,
+          "a": null
+        }
+      ],
+      "a": {
+        "y": -1.5,
+        "x": 0
+      }
+    },
+    "hash": "c3bc80ff5050ebb2a732fbd24a5d6cbed6361ebdcc5ea855af787785b308a5c5"
+  }
+]
