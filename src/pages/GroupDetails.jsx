@@ -1,5 +1,5 @@
 // src/pages/GroupDetails.jsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, writeBatch, arrayRemove, arrayUnion } from 'firebase/firestore';
 import { findMember, getMemberName, isActiveMember, isPersonalGroup } from '../utils/memberDirectory';
@@ -10,7 +10,7 @@ import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
-import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived, createNotification } from '../stores/notificationsStore';
+import { useNotificationsStore, confirmPaymentReceived, declinePaymentReceived, createNotification, recordPaymentSent } from '../stores/notificationsStore';
 import { 
   Home, Plane, Pizza, PartyPopper, Car, Palmtree, 
   Gamepad2, Heart, Users, ShoppingCart, Coffee, 
@@ -21,7 +21,9 @@ import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
 import SettleUpModal from '../components/SettleUpModal';
 import useStepUp from '../hooks/useStepUp';
-import { cancelSettlement, confirmParams, settlementErrorMessage } from '../utils/settlements';
+import { cancelSettlement, confirmParams, settlementErrorMessage, methodLabel } from '../utils/settlements';
+import { newIdempotencyKey } from '../utils/stepUp';
+import ActionButton from '../components/ActionButton';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 import ShareInviteModal from '../components/ShareInviteModal';
 import { getMySentInvitations, cancelInvitation, sendInvitation } from '../utils/invitationSystem'; 
@@ -80,6 +82,19 @@ export default function GroupDetails() {
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [settlementActionLoading, setSettlementActionLoading] = useState({});
   const [settlementActionError, setSettlementActionError] = useState({});
+  // Payer's own payment waiting for the payee, and feedback after each settle-up action
+  const [claimedPayment, setClaimedPayment] = useState(null);
+  const [payerBusy, setPayerBusy] = useState(null); // 'yes' | 'notyet' | 'withdraw'
+  const [payerError, setPayerError] = useState('');
+  const [settleToast, setSettleToast] = useState('');
+  const claimKeys = useRef({});
+  const toastTimer = useRef(null);
+  const showSettleToast = useCallback((text) => {
+    setSettleToast(text);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setSettleToast(''), 5000);
+  }, []);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
   const { requestStepUp, stepUpSheet } = useStepUp();
   const [showPaymentHistory, setShowPaymentHistory] = useState(true);
   // Active = non-dismissed entries, Dismissed = dismissed confirmed entries
@@ -304,6 +319,8 @@ export default function GroupDetails() {
       // Only payments the payer started ("did you pay?"). A claimed payment is
       // waiting for the payee, so there is nothing for the payer to answer.
       const started = snapshot.docs.find(d => d.data().status !== 'claimed');
+      const claimedDoc = snapshot.docs.find(d => d.data().status === 'claimed');
+      setClaimedPayment(claimedDoc ? claimedDoc.data() : null);
       if (started) {
         const paymentData = started.data();
         setPendingPaymentBanner(paymentData);
@@ -970,131 +987,197 @@ export default function GroupDetails() {
         {/* Sticky Payment Confirmation Banner zone.
             Only renders when there are actions the current user needs to take.
             Positioned sticky below the top nav so it remains visible while scrolling. */}
-        {(pendingPaymentBanner || groupPaymentActions.length > 0) && (
+        {(pendingPaymentBanner || claimedPayment || settleToast || groupPaymentActions.length > 0) && (
           <div className="sticky top-0 z-40 -mx-4 px-4 pt-2 pb-3 bg-gray-50 dark:bg-gray-900 border-b border-amber-200 dark:border-amber-800 shadow-sm mb-4">
 
-            {/* Payer: sessionStorage-based pending confirmation (same session, link-based payments) */}
-            {pendingPaymentBanner && (
-              <div className="bg-amber-50 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 rounded-xl p-4 animate-scale-in">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/60 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 size={18} className="text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1 text-sm">
-                      Payment Confirmation Needed
-                    </p>
-                    <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
-                      Did you complete your {pendingPaymentBanner.method?.toUpperCase()} payment of{' '}
-                      <strong>{pendingPaymentBanner.currency} {pendingPaymentBanner.amount?.toFixed(2)}</strong>{' '}
-                      to <strong>{pendingPaymentBanner.toName}</strong>?
-                    </p>
-                    <div className="flex gap-2 flex-wrap">
-                      <button
-                        onClick={() => {
-                          const matchingSettlement = settlements.find(
-                            s => s.from === pendingPaymentBanner.fromUserId &&
-                                s.to === pendingPaymentBanner.toUserId
-                          );
-                          if (matchingSettlement) {
-                            setSelectedSettlement(matchingSettlement);
-                          }
-                        }}
-                        className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition text-sm font-medium"
-                      >
-                        Yes, Mark as Paid
-                      </button>
-                      <button
-                        onClick={async () => {
-                          await cancelSettlement({ groupId, toUid: pendingPaymentBanner.toUserId }).catch(() => {});
-                          sessionStorage.removeItem('pendingPayment');
-                          setPendingPaymentBanner(null);
-                        }}
-                        className="px-4 py-2 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition text-sm"
-                      >
-                        Not Yet
-                      </button>
-                    </div>
-                  </div>
-                </div>
+            {/* Feedback after a settle-up action */}
+            {settleToast && (
+              <div role="status" className="flex items-center gap-2.5 rounded-xl bg-gray-900 dark:bg-gray-700 px-4 py-3 text-sm text-white animate-scale-in mb-2">
+                <CheckCircle2 size={18} className="flex-shrink-0" aria-hidden="true" />
+                <span className="flex-1">{settleToast}</span>
+                <button type="button" onClick={() => setSettleToast('')} aria-label="Dismiss" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 active:scale-95">
+                  <XCircle size={16} aria-hidden="true" />
+                </button>
               </div>
             )}
 
-            {/* Payee: notification-driven banners — confirm or decline each incoming payment */}
+            {/* Payer: a payment app was opened. Did they finish? */}
+            {pendingPaymentBanner && (
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 animate-scale-in">
+                <p className="font-semibold text-blue-900 dark:text-blue-100 text-[15px]">
+                  Did you finish paying {pendingPaymentBanner.toName}?
+                </p>
+                <p className="text-sm text-blue-800 dark:text-blue-200 mt-0.5 mb-3">
+                  {pendingPaymentBanner.currency} {Number(pendingPaymentBanner.amount).toFixed(2)} by {methodLabel(pendingPaymentBanner.method)}. Say yes only if the money has gone.
+                </p>
+                <div className="flex gap-2">
+                  <ActionButton
+                    className="flex-1"
+                    disabled={!!payerBusy}
+                    busy={payerBusy === 'yes'}
+                    busyLabel="Sending…"
+                    onClick={async () => {
+                      const p = pendingPaymentBanner;
+                      setPayerBusy('yes');
+                      setPayerError('');
+                      try {
+                        const k = `${p.toUserId}:${p.timestamp}`;
+                        if (!claimKeys.current[k]) claimKeys.current[k] = newIdempotencyKey();
+                        await recordPaymentSent({
+                          payeeId: p.toUserId, groupId, amount: Number(p.amount),
+                          method: p.method || 'manual', idempotencyKey: claimKeys.current[k],
+                        });
+                        sessionStorage.removeItem('pendingPayment');
+                        setPendingPaymentBanner(null);
+                        showSettleToast(`Sent to ${p.toName} to confirm.`);
+                      } catch (err) {
+                        setPayerError(settlementErrorMessage(err, 'That did not work. Nothing was saved, please try again.'));
+                      } finally {
+                        setPayerBusy(null);
+                      }
+                    }}
+                  >
+                    Yes, I paid
+                  </ActionButton>
+                  <ActionButton
+                    variant="secondary"
+                    className="flex-1"
+                    disabled={!!payerBusy}
+                    busy={payerBusy === 'notyet'}
+                    busyLabel="Saving…"
+                    onClick={async () => {
+                      setPayerBusy('notyet');
+                      setPayerError('');
+                      try {
+                        await cancelSettlement({ groupId, toUid: pendingPaymentBanner.toUserId });
+                        sessionStorage.removeItem('pendingPayment');
+                        setPendingPaymentBanner(null);
+                        showSettleToast('Okay, nothing was recorded. Settle up when you are ready.');
+                      } catch (err) {
+                        setPayerError(settlementErrorMessage(err, 'That did not work. Please try again.'));
+                      } finally {
+                        setPayerBusy(null);
+                      }
+                    }}
+                  >
+                    Not yet
+                  </ActionButton>
+                </div>
+                {payerError && (
+                  <p role="alert" className="mt-2 text-sm text-red-700 dark:text-red-300">{payerError}</p>
+                )}
+              </div>
+            )}
+
+            {/* Payer: a payment waiting for the payee */}
+            {claimedPayment && (
+              <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mt-2 flex items-center gap-3 animate-scale-in">
+                <Clock size={22} className="flex-shrink-0 text-amber-800 dark:text-amber-300" aria-hidden="true" />
+                <div className="flex-1">
+                  <p className="font-semibold text-amber-900 dark:text-amber-100 text-[15px]">Waiting for {claimedPayment.toName} to confirm</p>
+                  <p className="text-[13px] text-amber-800 dark:text-amber-300">
+                    {claimedPayment.currency} {Number(claimedPayment.amount).toFixed(2)} by {methodLabel(claimedPayment.method)}
+                  </p>
+                </div>
+                <ActionButton
+                  variant="warning"
+                  className="min-h-[44px] px-3 text-sm"
+                  disabled={!!payerBusy}
+                  busy={payerBusy === 'withdraw'}
+                  busyLabel="Withdrawing…"
+                  onClick={async () => {
+                    setPayerBusy('withdraw');
+                    setPayerError('');
+                    try {
+                      await cancelSettlement({ groupId, toUid: claimedPayment.toUserId });
+                      showSettleToast(`Payment withdrawn. ${claimedPayment.toName} was told.`);
+                    } catch (err) {
+                      setPayerError(settlementErrorMessage(err, 'That did not work. Please try again.'));
+                    } finally {
+                      setPayerBusy(null);
+                    }
+                  }}
+                >
+                  Withdraw
+                </ActionButton>
+              </div>
+            )}
+
+            {/* Payee: confirm or decline each incoming payment */}
             {groupPaymentActions.map((notif) => {
               const pd = notif.data || {};
               const actionLoading = settlementActionLoading[notif.id];
+              const amountText = `${pd.currency} ${Number(pd.amount).toFixed(2)}`;
 
               return (
                 <div
                   key={notif.id}
-                  className="bg-amber-50 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mt-2 animate-scale-in"
+                  className="bg-white dark:bg-gray-800 border-2 border-blue-300 dark:border-blue-700 rounded-xl p-4 mt-2 animate-scale-in"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/60 rounded-full flex items-center justify-center flex-shrink-0">
-                      <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+                      {(pd.payerName || '?').charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1 text-sm">
-                        Payment Confirmation Required
-                      </p>
-                      <p className="text-sm text-amber-800 dark:text-amber-300 mb-1">
-                        <strong>{pd.payerName}</strong> claims to have paid you{' '}
-                        <strong>{pd.currency} {Number(pd.amount).toFixed(2)}</strong> via{' '}
-                        <strong>{pd.method?.toUpperCase()}</strong>.
-                      </p>
-                      <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
-                        Confirm only if you actually received the money. The balance updates only after your confirmation.
-                      </p>
-                      <div className="flex gap-2 flex-wrap">
-                        <button
-                          onClick={async () => {
-                            setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'confirming' }));
-                            setSettlementActionError(prev => ({ ...prev, [notif.id]: null }));
-                            try {
-                              // Confirming changes balances: "Confirm it's you" first
-                              const token = await requestStepUp('settlements.confirm', confirmParams(notif.id));
-                              if (token) await confirmPaymentReceived(notif.id, token);
-                            } catch (err) {
-                              setSettlementActionError(prev => ({ ...prev, [notif.id]: settlementErrorMessage(err, 'Failed to confirm. Please try again.') }));
-                            } finally {
-                              setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
-                            }
-                          }}
-                          disabled={!!actionLoading}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-sm font-medium disabled:opacity-60"
-                        >
-                          {actionLoading === 'confirming'
-                            ? <Clock size={14} className="animate-spin" />
-                            : <CheckCircle2 size={14} />}
-                          {actionLoading === 'confirming' ? 'Confirming...' : 'Confirm Received'}
-                        </button>
-                        <button
-                          onClick={async () => {
-                            setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'declining' }));
-                            setSettlementActionError(prev => ({ ...prev, [notif.id]: null }));
-                            try {
-                              await declinePaymentReceived(notif.id);
-                            } catch (err) {
-                              setSettlementActionError(prev => ({ ...prev, [notif.id]: settlementErrorMessage(err, 'Failed to decline. Please try again.') }));
-                            } finally {
-                              setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
-                            }
-                          }}
-                          disabled={!!actionLoading}
-                          className="flex items-center gap-1.5 px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition text-sm disabled:opacity-60"
-                        >
-                          {actionLoading === 'declining'
-                            ? <Clock size={14} className="animate-spin" />
-                            : <XCircle size={14} />}
-                          {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
-                        </button>
-                      </div>
-                      {settlementActionError[notif.id] && (
-                        <p role="alert" className="mt-2 text-xs text-red-600 dark:text-red-400">{settlementActionError[notif.id]}</p>
-                      )}
+                      <p className="font-semibold text-gray-900 dark:text-white text-[15px]">{pd.payerName} says they paid you</p>
+                      <p className="text-[13px] text-gray-600 dark:text-gray-400">By {methodLabel(pd.method)}</p>
                     </div>
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">{amountText}</p>
                   </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 mb-3">
+                    Check you received it first. Confirming settles this for both of you.
+                  </p>
+                  <div className="flex gap-2">
+                    <ActionButton
+                      variant="success"
+                      className="flex-1"
+                      disabled={!!actionLoading}
+                      busy={actionLoading === 'confirming'}
+                      busyLabel="Recording payment…"
+                      onClick={async () => {
+                        setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'confirming' }));
+                        setSettlementActionError(prev => ({ ...prev, [notif.id]: null }));
+                        try {
+                          // Confirming changes balances: "Confirm it's you" first
+                          const token = await requestStepUp('settlements.confirm', confirmParams(notif.id));
+                          if (token) {
+                            await confirmPaymentReceived(notif.id, token);
+                            showSettleToast(`Payment recorded. ${pd.payerName} was told.`);
+                          }
+                        } catch (err) {
+                          setSettlementActionError(prev => ({ ...prev, [notif.id]: settlementErrorMessage(err, 'Failed to confirm. Please try again.') }));
+                        } finally {
+                          setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
+                        }
+                      }}
+                    >
+                      <CheckCircle2 size={16} aria-hidden="true" /> I got it
+                    </ActionButton>
+                    <ActionButton
+                      variant="secondary"
+                      className="flex-1"
+                      disabled={!!actionLoading}
+                      busy={actionLoading === 'declining'}
+                      busyLabel="Saving…"
+                      onClick={async () => {
+                        setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'declining' }));
+                        setSettlementActionError(prev => ({ ...prev, [notif.id]: null }));
+                        try {
+                          await declinePaymentReceived(notif.id);
+                          showSettleToast(`${pd.payerName} was told you did not get it. Nothing changed.`);
+                        } catch (err) {
+                          setSettlementActionError(prev => ({ ...prev, [notif.id]: settlementErrorMessage(err, 'Failed to decline. Please try again.') }));
+                        } finally {
+                          setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
+                        }
+                      }}
+                    >
+                      Not received
+                    </ActionButton>
+                  </div>
+                  {settlementActionError[notif.id] && (
+                    <p role="alert" className="mt-2 text-sm text-red-700 dark:text-red-300">{settlementActionError[notif.id]}</p>
+                  )}
                 </div>
               );
             })}

@@ -94,6 +94,10 @@ const mockConfirmPayment     = jest.fn(() => Promise.resolve());
 const mockDeclinePayment     = jest.fn(() => Promise.resolve());
 const mockCreateNotification = jest.fn(() => Promise.resolve());
 // Phase 1B: "Confirm it's you" and the settlements Functions
+// Payer's claim from the "Did you finish paying?" card (plain values: resetMocks keeps them)
+const mockRecordCalls = [];
+let mockRecordFail = false;
+jest.mock('../utils/stepUp', () => ({ newIdempotencyKey: () => 'idem-key-000000000001' }));
 jest.mock('../hooks/useStepUp', () => ({
   __esModule: true,
   default: () => ({ requestStepUp: () => Promise.resolve('tok'), stepUpSheet: null }),
@@ -102,12 +106,14 @@ jest.mock('../utils/settlements', () => ({
   cancelSettlement: () => Promise.resolve({ status: 'cancelled' }),
   confirmParams: (id) => ({ notificationId: id }),
   settlementErrorMessage: (_e, fallback) => fallback || 'That did not work. Please try again.',
+  methodLabel: (m) => (m === 'paypal' ? 'PayPal' : m),
 }));
 
 jest.mock('../stores/notificationsStore', () => ({
   useNotificationsStore:    () => mockNotificationsStore,
   confirmPaymentReceived:   (...a) => mockConfirmPayment(...a),
   declinePaymentReceived:   (...a) => mockDeclinePayment(...a),
+  recordPaymentSent:        (a) => { mockRecordCalls.push(a); return mockRecordFail ? Promise.reject(Object.assign(new Error('x'), { code: 'functions/internal' })) : Promise.resolve(); },
   createNotification:       (...a) => mockCreateNotification(...a),
 }));
 
@@ -475,22 +481,19 @@ describe('GroupDetails Extra - loadPendingInvitations error', () => {
 // ---------------------------------------------------------------------------
 
 describe('GroupDetails Extra - Pending payment banner Yes action', () => {
+  const pendingData = {
+    groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
+    toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR', timestamp: 1700000000000,
+  };
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    // Settlement matches fromUserId/toUserId in pending payment
-    mockCalculateSettlements.mockReturnValue([
-      { from: 'user-123', to: 'user-456', amount: 30 },
-    ]);
+    mockRecordCalls.length = 0;
+    mockRecordFail = false;
   });
-
   afterEach(() => sessionStorage.clear());
 
-  test('Clicking Yes opens SettleUpModal for matching settlement', async () => {
-    const pendingData = {
-      groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
-      toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR',
-    };
+  test('Yes, I paid sends the claim from the card and says so', async () => {
     mockCalculateSettlements.mockReturnValue([{ from: 'user-123', to: 'user-456', amount: 30 }]);
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
               .mockResolvedValue(mockUserDoc);
@@ -499,25 +502,23 @@ describe('GroupDetails Extra - Pending payment banner Yes action', () => {
       callCount++;
       if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
       else if (callCount === 2) cb({ docs: [] });
-      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => (pendingData) }] });
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);
     mockNotificationsStore.notifications = [];
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Yes, Mark as Paid'));
-    fireEvent.click(screen.getByText('Yes, Mark as Paid'));
-    await waitFor(() =>
-      expect(screen.getByTestId('settle-up-modal')).toBeInTheDocument()
-    );
+    await waitFor(() => screen.getByText('Yes, I paid'));
+    fireEvent.click(screen.getByText('Yes, I paid'));
+    await waitFor(() => expect(screen.getByText('Sent to Bob to confirm.')).toBeInTheDocument());
+    expect(mockRecordCalls).toEqual([{
+      payeeId: 'user-456', groupId: 'group-123', amount: 30, method: 'paypal', idempotencyKey: 'idem-key-000000000001',
+    }]);
+    expect(screen.queryByText(/Did you finish paying/)).not.toBeInTheDocument();
   });
 
-  test('Clicking Yes with no matching settlement does not crash', async () => {
-    const pendingData = {
-      groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
-      toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR',
-    };
-    mockCalculateSettlements.mockReturnValue([]);
+  test('Yes, I paid keeps the card and shows why when sending fails', async () => {
+    mockCalculateSettlements.mockReturnValue([{ from: 'user-123', to: 'user-456', amount: 30 }]);
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
               .mockResolvedValue(mockUserDoc);
     let callCount = 0;
@@ -525,16 +526,17 @@ describe('GroupDetails Extra - Pending payment banner Yes action', () => {
       callCount++;
       if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
       else if (callCount === 2) cb({ docs: [] });
-      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => (pendingData) }] });
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);
     mockNotificationsStore.notifications = [];
+    mockRecordFail = true;
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Yes, Mark as Paid'));
-    fireEvent.click(screen.getByText('Yes, Mark as Paid'));
-    // No modal, no crash
-    expect(screen.queryByTestId('settle-up-modal')).not.toBeInTheDocument();
+    await waitFor(() => screen.getByText('Yes, I paid'));
+    fireEvent.click(screen.getByText('Yes, I paid'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Nothing was saved'));
+    expect(screen.getByText(/Did you finish paying Bob/)).toBeInTheDocument();
   });
 });
 
@@ -561,9 +563,9 @@ describe('GroupDetails Extra - Payment banner error catches', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockConfirmPayment.mockRejectedValueOnce(new Error('Network error'));
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Confirm Received'));
+    await waitFor(() => screen.getByText('I got it'));
     await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Received'));
+      fireEvent.click(screen.getByText('I got it'));
     });
     await waitFor(() => expect(mockConfirmPayment).toHaveBeenCalled());
     consoleSpy.mockRestore();
@@ -573,9 +575,9 @@ describe('GroupDetails Extra - Payment banner error catches', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockDeclinePayment.mockRejectedValueOnce(new Error('Network error'));
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Did Not Receive'));
+    await waitFor(() => screen.getByText('Not received'));
     await act(async () => {
-      fireEvent.click(screen.getByText('Did Not Receive'));
+      fireEvent.click(screen.getByText('Not received'));
     });
     await waitFor(() => expect(mockDeclinePayment).toHaveBeenCalled());
     consoleSpy.mockRestore();
@@ -745,24 +747,14 @@ describe('GroupDetails Extra - Add Expense stopPropagation', () => {
 // 13. SettleUpModal onClose — clear pending banner (lines 1382-1386)
 // ---------------------------------------------------------------------------
 
-describe('GroupDetails Extra - SettleUpModal onClose clears banner', () => {
+describe('GroupDetails Extra - Waiting for the payee card', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    setupWithGroup();
-    // Override: Alice (user-123) owes Bob (user-456) — matches pending payment direction
-    mockCalculateBalances.mockReturnValue({ 'user-123': -30, 'user-456': 30 });
-    mockCalculateSettlements.mockReturnValue([{ from: 'user-123', to: 'user-456', amount: 30 }]);
-    mockGetUserBalanceSummary.mockReturnValue({ status: 'owes', amount: 30, message: 'You owe' });
   });
 
-  afterEach(() => sessionStorage.clear());
-
-  test('Closing SettleUpModal clears pending banner when sessionStorage is empty', async () => {
-    const pendingData = {
-      groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456',
-      toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR',
-    };
+  test('A claimed payment shows as waiting, and Withdraw gives feedback', async () => {
+    mockCalculateSettlements.mockReturnValue([{ from: 'user-123', to: 'user-456', amount: 30 }]);
     mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
               .mockResolvedValue(mockUserDoc);
     let callCount = 0;
@@ -770,26 +762,19 @@ describe('GroupDetails Extra - SettleUpModal onClose clears banner', () => {
       callCount++;
       if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
       else if (callCount === 2) cb({ docs: [] });
-      else cb({ empty: false, docs: [{ id: 'p1', data: () => pendingData }] });
+      else cb({ empty: false, docs: [{ id: 'p1', data: () => ({ groupId: 'group-123', fromUserId: 'user-123', toUserId: 'user-456', toName: 'Bob', method: 'paypal', amount: 30, currency: 'EUR', status: 'claimed' }) }] });
       return jest.fn();
     });
     mockGetMySentInvitations.mockResolvedValue([]);
     mockNotificationsStore.notifications = [];
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Yes, Mark as Paid'));
-    fireEvent.click(screen.getByText('Yes, Mark as Paid'));
-    await waitFor(() => screen.getByTestId('settle-up-modal'));
-    // Clear sessionStorage to simulate payment confirmed
-    sessionStorage.removeItem('pendingPayment');
-    fireEvent.click(screen.getByText('Close Settle'));
-    await waitFor(() =>
-      expect(screen.queryByText('Payment Confirmation Needed')).not.toBeInTheDocument()
-    );
+    await waitFor(() => screen.getByText('Waiting for Bob to confirm'));
+    expect(screen.queryByText(/Did you finish paying/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Withdraw'));
+    await waitFor(() => expect(screen.getByText('Payment withdrawn. Bob was told.')).toBeInTheDocument());
   });
 });
 
-// ---------------------------------------------------------------------------
-// 14. ExpenseDetailsModal onEdit (lines 1403-1407)
 // ---------------------------------------------------------------------------
 
 describe('GroupDetails Extra - ExpenseDetailsModal onEdit', () => {

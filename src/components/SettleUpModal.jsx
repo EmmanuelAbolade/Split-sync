@@ -1,56 +1,96 @@
-// src/components/SettleUpModal.jsx - WITH PAYMENT CONFIRMATION FLOW
-// Since Phase 1B every settlement write goes through the settlements
-// Functions (src/utils/settlements.js). A payer only ever *claims* a payment;
-// balances change when the payee confirms it, or when the payee records a
-// payment themselves (after "Confirm it's you").
+// src/components/SettleUpModal.jsx
+// Settle Up, in short steps (approved design, 2026-11-05):
+//   payer:    How are you settling? -> Pay now -> pick an app -> open it
+//                                   -> I already paid -> send to the payee to confirm
+//   payee:    I received a payment (after "Confirm it's you")
+// Every settlement write goes through the settlements Functions
+// (src/utils/settlements.js). A payer only ever *claims* a payment; balances
+// change when the payee confirms it, or when the payee records it themselves.
 import { useState, useEffect, useRef } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, ExternalLink, Copy, Check, Info, Landmark, QrCode, Smartphone, ChevronDown } from 'lucide-react';
+import {
+  X, ArrowLeft, ArrowUpRight, Check, ChevronRight, ChevronDown, Copy, CreditCard, Info,
+  Landmark, QrCode, Smartphone, AlertCircle, Clock, ExternalLink,
+} from 'lucide-react';
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
-import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
 import { fetchIban } from '../utils/ibanService';
 import { fetchGroupPaymentMethods } from '../utils/privateProfile';
 import { recordPaymentSent } from '../stores/notificationsStore';
 import useStepUp from '../hooks/useStepUp';
 import useFeatureFlags from '../hooks/useFeatureFlags';
-import { startSettlement, receiveSettlement, receiveParams, settlementErrorMessage } from '../utils/settlements';
+import {
+  startSettlement, receiveSettlement, receiveParams, cancelSettlement, settlementErrorMessage, methodLabel,
+} from '../utils/settlements';
 import { newIdempotencyKey } from '../utils/stepUp';
 import QRCodeCanvas from './QRCodeCanvas';
+import ActionButton from './ActionButton';
+
+const MAX_AMOUNT = 1000000;
+
+// "How did you pay?" choices for I already paid; cash and other are 'manual' on the server
+const PAID_VIA = [
+  { id: 'cash', label: 'Cash', method: 'manual' },
+  { id: 'bank', label: 'Bank transfer', method: 'bank' },
+  { id: 'revolut', label: 'Revolut', method: 'revolut' },
+  { id: 'paypal', label: 'PayPal', method: 'paypal' },
+  { id: 'other', label: 'Other', method: 'manual' },
+];
+
+const CHOICE =
+  'w-full flex items-center gap-4 p-4 text-left rounded-2xl border-2 border-gray-200 dark:border-gray-700 ' +
+  'bg-white dark:bg-gray-800 transition duration-150 hover:border-blue-300 hover:bg-blue-50 ' +
+  'dark:hover:border-blue-700 dark:hover:bg-blue-900/20 active:scale-[0.98] active:bg-blue-100 ' +
+  'dark:active:bg-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ' +
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500';
+
+function Note({ tone = 'info', children }) {
+  const tones = {
+    info: 'bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-100',
+    warn: 'bg-amber-50 text-amber-900 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-100 dark:border-amber-800',
+  };
+  const Icon = tone === 'warn' ? AlertCircle : Info;
+  return (
+    <div className={`flex items-start gap-2.5 rounded-xl px-4 py-3 text-sm leading-relaxed ${tones[tone]}`}>
+      <Icon size={18} className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+      <div>{children}</div>
+    </div>
+  );
+}
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
+  const [step, setStep] = useState('choose'); // payer: choose | paynow | method | already
   const [amount, setAmount] = useState(settlement?.amount?.toFixed(2) || '');
-  const [loading, setLoading] = useState(false);
+  const [paidVia, setPaidVia] = useState('cash');
+  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [busy, setBusy] = useState(null);
   const [error, setError] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('paypal');
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [result, setResult] = useState(null); // { title, message }
+  const [copied, setCopied] = useState(null);
+  const [copyFailed, setCopyFailed] = useState(false);
   const [recipientPaymentMethods, setRecipientPaymentMethods] = useState(null);
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
-  const [selectedPaymentLink, setSelectedPaymentLink] = useState(null);
-  const [copiedIban, setCopiedIban] = useState(false);
-  const [copiedAmount, setCopiedAmount] = useState(false);
-  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState(null);
   const [showSepaModal, setShowSepaModal] = useState(false);
   const [sepaPaymentData, setSepaPaymentData] = useState(null);
-  const [paymentInfo, setPaymentInfo] = useState(null);
-  
-  // Pending payment confirmation state
-  const [pendingPayment, setPendingPayment] = useState(null);
-  const [showPendingConfirmation, setShowPendingConfirmation] = useState(false);
   const [activeQR, setActiveQR] = useState('paypal');
   const [showQR, setShowQR] = useState(false);
   const [showDemoInfo, setShowDemoInfo] = useState(false);
   const { isEnabled } = useFeatureFlags();
   const paymentDemosOn = isEnabled('paymentDemosEnabled');
+  const { requestStepUp, stepUpSheet } = useStepUp();
+
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
+  const fromName = fromMember?.name || 'them';
+  const toName = toMember?.name || 'them';
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
-  const { requestStepUp, stepUpSheet } = useStepUp();
+  const currency = group?.currency || 'EUR';
+  const owed = settlement?.amount || 0;
 
   // One idempotency key per user intent (what, how much, how), kept while the
   // modal is open, so a retry or double tap can never record a payment twice.
@@ -59,59 +99,48 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     if (!intentKeys.current[intent]) intentKeys.current[intent] = newIdempotencyKey();
     return intentKeys.current[intent];
   };
+  const timers = useRef([]);
+  const later = (fn, ms) => { timers.current.push(setTimeout(fn, ms)); };
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  // Merge reset + pending-check into a single effect so the reset never
-  // overrides the pending-check result (previous bug: two separate effects
-  // on [isOpen] ran in definition order, reset was second and cleared
-  // showPendingConfirmation that the check had just set to true).
+  // Reset on open, then follow this pair's payment lock: 'started' means the
+  // payer opened a payment app ("Did you finish paying?"), 'claimed' means it
+  // is waiting for the payee.
   useEffect(() => {
-    if (!isOpen) return;
-
-    // Step 1: Reset all transient UI state
-    setPaymentSuccess(false);
+    if (!isOpen) return undefined;
+    setStep('choose');
+    setResult(null);
     setError('');
-    setLoading(false);
-    setShowConfirmation(false);
-    setCopiedIban(false);
+    setBusy(null);
+    setCopied(null);
+    setCopyFailed(false);
+    setSelectedMethod(null);
+    setPaidVia('cash');
     setAmount(settlement?.amount?.toFixed(2) || '');
     intentKeys.current = {};
 
-    // Step 2: Listen to Firestore for a pending payment for this exact settlement pair.
-    // Firestore persists across sessions and devices unlike sessionStorage.
-    if (!group?.id || !settlement?.from || !settlement?.to) return;
-
-    const pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;
-    const pendingDocRef = doc(db, 'pendingPayments', pendingDocId);
-
-    const unsubscribe = onSnapshot(pendingDocRef, (snap) => {
+    if (!group?.id || !settlement?.from || !settlement?.to) return undefined;
+    const ref = doc(db, 'pendingPayments', `${group.id}_${settlement.from}_${settlement.to}`);
+    const unsubscribe = onSnapshot(ref, (snap) => {
       if (snap.exists()) {
-        const paymentData = snap.data();
-        setPendingPayment(paymentData);
-        // "Did you complete the payment?" only for a payment the payer started;
-        // a claimed one is waiting for the payee (amber notice below instead).
-        setShowPendingConfirmation(paymentData.status !== 'claimed');
-        sessionStorage.setItem('pendingPayment', JSON.stringify(paymentData));
+        const data = snap.data();
+        setPendingPayment(data);
+        sessionStorage.setItem('pendingPayment', JSON.stringify(data));
       } else {
         setPendingPayment(null);
-        setShowPendingConfirmation(false);
         sessionStorage.removeItem('pendingPayment');
       }
     });
-
     return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
   }, [isOpen, group?.id, settlement?.from, settlement?.to, settlement?.amount]);
 
-  // Fetch recipient's payment methods
+  // The payee's payment options (private; the server shares them with group members)
   useEffect(() => {
-    const fetchRecipientPaymentMethods = async () => {
-      if (!settlement || !settlement.to) return;
-      
+    if (!isOpen || !settlement?.to) return;
+    let live = true;
+    (async () => {
       setLoadingPaymentMethods(true);
       try {
-        // Payment details are private. The server returns the recipient's
-        // payment options (no IBAN) because we share this group; the IBAN is
-        // fetched separately and exposed under .iban, which
-        // getAvailablePaymentMethods uses to show the Bank Transfer option.
         const all = await fetchGroupPaymentMethods(group?.id);
         const view = all[settlement.to];
         const raw = view ? { ...view } : null;
@@ -119,18 +148,48 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
           const plain = await fetchIban(settlement.to, group?.id);
           if (plain) raw.iban = plain;
         }
-        setRecipientPaymentMethods(raw);
-      } catch (error) {
-        console.error('Error fetching payment methods:', error);
+        if (live) setRecipientPaymentMethods(raw);
+      } catch (err) {
+        console.error('Error fetching payment methods:', err?.code);
       } finally {
-        setLoadingPaymentMethods(false);
+        if (live) setLoadingPaymentMethods(false);
       }
-    };
-
-    if (isOpen) {
-      fetchRecipientPaymentMethods();
-    }
+    })();
+    return () => { live = false; };
   }, [settlement, isOpen, group?.id]);
+
+  const methods = getAvailablePaymentMethods(recipientPaymentMethods) || [];
+  const claimed = pendingPayment?.status === 'claimed';
+  const started = !!pendingPayment && !claimed;
+
+  /** The amount as a number, or null with an error shown. */
+  const readAmount = () => {
+    const n = parseFloat(amount);
+    if (!n || n <= 0) { setError('Enter an amount above zero.'); return null; }
+    if (n > MAX_AMOUNT) { setError('The amount cannot be more than 1,000,000.'); return null; }
+    return n;
+  };
+
+  const onAmountChange = (value) => {
+    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+      setAmount(value);
+      if (error) setError('');
+    }
+  };
+
+  const copyText = (text, key) => {
+    setCopyFailed(false);
+    if (!navigator.clipboard?.writeText) { setCopyFailed(true); return; }
+    navigator.clipboard.writeText(text).then(
+      () => { setCopied(key); later(() => setCopied(c => (c === key ? null : c)), 2500); },
+      () => setCopyFailed(true),
+    );
+  };
+
+  const finish = (title, message) => {
+    setResult({ title, message });
+    later(() => onClose(), 3000);
+  };
 
   // Payer: tell the payee we paid. Nothing changes until they confirm.
   const claimPayment = async (method, amountNum, paypalOrderId = null) => {
@@ -144,979 +203,193 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     });
   };
 
-  // Payee: record a payment received. Balances change, so "Confirm it's you"
-  // first (replaces the device-only biometric check). Returns false if cancelled.
-  const receivePayment = async (amountNum) => {
-    const params = {
-      groupId: group.id,
-      fromUid: settlement.from,
-      amount: amountNum,
-      idempotencyKey: keyFor(`receive:${amountNum.toFixed(2)}`),
-    };
-    const token = await requestStepUp('settlements.receive', receiveParams(params));
-    if (!token) return false;
-    await receiveSettlement(params, token);
-    return true;
+  const sendClaim = async (method, amountNum, busyKey = 'claim') => {
+    setBusy(busyKey);
+    setError('');
+    try {
+      await claimPayment(method, amountNum);
+      sessionStorage.removeItem('pendingPayment');
+      finish(`Sent to ${toName}`,
+        `${currency} ${amountNum.toFixed(2)} by ${methodLabel(method)}. Your balance updates when ${toName} confirms. You can withdraw it until then.`);
+    } catch (err) {
+      setError(settlementErrorMessage(err, 'That did not work. Nothing was saved, please try again.'));
+    } finally {
+      setBusy(null);
+    }
   };
 
-  // Handle "Mark as Paid" for a payment started from a payment link.
-  // The server turns the started payment into a claim and asks the payee.
-  const handleMarkAsPaid = async () => {
+  // "I already paid"
+  const handleAlreadyPaid = (e) => {
+    e.preventDefault();
+    const n = readAmount();
+    if (n === null) return;
+    const via = PAID_VIA.find(p => p.id === paidVia) || PAID_VIA[0];
+    sendClaim(via.method, n);
+  };
+
+  // "Did you finish paying?" -> Yes, I paid
+  const handleFinishedPaying = () => {
     if (!pendingPayment) return;
+    sendClaim(pendingPayment.method || 'manual', Number(pendingPayment.amount), 'yes');
+  };
 
-    setLoading(true);
+  // "Did you finish paying?" -> Not yet, or Withdraw on a claim
+  const handleCancelPending = async (busyKey) => {
+    setBusy(busyKey);
     setError('');
-
     try {
-      await claimPayment(pendingPayment.method || 'manual', Number(pendingPayment.amount));
+      await cancelSettlement({ groupId: group.id, toUid: settlement.to });
       sessionStorage.removeItem('pendingPayment');
       setPendingPayment(null);
-      setShowPendingConfirmation(false);
-      setPaymentSuccess(true);
-
-      setTimeout(() => { onClose(); }, 2500);
-    } catch (err) {
-      setError(settlementErrorMessage(err, 'Failed to record payment. Please try again.'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle "Not Yet" for pending payment
-  const handleNotYet = () => {
-    // Keep pending payment in sessionStorage for later
-    setShowPendingConfirmation(false);
-    setPendingPayment(null);
-  };
-
-  const handleManualSettle = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    const amountNum = parseFloat(amount);
-    if (!amountNum || amountNum <= 0) {
-      setError('Valid amount is required');
-      return;
-    }
-
-    if (userIsReceiving && !showConfirmation) {
-      setShowConfirmation(true);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (userIsReceiving) {
-        const done = await receivePayment(amountNum);
-        if (!done) {
-          setError('Confirmation was cancelled. Please try again.');
-          setShowConfirmation(false);
-          return;
-        }
+      if (busyKey === 'withdraw') {
+        setResult({ title: 'Payment withdrawn', message: `${toName} was told. Nothing was recorded.` });
       } else {
-        await claimPayment('manual', amountNum);
+        setResult({ title: 'Nothing was recorded', message: 'Settle up again when you are ready.' });
       }
-      setPaymentSuccess(true);
-      setTimeout(() => {
-        onClose();
-        setShowConfirmation(false);
-      }, 2500);
+      later(() => onClose(), 3000);
     } catch (err) {
-      setError(settlementErrorMessage(err, 'Failed to record settlement. Please try again.'));
-      setShowConfirmation(false);
+      setError(settlementErrorMessage(err, 'That did not work. Please try again.'));
     } finally {
-      setLoading(false);
+      setBusy(null);
     }
   };
 
+  // Pay now -> open the app. window.open runs first, inside the tap, so
+  // browsers do not block it; the server then remembers the started payment.
+  const openPaymentApp = (method) => {
+    const n = readAmount();
+    if (n === null) return;
+    const link = method.id === 'paypal'
+      ? generatePayPalLink(method.username, n, currency)
+      : generateRevolutLink(method.username, n, currency);
+    navigator.clipboard?.writeText(n.toFixed(2)).catch(() => {});
+    window.open(link, '_blank');
+    const data = {
+      groupId: group.id, fromUserId: settlement.from, toUserId: settlement.to,
+      fromName, toName, amount: n, currency, method: method.id, timestamp: Date.now(),
+    };
+    sessionStorage.setItem('pendingPayment', JSON.stringify(data));
+    startSettlement({ groupId: group.id, toUid: settlement.to, amount: n, method: method.id })
+      .catch(err => console.error('Failed to save started payment:', err?.code));
+    onClose();
+  };
+
+  // Payee: record a payment received. Balances change, so "Confirm it's you" first.
+  const handleReceived = async (e) => {
+    e.preventDefault();
+    const n = readAmount();
+    if (n === null) return;
+    setBusy('receive');
+    setError('');
+    try {
+      const params = {
+        groupId: group.id,
+        fromUid: settlement.from,
+        amount: n,
+        idempotencyKey: keyFor(`receive:${n.toFixed(2)}`),
+      };
+      const token = await requestStepUp('settlements.receive', receiveParams(params));
+      if (!token) { setError('Not recorded: confirming it is you was cancelled.'); return; }
+      await receiveSettlement(params, token);
+      finish('Payment recorded', `${currency} ${n.toFixed(2)} from ${fromName} is settled. ${fromName} was told.`);
+    } catch (err) {
+      setError(settlementErrorMessage(err, 'That did not work. Nothing was saved, please try again.'));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  // ---- PayPal sandbox and SEPA simulation (demo switch) ----
   const handleSepaPayment = () => {
-    const paymentData = {
+    setSepaPaymentData({
       amount: parseFloat(amount),
-      fromUser: {
-        id: settlement.from,
-        name: fromMember?.name || 'Unknown'
-      },
-      toUser: {
-        id: settlement.to,
-        name: toMember?.name || 'Unknown'
-      },
+      fromUser: { id: settlement.from, name: fromName },
+      toUser: { id: settlement.to, name: toName },
       fromUserPaymentMethods: null,
       toUserPaymentMethods: recipientPaymentMethods,
       groupName: group.name,
-      groupId: group.id
-    };
-    
-    setSepaPaymentData(paymentData);
+      groupId: group.id,
+    });
     setShowSepaModal(true);
   };
 
-  // Handle SEPA demo simulation success. The simulation moves no money, so it
-  // is recorded like any other payment: as a claim the payee confirms.
+  // The simulation moves no money, so it is a claim like any other payment.
   const handleSepaPaymentSuccess = async (paymentResult) => {
-    try {
-      await claimPayment('sepa', Number(paymentResult.amount));
-      setPaymentSuccess(true);
-      setShowSepaModal(false);
-      setTimeout(() => onClose(), 2500);
-    } catch (err) {
-      setError(settlementErrorMessage(err, 'Payment processed but could not be recorded. Please try again.'));
-    }
-  };
-
-  // Save to sessionStorage before opening payment link
-  const handlePaymentLinkClick = (method) => {
-    const amountNum = parseFloat(amount);
-    
-    // Save pending payment data
-    const pendingPaymentData = {
-      groupId: group.id,
-      fromUserId: settlement.from,
-      toUserId: settlement.to,
-      fromName: fromMember?.name,
-      toName: toMember?.name,
-      amount: amountNum,
-      currency: group.currency,
-      method: method.id === 'paypal' || method.id === 'paypal-link' ? 'paypal' :
-              method.id === 'revolut' ? 'revolut' :
-              method.id === 'bank' ? 'bank' : 'manual',
-      timestamp: Date.now(),
-    };
-
-    // Saved on the server for cross-device persistence (the "did you pay?" prompt)
-    startSettlement({
-      groupId: group.id,
-      toUid: settlement.to,
-      amount: amountNum,
-      method: pendingPaymentData.method,
-    }).catch(err => console.error('Failed to save pending payment:', err?.code));
-
-    // Keep sessionStorage in sync for same-session GroupDetails banner
-    sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
-    
-    if (method.id === 'paypal' || method.id === 'paypal-link') {
-      setPaymentInfo({
-        method: 'paypal',
-        amount: amountNum,
-        currency: group.currency,
-        username: method.username,
-        onProceed: () => {
-        // Copy amount to clipboard so user can paste it in the payment app
-        navigator.clipboard?.writeText(amountNum.toFixed(2)).catch(() => {});
-        const link = generatePayPalLink(method.username, amountNum, group.currency);
-        window.open(link, '_blank');
-        setShowPaymentInfo(false);
-        onClose();
-      }
-      });
-      setShowPaymentInfo(true);
-      
-    } else if (method.id === 'revolut') {
-      setPaymentInfo({
-        method: 'revolut',
-        amount: amountNum,
-        currency: group.currency,
-        username: method.username,
-        onProceed: () => {
-        // Copy amount to clipboard so user can paste it in the payment app
-        navigator.clipboard?.writeText(amountNum.toFixed(2)).catch(() => {});
-        const link = generateRevolutLink(method.username, amountNum, group.currency);
-        window.open(link, '_blank');
-        setShowPaymentInfo(false);
-        onClose();
-      }
-      });
-      setShowPaymentInfo(true);
-      
-    } else if (method.id === 'bank') {
-      // Shows inline bank details - user copies IBAN and makes transfer
-      setSelectedPaymentLink(method);
-    }
+    setShowSepaModal(false);
+    await sendClaim('sepa', Number(paymentResult.amount));
   };
 
   const createPayPalOrder = (data, actions) => {
-    const amountNum = parseFloat(amount);
-    if (!amountNum || amountNum <= 0) {
-      setError('Please enter a valid amount');
-      return;
-    }
-
+    const n = readAmount();
+    if (n === null) return undefined;
     return actions.order.create({
-      purchase_units: [
-        {
-          description: `Settlement: ${fromMember?.name} pays ${toMember?.name}`,
-          amount: {
-            currency_code: group.currency || 'EUR',
-            value: amountNum.toFixed(2),
-          },
-          //payee: {
-            //email_address: toMember?.email || 'receiver@example.com',
-          //},
-        },
-      ],
-      application_context: {
-        shipping_preference: 'NO_SHIPPING',
-      },
+      purchase_units: [{
+        description: `Settlement: ${fromName} pays ${toName}`,
+        amount: { currency_code: currency, value: n.toFixed(2) },
+      }],
+      application_context: { shipping_preference: 'NO_SHIPPING' },
     });
   };
 
-  const onPayPalApprove = async (data, actions) => {
-    setLoading(true);
+  const onPayPalApprove = async (data) => {
+    setBusy('claim');
     setError('');
-
     try {
-      const fns           = getFunctions();
-      const capturePayPal = httpsCallable(fns, 'capturePayPalOrder');
-      const result        = await capturePayPal({ orderId: data.orderID });
-      if (!result.data.success) throw new Error('capture failed');
-      await claimPayment('paypal', parseFloat(amount), result.data.orderId);
-      setPaymentSuccess(true);
-      setTimeout(() => onClose(), 2500);
+      const capturePayPal = httpsCallable(getFunctions(), 'capturePayPalOrder');
+      const res = await capturePayPal({ orderId: data.orderID });
+      if (!res.data.success) throw new Error('capture failed');
+      const n = parseFloat(amount);
+      await claimPayment('paypal', n, res.data.orderId);
+      finish(`Sent to ${toName}`, `${currency} ${n.toFixed(2)} by PayPal (demo). Your balance updates when ${toName} confirms.`);
     } catch (err) {
-      console.error('PayPal error:', err);
+      console.error('PayPal error:', err?.code);
       setError('Payment failed. Please try again.');
-      setLoading(false);
+    } finally {
+      setBusy(null);
     }
   };
 
   const onPayPalError = (err) => {
-    console.error('PayPal error:', err);
+    console.error('PayPal error:', err?.code);
     setError('Payment initialization failed. Please try again.');
   };
 
   if (!isOpen) return null;
 
-  // Pending payment confirmation dialog
-  if (showPendingConfirmation && pendingPayment) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Did you complete the payment?
-            </h2>
-            <button
-              onClick={() => {
-                setShowPendingConfirmation(false);
-                setPendingPayment(null);
-              }}
-              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <X size={24} />
+  // ---- layout pieces ----
+  const shell = (title, { onBack, subtitle } = {}, body) => (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="bg-gray-50 dark:bg-gray-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-card-3d dark:shadow-gray-900/50"
+      >
+        <div className="sticky top-0 z-10 flex items-center gap-2 px-3 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          {onBack ? (
+            <button type="button" onClick={onBack} aria-label="Back" className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 active:scale-95 transition">
+              <ArrowLeft size={22} />
             </button>
+          ) : null}
+          <div className="flex-1 min-w-0 px-1">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">{title}</h2>
+            {subtitle ? <p className="text-[13px] text-gray-600 dark:text-gray-400">{subtitle}</p> : null}
           </div>
-
-          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <Info size={20} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-900 dark:text-blue-200">
-                <p className="font-medium mb-2">Payment Summary</p>
-                <div className="space-y-1">
-                  <p><strong>Amount:</strong> {pendingPayment.currency} {pendingPayment.amount.toFixed(2)}</p>
-                  <p><strong>To:</strong> {pendingPayment.toName}</p>
-                  <p><strong>Method:</strong> {pendingPayment.method.toUpperCase()}</p>
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
-                    {new Date(pendingPayment.timestamp).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-6">
-            <div className="flex items-start gap-2">
-              <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-yellow-800 dark:text-yellow-300">
-                <strong>Important:</strong> Only mark as paid if you actually transferred the money. This will update your group balances.
-              </p>
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleNotYet}
-              disabled={loading}
-              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
-            >
-              Not Yet
-            </button>
-            <button
-              onClick={handleMarkAsPaid}
-              disabled={loading}
-              className="flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                'Processing...'
-              ) : (
-                <>
-                  <CheckCircle2 size={18} />
-                  Mark as Paid
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (paymentSuccess) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in text-center">
-          <div className="flex justify-end mb-2">
-            <button
-              onClick={onClose}
-              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          <div className="mb-4">
-            <CheckCircle2 className="mx-auto text-green-500 dark:text-green-400" size={64} />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {userIsPaying ? 'Payment Sent!' : 'Payment Recorded!'}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
-            {userIsPaying
-              ? `${toMember?.name} has been notified and will confirm receipt.`
-              : `${group?.currency} ${amount} has been settled.`}
-          </p>
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition"
-          >
-            Close
+          <button type="button" onClick={onClose} aria-label="Close" className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 active:scale-95 transition">
+            <X size={22} />
           </button>
         </div>
-      </div>
-    );
-  }
-
-  if (showConfirmation && userIsReceiving) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Confirm Payment</h2>
-            <button
-              onClick={() => setShowConfirmation(false)}
-              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <X size={24} />
-            </button>
-          </div>
-
-          <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="text-yellow-600 dark:text-yellow-400 flex-shrink-0" size={24} />
-              <div>
-                <p className="text-sm font-medium text-yellow-900 dark:text-yellow-200 mb-2">
-                  Please confirm the payment details:
-                </p>
-                <div className="space-y-2 text-sm text-yellow-800 dark:text-yellow-300">
-                  <p><strong>From:</strong> {fromMember?.name}</p>
-                  <p><strong>To:</strong> {toMember?.name} (You)</p>
-                  <p><strong>Amount:</strong> {group?.currency} {amount}</p>
-                </div>
-              </div>
+        <div className="p-5 flex flex-col gap-4">
+          {error ? (
+            <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-800 dark:text-red-200">
+              <AlertCircle size={18} className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <span>{error}</span>
             </div>
-          </div>
-
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            By confirming, you acknowledge that you have received this payment from {fromMember?.name}.
-          </p>
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowConfirmation(false)}
-              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-            >
-              Go Back
-            </button>
-            <button
-              onClick={handleManualSettle}
-              disabled={loading}
-              className="flex-1 px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Authenticating...
-                </>
-              ) : (
-                'Confirm Receipt'
-              )}
-            </button>
-          </div>
+          ) : null}
+          {body}
         </div>
-        {stepUpSheet}
       </div>
-    );
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-scale-in">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6 shadow-card-3d dark:shadow-gray-900/50 animate-scale-in">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {userIsPaying ? 'Pay Settlement' : 'Mark as Received'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-lg mb-4 text-sm flex items-start gap-2 border border-red-200 dark:border-red-800">
-            <span className="font-semibold">Error:</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Settlement Details:</p>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-lg font-semibold text-primary dark:text-indigo-400">{fromMember?.name}</span>
-            <ArrowRight size={20} className="text-gray-400 dark:text-gray-500" />
-            <span className="text-lg font-semibold text-primary dark:text-indigo-400">{toMember?.name}</span>
-          </div>
-          <p className="text-center text-2xl font-bold text-gray-900 dark:text-white mt-2">
-            {group?.currency} {settlement?.amount?.toFixed(2)}
-          </p>
-        </div>
-        {/* Pending payment lock warning */}
-        {pendingPayment && !showPendingConfirmation && (
-          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg flex items-start gap-2">
-            <AlertCircle size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-800 dark:text-amber-200">
-              A payment of {pendingPayment.currency} {pendingPayment.amount?.toFixed(2)} to {pendingPayment.toName} is awaiting confirmation. You cannot initiate another payment until this is resolved.
-            </p>
-          </div>
-        )}
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Amount ({group?.currency})
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            min="0.01"
-            max="1000000"
-            value={amount}
-            readOnly={!!pendingPayment}
-            onChange={(e) => {
-              // Prevent changes when a payment is pending confirmation
-              if (pendingPayment) return;
-              const value = e.target.value;
-              
-              // Check if amount exceeds limit
-              if (value && parseFloat(value) > 1000000) {
-                setError('Settlement amount cannot exceed 1,000,000');
-                return;
-              }
-              
-              // Allow empty or valid numbers with max 2 decimals
-              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                setAmount(value);
-                if (error && error.includes('cannot exceed')) {
-                  setError(''); // Clear error when user fixes amount
-                }
-              }
-            }}
-            onBlur={(e) => {
-              // Format to 2 decimals when user leaves field
-              if (e.target.value && !isNaN(e.target.value)) {
-                const formatted = parseFloat(e.target.value).toFixed(2);
-                setAmount(formatted);
-              }
-            }}
-            placeholder="0.00"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary dark:focus:ring-indigo-500 focus:border-transparent outline-none text-lg font-semibold"
-            required
-            autoFocus
-          />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Suggested: {group?.currency} {settlement?.amount?.toFixed(2)} • Maximum: {group?.currency} 1,000,000.00
-          </p>
-        </div>
-
-        {userIsPaying ? (
-          /* User is paying - show payment options */
-          <div className="mb-6">
-            {/* Quick Payment Links Section — hidden when Paid Offline is selected */}
-            {!loadingPaymentMethods && (getAvailablePaymentMethods(recipientPaymentMethods) || []).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
-              <div className="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="relative group">
-                    <Info size={18} className="text-blue-600 dark:text-blue-400" />
-                    <div className="absolute left-0 top-6 w-64 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      These payment methods are set up by the recipient in their Profile settings
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Quick Payment Options</h3>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                  {toMember?.name} accepts payments via:
-                </p>
-                <div className="space-y-2">
-                  {getAvailablePaymentMethods(recipientPaymentMethods).map((method) => (
-                    <button
-                      key={method.id}
-                      type="button"
-                      onClick={() => handlePaymentLinkClick(method)}
-                      disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
-                      className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-700 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
-                    >
-                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        {method.id === 'paypal' && <CreditCard size={20} className="text-blue-600 dark:text-blue-400" />}
-                        {method.id === 'revolut' && <Smartphone size={20} className="text-indigo-600 dark:text-indigo-400" />}
-                        {method.id === 'bank' && <Landmark size={20} className="text-green-600 dark:text-green-400" />}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="font-semibold text-gray-900 dark:text-white">{method.name}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{method.description}</p>
-                      </div>
-                      <ExternalLink size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                  Click to open payment app, then return here to mark as paid
-                </p>
-              </div>
-            )}
-
-
-            {/* Bank Transfer Details */}
-            {selectedPaymentLink && selectedPaymentLink.id === 'bank' && (
-              <div className="mb-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 flex items-center gap-2">
-                    <CreditCard size={18} />
-                    Bank Transfer Details
-                  </h3>
-                  <button
-                    onClick={() => setSelectedPaymentLink(null)}
-                    className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
-                  >
-                    Back to options
-                  </button>
-                </div>
-                
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium">Recipient</p>
-                    <p className="text-blue-900 dark:text-blue-200">{toMember?.name}</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium">IBAN</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-blue-900 dark:text-blue-200 font-mono text-xs flex-1 break-all bg-white dark:bg-gray-700 p-2 rounded">
-                        {selectedPaymentLink.iban}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(selectedPaymentLink.iban);
-                          setCopiedIban(true);
-                          setTimeout(() => setCopiedIban(false), 2000);
-                        }}
-                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded flex-shrink-0"
-                      >
-                        {copiedIban ? <Check size={16} className="text-green-600 dark:text-green-400" /> : <Copy size={16} className="dark:text-blue-400" />}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {selectedPaymentLink.bic && (
-                    <div>
-                      <p className="text-blue-600 dark:text-blue-400 font-medium">BIC</p>
-                      <p className="text-blue-900 dark:text-blue-200 font-mono text-sm bg-white dark:bg-gray-700 p-2 rounded">{selectedPaymentLink.bic}</p>
-                    </div>
-                  )}
-                  
-                  <div>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium">Amount</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-blue-900 dark:text-blue-200 font-semibold bg-white dark:bg-gray-700 p-2 rounded flex-1">
-                        {group.currency} {amount}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(amount);
-                          setCopiedAmount(true);
-                          setTimeout(() => setCopiedAmount(false), 2000);
-                        }}
-                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded flex-shrink-0"
-                      >
-                        {copiedAmount
-                          ? <Check size={16} className="text-green-600 dark:text-green-400" />
-                          : <Copy size={16} className="text-blue-400 dark:text-blue-400" />}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium">Reference</p>
-                    <p className="text-blue-900 dark:text-blue-200 bg-white dark:bg-gray-700 p-2 rounded">SplitSync Settlement</p>
-                  </div>
-                </div>
-                
-                {/* Info bubble — guides user to complete the transfer in their banking app */}
-                <div className="mt-4 flex items-start gap-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg p-3">
-                  <Info size={14} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
-                  <p className="text-xs text-indigo-800 dark:text-indigo-300">
-                    Copy the IBAN above and use it to send the payment from your banking app (e.g. your bank, Wise, or Revolut).
-                    Once sent, return here and mark the payment as completed below.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Divider — hidden when Paid Offline is selected */}
-{!loadingPaymentMethods && (getAvailablePaymentMethods(recipientPaymentMethods) || []).length > 0 && !selectedPaymentLink && paymentMethod !== 'manual' && (
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or use</span>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-2 mb-4">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('paypal')}
-                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition ${
-                  paymentMethod === 'paypal'
-                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                <CreditCard size={18} />
-                <span className="font-medium">Pay In-App</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('manual')}
-                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition ${
-                  paymentMethod === 'manual'
-                    ? 'bg-blue-600 dark:bg-blue-700 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                <DollarSign size={18} />
-                <span className="font-medium">Paid Offline</span>
-              </button>
-            </div>
-
-            {paymentMethod === 'paypal' ? (
-              <div>
-
-                {/* Notice when recipient has no PayPal configured */}
-                {!loadingPaymentMethods && !recipientPaymentMethods?.paypalUsername && (
-                  <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4">
-                    <AlertCircle size={18} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
-                        {toMember?.name} has not set up PayPal
-                      </p>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        They need to add their PayPal username in their Profile settings before you can pay via PayPal.
-                        Use <strong>Paid Offline</strong> to record a cash or bank transfer instead.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Notice when current user has no biometric set up — shown to payer only */}
-                {!loadingPaymentMethods && recipientPaymentMethods?.paypalUsername && (
-                  <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4">
-                    <Info size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Click a payment method above to open the app and complete the payment, then return here to confirm.
-                      For faster future payments, enable biometric authentication in your Profile settings.
-                    </p>
-                  </div>
-                )}
-                {/* Demo panel: shown only while paymentDemosEnabled is on (admin panel) */}
-                {paymentDemosOn && (
-                <>
-                {/* Future Feature — collapsible demo panel for PayPal sandbox and SEPA simulation */}
-                <button
-                  type="button"
-                  onClick={() => setShowDemoInfo(prev => !prev)}
-                  className="w-full flex items-center justify-between px-4 py-3 mb-2 rounded-xl border-2 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-yellow-400 dark:bg-yellow-600 rounded-lg flex items-center justify-center shrink-0">
-                      <CreditCard size={16} className="text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-bold text-yellow-900 dark:text-yellow-200">
-                        Future feature - Settlement Payment Flow
-                      </p>
-                      <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-0.5">
-                        {showDemoInfo ? 'Tap to collapse' : 'PayPal sandbox and SEPA simulation demos'}
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronDown
-                    size={18}
-                    className={`text-yellow-600 dark:text-yellow-400 transition-transform duration-300 shrink-0 ${showDemoInfo ? 'rotate-180' : ''}`}
-                  />
-                </button>
-
-                {/* Expanded demo panel — PayPal sandbox + SEPA simulation */}
-                {showDemoInfo && (
-                  <div className="mb-2 border border-yellow-200 dark:border-yellow-800 rounded-xl overflow-hidden">
-                    {/* Demo notice */}
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 flex items-start gap-2 border-b border-yellow-200 dark:border-yellow-800">
-                      <Info size={14} className="text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
-                      <p className="text-xs text-yellow-800 dark:text-yellow-300">
-                        <strong>Demo Mode:</strong> These demos use sandbox environments. No real money is transferred.
-                        Use test credentials to explore the payment flows.
-                      </p>
-                    </div>
-
-                    {/* PayPal sandbox buttons */}
-                    <div className="px-4 pt-4 pb-2 bg-white dark:bg-gray-800 border-b border-yellow-100 dark:border-yellow-800">
-                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
-                        PayPal or Credit/Debit Card
-                      </p>
-                      {parseFloat(amount) > 0 ? (
-                        <PayPalButtons
-                          style={{ layout: 'vertical', label: 'pay' }}
-                          createOrder={createPayPalOrder}
-                          onApprove={onPayPalApprove}
-                          onError={onPayPalError}
-                          disabled={loading}
-                        />
-                      ) : (
-                        <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
-                          Enter an amount above to continue
-                        </div>
-                      )}
-                    </div>
-
-                    {/* SEPA simulation button — only shown if recipient has IBAN set */}
-                    {(recipientPaymentMethods?.hasIban || recipientPaymentMethods?.encryptedIBAN) && (
-                      <div className="px-4 py-4 bg-white dark:bg-gray-800">
-                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
-                          SEPA Bank Transfer Simulation
-                        </p>
-                        <button
-                          type="button"
-                          onClick={handleSepaPayment}
-                          disabled={!amount || parseFloat(amount) <= 0 || !!pendingPayment}
-                          className="w-full flex items-center gap-3 p-3 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center group-hover:bg-indigo-200 transition shrink-0">
-                            <Landmark size={18} className="text-indigo-600 dark:text-indigo-400" />
-                          </div>
-                          <div className="text-left flex-1">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white">SEPA Payment Demo</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Simulated bank-to-bank transfer — no real funds moved</p>
-                          </div>
-                          <ArrowRight size={16} className="text-gray-400 group-hover:text-indigo-500 transition shrink-0" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-                </>
-                )}
-              </div>
-            ) : (
-              /* Paid Offline — payer confirms they paid outside the app */
-              <form onSubmit={handleManualSettle}>
-                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    Mark this payment as completed if you paid {toMember?.name} via cash, bank transfer, or another method.
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium"
-                >
-                  {loading ? 'Recording...' : 'Confirm Payment Sent'}
-                </button>
-              </form>
-            )}
-          </div>
-        ) : (
-          /* ── Receiver view: collapsible QR + confirm received ── */
-          <div>
-
-            {/* QR toggle button — hidden by default, tap to reveal for payer to scan */}
-            <button
-              type="button"
-              onClick={() => setShowQR(prev => !prev)}
-              className="w-full flex items-center justify-between px-4 py-3 mb-3 rounded-xl border-2 border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-lg flex items-center justify-center shrink-0">
-                  <QrCode size={16} className="text-white" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200">
-                    Let {fromMember?.name} scan to pay you
-                  </p>
-                  <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
-                    {showQR ? 'Tap to hide QR code' : 'Tap to show PayPal or Revolut QR code'}
-                  </p>
-                </div>
-              </div>
-              <ChevronDown
-                size={18}
-                className={`text-indigo-500 dark:text-indigo-400 transition-transform duration-300 shrink-0 ${showQR ? 'rotate-180' : ''}`}
-              />
-            </button>
-
-            {/* Collapsible QR panel */}
-            {showQR && (
-              <div className="mb-4 border border-indigo-200 dark:border-indigo-800 rounded-xl overflow-hidden">
-
-                {/* Instruction */}
-                <div className="bg-indigo-50 dark:bg-indigo-900/30 px-4 py-3 flex items-start gap-2">
-                  <Smartphone size={15} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
-                  <p className="text-xs font-semibold text-indigo-800 dark:text-indigo-300">
-                    Show this screen to <strong>{fromMember?.name}</strong> — they scan the QR code with their phone camera to pay you instantly via PayPal or Revolut.
-                  </p>
-                </div>
-
-                {/* Tab selector — only show tabs for methods the receiver has configured */}
-                {recipientPaymentMethods && (recipientPaymentMethods.paypalUsername || recipientPaymentMethods.revolutUsername) && (
-                  <div className="flex gap-2 px-4 pt-3">
-                    {recipientPaymentMethods.paypalUsername && (
-                      <button
-                        type="button"
-                        onClick={() => setActiveQR('paypal')}
-                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-                          activeQR === 'paypal'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        PayPal
-                      </button>
-                    )}
-                    {recipientPaymentMethods.revolutUsername && (
-                      <button
-                        type="button"
-                        onClick={() => setActiveQR('revolut')}
-                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-                          activeQR === 'revolut'
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        Revolut
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* QR code display */}
-                <div className="flex flex-col items-center py-4 px-4">
-                  {recipientPaymentMethods?.paypalUsername && activeQR === 'paypal' && (
-                    <>
-                      <QRCodeCanvas
-                        value={generatePayPalLink(
-                          recipientPaymentMethods.paypalUsername,
-                          parseFloat(amount),
-                          group?.currency || 'EUR'
-                        )}
-                        size={200}
-                      />
-                      <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">
-                        Scan to pay via PayPal
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Opens PayPal pre-filled with {group?.currency || 'EUR'} {parseFloat(amount || 0).toFixed(2)}
-                      </p>
-                    </>
-                  )}
-                  {recipientPaymentMethods?.revolutUsername && activeQR === 'revolut' && (
-                    <>
-                      <QRCodeCanvas
-                        value={generateRevolutLink(
-                          recipientPaymentMethods.revolutUsername,
-                          parseFloat(amount),
-                          group?.currency || 'EUR'
-                        )}
-                        size={200}
-                      />
-                      <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">
-                        Scan to pay via Revolut
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Opens Revolut — enter {group?.currency || 'EUR'} {parseFloat(amount || 0).toFixed(2)} to complete
-                      </p>
-                    </>
-                  )}
-                  {/* Fallback — no payment methods configured */}
-                  {!recipientPaymentMethods?.paypalUsername && !recipientPaymentMethods?.revolutUsername && (
-                    <div className="text-center py-4">
-                      <QrCode size={36} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 dark:text-gray-400">No payment methods set up yet.</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                        Add your PayPal or Revolut username in Profile to enable QR payments.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Confirm received button — always visible regardless of QR state */}
-            <form onSubmit={handleManualSettle}>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-4 py-3 bg-success dark:bg-green-600 text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 font-medium"
-              >
-                {loading ? 'Recording...' : 'Confirm Payment Received'}
-              </button>
-            </form>
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-full mt-3 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-        >
-          Cancel
-        </button>
-      </div>
-
-      {/* Payment Info Modal */}
-      <PaymentInfoModal
-        isOpen={showPaymentInfo}
-        onClose={() => setShowPaymentInfo(false)}
-        paymentInfo={paymentInfo}
-      />
-
       {stepUpSheet}
-
-      {/* SEPA Payment Modal */}
       {showSepaModal && sepaPaymentData && (
         <SepaPaymentModal
           isOpen={showSepaModal}
@@ -1128,4 +401,377 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       )}
     </div>
   );
+
+  const amountField = (id, label, hint) => (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className="text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</label>
+      <div className="flex items-center gap-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 focus-within:border-blue-500">
+        <span className="text-xl font-semibold text-gray-600 dark:text-gray-400">{currency}</span>
+        <input
+          id={id}
+          type="text"
+          inputMode="decimal"
+          value={amount}
+          onChange={(e) => onAmountChange(e.target.value)}
+          onBlur={(e) => { const v = parseFloat(e.target.value); if (v > 0) setAmount(v.toFixed(2)); }}
+          placeholder="0.00"
+          className="w-full bg-transparent py-3 text-2xl font-bold text-gray-900 dark:text-white outline-none"
+        />
+      </div>
+      {hint ? <p className="text-[13px] text-gray-600 dark:text-gray-400">{hint}</p> : null}
+    </div>
+  );
+
+  const copyButton = (text, key, label) => (
+    copied === key ? (
+      <button type="button" aria-live="polite" className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl border-2 border-green-600 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 font-semibold">
+        <Check size={18} aria-hidden="true" /> Copied {key === 'amount' ? text : ''}
+      </button>
+    ) : (
+      <button type="button" onClick={() => copyText(text, key)} className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-200 active:scale-[0.97] transition">
+        <Copy size={18} aria-hidden="true" /> {label}
+      </button>
+    )
+  );
+
+  const debtCard = (who, line) => (
+    <div className="flex items-center gap-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+      <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 flex items-center justify-center text-lg font-bold">
+        {(who || '?').charAt(0).toUpperCase()}
+      </div>
+      <div>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{line}</p>
+        <p className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{currency} {owed.toFixed(2)}</p>
+      </div>
+    </div>
+  );
+
+  // ---- result (after any action) ----
+  if (result) {
+    return shell(result.title, {}, (
+      <div className="flex flex-col items-center gap-3 py-6 text-center" role="status" aria-live="polite">
+        <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 flex items-center justify-center">
+          <Check size={34} aria-hidden="true" />
+        </div>
+        <p className="text-xl font-bold text-gray-900 dark:text-white">{result.title}</p>
+        <p className="text-[15px] leading-relaxed text-gray-600 dark:text-gray-300">{result.message}</p>
+        <ActionButton className="w-full mt-2" onClick={onClose}>Done</ActionButton>
+      </div>
+    ));
+  }
+
+  // ---- payee ----
+  if (userIsReceiving) {
+    const hasQr = recipientPaymentMethods?.paypalUsername || recipientPaymentMethods?.revolutUsername;
+    return shell('Settle up', {}, (
+      <form onSubmit={handleReceived} className="flex flex-col gap-4">
+        {debtCard(fromName, `${fromName} owes you in ${group?.name || 'this group'}`)}
+        {amountField('received-amount', `How much did ${fromName} pay you?`, `${fromName} owes ${currency} ${owed.toFixed(2)}.`)}
+
+        <button
+          type="button"
+          onClick={() => setShowQR(p => !p)}
+          aria-expanded={showQR}
+          className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border-2 border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 active:scale-[0.98] transition"
+        >
+          <span className="flex items-center gap-3 text-left">
+            <QrCode size={20} className="text-indigo-700 dark:text-indigo-300" aria-hidden="true" />
+            <span>
+              <span className="block text-sm font-semibold text-indigo-900 dark:text-indigo-100">Let {fromName} scan to pay you</span>
+              <span className="block text-[13px] text-indigo-700 dark:text-indigo-300">{showQR ? 'Tap to hide' : 'Show a PayPal or Revolut QR code'}</span>
+            </span>
+          </span>
+          <ChevronDown size={18} className={`text-indigo-600 transition-transform ${showQR ? 'rotate-180' : ''}`} aria-hidden="true" />
+        </button>
+        {showQR && (
+          <div className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-gray-800 p-4 flex flex-col items-center gap-3">
+            {hasQr ? (
+              <>
+                <div className="flex gap-2 w-full">
+                  {recipientPaymentMethods.paypalUsername && (
+                    <button type="button" onClick={() => setActiveQR('paypal')} className={`flex-1 min-h-[40px] rounded-lg text-sm font-semibold transition active:scale-[0.97] ${activeQR === 'paypal' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>PayPal</button>
+                  )}
+                  {recipientPaymentMethods.revolutUsername && (
+                    <button type="button" onClick={() => setActiveQR('revolut')} className={`flex-1 min-h-[40px] rounded-lg text-sm font-semibold transition active:scale-[0.97] ${activeQR === 'revolut' ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>Revolut</button>
+                  )}
+                </div>
+                {recipientPaymentMethods.paypalUsername && (activeQR === 'paypal' || !recipientPaymentMethods.revolutUsername) && (
+                  <>
+                    <QRCodeCanvas value={generatePayPalLink(recipientPaymentMethods.paypalUsername, parseFloat(amount) || owed, currency)} size={200} />
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Opens PayPal with {currency} {(parseFloat(amount) || owed).toFixed(2)} filled in</p>
+                  </>
+                )}
+                {recipientPaymentMethods.revolutUsername && (activeQR === 'revolut' || !recipientPaymentMethods.paypalUsername) && (
+                  <>
+                    <QRCodeCanvas value={generateRevolutLink(recipientPaymentMethods.revolutUsername, parseFloat(amount) || owed, currency)} size={200} />
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Opens Revolut. {fromName} enters {currency} {(parseFloat(amount) || owed).toFixed(2)}.</p>
+                  </>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Add your PayPal or Revolut username in your Profile to show a QR code here.</p>
+            )}
+          </div>
+        )}
+
+        <Note>You will be asked to confirm it is you. Then {fromName}&apos;s balance updates straight away.</Note>
+        <ActionButton type="submit" variant="success" className="w-full" busy={busy === 'receive'} busyLabel="Recording payment…">
+          <Check size={18} aria-hidden="true" /> I received a payment
+        </ActionButton>
+      </form>
+    ));
+  }
+
+  if (!userIsPaying) return null;
+
+  // ---- payer: "Did you finish paying?" for a payment app they opened ----
+  if (started) {
+    return shell(`Did you finish paying ${toName}?`, {}, (
+      <>
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            You opened {methodLabel(pendingPayment.method)}
+            {pendingPayment.timestamp ? ` at ${new Date(pendingPayment.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}.
+          </p>
+          <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{pendingPayment.currency || currency} {Number(pendingPayment.amount).toFixed(2)}</p>
+        </div>
+        <Note>Say yes only if the money has gone. {toName} confirms before your balance changes.</Note>
+        <div className="flex gap-3">
+          <ActionButton className="flex-1" onClick={handleFinishedPaying} busy={busy === 'yes'} busyLabel="Sending…" disabled={!!busy}>Yes, I paid</ActionButton>
+          <ActionButton variant="secondary" className="flex-1" onClick={() => handleCancelPending('notyet')} busy={busy === 'notyet'} busyLabel="Saving…" disabled={!!busy}>Not yet</ActionButton>
+        </div>
+      </>
+    ));
+  }
+
+  // ---- payer: pick an app (step 2 of 2) ----
+  if (step === 'method' && selectedMethod) {
+    const n = parseFloat(amount) || 0;
+    const fixed = n.toFixed(2);
+    const back = { onBack: () => { setStep('paynow'); setError(''); }, subtitle: 'Step 2 of 2' };
+
+    if (selectedMethod.id === 'bank') {
+      return shell(`Pay ${toName} by bank transfer`, back, (
+        <>
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 flex flex-col gap-4 text-sm">
+            <div>
+              <p className="font-semibold text-gray-600 dark:text-gray-400">Name</p>
+              <p className="text-gray-900 dark:text-white">{toName}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-semibold text-gray-600 dark:text-gray-400">IBAN</p>
+              <p className="font-mono break-all rounded-lg bg-gray-100 dark:bg-gray-700 p-2 text-gray-900 dark:text-white">{selectedMethod.iban}</p>
+              {copyButton(selectedMethod.iban, 'iban', 'Copy IBAN')}
+            </div>
+            {selectedMethod.bic ? (
+              <div>
+                <p className="font-semibold text-gray-600 dark:text-gray-400">BIC</p>
+                <p className="font-mono text-gray-900 dark:text-white">{selectedMethod.bic}</p>
+              </div>
+            ) : null}
+            <div className="flex flex-col gap-2">
+              <p className="font-semibold text-gray-600 dark:text-gray-400">Amount</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{currency} {fixed}</p>
+              {copyButton(fixed, 'amount', 'Copy amount')}
+            </div>
+            <div>
+              <p className="font-semibold text-gray-600 dark:text-gray-400">Reference</p>
+              <p className="text-gray-900 dark:text-white">SplitSync Settlement</p>
+            </div>
+          </div>
+          {copyFailed ? <Note tone="warn">Copying is not available here. Type the details into your banking app.</Note> : null}
+          <Note>Send it from your banking app, then come back and tap below.</Note>
+          <ActionButton className="w-full" onClick={() => sendClaim('bank', n)} busy={busy === 'claim'} busyLabel={`Sending to ${toName}…`}>
+            I have sent it
+          </ActionButton>
+        </>
+      ));
+    }
+
+    const isRevolut = selectedMethod.id === 'revolut';
+    const appName = isRevolut ? 'Revolut' : 'PayPal';
+    return shell(`Pay ${toName} with ${appName}`, back, (
+      <>
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 flex flex-col items-center gap-3">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Amount to send to @{(selectedMethod.username || '').replace('@', '')}</p>
+          <p className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">{currency} {fixed}</p>
+          {copyButton(fixed, 'amount', 'Copy amount')}
+        </div>
+        {copyFailed ? <Note tone="warn">Copying is not available here. Remember {currency} {fixed}.</Note> : null}
+        {isRevolut
+          ? <Note tone="warn">Revolut cannot fill in the amount for you. Paste it when the app opens.</Note>
+          : <Note>PayPal fills in the amount for you.</Note>}
+        <ActionButton className="w-full min-h-[52px]" onClick={() => openPaymentApp(selectedMethod)}>
+          Open {appName} <ExternalLink size={18} aria-hidden="true" />
+        </ActionButton>
+        <p className="-mt-2 text-center text-[13px] text-gray-600 dark:text-gray-400">
+          Opening also copies the amount. When you come back, we ask if you finished paying.
+        </p>
+        {isRevolut ? (
+          <div className="flex items-center gap-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+            <div className="flex-shrink-0 rounded-lg bg-white p-1">
+              <QRCodeCanvas value={generateRevolutLink(selectedMethod.username, n, currency)} size={96} />
+            </div>
+            <div>
+              <p className="text-[15px] font-semibold text-gray-900 dark:text-white">On a laptop?</p>
+              <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">Revolut works best on your phone. Scan this with your phone camera to open it there.</p>
+            </div>
+          </div>
+        ) : null}
+      </>
+    ));
+  }
+
+  // ---- payer: Pay now (step 1 of 2) ----
+  if (step === 'paynow') {
+    return shell('Pay now', { onBack: () => { setStep('choose'); setError(''); }, subtitle: 'Step 1 of 2' }, (
+      <>
+        {amountField('pay-amount', `Amount to pay ${toName}`, `You owe ${currency} ${owed.toFixed(2)}. You can pay part of it.`)}
+        <h3 className="mt-1 text-base font-bold text-gray-900 dark:text-white">Pay {toName} with</h3>
+        {loadingPaymentMethods ? (
+          <p className="text-sm text-gray-600 dark:text-gray-400">Loading {toName}&apos;s payment options…</p>
+        ) : methods.length === 0 ? (
+          <Note tone="warn">{toName} has not added PayPal, Revolut or bank details yet. Pay another way, then use I already paid.</Note>
+        ) : (
+          methods.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              className={CHOICE}
+              onClick={() => { if (readAmount() !== null) { setSelectedMethod(m); setStep('method'); setCopied(null); } }}
+            >
+              <span className={`w-11 h-11 flex-shrink-0 rounded-xl flex items-center justify-center ${m.id === 'bank' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : m.id === 'paypal' ? 'bg-blue-800 text-white' : 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'}`}>
+                {m.id === 'bank' ? <Landmark size={22} aria-hidden="true" /> : m.id === 'paypal' ? <CreditCard size={22} aria-hidden="true" /> : <Smartphone size={22} aria-hidden="true" />}
+              </span>
+              <span className="flex-1">
+                <span className="block text-base font-semibold text-gray-900 dark:text-white">{m.id === 'bank' ? 'Bank transfer' : m.name}</span>
+                <span className="block text-[13px] text-gray-600 dark:text-gray-400">
+                  {m.id === 'bank' ? 'Copy IBAN and amount to your banking app'
+                    : m.id === 'paypal' ? `@${m.username} · amount filled in for you`
+                      : `@${m.username} · you paste the amount`}
+                </span>
+              </span>
+              <ChevronRight size={20} className="text-gray-500" aria-hidden="true" />
+            </button>
+          ))
+        )}
+        <p className="text-[13px] text-gray-600 dark:text-gray-400">Only the ways {toName} has set up are shown.</p>
+
+        {paymentDemosOn && (
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => setShowDemoInfo(p => !p)}
+              aria-expanded={showDemoInfo}
+              className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border-2 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 active:scale-[0.98] transition"
+            >
+              <span className="text-left">
+                <span className="block text-sm font-bold text-yellow-900 dark:text-yellow-200">Future feature - Settlement Payment Flow</span>
+                <span className="block text-xs text-yellow-800 dark:text-yellow-300">{showDemoInfo ? 'Tap to collapse' : 'PayPal sandbox and SEPA simulation demos'}</span>
+              </span>
+              <ChevronDown size={18} className={`text-yellow-700 transition-transform ${showDemoInfo ? 'rotate-180' : ''}`} aria-hidden="true" />
+            </button>
+            {showDemoInfo && (
+              <div className="mt-2 rounded-xl border border-yellow-200 dark:border-yellow-800 bg-white dark:bg-gray-800 p-4 flex flex-col gap-4">
+                <p className="text-xs text-yellow-900 dark:text-yellow-200"><strong>Demo Mode:</strong> These demos use sandbox environments. No real money is transferred.</p>
+                {parseFloat(amount) > 0 ? (
+                  <PayPalButtons
+                    style={{ layout: 'vertical', label: 'pay' }}
+                    createOrder={createPayPalOrder}
+                    onApprove={onPayPalApprove}
+                    onError={onPayPalError}
+                    disabled={!!busy}
+                  />
+                ) : (
+                  <p className="text-center text-sm text-gray-600 dark:text-gray-400">Enter an amount above to continue</p>
+                )}
+                {(recipientPaymentMethods?.hasIban || recipientPaymentMethods?.encryptedIBAN) && (
+                  <button
+                    type="button"
+                    onClick={handleSepaPayment}
+                    disabled={!amount || parseFloat(amount) <= 0}
+                    className={CHOICE}
+                  >
+                    <Landmark size={20} className="text-indigo-600" aria-hidden="true" />
+                    <span className="flex-1">
+                      <span className="block text-sm font-semibold text-gray-900 dark:text-white">SEPA Payment Demo</span>
+                      <span className="block text-xs text-gray-600 dark:text-gray-400">Simulated bank-to-bank transfer, no real funds moved</span>
+                    </span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </>
+    ));
+  }
+
+  // ---- payer: I already paid ----
+  if (step === 'already') {
+    return shell(`I already paid ${toName}`, { onBack: () => { setStep('choose'); setError(''); } }, (
+      <form onSubmit={handleAlreadyPaid} className="flex flex-col gap-4">
+        {amountField('paid-amount', 'How much did you pay?', `You owe ${currency} ${owed.toFixed(2)}.`)}
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">How did you pay?</legend>
+          <div className="flex flex-wrap gap-2">
+            {PAID_VIA.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                aria-pressed={paidVia === p.id}
+                onClick={() => setPaidVia(p.id)}
+                className={`min-h-[44px] px-4 rounded-full border-2 text-[15px] font-semibold transition active:scale-[0.96] ${paidVia === p.id ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:border-blue-300'}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <Note>{toName} gets a request to confirm. Your balance changes once {toName} says yes.</Note>
+        <ActionButton type="submit" className="w-full min-h-[52px]" busy={busy === 'claim'} busyLabel={`Sending to ${toName}…`}>
+          Send to {toName} to confirm
+        </ActionButton>
+      </form>
+    ));
+  }
+
+  // ---- payer: How are you settling? ----
+  return shell('Settle up', {}, (
+    <>
+      {debtCard(toName, `You owe ${toName} in ${group?.name || 'this group'}`)}
+      {claimed ? (
+        <div className="flex items-center gap-3 rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 p-4">
+          <Clock size={22} className="flex-shrink-0 text-amber-800 dark:text-amber-300" aria-hidden="true" />
+          <div className="flex-1">
+            <p className="text-[15px] font-semibold text-amber-900 dark:text-amber-100">Waiting for {toName} to confirm</p>
+            <p className="text-[13px] text-amber-800 dark:text-amber-300">
+              {pendingPayment.currency || currency} {Number(pendingPayment.amount).toFixed(2)} by {methodLabel(pendingPayment.method)}. You can send another once {toName} answers.
+            </p>
+          </div>
+          <ActionButton variant="warning" className="min-h-[44px] px-3 text-sm" onClick={() => handleCancelPending('withdraw')} busy={busy === 'withdraw'} busyLabel="Withdrawing…">
+            Withdraw
+          </ActionButton>
+        </div>
+      ) : null}
+      <h3 className="mt-1 text-xl font-bold text-gray-900 dark:text-white">How are you settling?</h3>
+      <button type="button" className={CHOICE} disabled={claimed} onClick={() => { setStep('paynow'); setError(''); }}>
+        <span className="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-600 text-white flex items-center justify-center"><ArrowUpRight size={24} aria-hidden="true" /></span>
+        <span className="flex-1">
+          <span className="block text-[17px] font-semibold text-gray-900 dark:text-white">Pay now</span>
+          <span className="block text-sm text-gray-600 dark:text-gray-400">Open Revolut, PayPal or your bank details with the amount ready</span>
+        </span>
+        <ChevronRight size={20} className="text-gray-500" aria-hidden="true" />
+      </button>
+      <button type="button" className={CHOICE} disabled={claimed} onClick={() => { setStep('already'); setError(''); }}>
+        <span className="w-12 h-12 flex-shrink-0 rounded-xl bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 flex items-center justify-center"><Check size={24} aria-hidden="true" /></span>
+        <span className="flex-1">
+          <span className="block text-[17px] font-semibold text-gray-900 dark:text-white">I already paid</span>
+          <span className="block text-sm text-gray-600 dark:text-gray-400">Cash, or a transfer you made outside the app</span>
+        </span>
+        <ChevronRight size={20} className="text-gray-500" aria-hidden="true" />
+      </button>
+      <Note>{toName} confirms each payment before your balances change.</Note>
+    </>
+  ));
 }

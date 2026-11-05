@@ -382,6 +382,20 @@ Deployed so far (2026-11-05): `settlements-*` (6 callables + `settlements-onExpe
 
 Tests: Jest 69 suites / 1,583 tests (the 35 Firestore-level store tests became 8 wrapper tests; the writes are now covered by emulator tests), 85.9% lines; functions unit 27/27; functions emulator 32/32 (12 new: claim, idempotent retry, debtor-only and amount limits, confirm with step-up and replay, wrong-notification token, legacy notifications, decline, receive, start/cancel/withdraw, stale-lock trigger logic); rules 55/55 (3 changed to the new behaviour, 7 added). Lint: no new errors (SettleUpModal and NotificationsDropdown test files are at or below their master counts). The emulator script now runs files one at a time (`--test-concurrency=1`) because both files clear the same emulator database.
 
+### 2026-11-05 (Settle Up redesign; live)
+
+Branch `feature/settle-up-ux`. Mockups approved by the user (Design canvas https://claude.ai/artifact/HY3cB3ACs9xLvV7XyE4rNf). No server or rules changes; same settlements Functions.
+
+| Area | What changed |
+|---|---|
+| Settle Up (`SettleUpModal.jsx`, rewritten) | Payer: "How are you settling?" -> Pay now (amount, then only the payee's methods) -> app step, or I already paid (amount + Cash/Bank transfer/Revolut/PayPal/Other chips; cash and other are `manual`). Revolut step: large amount, Copy amount with Copied feedback, note that Revolut cannot pre-fill, Open Revolut, laptop QR. PayPal: same, notes the amount is filled in. Bank: IBAN/BIC/amount/reference with copy, then I have sent it (claim `bank`). Started lock: Did you finish paying? Yes, I paid / Not yet (now calls `cancelSettlement`). Claimed lock: Waiting card with Withdraw. Payee: I received a payment (step-up), QR panel kept. Result screen after every action. Demo panel moved to the Pay now step (still behind `paymentDemosEnabled`) |
+| Buttons | New `ActionButton`: pressed look, spinner + saving label (aria-busy, blocks double taps); used in Settle Up and the group page |
+| Group page | Did you finish paying? card claims inline (no longer opens Settle Up); new Waiting for X to confirm card with Withdraw; payee card "X says they paid you" with I got it / Not received; short status message after each action |
+| Wording | Notifications use I got it / Not received; `methodLabel` in `utils/settlements.js` |
+| Dead code (listed, not deleted) | `src/components/PaymentInfoModal.jsx` (+ test) is no longer used by Settle Up |
+
+Tests: 70 suites, 1,557 passing (Settle Up tests rewritten for the new flow: 35, down from 66 tests of the old screens; ActionButton 3; methodLabel 1). Build compiles. Preview tested by the user on a phone (Revolut and PayPal open their apps; all five checks passed), then merged to `master` and hosting deployed (hosting only; no Functions or rules changes).
+
 ## 15. Maintaining this document
 
 - Add a dated entry to §14 for every working session, and keep §12 (deployment state) accurate.
