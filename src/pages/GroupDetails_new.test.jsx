@@ -70,6 +70,17 @@ jest.mock('../stores/authStore', () => {
 });
 
 const mockNotificationsStore = { notifications: [] };
+// Phase 1B: "Confirm it's you" and the settlements Functions
+jest.mock('../hooks/useStepUp', () => ({
+  __esModule: true,
+  default: () => ({ requestStepUp: () => Promise.resolve('tok'), stepUpSheet: null }),
+}));
+jest.mock('../utils/settlements', () => ({
+  cancelSettlement: () => Promise.resolve({ status: 'cancelled' }),
+  confirmParams: (id) => ({ notificationId: id }),
+  settlementErrorMessage: (_e, fallback) => fallback || 'That did not work. Please try again.',
+}));
+
 jest.mock('../stores/notificationsStore', () => ({
   useNotificationsStore:  () => mockNotificationsStore,
   confirmPaymentReceived: jest.fn(() => Promise.resolve()),

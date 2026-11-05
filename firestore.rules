@@ -96,13 +96,20 @@ service cloud.firestore {
     // Reads and writes require current group membership (admins may read).
     // Previously any signed-in user could read, create, edit or delete any
     // expense in any group.
+    // Settlement entries (isSettlement == true) are written only by the
+    // settlements Functions since Circles Phase 1B: the app can neither create
+    // one nor edit one (FR-SET-01). Deleting stays as before, because deleting
+    // a group or an account removes all of its expenses.
     match /expenses/{expenseId} {
       allow read: if isAdmin() || isGroupMember(resource.data.groupId);
       allow create: if isGroupMember(request.resource.data.groupId) && notSuspended() &&
+        request.resource.data.get('isSettlement', false) != true &&
         (!('createdBy' in request.resource.data) ||
           request.resource.data.createdBy == request.auth.uid);
       // An expense can never be moved to another group
       allow update: if (isGroupMember(resource.data.groupId) && notSuspended() &&
+        resource.data.get('isSettlement', false) != true &&
+        request.resource.data.get('isSettlement', false) != true &&
         request.resource.data.groupId == resource.data.groupId) ||
         // Admin moderation (Taskmaster): may only soft-remove an expense
         (isAdmin() &&
@@ -153,42 +160,36 @@ service cloud.firestore {
     match /notifications/{notificationId} {
       allow read: if request.auth != null &&
                    resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null;
-      // Owner may update their own notification. The other party to a payment
-      // (payer/payee named in data) may update it for the confirm/decline flow,
-      // but cannot change who it belongs to or the payment's amount/parties.
-      allow update: if request.auth != null && (
-        resource.data.userId == request.auth.uid ||
-        (
-          (request.auth.uid == resource.data.get('data', {}).get('payerId', '') ||
-           request.auth.uid == resource.data.get('data', {}).get('payeeId', '')) &&
-          request.resource.data.userId == resource.data.userId &&
-          request.resource.data.type == resource.data.type &&
-          request.resource.data.get('data', {}).get('amount', 0) == resource.data.get('data', {}).get('amount', 0) &&
-          request.resource.data.get('data', {}).get('payerId', '') == resource.data.get('data', {}).get('payerId', '') &&
-          request.resource.data.get('data', {}).get('payeeId', '') == resource.data.get('data', {}).get('payeeId', '') &&
-          request.resource.data.get('data', {}).get('groupId', '') == resource.data.get('data', {}).get('groupId', '')
-        )
-      );
+      // Payment notifications (claims, payer logs, payment confirmations) are
+      // written only by the settlements Functions since Phase 1B, so nobody can
+      // fake a "X paid you" request. Other types are created by the app.
+      allow create: if request.auth != null &&
+        !(request.resource.data.get('type', '') in ['payment_confirmation_needed', 'payment_log', 'payment']);
+      // Owner may update their own notification (mark as read). The other
+      // party no longer edits it: confirm and decline run on the server.
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.get('type', '') == resource.data.get('type', '');
       allow delete: if request.auth != null &&
                      resource.data.userId == request.auth.uid;
     }
 
     // ===== PENDING PAYMENTS =====
-    // Stores in-progress payment records to prevent duplicate payments
-    // across sessions and devices. Document ID: {groupId}_{fromUserId}_{toUserId}
+    // Payment locks that prevent duplicate payments across sessions and
+    // devices. Document ID: {groupId}_{fromUserId}_{toUserId}. Since Phase 1B
+    // they are written by the settlements Functions (status 'started' or
+    // 'claimed'). The payer may still delete a started lock of their own, which
+    // account deletion relies on; a claimed one stays until the payee answers.
     match /pendingPayments/{docId} {
       allow read: if request.auth != null && (
         resource == null ||
         resource.data.fromUserId == request.auth.uid ||
         resource.data.toUserId == request.auth.uid
       );
-      allow create, update: if request.auth != null &&
-        request.resource.data.fromUserId == request.auth.uid;
-      allow delete: if request.auth != null && (
-        resource.data.fromUserId == request.auth.uid ||
-        resource.data.toUserId == request.auth.uid
-      );
+      allow create, update: if false;
+      allow delete: if request.auth != null &&
+        resource.data.fromUserId == request.auth.uid &&
+        resource.data.get('status', 'started') != 'claimed';
     }
 
     // ===== CIRCLES FOUNDATIONS (Phase 1) =====
@@ -206,6 +207,7 @@ service cloud.firestore {
     match /stepUpTokens/{id}      { allow read, write: if false; }
     match /idempotency/{id}       { allow read, write: if false; }
     match /rateLimits/{id}        { allow read, write: if false; }
+    match /settlementClaims/{id}  { allow read, write: if false; }
 
     // Audit trail: platform admins may read; nobody may change it.
     match /auditLog/{id} {

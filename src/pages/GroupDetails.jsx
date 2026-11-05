@@ -20,6 +20,8 @@ import {
 import AddExpenseModal from '../components/AddExpenseModal';
 import { calculateBalances, calculateSettlements, getUserBalanceSummary } from '../utils/balanceCalculator';
 import SettleUpModal from '../components/SettleUpModal';
+import useStepUp from '../hooks/useStepUp';
+import { cancelSettlement, confirmParams, settlementErrorMessage } from '../utils/settlements';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 import ShareInviteModal from '../components/ShareInviteModal';
 import { getMySentInvitations, cancelInvitation, sendInvitation } from '../utils/invitationSystem'; 
@@ -77,6 +79,8 @@ export default function GroupDetails() {
   const [pendingPaymentBanner, setPendingPaymentBanner] = useState(null);
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [settlementActionLoading, setSettlementActionLoading] = useState({});
+  const [settlementActionError, setSettlementActionError] = useState({});
+  const { requestStepUp, stepUpSheet } = useStepUp();
   const [showPaymentHistory, setShowPaymentHistory] = useState(true);
   // Active = non-dismissed entries, Dismissed = dismissed confirmed entries
   const [paymentActivityTab, setPaymentActivityTab] = useState('active');
@@ -297,8 +301,11 @@ export default function GroupDetails() {
     );
 
     const unsubPending = onSnapshot(pendingQuery, (snapshot) => {
-      if (!snapshot.empty) {
-        const paymentData = snapshot.docs[0].data();
+      // Only payments the payer started ("did you pay?"). A claimed payment is
+      // waiting for the payee, so there is nothing for the payer to answer.
+      const started = snapshot.docs.find(d => d.data().status !== 'claimed');
+      if (started) {
+        const paymentData = started.data();
         setPendingPaymentBanner(paymentData);
         sessionStorage.setItem('pendingPayment', JSON.stringify(paymentData));
       } else {
@@ -999,8 +1006,7 @@ export default function GroupDetails() {
                       </button>
                       <button
                         onClick={async () => {
-                          const pendingDocId = `${groupId}_${pendingPaymentBanner.fromUserId}_${pendingPaymentBanner.toUserId}`;
-                          await deleteDoc(doc(db, 'pendingPayments', pendingDocId)).catch(() => {});
+                          await cancelSettlement({ groupId, toUid: pendingPaymentBanner.toUserId }).catch(() => {});
                           sessionStorage.removeItem('pendingPayment');
                           setPendingPaymentBanner(null);
                         }}
@@ -1044,10 +1050,13 @@ export default function GroupDetails() {
                         <button
                           onClick={async () => {
                             setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'confirming' }));
+                            setSettlementActionError(prev => ({ ...prev, [notif.id]: null }));
                             try {
-                              await confirmPaymentReceived(notif.id);
+                              // Confirming changes balances: "Confirm it's you" first
+                              const token = await requestStepUp('settlements.confirm', confirmParams(notif.id));
+                              if (token) await confirmPaymentReceived(notif.id, token);
                             } catch (err) {
-                              console.error('Error confirming payment:', err);
+                              setSettlementActionError(prev => ({ ...prev, [notif.id]: settlementErrorMessage(err, 'Failed to confirm. Please try again.') }));
                             } finally {
                               setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
                             }
@@ -1063,10 +1072,11 @@ export default function GroupDetails() {
                         <button
                           onClick={async () => {
                             setSettlementActionLoading(prev => ({ ...prev, [notif.id]: 'declining' }));
+                            setSettlementActionError(prev => ({ ...prev, [notif.id]: null }));
                             try {
                               await declinePaymentReceived(notif.id);
                             } catch (err) {
-                              console.error('Error declining payment:', err);
+                              setSettlementActionError(prev => ({ ...prev, [notif.id]: settlementErrorMessage(err, 'Failed to decline. Please try again.') }));
                             } finally {
                               setSettlementActionLoading(prev => ({ ...prev, [notif.id]: null }));
                             }
@@ -1080,6 +1090,9 @@ export default function GroupDetails() {
                           {actionLoading === 'declining' ? 'Declining...' : 'Did Not Receive'}
                         </button>
                       </div>
+                      {settlementActionError[notif.id] && (
+                        <p role="alert" className="mt-2 text-xs text-red-600 dark:text-red-400">{settlementActionError[notif.id]}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1884,6 +1897,7 @@ export default function GroupDetails() {
         group={group}
         initialExpense={editingExpense}
       />
+      {stepUpSheet}
       {/* Settle Up Modal */}
       <SettleUpModal
         isOpen={!!selectedSettlement}

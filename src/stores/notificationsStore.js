@@ -3,9 +3,10 @@ import { create } from 'zustand';
 import {
   collection, query, where, onSnapshot,
   doc, updateDoc, writeBatch, addDoc,
-  serverTimestamp, getDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { claimSettlement, confirmSettlement, declineSettlement } from '../utils/settlements';
 
 export const useNotificationsStore = create((set, get) => ({
   notifications: [],
@@ -106,140 +107,38 @@ export const createNotification = async ({
 
 /**
  * recordPaymentSent
- * Called when the PAYER marks a payment as sent via an external link (PayPal / Revolut).
- * Uses ONLY the existing notifications collection - no new Firestore collection needed.
- *
- * Creates two notification documents:
- *   1. payee notification  - type: payment_confirmation_needed, requiresAction: true
- *   2. payer log entry     - type: payment_log, auto-read, tracks status changes
- *
- * Both documents cross-reference each other via payeeNotifId / payerLogNotifId
- * so that confirm / decline can update both in one operation.
+ * Called when the PAYER says they paid (after a PayPal / Revolut / bank link,
+ * Paid Offline, or a demo). Since Phase 1B this is done by the
+ * settlements-claim Function: it writes the payee's actionable notification
+ * (payment_confirmation_needed), the payer's log entry (payment_log) and the
+ * pending-payment lock in one transaction. Balances change only when the payee
+ * confirms. The payer is always the signed-in user, so no payer id is sent.
  */
 export const recordPaymentSent = async ({
-  payerId, payerName,
-  payeeId, payeeName,
-  groupId, groupName,
-  amount, currency, method,
+  payeeId, groupId, amount, method, idempotencyKey, paypalOrderId,
 }) => {
   try {
-    const amountFixed = Number(amount).toFixed(2);
-
-    // 1 - Create the payee's actionable notification
-    const payeeNotifRef = await addDoc(collection(db, 'notifications'), {
-      userId: payeeId,
-      type: 'payment_confirmation_needed',
-      title: 'Payment Confirmation Needed',
-      message: `${payerName} claims to have paid you ${currency} ${amountFixed} via ${method.toUpperCase()} in ${groupName}. Did you receive it?`,
-      requiresAction: true,
-      actionStatus: 'pending',
-      data: {
-        groupId, groupName,
-        payerId, payerName,
-        payeeId, payeeName,
-        amount: Number(amount),
-        currency, method,
-        // payerLogNotifId is backfilled in step 3
-      },
-      read: false,
-      createdAt: serverTimestamp(),
+    return await claimSettlement({
+      groupId, toUid: payeeId, amount, method, idempotencyKey, paypalOrderId,
     });
-
-    // 2 - Create the payer's personal log entry
-    const payerLogRef = await addDoc(collection(db, 'notifications'), {
-      userId: payerId,
-      type: 'payment_log',
-      title: 'Payment Sent — Awaiting Confirmation',
-      message: `You paid ${currency} ${amountFixed} via ${method.toUpperCase()} to ${payeeName} in ${groupName}. Waiting for ${payeeName} to confirm.`,
-      requiresAction: false,
-      status: 'pending_confirmation',
-      data: {
-        groupId, groupName,
-        payerId, payerName,
-        payeeId, payeeName,
-        amount: Number(amount),
-        currency, method,
-        payeeNotifId: payeeNotifRef.id,
-      },
-      read: true, // Auto-read: payer initiated this, no badge increment
-      createdAt: serverTimestamp(),
-    });
-
-    // 3 - Backfill the payee notification with the payer log ID.
-    // This is a best-effort step — if it fails (e.g. rules not yet deployed),
-    // the confirm/decline flow still works; the payer log just won't update on
-    // payee action. Wrapped separately so it never cancels steps 1 and 2.
-    try {
-      await updateDoc(payeeNotifRef, {
-        'data.payerLogNotifId': payerLogRef.id,
-      });
-    } catch (backfillErr) {
-      console.warn('Could not backfill payerLogNotifId (non-critical):', backfillErr?.code);
-    }
-
-    return { success: true };
   } catch (error) {
-    console.error('Error recording payment sent:', error);
+    console.error('Error recording payment sent:', error?.code);
     throw error;
   }
 };
 
 /**
  * confirmPaymentReceived
- * Called by the PAYEE via their notification action button.
- * - Writes the expense (triggers balance recalculation)
- * - Removes the action buttons from the payee notification
- * - Updates the payer log so the payer sees the confirmed status
+ * Called by the PAYEE via their notification action button, after the
+ * "Confirm it's you" step (useStepUp) has produced a token for
+ * confirmParams(payeeNotifId). The settlements-confirm Function writes the
+ * settlement entry, updates both notifications and releases the lock.
  */
-export const confirmPaymentReceived = async (payeeNotifId) => {
+export const confirmPaymentReceived = async (payeeNotifId, stepUpToken) => {
   try {
-    const payeeNotifRef = doc(db, 'notifications', payeeNotifId);
-    const payeeNotifDoc = await getDoc(payeeNotifRef);
-
-    if (!payeeNotifDoc.exists()) throw new Error('Payment notification not found');
-
-    const { data } = payeeNotifDoc.data();
-
-    // Write the expense - this is the only thing that updates the balance
-    await addDoc(collection(db, 'expenses'), {
-      groupId: data.groupId,
-      title: `Settlement: ${data.payerName} to ${data.payeeName}`,
-      amount: data.amount,
-      currency: data.currency,
-      paidBy: data.payerId,
-      category: 'settlement',
-      description: `${data.method.toUpperCase()} Payment — confirmed by ${data.payeeName}`,
-      date: new Date(),
-      splitMethod: 'exact',
-      splits: { [data.payeeId]: data.amount },
-      participants: [data.payerId, data.payeeId],
-      createdAt: serverTimestamp(),
-      isSettlement: true,
-      paymentMethod: data.method,
-      confirmedAt: serverTimestamp(),
-    });
-
-    // Remove action buttons from payee notification
-    await updateDoc(payeeNotifRef, {
-      requiresAction: false,
-      actionStatus: 'confirmed',
-      read: true,
-      readAt: serverTimestamp(),
-    });
-
-    // Update payer log so payer sees confirmed status (unread so they notice)
-    if (data.payerLogNotifId) {
-      await updateDoc(doc(db, 'notifications', data.payerLogNotifId), {
-        status: 'confirmed',
-        title: 'Payment Confirmed',
-        message: `${data.payeeName} confirmed receiving ${data.currency} ${Number(data.amount).toFixed(2)} in ${data.groupName}. Your balance has been updated.`,
-        read: false,
-      });
-    }
-
-    return { success: true };
+    return await confirmSettlement(payeeNotifId, stepUpToken);
   } catch (error) {
-    console.error('Error confirming payment:', error);
+    console.error('Error confirming payment:', error?.code);
     throw error;
   }
 };
@@ -247,38 +146,13 @@ export const confirmPaymentReceived = async (payeeNotifId) => {
 /**
  * declinePaymentReceived
  * Called by the PAYEE when they did not receive the money.
- * Balance is NOT updated. Payer log is updated so payer knows to retry.
+ * Balance is NOT updated. The payer's log entry tells them to check and retry.
  */
 export const declinePaymentReceived = async (payeeNotifId) => {
   try {
-    const payeeNotifRef = doc(db, 'notifications', payeeNotifId);
-    const payeeNotifDoc = await getDoc(payeeNotifRef);
-
-    if (!payeeNotifDoc.exists()) throw new Error('Payment notification not found');
-
-    const { data } = payeeNotifDoc.data();
-
-    // Remove action buttons from payee notification
-    await updateDoc(payeeNotifRef, {
-      requiresAction: false,
-      actionStatus: 'declined',
-      read: true,
-      readAt: serverTimestamp(),
-    });
-
-    // Update payer log — declined status, make unread so payer notices
-    if (data.payerLogNotifId) {
-      await updateDoc(doc(db, 'notifications', data.payerLogNotifId), {
-        status: 'declined',
-        title: 'Payment Not Confirmed',
-        message: `${data.payeeName} could not confirm your ${data.currency} ${Number(data.amount).toFixed(2)} ${data.method.toUpperCase()} payment in ${data.groupName}. Please check and retry.`,
-        read: false,
-      });
-    }
-
-    return { success: true };
+    return await declineSettlement(payeeNotifId);
   } catch (error) {
-    console.error('Error declining payment:', error);
+    console.error('Error declining payment:', error?.code);
     throw error;
   }
 };

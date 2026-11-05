@@ -27,7 +27,6 @@ import QRCodeModal    from '../components/QRCodeModal';
 import InfoHubModal   from '../components/InfoHubModal';
 import DarkModeToggle from '../components/DarkModeToggle';
 import PasskeysCard   from '../components/PasskeysCard';
-import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import {
   registerBiometric,
   authenticateWithBiometric,
@@ -124,7 +123,6 @@ function ActionRow({ icon: Icon, iconBg, iconColor, label, description, onClick,
 export default function Settings() {
   const navigate       = useNavigate();
   const { user, logout, updateUserDisplayName } = useAuthStore();
-  const { isEnabled } = useFeatureFlags();
 
   const [notifications,    setNotifications]    = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -601,7 +599,7 @@ export default function Settings() {
             </button>
           </div>
           {/* Passkeys for money actions (Circles; shown only when the flag is on) */}
-          {isEnabled('circlesEnabled') && <PasskeysCard />}
+          <PasskeysCard />
           {/* Auto-Logout Timer */}
           <div className="py-3 px-4 bg-gray-50 dark:bg-gray-700/60 rounded-xl">
             <div className="flex items-center gap-3 mb-3">

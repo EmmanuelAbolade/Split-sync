@@ -72,9 +72,10 @@ test('a former member (left) cannot read the group expenses', async () => {
 });
 
 // ── Expense writes ───────────────────────────────────────────────────────────
-test('member adds an expense; settlement without createdBy is allowed', async () => {
+test('member adds an expense; the app can no longer write a settlement (Phase 1B)', async () => {
   await assertSucceeds(addDoc(collection(as(BOB), 'expenses'), expense('g1', { createdBy: BOB })));
-  await assertSucceeds(addDoc(collection(as(BOB), 'expenses'), expense('g1', { isSettlement: true })));
+  await assertSucceeds(addDoc(collection(as(BOB), 'expenses'), expense('g1', { isSettlement: false })));
+  await assertFails(addDoc(collection(as(BOB), 'expenses'), expense('g1', { isSettlement: true })));
 });
 test('non-member / former member cannot add an expense', async () => {
   await assertFails(addDoc(collection(as(MALLORY), 'expenses'), expense('g1', { createdBy: MALLORY })));
@@ -130,11 +131,13 @@ test('admin can only toggle isActive on another user', async () => {
 });
 
 // ── Notifications (payment confirm/decline flow) ─────────────────────────────
-test('payer backfills payerLogNotifId on the payee notification', async () => {
-  await assertSucceeds(updateDoc(doc(as(ALICE), 'notifications/n-payee'), { 'data.payerLogNotifId': 'n-log' }));
+// Since Phase 1B confirm and decline run on the server, so the other party to
+// a payment can no longer edit its notifications.
+test('the payer can no longer edit the payee notification', async () => {
+  await assertFails(updateDoc(doc(as(ALICE), 'notifications/n-payee'), { 'data.payerLogNotifId': 'n-log' }));
 });
-test('payee updates the payer log on confirm/decline', async () => {
-  await assertSucceeds(updateDoc(doc(as(BOB), 'notifications/n-log'), { status: 'confirmed', title: 'Payment Confirmed', message: 'ok', read: false }));
+test('the payee can no longer edit the payer log', async () => {
+  await assertFails(updateDoc(doc(as(BOB), 'notifications/n-log'), { status: 'confirmed', title: 'Payment Confirmed', message: 'ok', read: false }));
 });
 test('a party cannot change the payment amount or owner of the other\'s notification', async () => {
   await assertFails(updateDoc(doc(as(ALICE), 'notifications/n-payee'), { 'data.amount': 1 }));
@@ -145,6 +148,63 @@ test('an unrelated user cannot update someone else\'s notification', async () =>
 });
 test('owner marks own notification read', async () => {
   await assertSucceeds(updateDoc(doc(as(BOB), 'notifications/n-payee'), { read: true }));
+});
+test('owner cannot change the type or owner of their own notification', async () => {
+  await assertFails(updateDoc(doc(as(BOB), 'notifications/n-payee'), { type: 'expense' }));
+  await assertFails(updateDoc(doc(as(BOB), 'notifications/n-payee'), { userId: ALICE }));
+});
+test('payment notifications can only come from the server; other types still from the app', async () => {
+  for (const type of ['payment_confirmation_needed', 'payment_log', 'payment']) {
+    await assertFails(addDoc(collection(as(ALICE), 'notifications'), { userId: BOB, type, data: { payerId: ALICE, payeeId: BOB, amount: 50 } }));
+  }
+  await assertSucceeds(addDoc(collection(as(ALICE), 'notifications'), { userId: BOB, type: 'expense', read: false }));
+});
+
+// ── Settlements (Phase 1B: written by the settlements Functions) ──────────────
+async function seedSettlement() {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'expenses/s1'), expense('g1', { isSettlement: true, paidBy: BOB, splits: { [ALICE]: 10 }, participants: [BOB, ALICE] }));
+    await setDoc(doc(db, 'pendingPayments/g1_bob_alice'), { groupId: 'g1', fromUserId: BOB, toUserId: ALICE, status: 'started' });
+    await setDoc(doc(db, 'pendingPayments/g1_alice_bob'), { groupId: 'g1', fromUserId: ALICE, toUserId: BOB, status: 'claimed', claimId: 'c1' });
+    await setDoc(doc(db, 'pendingPayments/old_bob_alice'), { groupId: 'old', fromUserId: BOB, toUserId: ALICE });
+    await setDoc(doc(db, 'settlementClaims/c1'), { fromUid: ALICE, toUid: BOB, status: 'pending' });
+  });
+}
+test('a settlement entry cannot be edited by members, and an expense cannot become one', async () => {
+  await seedSettlement();
+  await assertFails(updateDoc(doc(as(ALICE), 'expenses/s1'), { amount: 999 }));
+  await assertFails(updateDoc(doc(as(BOB), 'expenses/s1'), { isSettlement: false }));
+  await assertFails(updateDoc(doc(as(ALICE), 'expenses/e1'), { isSettlement: true }));
+  await assertSucceeds(updateDoc(doc(as(ADMIN, { admin: true }), 'expenses/s1'), { status: 'deleted', deletedAt: new Date(), deletedBy: ADMIN, moderated: true }));
+});
+test('a settlement entry is still deleted with its group (group and account deletion)', async () => {
+  await seedSettlement();
+  await assertFails(deleteDoc(doc(as(MALLORY), 'expenses/s1')));
+  await assertSucceeds(deleteDoc(doc(as(ALICE), 'expenses/s1')));
+});
+test('payment locks: the app cannot create or change them', async () => {
+  await seedSettlement();
+  await assertFails(setDoc(doc(as(ALICE), 'pendingPayments/g1_alice_carol'), { groupId: 'g1', fromUserId: ALICE, toUserId: CAROL, amount: 5 }));
+  await assertFails(updateDoc(doc(as(BOB), 'pendingPayments/g1_bob_alice'), { amount: 1 }));
+  await assertFails(updateDoc(doc(as(ALICE), 'pendingPayments/g1_alice_bob'), { status: 'started' }));
+});
+test('payment locks: both parties read; only the payer deletes, and never a claimed one', async () => {
+  await seedSettlement();
+  await assertSucceeds(getDoc(doc(as(BOB), 'pendingPayments/g1_bob_alice')));
+  await assertSucceeds(getDoc(doc(as(ALICE), 'pendingPayments/g1_bob_alice')));
+  await assertSucceeds(getDocs(query(collection(as(BOB), 'pendingPayments'), where('groupId', '==', 'g1'), where('fromUserId', '==', BOB))));
+  await assertFails(getDoc(doc(as(MALLORY), 'pendingPayments/g1_bob_alice')));
+  await assertFails(deleteDoc(doc(as(ALICE), 'pendingPayments/g1_bob_alice')), 'the payee may not drop it');
+  await assertFails(deleteDoc(doc(as(ALICE), 'pendingPayments/g1_alice_bob')), 'a claimed lock waits for the payee');
+  await assertSucceeds(deleteDoc(doc(as(BOB), 'pendingPayments/g1_bob_alice')));
+  await assertSucceeds(deleteDoc(doc(as(BOB), 'pendingPayments/old_bob_alice')), 'older locks without a status count as started');
+});
+test('settlement claims are server-only', async () => {
+  await seedSettlement();
+  await assertFails(getDoc(doc(as(ALICE), 'settlementClaims/c1')));
+  await assertFails(getDoc(doc(as(BOB), 'settlementClaims/c1')));
+  await assertFails(setDoc(doc(as(ALICE), 'settlementClaims/c2'), { fromUid: ALICE, toUid: BOB, status: 'pending' }));
 });
 
 // ── Private profile details (payment methods, phone number) ──────────────────

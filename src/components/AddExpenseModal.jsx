@@ -2,7 +2,7 @@
 import ReceiptScanner from './ReceiptScanner';
 import { Camera, Calculator, Copy, Check, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { collection, addDoc, doc, updateDoc, serverTimestamp, getDocs, query, where, deleteDoc  } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import Tooltip from './Tooltip';
@@ -458,8 +458,11 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
         where('toUserId', '==', user.uid)
       );
       const incomingSnap = await getDocs(incomingQuery);
-      if (!incomingSnap.empty) {
-        const pd = incomingSnap.docs[0].data();
+      // Only a claimed payment is waiting for this user; a payment the payer
+      // has merely started needs nothing from them.
+      const waiting = incomingSnap.docs.find(d => d.data().status === 'claimed');
+      if (waiting) {
+        const pd = waiting.data();
         setError(
           `You have a payment from ${pd.fromName || 'a group member'} awaiting your confirmation. ` +
           `Please confirm or decline it in the group before adding a new expense.`
@@ -562,21 +565,10 @@ export default function AddExpenseModal({ isOpen, onClose, group, initialExpense
       setSplitMethod('equal');
       setScannedData(null);
 
-      // Rule 2 — Auto-cancel any pending payments in this group because
-      // the new expense changes the balances, making pending amounts stale.
-      // Both payer and payee are notified via the existing Firestore listener.
-      try {
-        const pendingQuery = query(
-          collection(db, 'pendingPayments'),
-          where('groupId', '==', group.id)
-        );
-        const pendingSnap = await getDocs(pendingQuery);
-        await Promise.all(
-          pendingSnap.docs.map(d => deleteDoc(d.ref))
-        );
-      } catch {
-        // Non-blocking — balance accuracy takes priority but do not fail the expense save
-      }
+      // Rule 2 — A new expense changes the balances, so payments that were only
+      // started (not yet claimed) are now stale. Since Phase 1B the server does
+      // this clean-up (settlements-onExpenseCreated); the app can no longer
+      // write payment locks. Both payer and payee see it through their listeners.
 
       onClose();
     } catch (err) {

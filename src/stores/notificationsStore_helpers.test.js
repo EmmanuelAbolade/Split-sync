@@ -1,390 +1,98 @@
 // src/stores/notificationsStore_helpers.test.js
-// Tests for standalone helpers: recordPaymentSent, confirmPaymentReceived, declinePaymentReceived
-// These cover lines 125-282 of notificationsStore.js
+// Tests for the standalone payment helpers: recordPaymentSent,
+// confirmPaymentReceived, declinePaymentReceived. Since Circles Phase 1B they
+// call the settlements Functions; what those Functions write (notifications,
+// locks, the settlement entry) is tested against the emulator in
+// functions/test/integration/settlements.test.js.
 
-// ─── Mocks ────────────────────────────────────────────────────────────────────
+jest.mock('../services/firebase', () => ({ __esModule: true, default: {}, db: {} }));
 
-jest.mock('../services/firebase', () => ({ db: {} }));
-
-const mockAddDoc      = jest.fn();
-const mockUpdateDoc   = jest.fn();
-const mockGetDoc      = jest.fn();
-const mockDoc         = jest.fn();
-const mockCollection  = jest.fn();
-const mockQuery       = jest.fn();
-const mockWhere       = jest.fn();
-const mockOnSnapshot  = jest.fn();
-const mockWriteBatch  = jest.fn();
-const mockServerTimestamp = jest.fn(() => 'SERVER_TIMESTAMP');
-
-jest.mock('firebase/firestore', () => ({
-  collection:      (...args) => mockCollection(...args),
-  query:           (...args) => mockQuery(...args),
-  where:           (...args) => mockWhere(...args),
-  onSnapshot:      (...args) => mockOnSnapshot(...args),
-  doc:             (...args) => mockDoc(...args),
-  updateDoc:       (...args) => mockUpdateDoc(...args),
-  writeBatch:      (...args) => mockWriteBatch(...args),
-  addDoc:          (...args) => mockAddDoc(...args),
-  getDoc:          (...args) => mockGetDoc(...args),
-  serverTimestamp: () => mockServerTimestamp(),
+const mockCall = jest.fn();
+jest.mock('firebase/functions', () => ({
+  getFunctions: () => ({}),
+  httpsCallable: (_fns, name) => (data) => mockCall(name, data),
 }));
 
-// ─── Shared payment payload ────────────────────────────────────────────────────
+jest.mock('firebase/firestore', () => ({
+  collection: () => ({}), query: () => ({}), where: () => ({}), onSnapshot: () => () => {},
+  doc: () => ({}), updateDoc: () => Promise.resolve(), writeBatch: () => ({}),
+  addDoc: () => Promise.resolve({ id: 'x' }), serverTimestamp: () => 'TS',
+}));
+
+// eslint-disable-next-line import/first
+import { recordPaymentSent, confirmPaymentReceived, declinePaymentReceived } from './notificationsStore';
 
 const paymentPayload = {
-  payerId:   'payer-uid',
+  payerId: 'payer-uid',
   payerName: 'Alice',
-  payeeId:   'payee-uid',
+  payeeId: 'payee-uid',
   payeeName: 'Bob',
-  groupId:   'group-001',
+  groupId: 'group-001',
   groupName: 'Flatmates',
-  amount:    25,
-  currency:  'EUR',
-  method:    'paypal',
+  amount: 25.5,
+  currency: 'EUR',
+  method: 'paypal',
+  idempotencyKey: 'k'.repeat(20),
 };
 
-// ─── Helpers to get store exports fresh each test ─────────────────────────────
-
-const getHelpers = () => {
-  const mod = require('./notificationsStore');
-  return {
-    recordPaymentSent:       mod.recordPaymentSent,
-    confirmPaymentReceived:  mod.confirmPaymentReceived,
-    declinePaymentReceived:  mod.declinePaymentReceived,
-  };
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// recordPaymentSent (lines 125-183)
-// ─────────────────────────────────────────────────────────────────────────────
+let errorSpy;
+beforeEach(() => {
+  mockCall.mockReset();
+  mockCall.mockImplementation((_name, data) => Promise.resolve({ data: { ok: true, echo: data } }));
+  errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+afterEach(() => errorSpy.mockRestore());
 
 describe('recordPaymentSent', () => {
-
-  beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
-    mockServerTimestamp.mockReturnValue('SERVER_TIMESTAMP');
-    mockCollection.mockReturnValue('mock-collection');
-    mockDoc.mockReturnValue('mock-doc-ref');
-    mockUpdateDoc.mockResolvedValue();
-    // First addDoc = payee notification, second = payer log
-    mockAddDoc
-      .mockResolvedValueOnce({ id: 'payee-notif-id' })
-      .mockResolvedValueOnce({ id: 'payer-log-id' });
+  test('claims the payment on the server in cents, with the payee and the idempotency key', async () => {
+    const r = await recordPaymentSent(paymentPayload);
+    expect(mockCall).toHaveBeenCalledWith('settlements-claim', {
+      groupId: 'group-001', toUid: 'payee-uid', amountMinor: 2550, method: 'paypal', idempotencyKey: 'k'.repeat(20),
+    });
+    expect(r.ok).toBe(true);
   });
 
-  test('Returns success:true on happy path', async () => {
-    const { recordPaymentSent } = getHelpers();
-    const result = await recordPaymentSent(paymentPayload);
-    expect(result).toEqual({ success: true });
-  });
-
-  test('Calls addDoc twice — once for payee, once for payer log', async () => {
-    const { recordPaymentSent } = getHelpers();
+  test('never sends a payer id: the server uses the signed-in user', async () => {
     await recordPaymentSent(paymentPayload);
-    expect(mockAddDoc).toHaveBeenCalledTimes(2);
+    const [, data] = mockCall.mock.calls[0];
+    expect(data).not.toHaveProperty('payerId');
+    expect(data).not.toHaveProperty('fromUid');
   });
 
-  test('Payee notification has type payment_confirmation_needed', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const firstCall = mockAddDoc.mock.calls[0][1];
-    expect(firstCall.type).toBe('payment_confirmation_needed');
+  test('passes a PayPal order reference when there is one', async () => {
+    await recordPaymentSent({ ...paymentPayload, paypalOrderId: 'ORDER-1' });
+    expect(mockCall.mock.calls[0][1].paypalOrderId).toBe('ORDER-1');
   });
 
-  test('Payee notification has requiresAction true', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const firstCall = mockAddDoc.mock.calls[0][1];
-    expect(firstCall.requiresAction).toBe(true);
+  test('rethrows and logs only the error code', async () => {
+    mockCall.mockRejectedValueOnce(Object.assign(new Error('secret detail'), { code: 'functions/failed-precondition' }));
+    await expect(recordPaymentSent(paymentPayload)).rejects.toMatchObject({ code: 'functions/failed-precondition' });
+    expect(errorSpy).toHaveBeenCalledWith('Error recording payment sent:', 'functions/failed-precondition');
   });
-
-  test('Payee notification is unread', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const firstCall = mockAddDoc.mock.calls[0][1];
-    expect(firstCall.read).toBe(false);
-  });
-
-  test('Payee notification message contains payer name', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const firstCall = mockAddDoc.mock.calls[0][1];
-    expect(firstCall.message).toContain('Alice');
-  });
-
-  test('Payee notification message contains formatted amount', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const firstCall = mockAddDoc.mock.calls[0][1];
-    expect(firstCall.message).toContain('25.00');
-  });
-
-  test('Payer log notification has type payment_log', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const secondCall = mockAddDoc.mock.calls[1][1];
-    expect(secondCall.type).toBe('payment_log');
-  });
-
-  test('Payer log notification is auto-read', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const secondCall = mockAddDoc.mock.calls[1][1];
-    expect(secondCall.read).toBe(true);
-  });
-
-  test('Payer log data contains payeeNotifId', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    const secondCall = mockAddDoc.mock.calls[1][1];
-    expect(secondCall.data.payeeNotifId).toBe('payee-notif-id');
-  });
-
-  test('Calls updateDoc to backfill payerLogNotifId into payee notification', async () => {
-    const { recordPaymentSent } = getHelpers();
-    await recordPaymentSent(paymentPayload);
-    expect(mockUpdateDoc).toHaveBeenCalledWith(
-      expect.anything(),
-      { 'data.payerLogNotifId': 'payer-log-id' }
-    );
-  });
-
-  test('Still returns success if backfill updateDoc fails (non-critical)', async () => {
-    mockUpdateDoc.mockRejectedValueOnce(new Error('backfill failed'));
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    const { recordPaymentSent } = getHelpers();
-    const result = await recordPaymentSent(paymentPayload);
-    expect(result).toEqual({ success: true });
-    consoleSpy.mockRestore();
-  });
-
-  test('Throws and logs error when addDoc fails', async () => {
-    mockAddDoc.mockReset();
-    mockAddDoc.mockRejectedValue(new Error('Firestore down'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const { recordPaymentSent } = getHelpers();
-    await expect(recordPaymentSent(paymentPayload)).rejects.toThrow('Firestore down');
-    expect(consoleSpy).toHaveBeenCalledWith('Error recording payment sent:', expect.any(Error));
-    consoleSpy.mockRestore();
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// confirmPaymentReceived (lines 195-243)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const makePayeeNotifDoc = (overrides = {}) => ({
-  exists: () => true,
-  data: () => ({
-    data: {
-      groupId:          'group-001',
-      groupName:        'Flatmates',
-      payerId:          'payer-uid',
-      payerName:        'Alice',
-      payeeId:          'payee-uid',
-      payeeName:        'Bob',
-      amount:           25,
-      currency:         'EUR',
-      method:           'paypal',
-      payerLogNotifId:  'payer-log-id',
-      ...overrides,
-    },
-  }),
 });
 
 describe('confirmPaymentReceived', () => {
-
-  beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
-    mockServerTimestamp.mockReturnValue('SERVER_TIMESTAMP');
-    mockCollection.mockReturnValue('mock-collection');
-    mockDoc.mockReturnValue('mock-doc-ref');
-    mockGetDoc.mockResolvedValue(makePayeeNotifDoc());
-    mockAddDoc.mockResolvedValue({ id: 'expense-id' });
-    mockUpdateDoc.mockResolvedValue();
+  test('confirms on the server with the notification id and the step-up token', async () => {
+    await confirmPaymentReceived('notif-1', 't'.repeat(40));
+    expect(mockCall).toHaveBeenCalledWith('settlements-confirm', { notificationId: 'notif-1', stepUpToken: 't'.repeat(40) });
   });
 
-  test('Returns success:true on happy path', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    const result = await confirmPaymentReceived('payee-notif-id');
-    expect(result).toEqual({ success: true });
-  });
-
-  test('Calls getDoc to fetch the payee notification', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    expect(mockGetDoc).toHaveBeenCalledTimes(1);
-  });
-
-  test('Creates an expense document in Firestore', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    expect(mockAddDoc).toHaveBeenCalledTimes(1);
-    const expenseData = mockAddDoc.mock.calls[0][1];
-    expect(expenseData.isSettlement).toBe(true);
-  });
-
-  test('Expense has correct amount', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    const expenseData = mockAddDoc.mock.calls[0][1];
-    expect(expenseData.amount).toBe(25);
-  });
-
-  test('Expense paidBy is the payerId', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    const expenseData = mockAddDoc.mock.calls[0][1];
-    expect(expenseData.paidBy).toBe('payer-uid');
-  });
-
-  test('Updates payee notification to requiresAction false', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    expect(mockUpdateDoc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ requiresAction: false, actionStatus: 'confirmed' })
-    );
-  });
-
-  test('Updates payer log notification when payerLogNotifId present', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    // updateDoc called twice: payee notif + payer log
-    expect(mockUpdateDoc).toHaveBeenCalledTimes(2);
-    const payerLogUpdate = mockUpdateDoc.mock.calls[1][1];
-    expect(payerLogUpdate.status).toBe('confirmed');
-  });
-
-  test('Payer log update sets read to false so payer notices', async () => {
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    const payerLogUpdate = mockUpdateDoc.mock.calls[1][1];
-    expect(payerLogUpdate.read).toBe(false);
-  });
-
-  test('Skips payer log update when payerLogNotifId is absent', async () => {
-    mockGetDoc.mockResolvedValue(makePayeeNotifDoc({ payerLogNotifId: undefined }));
-    const { confirmPaymentReceived } = getHelpers();
-    await confirmPaymentReceived('payee-notif-id');
-    // Only one updateDoc call (payee notif) — no payer log update
-    expect(mockUpdateDoc).toHaveBeenCalledTimes(1);
-  });
-
-  test('Throws when payee notification does not exist', async () => {
-    mockGetDoc.mockResolvedValue({ exists: () => false });
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const { confirmPaymentReceived } = getHelpers();
-    await expect(confirmPaymentReceived('bad-id')).rejects.toThrow('Payment notification not found');
-    consoleSpy.mockRestore();
-  });
-
-  test('Logs error and throws when Firestore call fails', async () => {
-    mockGetDoc.mockRejectedValue(new Error('Firestore error'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const { confirmPaymentReceived } = getHelpers();
-    await expect(confirmPaymentReceived('payee-notif-id')).rejects.toThrow();
-    expect(consoleSpy).toHaveBeenCalledWith('Error confirming payment:', expect.any(Error));
-    consoleSpy.mockRestore();
+  test('rethrows server errors', async () => {
+    mockCall.mockRejectedValueOnce(Object.assign(new Error('x'), { code: 'functions/unauthenticated' }));
+    await expect(confirmPaymentReceived('notif-1', 'tok')).rejects.toMatchObject({ code: 'functions/unauthenticated' });
+    expect(errorSpy).toHaveBeenCalledWith('Error confirming payment:', 'functions/unauthenticated');
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// declinePaymentReceived (lines 253-282)
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('declinePaymentReceived', () => {
-
-  beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
-    mockServerTimestamp.mockReturnValue('SERVER_TIMESTAMP');
-    mockCollection.mockReturnValue('mock-collection');
-    mockDoc.mockReturnValue('mock-doc-ref');
-    mockGetDoc.mockResolvedValue(makePayeeNotifDoc());
-    mockUpdateDoc.mockResolvedValue();
+  test('declines on the server with only the notification id', async () => {
+    await declinePaymentReceived('notif-2');
+    expect(mockCall).toHaveBeenCalledWith('settlements-decline', { notificationId: 'notif-2' });
   });
 
-  test('Returns success:true on happy path', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    const result = await declinePaymentReceived('payee-notif-id');
-    expect(result).toEqual({ success: true });
-  });
-
-  test('Calls getDoc to fetch the payee notification', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    expect(mockGetDoc).toHaveBeenCalledTimes(1);
-  });
-
-  test('Does NOT create an expense document (balance unchanged)', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    expect(mockAddDoc).not.toHaveBeenCalled();
-  });
-
-  test('Updates payee notification to actionStatus declined', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    expect(mockUpdateDoc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ requiresAction: false, actionStatus: 'declined' })
-    );
-  });
-
-  test('Payee notification is marked as read after decline', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    const payeeUpdate = mockUpdateDoc.mock.calls[0][1];
-    expect(payeeUpdate.read).toBe(true);
-  });
-
-  test('Updates payer log to status declined when payerLogNotifId present', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    expect(mockUpdateDoc).toHaveBeenCalledTimes(2);
-    const payerLogUpdate = mockUpdateDoc.mock.calls[1][1];
-    expect(payerLogUpdate.status).toBe('declined');
-  });
-
-  test('Payer log decline update sets read to false so payer notices', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    const payerLogUpdate = mockUpdateDoc.mock.calls[1][1];
-    expect(payerLogUpdate.read).toBe(false);
-  });
-
-  test('Payer log decline message contains payee name', async () => {
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    const payerLogUpdate = mockUpdateDoc.mock.calls[1][1];
-    expect(payerLogUpdate.message).toContain('Bob');
-  });
-
-  test('Skips payer log update when payerLogNotifId is absent', async () => {
-    mockGetDoc.mockResolvedValue(makePayeeNotifDoc({ payerLogNotifId: undefined }));
-    const { declinePaymentReceived } = getHelpers();
-    await declinePaymentReceived('payee-notif-id');
-    expect(mockUpdateDoc).toHaveBeenCalledTimes(1);
-  });
-
-  test('Throws when payee notification does not exist', async () => {
-    mockGetDoc.mockResolvedValue({ exists: () => false });
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const { declinePaymentReceived } = getHelpers();
-    await expect(declinePaymentReceived('bad-id')).rejects.toThrow('Payment notification not found');
-    consoleSpy.mockRestore();
-  });
-
-  test('Logs error and throws when Firestore call fails', async () => {
-    mockGetDoc.mockRejectedValue(new Error('Firestore error'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const { declinePaymentReceived } = getHelpers();
-    await expect(declinePaymentReceived('payee-notif-id')).rejects.toThrow();
-    expect(consoleSpy).toHaveBeenCalledWith('Error declining payment:', expect.any(Error));
-    consoleSpy.mockRestore();
+  test('rethrows server errors', async () => {
+    mockCall.mockRejectedValueOnce(Object.assign(new Error('x'), { code: 'functions/permission-denied' }));
+    await expect(declinePaymentReceived('notif-2')).rejects.toMatchObject({ code: 'functions/permission-denied' });
+    expect(errorSpy).toHaveBeenCalledWith('Error declining payment:', 'functions/permission-denied');
   });
 });

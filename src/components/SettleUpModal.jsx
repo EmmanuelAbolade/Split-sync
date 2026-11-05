@@ -1,6 +1,10 @@
 // src/components/SettleUpModal.jsx - WITH PAYMENT CONFIRMATION FLOW
-import { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+// Since Phase 1B every settlement write goes through the settlements
+// Functions (src/utils/settlements.js). A payer only ever *claims* a payment;
+// balances change when the payee confirms it, or when the payee records a
+// payment themselves (after "Confirm it's you").
+import { useState, useEffect, useRef } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { PayPalButtons } from '@paypal/react-paypal-js';
@@ -8,10 +12,13 @@ import { DollarSign, CreditCard, CheckCircle2, X, ArrowRight, AlertCircle, Exter
 import { generatePayPalLink, generateRevolutLink, getAvailablePaymentMethods } from '../utils/paymentLinks';
 import PaymentInfoModal from './PaymentInfoModal';
 import SepaPaymentModal from './SepaPaymentModal';
-import { authenticateWithBiometric } from '../utils/biometric';
 import { fetchIban } from '../utils/ibanService';
 import { fetchGroupPaymentMethods } from '../utils/privateProfile';
-import { createNotification, recordPaymentSent } from '../stores/notificationsStore';
+import { recordPaymentSent } from '../stores/notificationsStore';
+import useStepUp from '../hooks/useStepUp';
+import useFeatureFlags from '../hooks/useFeatureFlags';
+import { startSettlement, receiveSettlement, receiveParams, settlementErrorMessage } from '../utils/settlements';
+import { newIdempotencyKey } from '../utils/stepUp';
 import QRCodeCanvas from './QRCodeCanvas';
 
 export default function SettleUpModal({ isOpen, onClose, settlement, group, currentUserId }) {
@@ -37,10 +44,21 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
   const [activeQR, setActiveQR] = useState('paypal');
   const [showQR, setShowQR] = useState(false);
   const [showDemoInfo, setShowDemoInfo] = useState(false);
+  const { isEnabled } = useFeatureFlags();
+  const paymentDemosOn = isEnabled('paymentDemosEnabled');
   const fromMember = group?.members?.find(m => m.userId === settlement?.from);
   const toMember = group?.members?.find(m => m.userId === settlement?.to);
   const userIsPaying = currentUserId === settlement?.from;
   const userIsReceiving = currentUserId === settlement?.to;
+  const { requestStepUp, stepUpSheet } = useStepUp();
+
+  // One idempotency key per user intent (what, how much, how), kept while the
+  // modal is open, so a retry or double tap can never record a payment twice.
+  const intentKeys = useRef({});
+  const keyFor = (intent) => {
+    if (!intentKeys.current[intent]) intentKeys.current[intent] = newIdempotencyKey();
+    return intentKeys.current[intent];
+  };
 
   // Merge reset + pending-check into a single effect so the reset never
   // overrides the pending-check result (previous bug: two separate effects
@@ -56,6 +74,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setShowConfirmation(false);
     setCopiedIban(false);
     setAmount(settlement?.amount?.toFixed(2) || '');
+    intentKeys.current = {};
 
     // Step 2: Listen to Firestore for a pending payment for this exact settlement pair.
     // Firestore persists across sessions and devices unlike sessionStorage.
@@ -68,7 +87,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       if (snap.exists()) {
         const paymentData = snap.data();
         setPendingPayment(paymentData);
-        setShowPendingConfirmation(true);
+        // "Did you complete the payment?" only for a payment the payer started;
+        // a claimed one is waiting for the payee (amber notice below instead).
+        setShowPendingConfirmation(paymentData.status !== 'claimed');
         sessionStorage.setItem('pendingPayment', JSON.stringify(paymentData));
       } else {
         setPendingPayment(null);
@@ -111,79 +132,35 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     }
   }, [settlement, isOpen, group?.id]);
 
-  const recordSettlement = async (paypalOrderId = null) => {
-    const amountNum = parseFloat(amount);
-
-    try {
-      const settlementData = {
-        groupId: group.id,
-        title: `Settlement: ${fromMember?.name} → ${toMember?.name}`,
-        amount: amountNum,
-        currency: group.currency,
-        paidBy: settlement.from,
-        category: 'settlement',
-        description: paypalOrderId 
-          ? `PayPal Payment (Order: ${paypalOrderId})`
-          : `Manual payment ${userIsReceiving ? 'received' : 'sent'}`,
-        date: new Date(),
-        splitMethod: 'exact',
-        splits: {
-          [settlement.to]: amountNum,
-        },
-        participants: [settlement.from, settlement.to],
-        createdAt: serverTimestamp(),
-        isSettlement: true,
-        paymentMethod: paypalOrderId ? 'paypal' : 'manual',
-        paypalOrderId: paypalOrderId || null,
-        recordedBy: currentUserId,
-      };
-
-      await addDoc(collection(db, 'expenses'), settlementData);
-
-      // Notify the OTHER person (not the one who recorded it)
-      if (userIsReceiving) {
-        // Receiver marked as received - notify the payer
-        await createNotification({
-          userId: settlement.from,
-          type: 'payment',
-          title: 'Payment Confirmed',
-          message: `${toMember?.name} confirmed receiving ${group.currency} ${amountNum.toFixed(2)} from you in ${group.name}`,
-          data: {
-            groupId: group.id,
-            amount: amountNum,
-            currency: group.currency,
-            toUserId: settlement.to,
-            toName: toMember?.name,
-          },
-        });
-      } else {
-        // Payer marked as sent - notify the receiver
-        await createNotification({
-          userId: settlement.to,
-          type: 'payment',
-          title: 'Payment Received',
-          message: `${fromMember?.name} paid you ${group.currency} ${amountNum.toFixed(2)} in ${group.name}`,
-          data: {
-            groupId: group.id,
-            amount: amountNum,
-            currency: group.currency,
-            fromUserId: settlement.from,
-            fromName: fromMember?.name,
-          },
-        });
-      }
-
-      return true;
-    } catch (err) {
-      console.error('Error recording settlement:', err);
-      throw err;
-    }
+  // Payer: tell the payee we paid. Nothing changes until they confirm.
+  const claimPayment = async (method, amountNum, paypalOrderId = null) => {
+    await recordPaymentSent({
+      payeeId: settlement.to,
+      groupId: group.id,
+      amount: amountNum,
+      method,
+      idempotencyKey: keyFor(`claim:${method}:${amountNum.toFixed(2)}`),
+      ...(paypalOrderId ? { paypalOrderId } : {}),
+    });
   };
 
-  // Handle "Mark as Paid" for pending payment
-  // Handle "Mark as Paid" for pending payment.
-  // Uses recordPaymentSent which writes to the existing notifications collection only —
-  // no new Firestore collection, no additional security rules required.
+  // Payee: record a payment received. Balances change, so "Confirm it's you"
+  // first (replaces the device-only biometric check). Returns false if cancelled.
+  const receivePayment = async (amountNum) => {
+    const params = {
+      groupId: group.id,
+      fromUid: settlement.from,
+      amount: amountNum,
+      idempotencyKey: keyFor(`receive:${amountNum.toFixed(2)}`),
+    };
+    const token = await requestStepUp('settlements.receive', receiveParams(params));
+    if (!token) return false;
+    await receiveSettlement(params, token);
+    return true;
+  };
+
+  // Handle "Mark as Paid" for a payment started from a payment link.
+  // The server turns the started payment into a claim and asks the payee.
   const handleMarkAsPaid = async () => {
     if (!pendingPayment) return;
 
@@ -191,21 +168,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setError('');
 
     try {
-      await recordPaymentSent({
-        payerId: settlement.from,
-        payerName: fromMember?.name || 'Unknown',
-        payeeId: settlement.to,
-        payeeName: toMember?.name || 'Unknown',
-        groupId: group.id,
-        groupName: group.name,
-        amount: pendingPayment.amount,
-        currency: pendingPayment.currency,
-        method: pendingPayment.method,
-      });
-
-      // Delete from Firestore so all devices and sessions are unblocked
-      const pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;
-      await deleteDoc(doc(db, 'pendingPayments', pendingDocId)).catch(() => {});
+      await claimPayment(pendingPayment.method || 'manual', Number(pendingPayment.amount));
       sessionStorage.removeItem('pendingPayment');
       setPendingPayment(null);
       setShowPendingConfirmation(false);
@@ -213,13 +176,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
 
       setTimeout(() => { onClose(); }, 2500);
     } catch (err) {
-      console.error('Error marking as paid:', err);
-      // Show the actual error message so it is debuggable
-      setError(
-        err?.code === 'permission-denied'
-          ? 'Permission denied. Please ensure you are signed in and try again.'
-          : `Failed to record payment: ${err?.message || 'Please try again.'}`
-      );
+      setError(settlementErrorMessage(err, 'Failed to record payment. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -247,40 +204,26 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       return;
     }
 
-    // Set loading BEFORE biometric check
     setLoading(true);
-
-    if (userIsReceiving && showConfirmation) {
-      try {
-        const authenticated = await authenticateWithBiometric(
-          currentUserId,
-          'Authenticate to confirm receipt'
-        );
-        
-        if (!authenticated) {
-          setError('Biometric authentication was cancelled or failed. Please try again or Enable biometric authentication in Settings.');
-          setLoading(false);
-          setShowConfirmation(false); // Reset confirmation state
+    try {
+      if (userIsReceiving) {
+        const done = await receivePayment(amountNum);
+        if (!done) {
+          setError('Confirmation was cancelled. Please try again.');
+          setShowConfirmation(false);
           return;
         }
-      } catch (err) {
-        console.error('Biometric error:', err);
-        setError('Authentication failed. Please enable biometric authentication in Settings or try again.');
-        setLoading(false);
-        setShowConfirmation(false); // Reset confirmation state
-        return;
+      } else {
+        await claimPayment('manual', amountNum);
       }
-    }
-
-    try {
-      await recordSettlement();
       setPaymentSuccess(true);
       setTimeout(() => {
         onClose();
         setShowConfirmation(false);
       }, 2500);
     } catch (err) {
-      setError('Failed to record settlement. Please try again.');
+      setError(settlementErrorMessage(err, 'Failed to record settlement. Please try again.'));
+      setShowConfirmation(false);
     } finally {
       setLoading(false);
     }
@@ -307,54 +250,16 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
     setShowSepaModal(true);
   };
 
-  // Handle SEPA demo simulation success.
-  // The demo simulates a completed transfer so balances update immediately
-  // without requiring payee confirmation — appropriate for demo purposes only.
+  // Handle SEPA demo simulation success. The simulation moves no money, so it
+  // is recorded like any other payment: as a claim the payee confirms.
   const handleSepaPaymentSuccess = async (paymentResult) => {
     try {
-      const amountNum = paymentResult.amount;
-
-      // Write settlement expense directly — same as a confirmed payment
-      await addDoc(collection(db, 'expenses'), {
-        groupId: group.id,
-        title: `Settlement: ${fromMember?.name} → ${toMember?.name}`,
-        amount: amountNum,
-        currency: group.currency,
-        paidBy: settlement.from,
-        category: 'settlement',
-        description: 'SEPA Demo Payment (simulated)',
-        date: new Date(),
-        splitMethod: 'exact',
-        splits: { [settlement.to]: amountNum },
-        participants: [settlement.from, settlement.to],
-        createdAt: serverTimestamp(),
-        isSettlement: true,
-        paymentMethod: 'sepa',
-        recordedBy: currentUserId,
-      });
-
-      // Notify the payee that payment was received — no confirmation needed
-      await createNotification({
-        userId: settlement.to,
-        type: 'payment',
-        title: 'Payment Received',
-        message: `${fromMember?.name} paid you ${group.currency} ${amountNum.toFixed(2)} via SEPA in ${group.name}`,
-        data: {
-          groupId: group.id,
-          amount: amountNum,
-          currency: group.currency,
-          fromUserId: settlement.from,
-          fromName: fromMember?.name,
-        },
-      });
-
+      await claimPayment('sepa', Number(paymentResult.amount));
       setPaymentSuccess(true);
       setShowSepaModal(false);
       setTimeout(() => onClose(), 2500);
-
     } catch (err) {
-      console.error('Error recording SEPA demo settlement:', err);
-      setError('Payment processed but failed to update balances. Please try again.');
+      setError(settlementErrorMessage(err, 'Payment processed but could not be recorded. Please try again.'));
     }
   };
 
@@ -377,12 +282,13 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       timestamp: Date.now(),
     };
 
-    // Save to Firestore for cross-device persistence
-    const pendingDocId = `${group.id}_${settlement.from}_${settlement.to}`;
-    setDoc(doc(db, 'pendingPayments', pendingDocId), {
-      ...pendingPaymentData,
-      createdAt: new Date(),
-    }).catch(err => console.error('Failed to save pending payment:', err));
+    // Saved on the server for cross-device persistence (the "did you pay?" prompt)
+    startSettlement({
+      groupId: group.id,
+      toUid: settlement.to,
+      amount: amountNum,
+      method: pendingPaymentData.method,
+    }).catch(err => console.error('Failed to save pending payment:', err?.code));
 
     // Keep sessionStorage in sync for same-session GroupDetails banner
     sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
@@ -461,8 +367,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
       const fns           = getFunctions();
       const capturePayPal = httpsCallable(fns, 'capturePayPalOrder');
       const result        = await capturePayPal({ orderId: data.orderID });
-      if (!result.data.success) throw new Error('...');
-      await recordSettlement(result.data.orderId);
+      if (!result.data.success) throw new Error('capture failed');
+      await claimPayment('paypal', parseFloat(amount), result.data.orderId);
       setPaymentSuccess(true);
       setTimeout(() => onClose(), 2500);
     } catch (err) {
@@ -650,6 +556,7 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
             </button>
           </div>
         </div>
+        {stepUpSheet}
       </div>
     );
   }
@@ -947,6 +854,9 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                     </p>
                   </div>
                 )}
+                {/* Demo panel: shown only while paymentDemosEnabled is on (admin panel) */}
+                {paymentDemosOn && (
+                <>
                 {/* Future Feature — collapsible demo panel for PayPal sandbox and SEPA simulation */}
                 <button
                   type="button"
@@ -1028,6 +938,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
                       </div>
                     )}
                   </div>
+                )}
+                </>
                 )}
               </div>
             ) : (
@@ -1201,6 +1113,8 @@ export default function SettleUpModal({ isOpen, onClose, settlement, group, curr
         onClose={() => setShowPaymentInfo(false)}
         paymentInfo={paymentInfo}
       />
+
+      {stepUpSheet}
 
       {/* SEPA Payment Modal */}
       {showSepaModal && sepaPaymentData && (
