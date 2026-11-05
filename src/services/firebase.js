@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { startAppCheck } from './appCheck';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -17,6 +18,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// App Check (monitor mode; only when a site key is configured). Must start
+// before any other Firebase service is used.
+startAppCheck(app);
 
 // Initialize services
 export const auth = getAuth(app);

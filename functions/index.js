@@ -452,3 +452,9 @@ exports.splitSyncChat = functions.https.onCall(
     });
   }
 );
+
+// ─── Circles foundations (Phase 1) ───────────────────────────────────────────
+// Grouped exports: deployed as stepUp-begin, stepUp-complete, ..., admin-setFlag.
+// Shared money-pipeline helpers live in functions/core/.
+exports.stepUp = require('./stepUp');
+exports.admin = { setFlag: require('./admin/setFlag').callable };

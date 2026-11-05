@@ -73,6 +73,13 @@ jest.mock('../components/InfoHubModal',  () => ({ isOpen, onClose }) =>
 );
 jest.mock('../components/DarkModeToggle', () => () => <div data-testid="dark-mode-toggle" />);
 
+// Circles flags: off unless a test switches them on
+let mockFlagsOn = false;
+jest.mock('../hooks/useFeatureFlags', () => ({
+  useFeatureFlags: () => ({ loading: false, isEnabled: () => mockFlagsOn }),
+}));
+jest.mock('../components/PasskeysCard', () => () => <div data-testid="passkeys-card" />);
+
 // ─── Import after mocks ───────────────────────────────────────────────────────
 import Settings from './Settings';
 
@@ -428,5 +435,23 @@ describe('Settings - Biometric toggle', () => {
       expect(screen.getByText('Failed to enable biometric authentication')).toBeInTheDocument()
     );
     consoleSpy.mockRestore();
+  });
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('Settings - Passkeys for money actions (Circles flag)', () => {
+  afterEach(() => { mockFlagsOn = false; });
+
+  test('Hidden while the Circles flag is off (production default)', () => {
+    mockFlagsOn = false;
+    render(<Settings />);
+    expect(screen.queryByTestId('passkeys-card')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Toggle biometric authentication')).toBeInTheDocument();
+  });
+
+  test('Shown when the Circles flag is on for this user', () => {
+    mockFlagsOn = true;
+    render(<Settings />);
+    expect(screen.getByTestId('passkeys-card')).toBeInTheDocument();
   });
 });

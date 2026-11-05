@@ -7,6 +7,12 @@
  * all debts within a group. It also provides helpers for per-user balance summaries
  * and multi-currency grouping.
  *
+ * Spaces (Circles extension): everything here belongs to the Expenses space.
+ * Expense documents written before spaces existed have no `spaceId`; a
+ * missing `spaceId` means 'expenses' (see spaceIdOf in src/config/spaces.js).
+ * These functions are only ever given one group's expenses, so they never mix
+ * spaces; their behaviour is unchanged.
+ *
  * @author Emmanuel Abolade (C00288657)
  * @date 2025-2026
  * @version 1.0.0

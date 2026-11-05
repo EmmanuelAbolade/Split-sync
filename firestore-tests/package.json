@@ -3,7 +3,7 @@
   "private": true,
   "description": "Firestore security rules tests. Run from repo root: npm run test:rules",
   "scripts": {
-    "test": "node --test rules.test.js"
+    "test": "node --test --test-concurrency=1 rules.test.js foundations.rules.test.js circles.rules.test.js"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "5.0.2",

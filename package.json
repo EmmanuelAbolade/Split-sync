@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@paypal/react-paypal-js": "8.9.2",
+    "@simplewebauthn/browser": "14.0.0",
     "@testing-library/dom": "10.4.1",
     "crypto-js": "4.2.0",
     "firebase": "12.6.0",
@@ -25,7 +26,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:rules": "firebase emulators:exec --only firestore --project demo-splitsync \"npm --prefix firestore-tests test\"",
-    "test:functions": "node --test functions/iban.test.js functions/privateData.test.js"
+    "test:functions": "node --test functions/iban.test.js functions/privateData.test.js functions/core/core.test.js",
+    "test:functions:emulator": "firebase emulators:exec --only firestore --project demo-splitsync \"node --test functions/test/integration/*.test.js\""
   },
   "jest": {
     "transformIgnorePatterns": [

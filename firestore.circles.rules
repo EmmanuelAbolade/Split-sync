@@ -1,0 +1,101 @@
+rules_version = '2';
+// Security rules for the `circles` Firestore database (Circles, Loans, Aid).
+// Money data here is written ONLY by Cloud Functions (Admin SDK); every client
+// write to a money collection is denied. Design: docs/circles/10-database-design.md §7.2.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin()  { return signedIn() && request.auth.token.admin == true; }
+    function me()       { return request.auth.uid; }
+    function audience() { return ['nobody', 'trusted', 'shared', 'groups']; }
+
+    // Containers: members read; nobody writes from the client
+    match /circles/{circleId} {
+      allow read: if signedIn() && me() in resource.data.memberUids;
+      allow write: if false;
+      match /{sub=**} {
+        allow read: if signedIn() &&
+          me() in get(/databases/$(database)/documents/circles/$(circleId)).data.memberUids;
+        allow write: if false;
+      }
+    }
+
+    // Invite previews: fetch one invite by its id (like groups today). Listing
+    // all invites is not allowed.
+    match /circleInvites/{id} {
+      allow get: if signedIn();
+      allow list, write: if false;
+    }
+
+    // Borrower only. The lender reads the summary in their own `requests` item,
+    // so nothing the borrower can read reveals whether the request was held.
+    match /loanRequests/{id} {
+      allow read: if signedIn() && resource.data.borrowerUid == me();
+      allow write: if false;
+    }
+    match /loans/{id} {
+      allow read: if signedIn() && me() in resource.data.partyUids;
+      allow write: if false;
+    }
+
+    match /aidRequests/{aid} {
+      allow read: if signedIn() && (
+        resource.data.requesterUid == me() || resource.data.adminUid == me() ||
+        (me() in resource.data.memberUids && resource.data.status in ['open', 'closed']));
+      allow write: if false;
+      match /pledges/{pid} {
+        allow read: if signedIn() && (resource.data.uid == me() ||
+          get(/databases/$(database)/documents/aidRequests/$(aid)).data.requesterUid == me());
+        allow write: if false;
+      }
+    }
+    match /aidPrivate/{aid} {
+      allow read: if signedIn() && me() in resource.data.readerUids;
+      allow write: if false;
+    }
+
+    // Inbox: the recipient only; the sender can never learn delivery status
+    match /requests/{id} {
+      allow read: if signedIn() && resource.data.recipientUid == me();
+      allow write: if false;
+    }
+
+    // Owner-managed, non-money settings (who may send me requests)
+    match /privacy/{uid} {
+      allow read: if signedIn() && uid == me();
+      allow create, update: if signedIn() && uid == me() &&
+        request.resource.data.keys().hasOnly(['loans', 'aid', 'direct', 'holdOthers']) &&
+        request.resource.data.keys().hasAll(['loans', 'aid', 'direct', 'holdOthers']) &&
+        request.resource.data.loans  in audience() &&
+        request.resource.data.aid    in audience() &&
+        request.resource.data.direct in audience() &&
+        request.resource.data.holdOthers is bool;
+      allow delete: if false;
+    }
+    match /trusted/{uid}/people/{other} {
+      allow read, delete: if signedIn() && uid == me();
+      allow create, update: if signedIn() && uid == me() && other != me() &&
+        request.resource.data.keys().hasOnly(['addedAt']);
+    }
+    match /blocked/{uid}/people/{other} {
+      allow read, delete: if signedIn() && uid == me();
+      allow create, update: if signedIn() && uid == me() && other != me() &&
+        request.resource.data.keys().hasOnly(['addedAt']);
+    }
+
+    match /trust/{uid} { allow read: if signedIn() && uid == me(); allow write: if false; }
+
+    // Ledger: members of the container read; append-only, server-written
+    match /ledger/{id} {
+      allow read: if signedIn() && me() in resource.data.memberUids;
+      allow write: if false;
+    }
+
+    match /locks/{id}       { allow read: if signedIn() && resource.data.uid == me(); allow write: if false; }
+    match /idempotency/{id} { allow read, write: if false; }
+    match /rateLimits/{id}  { allow read, write: if false; }
+    match /auditLog/{id}    { allow read: if isAdmin(); allow write: if false; }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
