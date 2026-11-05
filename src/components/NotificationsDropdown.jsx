@@ -247,7 +247,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
                               {loadingState === 'confirming'
                                 ? <Clock size={13} className="animate-spin" />
                                 : <CheckCircle2 size={13} />}
-                              {loadingState === 'confirming' ? 'Confirming...' : 'Confirm Received'}
+                              {loadingState === 'confirming' ? 'Recording payment…' : 'I got it'}
                             </button>
                             <button
                               onClick={(e) => handleDeclinePayment(e, notification)}
@@ -257,7 +257,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
                               {loadingState === 'declining'
                                 ? <Clock size={13} className="animate-spin" />
                                 : <XCircle size={13} />}
-                              {loadingState === 'declining' ? 'Declining...' : 'Did Not Receive'}
+                              {loadingState === 'declining' ? 'Saving…' : 'Not received'}
                             </button>
                           </div>
                         )}

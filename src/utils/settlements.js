@@ -66,3 +66,12 @@ export function settlementErrorMessage(err, fallback = 'That did not work. Pleas
   if (code.endsWith('permission-denied')) return 'You are not allowed to do this.';
   return fallback;
 }
+
+const METHOD_LABEL = {
+  paypal: 'PayPal', revolut: 'Revolut', bank: 'bank transfer', manual: 'cash or other', sepa: 'SEPA demo',
+};
+
+/** How a payment method reads in a sentence ("by Revolut", "by bank transfer"). */
+export function methodLabel(method) {
+  return METHOD_LABEL[method] || 'another way';
+}

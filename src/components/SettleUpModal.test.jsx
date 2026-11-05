@@ -1,70 +1,43 @@
 // src/components/SettleUpModal.test.jsx
-// Tests for SettleUpModal component
-// Covers: rendering, payer view, receiver view, manual settlement,
-//         pending payment confirmation, payment success, and error handling
+// Settle Up in short steps (approved design, 2026-11-05):
+//   payer: How are you settling? -> Pay now -> app step | I already paid
+//          plus "Did you finish paying?" and the waiting-for-confirmation card
+//   payee: I received a payment (after "Confirm it's you")
+// Mocks are plain functions and values, not jest.fn, so CRA's resetMocks
+// does not clear them between tests.
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import SettleUpModal from './SettleUpModal';
-
-// ---------------------------------------------------------------------------
-// Mocks
-// ---------------------------------------------------------------------------
 
 jest.mock('../services/firebase', () => ({ db: {} }));
 
-// PayPal capture now happens server-side via the capturePayPalOrder callable.
-// Plain functions (not jest.fn) so CRA's resetMocks does not clear them.
 jest.mock('firebase/functions', () => ({
   getFunctions: () => ({}),
   httpsCallable: () => () =>
     Promise.resolve({ data: { success: true, orderId: 'capture-123', status: 'COMPLETED' } }),
 }));
 
+// The pair's payment lock: null, { status: 'started', ... } or { status: 'claimed', ... }
+let mockLock = null;
 jest.mock('firebase/firestore', () => ({
-  collection:      jest.fn(() => ({})),
-  addDoc:          jest.fn(() => Promise.resolve({ id: 'settlement-id' })),
-  serverTimestamp: jest.fn(() => new Date()),
-  doc:             jest.fn(() => ({})),
-  setDoc:    jest.fn().mockResolvedValue(undefined),
-  deleteDoc: jest.fn().mockResolvedValue(undefined),
-  onSnapshot: jest.fn((_ref, callback) => {
-    if (typeof callback === 'function') {
-      callback({ exists: () => false, data: () => ({}) });
-    }
-    const unsubscribe = jest.fn();
-    return unsubscribe;
-  }),
-  getDoc: jest.fn(() =>
-    Promise.resolve({
-      exists: () => true,
-      data: () => ({
-        paymentMethods: {
-          paypalUsername: 'bob_paypal',
-          revolutUsername: 'bob_revolut',
-        },
-      }),
-    })
-  ),
+  doc: () => ({}),
+  onSnapshot: (_ref, cb) => {
+    cb(mockLock ? { exists: () => true, data: () => mockLock } : { exists: () => false, data: () => ({}) });
+    return () => {};
+  },
 }));
 
+// Payer's claims
+const mockClaims = [];
+let mockClaimResult = () => Promise.resolve();
 jest.mock('../stores/notificationsStore', () => ({
-  createNotification: jest.fn(() => Promise.resolve()),
-  recordPaymentSent: jest.fn(() => Promise.resolve()),
+  recordPaymentSent: (data) => { mockClaims.push(data); return mockClaimResult(); },
 }));
 
-// Phase 1B: settle-up goes through the settlements Functions, and recording a
-// payment as the payee needs "Confirm it's you". Plain functions and arrays
-// (not jest.fn) so CRA's resetMocks does not clear them between tests.
 let mockStepUpToken = 'tok';
 const mockStepUpCalls = [];
-// Payment demos switch (admin panel); on by default so the demo tests below run
-let mockDemosOn = true;
-jest.mock('../hooks/useFeatureFlags', () => ({
-  __esModule: true,
-  default: () => ({ loading: false, isEnabled: (name) => name === 'paymentDemosEnabled' && mockDemosOn }),
-}));
-
 jest.mock('../hooks/useStepUp', () => ({
   __esModule: true,
   default: () => ({
@@ -72,117 +45,46 @@ jest.mock('../hooks/useStepUp', () => ({
     stepUpSheet: null,
   }),
 }));
-const mockSettlementCalls = [];
-let mockReceiveError = null;
+
+let mockDemosOn = false;
+jest.mock('../hooks/useFeatureFlags', () => ({
+  __esModule: true,
+  default: () => ({ loading: false, isEnabled: (name) => name === 'paymentDemosEnabled' && mockDemosOn }),
+}));
+
+const mockCalls = [];
+let mockReceiveResult = () => Promise.resolve({ status: 'confirmed' });
+let mockCancelResult = () => Promise.resolve({ status: 'cancelled' });
 jest.mock('../utils/settlements', () => {
   const actual = jest.requireActual('../utils/settlements');
   return {
     receiveParams: actual.receiveParams,
     settlementErrorMessage: actual.settlementErrorMessage,
-    startSettlement: (data) => { mockSettlementCalls.push(['start', data]); return Promise.resolve({ status: 'started' }); },
-    receiveSettlement: (data, token) => {
-      mockSettlementCalls.push(['receive', data, token]);
-      return mockReceiveError ? Promise.reject(mockReceiveError) : Promise.resolve({ status: 'confirmed' });
-    },
+    methodLabel: actual.methodLabel,
+    startSettlement: (data) => { mockCalls.push(['start', data]); return Promise.resolve({ status: 'started' }); },
+    receiveSettlement: (data, token) => { mockCalls.push(['receive', data, token]); return mockReceiveResult(); },
+    cancelSettlement: (data) => { mockCalls.push(['cancel', data]); return mockCancelResult(); },
   };
 });
 jest.mock('../utils/stepUp', () => ({ newIdempotencyKey: () => 'idem-key-0000000001' }));
-beforeEach(() => {
-  mockStepUpToken = 'tok';
-  mockStepUpCalls.length = 0;
-  mockSettlementCalls.length = 0;
-  mockReceiveError = null;
-});
 
-// The recipient's IBAN is decrypted server-side (ibanService.fetchIban → getIban
-// Cloud Function) and exposed under .iban. Plain function so resetMocks keeps it.
-jest.mock('../utils/ibanService', () => ({
-  fetchIban: async () => 'DECRYPTED-enc-iban-data',
-}));
-
-// Recipient payment options come from the getGroupPaymentMethods Cloud
-// Function (server-side group check). The mock reuses each test's getDoc
-// fixture ({ paymentMethods }) so existing scenarios keep their meaning, and
-// returns the server's shape: no ciphertext, just hasIban.
+// The payee's payment options, as the server returns them
+let mockMethods = null;
 jest.mock('../utils/privateProfile', () => ({
-  fetchGroupPaymentMethods: async () => {
-    const { getDoc } = require('firebase/firestore');
-    const snap = await getDoc();
-    const pm = snap?.exists?.() ? snap.data()?.paymentMethods : null;
-    if (!pm) return {};
-    const view = {
-      paypalUsername: pm.paypalUsername || null,
-      revolutUsername: pm.revolutUsername || null,
-      bic: pm.bic || null,
-      hasIban: !!pm.encryptedIBAN,
-    };
-    return new Proxy({}, { get: () => view }); // any member id → this view
-  },
+  fetchGroupPaymentMethods: async () => (mockMethods ? new Proxy({}, { get: () => mockMethods }) : {}),
 }));
+jest.mock('../utils/ibanService', () => ({ fetchIban: async () => 'IE29AIBK93115212345678' }));
 
-// Return empty array to prevent crash from .length on undefined
-jest.mock('../utils/paymentLinks', () => ({
-  generatePayPalLink: jest.fn(() => 'https://paypal.me/bob_paypal'),
-  generateRevolutLink: jest.fn(() => 'https://revolut.me/bob_revolut'),
-  getAvailablePaymentMethods: jest.fn(() => []),
-}));
-
-// Exposes createOrder / onApprove / onError so they can be triggered in tests
 jest.mock('@paypal/react-paypal-js', () => ({
-  PayPalButtons: ({ createOrder, onApprove, onError, disabled }) => (
-    <div data-testid="paypal-buttons">
-      <button
-        data-testid="paypal-create"
-        disabled={disabled}
-        onClick={() =>
-          createOrder({}, { order: { create: jest.fn().mockResolvedValue('order-123') } })
-        }
-      >
-        PayPal Create
-      </button>
-      <button
-        data-testid="paypal-approve"
-        disabled={disabled}
-        onClick={() =>
-          onApprove({}, { order: { capture: jest.fn().mockResolvedValue({ id: 'capture-123' }) } })
-        }
-      >
-        PayPal Approve
-      </button>
-      <button data-testid="paypal-error" onClick={() => onError(new Error('SDK error'))}>
-        PayPal Error
-      </button>
-    </div>
+  PayPalButtons: ({ onApprove }) => (
+    <button type="button" data-testid="paypal-approve" onClick={() => onApprove({ orderID: 'order-123' })}>PayPal Approve</button>
   ),
 }));
 
-jest.mock('./PaymentInfoModal', () =>
-  function MockPaymentInfoModal({ isOpen, onClose, paymentInfo }) {
-    if (!isOpen) return null;
-    return (
-      <div data-testid="payment-info-modal">
-        <button onClick={() => paymentInfo?.onProceed?.()}>Proceed</button>
-        <button onClick={onClose}>Close Payment Info</button>
-      </div>
-    );
-  }
-);
-
 jest.mock('./SepaPaymentModal', () =>
-  function MockSepaPaymentModal({ isOpen, onClose, onPaymentSuccess }) {
+  function MockSepaPaymentModal({ isOpen, onPaymentSuccess }) {
     if (!isOpen) return null;
-    return (
-      <div data-testid="sepa-modal">
-        <button onClick={onClose}>Close SEPA</button>
-        <button
-          onClick={() =>
-            onPaymentSuccess({ amount: 50, reference: 'REF123', paymentId: 'PID123' })
-          }
-        >
-          Complete SEPA
-        </button>
-      </div>
-    );
+    return <button type="button" onClick={() => onPaymentSuccess({ amount: 20 })}>Complete SEPA</button>;
   }
 );
 
@@ -192,1179 +94,399 @@ jest.mock('./QRCodeCanvas', () =>
   }
 );
 
-// ---------------------------------------------------------------------------
-// Test data
-// ---------------------------------------------------------------------------
-
-const mockGroup = {
+const group = {
   id: 'group-1',
-  name: 'Trip to Lisbon',
+  name: 'Flat',
   currency: 'EUR',
   members: [
-    { userId: 'user-1', name: 'Alice', email: 'alice@test.com' },
-    { userId: 'user-2', name: 'Bob', email: 'bob@test.com' },
+    { userId: 'alice', name: 'Alice' },
+    { userId: 'bob', name: 'Bob' },
   ],
 };
+const settlement = { from: 'alice', to: 'bob', amount: 45.5 };
+let closed = 0;
+const onClose = () => { closed += 1; };
 
-const mockSettlement = {
-  from: 'user-1',
-  to: 'user-2',
-  amount: 45.5,
-};
+const asPayer = (props = {}) =>
+  render(<SettleUpModal isOpen onClose={onClose} settlement={settlement} group={group} currentUserId="alice" {...props} />);
+const asPayee = () =>
+  render(<SettleUpModal isOpen onClose={onClose} settlement={settlement} group={group} currentUserId="bob" />);
 
-// Alice is the current user (payer)
-const payerProps = {
-  isOpen: true,
-  onClose: jest.fn(),
-  settlement: mockSettlement,
-  group: mockGroup,
-  currentUserId: 'user-1',
-};
+const copies = [];
+let copyWorks = true;
+let opened = [];
 
-// Bob is the current user (receiver)
-const receiverProps = {
-  ...payerProps,
-  onClose: jest.fn(),
-  currentUserId: 'user-2',
-};
+beforeEach(() => {
+  mockLock = null;
+  mockClaims.length = 0;
+  mockClaimResult = () => Promise.resolve();
+  mockStepUpToken = 'tok';
+  mockStepUpCalls.length = 0;
+  mockDemosOn = false;
+  mockCalls.length = 0;
+  mockReceiveResult = () => Promise.resolve({ status: 'confirmed' });
+  mockCancelResult = () => Promise.resolve({ status: 'cancelled' });
+  mockMethods = { paypalUsername: 'bobpaypal', revolutUsername: 'bobrev', bic: 'AIBKIE2D', hasIban: true };
+  closed = 0;
+  copies.length = 0;
+  copyWorks = true;
+  opened = [];
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText: (t) => { if (!copyWorks) return Promise.reject(new Error('no')); copies.push(t); return Promise.resolve(); } },
+  });
+  window.open = (url, target) => { opened.push([url, target]); return null; };
+  sessionStorage.clear();
+});
 
-const renderModal = (props = {}) =>
-  render(<SettleUpModal {...payerProps} {...props} />);
+const serverError = (code, message) => Object.assign(new Error(message), { code });
 
 // ---------------------------------------------------------------------------
-// 1. Closed state
-// ---------------------------------------------------------------------------
 
-describe('SettleUpModal - Closed State', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    sessionStorage.clear();
+describe('Settle Up - opening', () => {
+  test('renders nothing while closed', () => {
+    render(<SettleUpModal isOpen={false} onClose={onClose} settlement={settlement} group={group} currentUserId="alice" />);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  test('renders nothing when isOpen is false', () => {
-    renderModal({ isOpen: false });
-    expect(screen.queryByText(/Settle Up/i)).not.toBeInTheDocument();
+  test('renders nothing for someone who is neither paying nor receiving', () => {
+    render(<SettleUpModal isOpen onClose={onClose} settlement={settlement} group={group} currentUserId="carol" />);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  test('the payer is asked how they are settling', () => {
+    asPayer();
+    expect(screen.getByText('You owe Bob in Flat')).toBeInTheDocument();
+    expect(screen.getByText('EUR 45.50')).toBeInTheDocument();
+    expect(screen.getByText('How are you settling?')).toBeInTheDocument();
+    expect(screen.getByText('Pay now')).toBeInTheDocument();
+    expect(screen.getByText('I already paid')).toBeInTheDocument();
+    expect(screen.getByText('Bob confirms each payment before your balances change.')).toBeInTheDocument();
+  });
+
+  test('Close calls onClose', () => {
+    asPayer();
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(closed).toBe(1);
   });
 });
 
-// ---------------------------------------------------------------------------
-// 2. Payer view
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Payer View', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    sessionStorage.clear();
+describe('Settle Up - Pay now', () => {
+  test('lists only the ways the payee has set up, with what each one does', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    expect(screen.getByText('Step 1 of 2')).toBeInTheDocument();
+    expect(await screen.findByText('Revolut')).toBeInTheDocument();
+    expect(screen.getByText('@bobrev · you paste the amount')).toBeInTheDocument();
+    expect(screen.getByText('@bobpaypal · amount filled in for you')).toBeInTheDocument();
+    expect(screen.getByText('Bank transfer')).toBeInTheDocument();
+    expect(screen.getByText('You owe EUR 45.50. You can pay part of it.')).toBeInTheDocument();
   });
 
-  test('renders the Pay Settlement heading for payer', async () => {
-    renderModal();
-    await waitFor(() =>
-      expect(screen.getByText(/Pay Settlement/i)).toBeInTheDocument()
-    );
+  test('says so when the payee has set nothing up', async () => {
+    mockMethods = null;
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    expect(await screen.findByText(/Bob has not added PayPal, Revolut or bank details yet/)).toBeInTheDocument();
   });
 
-  test('renders the settlement amount pre-filled', async () => {
-    renderModal();
-    await waitFor(() =>
-      expect(screen.getByDisplayValue('45.50')).toBeInTheDocument()
-    );
+  test('Back returns to the first question', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    fireEvent.click(screen.getByLabelText('Back'));
+    expect(screen.getByText('How are you settling?')).toBeInTheDocument();
   });
 
-  test('renders payer and receiver member names', async () => {
-    renderModal();
-    await waitFor(() => {
-      expect(screen.getAllByText(/Alice/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Bob/i).length).toBeGreaterThan(0);
-    });
+  test('an empty amount is refused before choosing an app', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    await screen.findByText('Revolut');
+    fireEvent.change(screen.getByLabelText('Amount to pay Bob'), { target: { value: '' } });
+    fireEvent.click(screen.getByText('Revolut'));
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter an amount above zero.');
+    expect(screen.getByText('Step 1 of 2')).toBeInTheDocument();
   });
 
-  test('calls onClose when Cancel is clicked', async () => {
-    renderModal();
-    await waitFor(() => screen.getByRole('button', { name: /cancel/i }));
-    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(payerProps.onClose).toHaveBeenCalledTimes(1);
-  });
-
-  test('renders Confirm Payment Sent button after selecting Paid Offline', async () => {
-    renderModal();
-    // Default tab is PayPal — switch to Paid Offline to show the manual confirm button
-    await waitFor(() => screen.getByRole('button', { name: /Paid Offline/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Paid Offline/i }));
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Confirm Payment Sent/i })
-      ).toBeInTheDocument()
-    );
+  test('letters are not accepted in the amount', () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    const input = screen.getByLabelText('Amount to pay Bob');
+    fireEvent.change(input, { target: { value: '12a' } });
+    expect(input).toHaveValue('45.50');
+    fireEvent.change(input, { target: { value: '12.3' } });
+    expect(input).toHaveValue('12.3');
   });
 });
 
-// ---------------------------------------------------------------------------
-// 3. Receiver view
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Receiver View', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    sessionStorage.clear();
-  });
-
-  test('renders Mark as Received heading for receiver', async () => {
-    renderModal(receiverProps);
-    await waitFor(() =>
-      expect(screen.getByText(/Mark as Received/i)).toBeInTheDocument()
-    );
-  });
-
-  test('renders Confirm Payment Received button for receiver', async () => {
-    renderModal(receiverProps);
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Confirm Payment Received/i })
-      ).toBeInTheDocument()
-    );
-  });
-
-  test('renders QR toggle button for receiver', async () => {
-    renderModal(receiverProps);
-    await waitFor(() =>
-      expect(screen.getByText(/Let Alice scan to pay you/i)).toBeInTheDocument()
-    );
-  });
-
-  test('reveals QR panel text when toggle button is clicked', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByText(/Let Alice scan to pay you/i));
-
-    // Initially shows "Tap to show" text
-    expect(screen.getByText(/Tap to show PayPal or Revolut QR code/i)).toBeInTheDocument();
-
-    // Click to reveal
-    fireEvent.click(
-      screen.getByText(/Let Alice scan to pay you/i).closest('button')
-    );
-
-    await waitFor(() =>
-      expect(screen.getByText(/Tap to hide QR code/i)).toBeInTheDocument()
-    );
-  });
-
-  test('hides QR panel when toggle button is clicked a second time', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByText(/Let Alice scan to pay you/i));
-    const toggleBtn = screen
-      .getByText(/Let Alice scan to pay you/i)
-      .closest('button');
-
-    fireEvent.click(toggleBtn); // show
-    await waitFor(() => screen.getByText(/Tap to hide QR code/i));
-
-    fireEvent.click(toggleBtn); // hide
-    await waitFor(() =>
-      expect(
-        screen.queryByText(/Tap to hide QR code/i)
-      ).not.toBeInTheDocument()
-    );
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 4. Amount editing
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Amount Editing', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    sessionStorage.clear();
-  });
-
-  test('allows the amount to be changed', async () => {
-    renderModal();
-    await waitFor(() => screen.getByDisplayValue('45.50'));
-    const amountInput = screen.getByDisplayValue('45.50');
-    fireEvent.change(amountInput, { target: { value: '60' } });
-    expect(amountInput).toHaveValue(60);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 5. Manual settlement — payer
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Manual Settlement (Payer)', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    sessionStorage.clear();
-  });
-
-  test('claims the payment (no direct write) and shows success when payer confirms payment sent', async () => {
-    const { addDoc } = require('firebase/firestore');
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    renderModal();
-    // Switch to Paid Offline mode to reveal the manual confirm button
-    await waitFor(() => screen.getByRole('button', { name: /Paid Offline/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Paid Offline/i }));
-    await waitFor(() =>
-      screen.getByRole('button', { name: /Confirm Payment Sent/i })
-    );
-
-    await act(async () => {
-      fireEvent.click(
-        screen.getByRole('button', { name: /Confirm Payment Sent/i })
-      );
-    });
-
-    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledTimes(1));
-    expect(recordPaymentSent).toHaveBeenCalledWith({
-      payeeId: 'user-2', groupId: 'group-1', amount: 45.5, method: 'manual', idempotencyKey: 'idem-key-0000000001',
-    });
-    expect(addDoc).not.toHaveBeenCalled();
-    expect(mockStepUpCalls).toEqual([]); // the payer is not asked to step up
-    await waitFor(() =>
-      expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
-    );
-    expect(screen.getByText(/Bob has been notified and will confirm receipt/)).toBeInTheDocument();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 6. Manual settlement — receiver
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Manual Settlement (Receiver)', () => {
-  beforeEach(() => {
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    jest.clearAllMocks();
-    sessionStorage.clear();
-  });
-
-  test('shows confirmation dialog on first click', async () => {
-    renderModal(receiverProps);
-    await waitFor(() =>
-      screen.getByRole('button', { name: /Confirm Payment Received/i })
-    );
-
-    await act(async () => {
-      fireEvent.click(
-        screen.getByRole('button', { name: /Confirm Payment Received/i })
-      );
-    });
-
-    // Confirmation dialog with Confirm Receipt button appears
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Confirm Receipt/i })
-      ).toBeInTheDocument()
-    );
-  });
-
-  test('records the payment on the server after "Confirm it\'s you" when receiver clicks Confirm Receipt', async () => {
-    const { addDoc } = require('firebase/firestore');
-    renderModal(receiverProps);
-    await waitFor(() =>
-      screen.getByRole('button', { name: /Confirm Payment Received/i })
-    );
-
-    // First click — shows confirmation dialog
-    await act(async () => {
-      fireEvent.click(
-        screen.getByRole('button', { name: /Confirm Payment Received/i })
-      );
-    });
-
-    await waitFor(() =>
-      screen.getByRole('button', { name: /Confirm Receipt/i })
-    );
-
-    // Second click — "Confirm it's you", then the server records it
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
-    });
-
-    const params = { groupId: 'group-1', fromUid: 'user-1', amount: 45.5, idempotencyKey: 'idem-key-0000000001' };
-    expect(mockStepUpCalls).toEqual([['settlements.receive', { groupId: 'group-1', fromUid: 'user-1', amountMinor: 4550, idempotencyKey: 'idem-key-0000000001' }]]);
-    await waitFor(() => expect(mockSettlementCalls).toEqual([['receive', params, 'tok']]));
-    expect(addDoc).not.toHaveBeenCalled();
-    expect(await screen.findByText(/Payment Recorded!/i)).toBeInTheDocument();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 7. Pending payment confirmation flow
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Pending Payment Flow', () => {
-  const pendingPaymentData = {
-    groupId: 'group-1',
-    fromUserId: 'user-1',
-    toUserId: 'user-2',
-    fromName: 'Alice',
-    toName: 'Bob',
-    amount: 45.5,
-    currency: 'EUR',
-    method: 'paypal',
-    timestamp: Date.now(),
+describe('Settle Up - Revolut step', () => {
+  const toRevolut = async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    await screen.findByText('Revolut');
+    fireEvent.click(screen.getByText('Revolut'));
   };
 
-  beforeEach(() => {
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    jest.clearAllMocks();
-    // Simulate a pending payment existing in Firestore
-    const { onSnapshot } = require('firebase/firestore');
-    onSnapshot.mockImplementation((_ref, callback) => {
-      if (typeof callback === 'function') {
-        callback({ exists: () => true, data: () => pendingPaymentData });
-      }
-      return jest.fn();
-    });
+  test('shows the amount large, explains pasting, and offers a QR code for laptops', async () => {
+    await toRevolut();
+    expect(screen.getByText('Pay Bob with Revolut')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 of 2')).toBeInTheDocument();
+    expect(screen.getByText('EUR 45.50')).toBeInTheDocument();
+    expect(screen.getByText('Revolut cannot fill in the amount for you. Paste it when the app opens.')).toBeInTheDocument();
+    expect(screen.getByText('On a laptop?')).toBeInTheDocument();
+    expect(screen.getByTestId('qr-canvas')).toHaveAttribute('data-value', 'https://revolut.me/bobrev');
   });
 
-  afterEach(() => {
-    sessionStorage.clear();
+  test('Copy amount copies it and says Copied', async () => {
+    await toRevolut();
+    fireEvent.click(screen.getByText('Copy amount'));
+    expect(await screen.findByText(/Copied 45\.50/)).toBeInTheDocument();
+    expect(copies).toEqual(['45.50']);
   });
 
-  const setPendingPayment = () => {
-    // kept for backward compatibility — Firestore mock now drives the flow
-    sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
-  };
-
-  test('shows pending confirmation dialog when a matching pending payment exists', async () => {
-    setPendingPayment();
-    renderModal();
-    await waitFor(() =>
-      expect(
-        screen.getByText(/Did you complete the payment/i)
-      ).toBeInTheDocument()
-    );
+  test('when copying is blocked, the amount is shown to remember instead', async () => {
+    copyWorks = false;
+    await toRevolut();
+    fireEvent.click(screen.getByText('Copy amount'));
+    expect(await screen.findByText('Copying is not available here. Remember EUR 45.50.')).toBeInTheDocument();
   });
 
-  test('shows Not Yet and Mark as Paid buttons in pending dialog', async () => {
-    setPendingPayment();
-    renderModal();
-    await waitFor(() => screen.getByText(/Did you complete the payment/i));
-    expect(
-      screen.getByRole('button', { name: /Not Yet/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Mark as Paid/i })
-    ).toBeInTheDocument();
+  test('Open Revolut opens the link, copies the amount, remembers the started payment, and closes', async () => {
+    await toRevolut();
+    fireEvent.click(screen.getByText('Open Revolut'));
+    expect(opened).toEqual([['https://revolut.me/bobrev', '_blank']]);
+    expect(copies).toEqual(['45.50']);
+    expect(mockCalls).toEqual([['start', { groupId: 'group-1', toUid: 'bob', amount: 45.5, method: 'revolut' }]]);
+    expect(JSON.parse(sessionStorage.getItem('pendingPayment'))).toMatchObject({ method: 'revolut', amount: 45.5, toName: 'Bob' });
+    expect(closed).toBe(1);
+    expect(mockClaims).toEqual([]);
   });
 
-  test('dismisses pending dialog when Not Yet is clicked', async () => {
-    setPendingPayment();
-    renderModal();
-    await waitFor(() => screen.getByText(/Did you complete the payment/i));
-    fireEvent.click(screen.getByRole('button', { name: /Not Yet/i }));
-    await waitFor(() =>
-      expect(
-        screen.queryByText(/Did you complete the payment/i)
-      ).not.toBeInTheDocument()
-    );
-  });
-
-  test('calls recordPaymentSent and shows success when Mark as Paid is clicked', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    setPendingPayment();
-    renderModal();
-    await waitFor(() => screen.getByText(/Did you complete the payment/i));
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
-    });
-
-    await waitFor(() =>
-      expect(recordPaymentSent).toHaveBeenCalledTimes(1)
-    );
-    expect(recordPaymentSent).toHaveBeenCalledWith({
-      payeeId: 'user-2', groupId: 'group-1', amount: 45.5, method: 'paypal', idempotencyKey: 'idem-key-0000000001',
-    });
-    const { deleteDoc } = require('firebase/firestore');
-    expect(deleteDoc).not.toHaveBeenCalled(); // the server keeps the lock until the payee answers
-    // Success screen shows Payment Sent! heading
-    await waitFor(() =>
-      expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
-    );
+  test('a part payment carries the changed amount', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    await screen.findByText('Revolut');
+    fireEvent.change(screen.getByLabelText('Amount to pay Bob'), { target: { value: '20' } });
+    fireEvent.click(screen.getByText('Revolut'));
+    expect(screen.getByText('EUR 20.00')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Open Revolut'));
+    expect(mockCalls[0][1].amount).toBe(20);
   });
 });
 
-// ---------------------------------------------------------------------------
-// 8. Error handling
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Claimed payment waiting for the payee', () => {
-  beforeEach(() => {
-    const { onSnapshot } = require('firebase/firestore');
-    onSnapshot.mockImplementation((_ref, callback) => {
-      if (typeof callback === 'function') {
-        callback({ exists: () => true, data: () => ({
-          groupId: 'group-1', fromUserId: 'user-1', toUserId: 'user-2', toName: 'Bob',
-          amount: 45.5, currency: 'EUR', method: 'revolut', status: 'claimed', timestamp: Date.now(),
-        }) });
-      }
-      return () => {};
-    });
-  });
-  afterEach(() => sessionStorage.clear());
-
-  test('does not ask "did you complete the payment?" again; explains it is awaiting confirmation', async () => {
-    renderModal();
-    expect(await screen.findByText(/is awaiting confirmation/)).toBeInTheDocument();
-    expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument();
-  });
-});
-
-describe('SettleUpModal - Error Handling', () => {
-  beforeEach(() => {
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    jest.clearAllMocks();
-    sessionStorage.clear();
+describe('Settle Up - PayPal and bank steps', () => {
+  test('PayPal says it fills in the amount, and opens the PayPal.me link with it', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    await screen.findByText('PayPal');
+    fireEvent.click(screen.getByText('PayPal'));
+    expect(screen.getByText('PayPal fills in the amount for you.')).toBeInTheDocument();
+    expect(screen.queryByText('On a laptop?')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Open PayPal'));
+    expect(opened).toEqual([['https://paypal.me/bobpaypal/45.5EUR', '_blank']]);
+    expect(mockCalls[0]).toEqual(['start', { groupId: 'group-1', toUid: 'bob', amount: 45.5, method: 'paypal' }]);
   });
 
-  test('shows error message when the claim fails during settlement', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    recordPaymentSent.mockRejectedValueOnce(new Error('network down'));
-
-    renderModal();
-    // Switch to Paid Offline mode to reveal the manual confirm button
-    await waitFor(() => screen.getByRole('button', { name: /Paid Offline/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Paid Offline/i }));
-    await waitFor(() =>
-      screen.getByRole('button', { name: /Confirm Payment Sent/i })
-    );
-
-    await act(async () => {
-      fireEvent.click(
-        screen.getByRole('button', { name: /Confirm Payment Sent/i })
-      );
-    });
-
-    await waitFor(() =>
-      expect(
-        screen.getByText(/failed to record settlement/i)
-      ).toBeInTheDocument()
-    );
+  test('bank transfer shows the details to copy, then sends a claim once sent', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    await screen.findByText('Bank transfer');
+    fireEvent.click(screen.getByText('Bank transfer'));
+    expect(screen.getByText('IE29AIBK93115212345678')).toBeInTheDocument();
+    expect(screen.getByText('AIBKIE2D')).toBeInTheDocument();
+    expect(screen.getByText('SplitSync Settlement')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Copy IBAN'));
+    await waitFor(() => expect(copies).toEqual(['IE29AIBK93115212345678']));
+    fireEvent.click(screen.getByText('I have sent it'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Sent to Bob'));
+    expect(mockClaims).toEqual([{ payeeId: 'bob', groupId: 'group-1', amount: 45.5, method: 'bank', idempotencyKey: 'idem-key-0000000001' }]);
   });
 });
 
-// ---------------------------------------------------------------------------
-// 9. Stale / malformed pending payment (lines 71-72, 78-80)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Stale pending payment', () => {
-  beforeEach(() => {
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    jest.clearAllMocks();
-    // No pending payment in Firestore for these tests
-    const { onSnapshot } = require('firebase/firestore');
-    onSnapshot.mockImplementation((_ref, callback) => {
-      if (typeof callback === 'function') {
-        callback({ exists: () => false, data: () => ({}) });
-      }
-      return jest.fn();
-    });
+describe('Settle Up - I already paid', () => {
+  test('sends a cash claim to the payee and says what happens next', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('I already paid'));
+    expect(screen.getByRole('button', { name: 'Cash' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByText('Send to Bob to confirm'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Sent to Bob'));
+    expect(screen.getByText(/EUR 45\.50 by cash or other\. Your balance updates when Bob confirms/)).toBeInTheDocument();
+    expect(mockClaims).toEqual([{ payeeId: 'bob', groupId: 'group-1', amount: 45.5, method: 'manual', idempotencyKey: 'idem-key-0000000001' }]);
+    fireEvent.click(screen.getByText('Done'));
+    expect(closed).toBe(1);
   });
 
-  test('clears sessionStorage and shows main modal when groupId does not match', () => {
-    sessionStorage.setItem(
-      'pendingPayment',
-      JSON.stringify({
-        groupId: 'other-group',
-        fromUserId: 'user-1',
-        toUserId: 'user-2',
-        amount: 45.5,
-        currency: 'EUR',
-        method: 'paypal',
-        timestamp: Date.now(),
-      })
-    );
-    renderModal();
-    expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument();
-    expect(sessionStorage.getItem('pendingPayment')).toBeNull();
+  test('the chosen method and a part amount are sent', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('I already paid'));
+    fireEvent.click(screen.getByRole('button', { name: 'Revolut' }));
+    expect(screen.getByRole('button', { name: 'Revolut' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.change(screen.getByLabelText('How much did you pay?'), { target: { value: '20' } });
+    fireEvent.click(screen.getByText('Send to Bob to confirm'));
+    await waitFor(() => expect(mockClaims).toHaveLength(1));
+    expect(mockClaims[0]).toMatchObject({ amount: 20, method: 'revolut' });
   });
 
-  test('handles malformed JSON in sessionStorage gracefully', () => {
-    sessionStorage.setItem('pendingPayment', 'not-valid-json{{{');
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument();
-    expect(sessionStorage.getItem('pendingPayment')).toBeNull();
-    consoleSpy.mockRestore();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 10. Recipient doc exists — sets payment methods (lines 93-94)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Recipient doc exists', () => {
-  beforeEach(() => {
-    const { setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    jest.clearAllMocks();
-    sessionStorage.clear();
-    const { getDoc } = require('firebase/firestore');
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({
-        paymentMethods: {
-          paypalUsername: 'bob_paypal',
-          revolutUsername: 'bob_revolut',
-        },
-      }),
-    });
+  test('while sending, the button shows a spinner label and cannot be pressed again', async () => {
+    let release;
+    mockClaimResult = () => new Promise((r) => { release = r; });
+    asPayer();
+    fireEvent.click(screen.getByText('I already paid'));
+    fireEvent.click(screen.getByText('Send to Bob to confirm'));
+    const button = await screen.findByRole('button', { name: 'Sending to Bob…' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    fireEvent.click(button);
+    expect(mockClaims).toHaveLength(1);
+    release();
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Sent to Bob'));
   });
 
-  test('fetches and stores recipient payment methods when doc exists', async () => {
-    const { getDoc } = require('firebase/firestore');
-    renderModal();
-    await waitFor(() => expect(getDoc).toHaveBeenCalledTimes(1));
-    // Component should still render correctly after loading
-    expect(screen.getByText(/Pay Settlement/i)).toBeInTheDocument();
+  test('a server refusal is shown and nothing is lost', async () => {
+    mockClaimResult = () => Promise.reject(serverError('functions/invalid-argument', 'That is more than you owe.'));
+    asPayer();
+    fireEvent.click(screen.getByText('I already paid'));
+    fireEvent.click(screen.getByText('Send to Bob to confirm'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('That is more than you owe.'));
+    expect(screen.getByText('Send to Bob to confirm')).toBeInTheDocument();
+  });
+
+  test('an unexpected failure says nothing was saved', async () => {
+    mockClaimResult = () => Promise.reject(serverError('functions/internal', 'stack'));
+    asPayer();
+    fireEvent.click(screen.getByText('I already paid'));
+    fireEvent.click(screen.getByText('Send to Bob to confirm'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('That did not work. Nothing was saved, please try again.'));
   });
 });
 
-// ---------------------------------------------------------------------------
-// 11. Amount validation (lines 232-233, 669-670)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Amount validation', () => {
+describe('Settle Up - a payment app was opened earlier', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
+    mockLock = { status: 'started', method: 'revolut', amount: 30, currency: 'EUR', toName: 'Bob', timestamp: Date.now() };
   });
 
-  test('shows error when manual settle is attempted with zero amount', async () => {
-    renderModal();
-    await waitFor(() => screen.getByRole('button', { name: /Paid Offline/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Paid Offline/i }));
-    // Clear the amount
-    const input = screen.getByPlaceholderText('0.00');
-    fireEvent.change(input, { target: { value: '' } });
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Sent/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Sent/i }));
-    await waitFor(() =>
-      expect(screen.getByText('Valid amount is required')).toBeInTheDocument()
-    );
+  test('asks whether they finished paying', () => {
+    asPayer();
+    expect(screen.getByText('Did you finish paying Bob?')).toBeInTheDocument();
+    expect(screen.getByText('EUR 30.00')).toBeInTheDocument();
+    expect(screen.getByText(/You opened Revolut/)).toBeInTheDocument();
   });
 
-  test('blocks input and shows error when amount exceeds 1,000,000', async () => {
-    renderModal();
-    await waitFor(() => screen.getByPlaceholderText('0.00'));
-    const input = screen.getByPlaceholderText('0.00');
-    fireEvent.change(input, { target: { value: '1000001' } });
-    await waitFor(() =>
-      expect(screen.getByText('Settlement amount cannot exceed 1,000,000')).toBeInTheDocument()
-    );
+  test('Yes, I paid sends a claim for that payment', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Yes, I paid'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Sent to Bob'));
+    expect(mockClaims).toEqual([{ payeeId: 'bob', groupId: 'group-1', amount: 30, method: 'revolut', idempotencyKey: 'idem-key-0000000001' }]);
   });
 
-  test('formats amount to 2 decimal places on blur', async () => {
-    renderModal();
-    await waitFor(() => screen.getByPlaceholderText('0.00'));
-    const input = screen.getByPlaceholderText('0.00');
-    fireEvent.change(input, { target: { value: '25' } });
-    fireEvent.blur(input);
-    expect(input.value).toBe('25.00');
+  test('Not yet drops the started payment and says nothing was recorded', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Not yet'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Nothing was recorded'));
+    expect(mockCalls).toEqual([['cancel', { groupId: 'group-1', toUid: 'bob' }]]);
+    expect(mockClaims).toEqual([]);
+  });
+
+  test('Not yet shows Saving while it works', async () => {
+    let release;
+    mockCancelResult = () => new Promise((r) => { release = r; });
+    asPayer();
+    fireEvent.click(screen.getByText('Not yet'));
+    expect(await screen.findByRole('button', { name: 'Saving…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Yes, I paid' })).toBeDisabled();
+    release({ status: 'cancelled' });
+    expect(await screen.findByRole('status')).toBeInTheDocument();
   });
 });
 
-// ---------------------------------------------------------------------------
-// 12. handleMarkAsPaid error paths (lines 207-213)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - handleMarkAsPaid errors', () => {
-  const pendingPaymentData = {
-    groupId: 'group-1',
-    fromUserId: 'user-1',
-    toUserId: 'user-2',
-    fromName: 'Alice',
-    toName: 'Bob',
-    amount: 45.5,
-    currency: 'EUR',
-    method: 'paypal',
-    timestamp: Date.now(),
-  };
-
+describe('Settle Up - a payment waiting for the payee', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    const { setDoc, deleteDoc, onSnapshot } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    onSnapshot.mockImplementation((_ref, callback) => {
-      if (typeof callback === 'function') {
-        callback({ exists: () => true, data: () => pendingPaymentData });
-      }
-      return jest.fn();
-    });
+    mockLock = { status: 'claimed', method: 'bank', amount: 30, currency: 'EUR', toName: 'Bob' };
   });
 
-  afterEach(() => sessionStorage.clear());
-
-  test('shows a not-allowed error when the server refuses the claim', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    const err = Object.assign(new Error('denied'), { code: 'functions/permission-denied' });
-    recordPaymentSent.mockRejectedValueOnce(err);
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await waitFor(() => screen.getByRole('button', { name: /Mark as Paid/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
-    });
-    await waitFor(() =>
-      expect(
-        screen.getByText('You are not allowed to do this.')
-      ).toBeInTheDocument()
-    );
-    consoleSpy.mockRestore();
+  test('shows the waiting card and blocks a second payment', () => {
+    asPayer();
+    expect(screen.getByText('Waiting for Bob to confirm')).toBeInTheDocument();
+    expect(screen.getByText(/EUR 30\.00 by bank transfer/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Pay now/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /I already paid/ })).toBeDisabled();
   });
 
-  test('shows generic error message when recordPaymentSent fails with unknown error', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    recordPaymentSent.mockRejectedValueOnce(new Error('Network timeout'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await waitFor(() => screen.getByRole('button', { name: /Mark as Paid/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
-    });
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to record payment/)).toBeInTheDocument()
-    );
-    consoleSpy.mockRestore();
+  test('Withdraw takes the claim back and says so', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Withdraw'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Payment withdrawn'));
+    expect(mockCalls).toEqual([['cancel', { groupId: 'group-1', toUid: 'bob' }]]);
   });
 
-  test('shows the server explanation, e.g. a claim already waiting', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    recordPaymentSent.mockRejectedValueOnce(Object.assign(new Error('A payment to this person is already waiting for confirmation.'), { code: 'functions/failed-precondition' }));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await waitFor(() => screen.getByRole('button', { name: /Mark as Paid/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Mark as Paid/i }));
-    });
-    expect(await screen.findByText('A payment to this person is already waiting for confirmation.')).toBeInTheDocument();
-    consoleSpy.mockRestore();
-  });
-
-  test('closes pending dialog when X button is clicked', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText(/Did you complete the payment/i));
-    // The X close button has no visible text — find it by absence of text
-    const allButtons = screen.getAllByRole('button');
-    const xBtn = allButtons.find(b => b.textContent.trim() === '');
-    fireEvent.click(xBtn);
-    await waitFor(() =>
-      expect(screen.queryByText(/Did you complete the payment/i)).not.toBeInTheDocument()
-    );
+  test('a failed withdraw is explained', async () => {
+    mockCancelResult = () => Promise.reject(serverError('functions/failed-precondition', 'Bob already answered.'));
+    asPayer();
+    fireEvent.click(screen.getByText('Withdraw'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Bob already answered.'));
   });
 });
 
-// ---------------------------------------------------------------------------
-// 13. "Confirm it's you" failure paths (receiver recording a payment)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Step-up failure paths', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
+describe('Settle Up - the payee records a payment', () => {
+  test('confirming it is you, then recording, settles the debt', async () => {
+    asPayee();
+    expect(screen.getByText('Alice owes you in Flat')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('I received a payment'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Payment recorded'));
+    expect(mockStepUpCalls).toEqual([['settlements.receive', { groupId: 'group-1', fromUid: 'alice', amountMinor: 4550, idempotencyKey: 'idem-key-0000000001' }]]);
+    expect(mockCalls).toEqual([['receive', { groupId: 'group-1', fromUid: 'alice', amount: 45.5, idempotencyKey: 'idem-key-0000000001' }, 'tok']]);
   });
 
-  const openAndConfirmReceipt = async () => {
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    });
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Receipt/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Receipt/i }));
-    });
-  };
-
-  test('nothing is recorded when "Confirm it\'s you" is cancelled', async () => {
+  test('cancelling "Confirm it is you" records nothing and says why', async () => {
     mockStepUpToken = null;
-    await openAndConfirmReceipt();
-    expect(await screen.findByText('Confirmation was cancelled. Please try again.')).toBeInTheDocument();
-    expect(mockSettlementCalls).toEqual([]);
+    asPayee();
+    fireEvent.click(screen.getByText('I received a payment'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not recorded: confirming it is you was cancelled.'));
+    expect(mockCalls).toEqual([]);
   });
 
-  test('shows the server explanation when recording is refused', async () => {
-    mockReceiveError = Object.assign(new Error('That is more than is owed. Please check the amount.'), { code: 'functions/invalid-argument' });
-    await openAndConfirmReceipt();
-    expect(await screen.findByText('That is more than is owed. Please check the amount.')).toBeInTheDocument();
+  test('a server refusal is shown', async () => {
+    mockReceiveResult = () => Promise.reject(serverError('functions/failed-precondition', 'A payment from Alice is waiting for you to answer.'));
+    asPayee();
+    fireEvent.click(screen.getByText('I received a payment'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('A payment from Alice is waiting for you to answer.'));
   });
 
-  test('shows a generic error for unexpected failures', async () => {
-    mockReceiveError = new Error('socket hang up');
-    await openAndConfirmReceipt();
-    expect(await screen.findByText('Failed to record settlement. Please try again.')).toBeInTheDocument();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 14. Receiver confirmation dialog detail (lines 566-595)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Receiver confirmation dialog detail', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
-  });
-
-  test('confirmation dialog shows From, To, and Amount', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    });
-    await waitFor(() => screen.getByText('Confirm Payment'));
-    // Confirmation details — names may appear multiple times in the UI
-    expect(screen.getAllByText(/Alice/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Bob/).length).toBeGreaterThan(0);
-  });
-
-  test('Go Back button dismisses confirmation and returns to main form', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    });
-    await waitFor(() => screen.getByRole('button', { name: /Go Back/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Go Back/i }));
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Confirm Payment Received/i })
-      ).toBeInTheDocument()
-    );
-  });
-
-  test('X button on confirmation dialog dismisses it', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Confirm Payment Received/i }));
-    });
-    await waitFor(() => screen.getByText('Confirm Payment'));
-    const allButtons = screen.getAllByRole('button');
-    const xBtn = allButtons.find(b => b.textContent.trim() === '');
-    fireEvent.click(xBtn);
-    await waitFor(() =>
-      expect(screen.queryByText('Confirm Payment')).not.toBeInTheDocument()
-    );
+  test('the QR panel shows PayPal and Revolut codes', async () => {
+    asPayee();
+    fireEvent.click(screen.getByText('Let Alice scan to pay you'));
+    await waitFor(() => expect(screen.getByTestId('qr-canvas')).toHaveAttribute('data-value', 'https://paypal.me/bobpaypal/45.5EUR'));
+    fireEvent.click(screen.getByRole('button', { name: 'Revolut' }));
+    expect(screen.getByTestId('qr-canvas')).toHaveAttribute('data-value', 'https://revolut.me/bobrev');
   });
 });
 
-// ---------------------------------------------------------------------------
-// 15. SEPA payment flow (lines 281-298, 308-330)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - SEPA payment flow', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
-    // fetchIban (mocked above) resolves encryptedIBAN into the iban key that
-    // getAvailablePaymentMethods and the SEPA demo button depend on.
-    // Recipient has an IBAN so the SEPA demo button is visible inside the
-    // Future Feature panel.
-    const { getDoc } = require('firebase/firestore');
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({
-        paymentMethods: { encryptedIBAN: 'enc-iban-data', paypalUsername: '' },
-      }),
-    });
-  });
-
-  // Helper — expands the Future Feature collapsible panel then clicks SEPA demo
-  const expandAndClickSEPA = async () => {
-    await waitFor(() =>
-      expect(screen.getByText('Future feature - Settlement Payment Flow')).toBeInTheDocument()
-    );
-    fireEvent.click(screen.getByText('Future feature - Settlement Payment Flow'));
-    await waitFor(() =>
-      expect(screen.getByText('SEPA Payment Demo')).toBeInTheDocument()
-    );
-    fireEvent.click(screen.getByText('SEPA Payment Demo'));
-  };
-
-  test('clicking SEPA Payment Demo inside Future Feature panel opens SepaPaymentModal', async () => {
-    renderModal();
-    await expandAndClickSEPA();
-    expect(screen.getByTestId('sepa-modal')).toBeInTheDocument();
-  });
-
-  test('SEPA demo success is recorded as a claim the payee confirms', async () => {
-    const { addDoc } = require('firebase/firestore');
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    renderModal();
-    await expandAndClickSEPA();
-    await act(async () => {
-      fireEvent.click(screen.getByText('Complete SEPA'));
-    });
-    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledWith({
-      payeeId: 'user-2', groupId: 'group-1', amount: 50, method: 'sepa', idempotencyKey: 'idem-key-0000000001',
-    }));
-    expect(addDoc).not.toHaveBeenCalled();
-    await waitFor(() =>
-      expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
-    );
-  });
-
-  test('SEPA success shows error when the claim fails', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    recordPaymentSent.mockRejectedValueOnce(new Error('Network error'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await expandAndClickSEPA();
-    await act(async () => {
-      fireEvent.click(screen.getByText('Complete SEPA'));
-    });
-    await waitFor(() =>
-      expect(
-        screen.getByText('Payment processed but could not be recorded. Please try again.')
-      ).toBeInTheDocument()
-    );
-    consoleSpy.mockRestore();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 16. handlePaymentLinkClick — PayPal, Revolut, Bank (lines 340-391, 677-850)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Payment link click and options section', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
-    const { getDoc, setDoc, deleteDoc } = require('firebase/firestore');
-    setDoc.mockResolvedValue(undefined);
-    deleteDoc.mockResolvedValue(undefined);
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({
-        paymentMethods: { paypalUsername: 'bob', revolutUsername: 'bobrev' },
-      }),
-    });
-    const { getAvailablePaymentMethods } = require('../utils/paymentLinks');
-    getAvailablePaymentMethods.mockReturnValue([
-      { id: 'paypal',  name: 'PayPal',         icon: null, description: 'Pay via PayPal',  username: 'bob'    },
-      { id: 'revolut', name: 'Revolut',         icon: null, description: 'Pay via Revolut', username: 'bobrev' },
-      { id: 'bank',    name: 'Bank Transfer',   icon: null, description: 'Direct transfer', iban: 'GB29XXXX', bic: 'BARCGB22' },
-    ]);
-  });
-
-  test('shows Quick Payment Options section when methods are available', async () => {
-    renderModal();
-    await waitFor(() =>
-      expect(screen.getByText('Quick Payment Options')).toBeInTheDocument()
-    );
-  });
-
-  test('clicking PayPal method opens PaymentInfoModal', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('PayPal'));
-    fireEvent.click(screen.getByText('PayPal'));
-    expect(screen.getByTestId('payment-info-modal')).toBeInTheDocument();
-  });
-
-  test('PayPal Proceed calls generatePayPalLink and opens external URL', async () => {
-    window.open = jest.fn();
-    const { generatePayPalLink } = require('../utils/paymentLinks');
-    renderModal();
-    await waitFor(() => screen.getByText('PayPal'));
-    fireEvent.click(screen.getByText('PayPal'));
-    await waitFor(() => screen.getByText('Proceed'));
-    fireEvent.click(screen.getByText('Proceed'));
-    expect(generatePayPalLink).toHaveBeenCalled();
-  });
-
-  test('clicking Revolut method opens PaymentInfoModal', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Revolut'));
-    fireEvent.click(screen.getByText('Revolut'));
-    expect(screen.getByTestId('payment-info-modal')).toBeInTheDocument();
-  });
-
-  test('clicking Bank Transfer method shows inline bank details with IBAN', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Bank Transfer'));
-    fireEvent.click(screen.getByText('Bank Transfer'));
-    expect(screen.getByText('Bank Transfer Details')).toBeInTheDocument();
-    expect(screen.getByText('GB29XXXX')).toBeInTheDocument();
-  });
-
-  test('clicking Bank Transfer shows BIC when present', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Bank Transfer'));
-    fireEvent.click(screen.getByText('Bank Transfer'));
-    expect(screen.getByText('BARCGB22')).toBeInTheDocument();
-  });
-
-  test('Back to options link hides bank details', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Bank Transfer'));
-    fireEvent.click(screen.getByText('Bank Transfer'));
-    fireEvent.click(screen.getByText('Back to options'));
-    expect(screen.queryByText('Bank Transfer Details')).not.toBeInTheDocument();
-  });
-
-  test('saves pending payment to sessionStorage when a payment method is clicked', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('PayPal'));
-    fireEvent.click(screen.getByText('PayPal'));
-    expect(sessionStorage.getItem('pendingPayment')).not.toBeNull();
-    const stored = JSON.parse(sessionStorage.getItem('pendingPayment'));
-    expect(stored.groupId).toBe('group-1');
-    expect(stored.method).toBe('paypal');
-  });
-
-  test('a payment link starts the payment on the server (for the "did you pay?" prompt)', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Revolut'));
-    fireEvent.click(screen.getByText('Revolut'));
-    expect(mockSettlementCalls).toEqual([['start', { groupId: 'group-1', toUid: 'user-2', amount: 45.5, method: 'revolut' }]]);
-    const { setDoc } = require('firebase/firestore');
-    expect(setDoc).not.toHaveBeenCalled();
-  });
-
-  test('stores revolut method when Revolut link is clicked', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Revolut'));
-    fireEvent.click(screen.getByText('Revolut'));
-    const stored = JSON.parse(sessionStorage.getItem('pendingPayment'));
-    expect(stored.method).toBe('revolut');
-  });
-
-  test('recipient has no PayPal notice shown when paypalUsername is missing', async () => {
-    const { getDoc } = require('firebase/firestore');
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({ paymentMethods: { paypalUsername: '', revolutUsername: '' } }),
-    });
-    const { getAvailablePaymentMethods } = require('../utils/paymentLinks');
-    getAvailablePaymentMethods.mockReturnValue([]);
-    renderModal();
-    await waitFor(() => expect(getDoc).toHaveBeenCalled());
-    await waitFor(() =>
-      expect(screen.getByText(/has not set up PayPal/i)).toBeInTheDocument()
-    );
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 17. PayPal demo panel — toggle, createOrder, onApprove, onError (lines 396-441, 906)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - PayPal demo panel', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
-    // Ensure collection mock always returns a valid ref after clearAllMocks
-    const { collection } = require('firebase/firestore');
-    collection.mockReturnValue({});
-  });
-
-  const expandDemoPanel = () =>
-    fireEvent.click(screen.getByText('Future feature - Settlement Payment Flow'));
-
-  test('demo panel is hidden by default', () => {
-    renderModal();
-    expect(screen.queryByTestId('paypal-buttons')).not.toBeInTheDocument();
-  });
-
-  test('clicking demo toggle reveals PayPal buttons', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
-    expandDemoPanel();
-    expect(screen.getByTestId('paypal-buttons')).toBeInTheDocument();
-  });
-
-  test('clicking demo toggle again hides the panel', async () => {
-    renderModal();
-    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
-    expandDemoPanel();
-    expandDemoPanel();
-    expect(screen.queryByTestId('paypal-buttons')).not.toBeInTheDocument();
-  });
-
-  test('PayPal buttons not shown when amount is zero (entry-amount prompt shown)', async () => {
-    renderModal();
-    const input = screen.getByPlaceholderText('0.00');
-    fireEvent.change(input, { target: { value: '' } });
-    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
-    expandDemoPanel();
-    expect(screen.queryByTestId('paypal-buttons')).not.toBeInTheDocument();
-    expect(screen.getByText('Enter an amount above to continue')).toBeInTheDocument();
-  });
-
-  test('onPayPalApprove claims the payment with the PayPal order ID and shows success', async () => {
-    const { addDoc } = require('firebase/firestore');
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    renderModal();
-    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
-    expandDemoPanel();
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('paypal-approve'));
-    });
-    await waitFor(() => expect(recordPaymentSent).toHaveBeenCalledWith({
-      payeeId: 'user-2', groupId: 'group-1', amount: 45.5, method: 'paypal',
-      idempotencyKey: 'idem-key-0000000001', paypalOrderId: 'capture-123',
-    }));
-    expect(addDoc).not.toHaveBeenCalled();
-    await waitFor(() =>
-      expect(screen.getByText(/Payment Sent!/i)).toBeInTheDocument()
-    );
-  });
-
-  test('onPayPalError sets an error message', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
-    expandDemoPanel();
-    fireEvent.click(screen.getByTestId('paypal-error'));
-    expect(
-      screen.getByText('Payment initialization failed. Please try again.')
-    ).toBeInTheDocument();
-    consoleSpy.mockRestore();
-  });
-
-  test('onPayPalApprove shows error when the claim fails', async () => {
-    const { recordPaymentSent } = require('../stores/notificationsStore');
-    recordPaymentSent.mockRejectedValueOnce(new Error('Server error'));
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    renderModal();
-    await waitFor(() => screen.getByText('Future feature - Settlement Payment Flow'));
-    expandDemoPanel();
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('paypal-approve'));
-    });
-    await waitFor(() =>
-      expect(screen.getByText('Payment failed. Please try again.')).toBeInTheDocument()
-    );
-    consoleSpy.mockRestore();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 18. Receiver QR panel — tabs and QR canvas (lines 1022-1133)
-// ---------------------------------------------------------------------------
-
-describe('SettleUpModal - Receiver QR panel tabs', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    sessionStorage.clear();
-    const { getDoc } = require('firebase/firestore');
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({
-        paymentMethods: {
-          paypalUsername: 'bob_paypal',
-          revolutUsername: 'bob_revolut',
-        },
-      }),
-    });
-  });
-
-  const openQRPanel = async () => {
-    await waitFor(() => screen.getByText(/Let Alice scan to pay you/i));
-    fireEvent.click(screen.getByText(/Let Alice scan to pay you/i).closest('button'));
-  };
-
-  test('PayPal tab is shown when paypalUsername is set', async () => {
-    renderModal(receiverProps);
-    await openQRPanel();
-    expect(screen.getByRole('button', { name: /PayPal/i })).toBeInTheDocument();
-  });
-
-  test('Revolut tab is shown when revolutUsername is set', async () => {
-    renderModal(receiverProps);
-    await openQRPanel();
-    expect(screen.getByRole('button', { name: /Revolut/i })).toBeInTheDocument();
-  });
-
-  test('PayPal QR canvas is visible by default (activeQR = paypal)', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => expect(require('firebase/firestore').getDoc).toHaveBeenCalled());
-    await openQRPanel();
-    await waitFor(() => expect(screen.getByTestId('qr-canvas')).toBeInTheDocument());
-    const { generatePayPalLink } = require('../utils/paymentLinks');
-    expect(generatePayPalLink).toHaveBeenCalledWith('bob_paypal', expect.any(Number), expect.any(String));
-  });
-
-  test('switching to Revolut tab shows Revolut QR canvas', async () => {
-    renderModal(receiverProps);
-    await waitFor(() => expect(require('firebase/firestore').getDoc).toHaveBeenCalled());
-    await openQRPanel();
-    await waitFor(() => screen.getByRole('button', { name: /Revolut/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Revolut/i }));
-    await waitFor(() => {
-      const { generateRevolutLink } = require('../utils/paymentLinks');
-      expect(generateRevolutLink).toHaveBeenCalledWith(
-        'bob_revolut',
-        expect.any(Number),
-        expect.any(String)
-      );
-    });
-  });
-
-  test('shows no-methods fallback when neither PayPal nor Revolut is configured', async () => {
-    const { getDoc } = require('firebase/firestore');
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({ paymentMethods: {} }),
-    });
-    renderModal(receiverProps);
-    await waitFor(() => expect(require('firebase/firestore').getDoc).toHaveBeenCalled());
-    await openQRPanel();
-    await waitFor(() =>
-      expect(screen.getByText('No payment methods set up yet.')).toBeInTheDocument()
-    );
-  });
-
-  test('instruction text identifies the payer by name', async () => {
-    renderModal(receiverProps);
-    await openQRPanel();
-    expect(screen.getByText(/Show this screen to/i)).toBeInTheDocument();
-    // Alice may appear multiple times in the UI — just verify at least one instance
-    expect(screen.getAllByText(/Alice/i).length).toBeGreaterThan(0);
-  });
-});
-
-describe('SettleUpModal - payment demos switch', () => {
-  afterEach(() => { mockDemosOn = true; });
-
-  test('the PayPal and SEPA demo panel is hidden while paymentDemosEnabled is off', () => {
-    mockDemosOn = false;
-    renderModal();
+describe('Settle Up - payment demos switch', () => {
+  test('the demo panel is hidden while paymentDemosEnabled is off', async () => {
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    await screen.findByText('Revolut');
     expect(screen.queryByText('Future feature - Settlement Payment Flow')).not.toBeInTheDocument();
   });
 
-  test('the demo panel shows while paymentDemosEnabled is on', () => {
+  test('with the switch on, the PayPal sandbox demo sends a claim with the order id', async () => {
     mockDemosOn = true;
-    renderModal();
-    expect(screen.getByText('Future feature - Settlement Payment Flow')).toBeInTheDocument();
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    fireEvent.click(screen.getByText('Future feature - Settlement Payment Flow'));
+    fireEvent.click(screen.getByTestId('paypal-approve'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Sent to Bob'));
+    expect(mockClaims[0]).toMatchObject({ method: 'paypal', amount: 45.5, paypalOrderId: 'capture-123' });
+  });
+
+  test('with the switch on, the SEPA simulation sends a SEPA claim', async () => {
+    mockDemosOn = true;
+    asPayer();
+    fireEvent.click(screen.getByText('Pay now'));
+    fireEvent.click(screen.getByText('Future feature - Settlement Payment Flow'));
+    await screen.findByText('SEPA Payment Demo');
+    fireEvent.click(screen.getByText('SEPA Payment Demo'));
+    fireEvent.click(screen.getByText('Complete SEPA'));
+    await waitFor(() => expect(mockClaims).toHaveLength(1));
+    expect(mockClaims[0]).toMatchObject({ method: 'sepa', amount: 20 });
   });
 });

@@ -266,21 +266,21 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     mockStore.unreadCount   = 1;
   });
 
-  test('Shows Confirm Received button for actionable notification', () => {
+  test('Shows I got it button for actionable notification', () => {
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
-    expect(screen.getByText('Confirm Received')).toBeInTheDocument();
+    expect(screen.getByText('I got it')).toBeInTheDocument();
   });
 
-  test('Shows Did Not Receive button for actionable notification', () => {
+  test('Shows Not received button for actionable notification', () => {
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
-    expect(screen.getByText('Did Not Receive')).toBeInTheDocument();
+    expect(screen.getByText('Not received')).toBeInTheDocument();
   });
 
-  test('Calls confirmPaymentReceived when Confirm Received is clicked', async () => {
+  test('Calls confirmPaymentReceived when I got it is clicked', async () => {
     mockConfirmPayment.mockResolvedValue({});
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Received'));
+      fireEvent.click(screen.getByText('I got it'));
     });
     expect(mockStepUpCalls).toEqual([['settlements.confirm', { notificationId: 'notif-pay' }]]);
     expect(mockConfirmPayment).toHaveBeenCalledWith('notif-pay', 'tok');
@@ -289,25 +289,25 @@ describe('NotificationsDropdown - Payment action buttons', () => {
   test('Does not confirm when the step-up is cancelled', async () => {
     mockStepUpToken = null;
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
-    fireEvent.click(screen.getByText('Confirm Received'));
+    fireEvent.click(screen.getByText('I got it'));
     await waitFor(() => expect(mockStepUpCalls).toHaveLength(1));
     expect(mockConfirmPayment).not.toHaveBeenCalled();
-    expect(screen.getByText('Confirm Received')).toBeInTheDocument();
+    expect(screen.getByText('I got it')).toBeInTheDocument();
   });
 
   test('Declining needs no step-up', async () => {
     mockDeclinePayment.mockResolvedValue({});
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
-    fireEvent.click(screen.getByText('Did Not Receive'));
+    fireEvent.click(screen.getByText('Not received'));
     await waitFor(() => expect(mockDeclinePayment).toHaveBeenCalled());
     expect(mockStepUpCalls).toEqual([]);
   });
 
-  test('Calls declinePaymentReceived when Did Not Receive is clicked', async () => {
+  test('Calls declinePaymentReceived when Not received is clicked', async () => {
     mockDeclinePayment.mockResolvedValue({});
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
-      fireEvent.click(screen.getByText('Did Not Receive'));
+      fireEvent.click(screen.getByText('Not received'));
     });
     expect(mockDeclinePayment).toHaveBeenCalledWith('notif-pay');
   });
@@ -316,7 +316,7 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     mockConfirmPayment.mockResolvedValue({});
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Received'));
+      fireEvent.click(screen.getByText('I got it'));
     });
     await waitFor(() =>
       expect(screen.getByText('Payment confirmed. Balance updated.')).toBeInTheDocument()
@@ -327,7 +327,7 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     mockDeclinePayment.mockResolvedValue({});
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
-      fireEvent.click(screen.getByText('Did Not Receive'));
+      fireEvent.click(screen.getByText('Not received'));
     });
     await waitFor(() =>
       expect(screen.getByText('Marked as not received. Payer has been notified.')).toBeInTheDocument()
@@ -338,7 +338,7 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     mockConfirmPayment.mockRejectedValue(new Error('Network error'));
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Received'));
+      fireEvent.click(screen.getByText('I got it'));
     });
     await waitFor(() =>
       expect(screen.getByText('Failed to confirm. Please try again.')).toBeInTheDocument()
@@ -348,7 +348,7 @@ describe('NotificationsDropdown - Payment action buttons', () => {
   test('Shows the server explanation when the payment cannot be confirmed', async () => {
     mockConfirmPayment.mockRejectedValue(Object.assign(new Error('This payment has already been answered.'), { code: 'functions/failed-precondition' }));
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
-    fireEvent.click(screen.getByText('Confirm Received'));
+    fireEvent.click(screen.getByText('I got it'));
     expect(await screen.findByText('This payment has already been answered.')).toBeInTheDocument();
   });
 
@@ -357,7 +357,7 @@ describe('NotificationsDropdown - Payment action buttons', () => {
     mockConfirmPayment.mockRejectedValue(permError);
     render(<NotificationsDropdown isOpen={true} onClose={jest.fn()} />);
     await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Received'));
+      fireEvent.click(screen.getByText('I got it'));
     });
     await waitFor(() =>
       expect(screen.getByText('You are not allowed to do this.')).toBeInTheDocument()

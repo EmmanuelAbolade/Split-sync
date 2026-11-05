@@ -79,12 +79,14 @@ jest.mock('../utils/settlements', () => ({
   cancelSettlement: () => Promise.resolve({ status: 'cancelled' }),
   confirmParams: (id) => ({ notificationId: id }),
   settlementErrorMessage: (_e, fallback) => fallback || 'That did not work. Please try again.',
+  methodLabel: (m) => (m === 'paypal' ? 'PayPal' : m),
 }));
 
 jest.mock('../stores/notificationsStore', () => ({
   useNotificationsStore:  () => mockNotificationsStore,
   confirmPaymentReceived: jest.fn(() => Promise.resolve()),
   declinePaymentReceived: jest.fn(() => Promise.resolve()),
+  recordPaymentSent:        () => Promise.resolve(),
   createNotification:     jest.fn(() => Promise.resolve()),
 }));
 

@@ -10,7 +10,7 @@ jest.mock('firebase/functions', () => ({
 // eslint-disable-next-line import/first
 import {
   toMinor, startSettlement, claimSettlement, confirmSettlement, declineSettlement,
-  receiveSettlement, receiveParams, confirmParams, cancelSettlement, settlementErrorMessage,
+  receiveSettlement, receiveParams, confirmParams, cancelSettlement, settlementErrorMessage, methodLabel,
 } from './settlements';
 
 beforeEach(() => {
@@ -61,4 +61,11 @@ test('error messages: server explanations are shown, other errors stay generic',
   expect(settlementErrorMessage(e('functions/permission-denied'))).toBe('You are not allowed to do this.');
   expect(settlementErrorMessage(e('functions/internal', 'stack trace'))).toBe('That did not work. Please try again.');
   expect(settlementErrorMessage(new Error('offline'), 'Fallback')).toBe('Fallback');
+});
+
+test('methodLabel reads naturally in a sentence', () => {
+  expect(methodLabel('revolut')).toBe('Revolut');
+  expect(methodLabel('bank')).toBe('bank transfer');
+  expect(methodLabel('manual')).toBe('cash or other');
+  expect(methodLabel('nope')).toBe('another way');
 });

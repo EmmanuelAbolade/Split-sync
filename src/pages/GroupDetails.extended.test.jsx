@@ -56,12 +56,14 @@ jest.mock('../utils/settlements', () => ({
   cancelSettlement: () => Promise.resolve({ status: 'cancelled' }),
   confirmParams: (id) => ({ notificationId: id }),
   settlementErrorMessage: (_e, fallback) => fallback || 'That did not work. Please try again.',
+  methodLabel: (m) => (m === 'paypal' ? 'PayPal' : m),
 }));
 
 jest.mock('../stores/notificationsStore', () => ({
   useNotificationsStore:    () => mockNotificationsStore,
   confirmPaymentReceived:   (...a) => mockConfirmPayment(...a),
   declinePaymentReceived:   (...a) => mockDeclinePayment(...a),
+  recordPaymentSent:        () => Promise.resolve(),
 }));
 
 // Invitation system
@@ -232,7 +234,7 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
 
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Payment Confirmation Required')).toBeInTheDocument()
+      expect(screen.getByText(/says they paid you/)).toBeInTheDocument()
     );
   });
 
@@ -254,12 +256,12 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
 
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Payment Confirmation Required')).toBeInTheDocument()
+      expect(screen.getByText(/says they paid you/)).toBeInTheDocument()
     );
     expect(screen.getAllByText(/30\.00/).length).toBeGreaterThan(0);
   });
 
-  test('Shows Confirm Received button in banner', async () => {
+  test('Shows I got it button in banner', async () => {
     mockNotificationsStore.notifications = [{
       id:             'notif-1',
       userId:         'user-123',
@@ -274,11 +276,11 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
 
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Confirm Received')).toBeInTheDocument()
+      expect(screen.getByText('I got it')).toBeInTheDocument()
     );
   });
 
-  test('Shows Did Not Receive button in banner', async () => {
+  test('Shows Not received button in banner', async () => {
     mockNotificationsStore.notifications = [{
       id:             'notif-1',
       userId:         'user-123',
@@ -293,11 +295,11 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
 
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Did Not Receive')).toBeInTheDocument()
+      expect(screen.getByText('Not received')).toBeInTheDocument()
     );
   });
 
-  test('Calls confirmPaymentReceived when Confirm Received is clicked', async () => {
+  test('Calls confirmPaymentReceived when I got it is clicked', async () => {
     mockConfirmPayment.mockResolvedValue({});
     mockNotificationsStore.notifications = [{
       id:             'notif-1',
@@ -312,14 +314,14 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
     }];
 
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Confirm Received'));
+    await waitFor(() => screen.getByText('I got it'));
     await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Received'));
+      fireEvent.click(screen.getByText('I got it'));
     });
     expect(mockConfirmPayment).toHaveBeenCalledWith('notif-1', 'tok');
   });
 
-  test('Calls declinePaymentReceived when Did Not Receive is clicked', async () => {
+  test('Calls declinePaymentReceived when Not received is clicked', async () => {
     mockDeclinePayment.mockResolvedValue({});
     mockNotificationsStore.notifications = [{
       id:             'notif-1',
@@ -334,9 +336,9 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
     }];
 
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Did Not Receive'));
+    await waitFor(() => screen.getByText('Not received'));
     await act(async () => {
-      fireEvent.click(screen.getByText('Did Not Receive'));
+      fireEvent.click(screen.getByText('Not received'));
     });
     expect(mockDeclinePayment).toHaveBeenCalledWith('notif-1');
   });
@@ -356,7 +358,7 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
 
     render(<GroupDetails />);
     await waitFor(() => screen.getByText('Weekend Trip'));
-    expect(screen.queryByText('Payment Confirmation Required')).not.toBeInTheDocument();
+    expect(screen.queryByText(/says they paid you/)).not.toBeInTheDocument();
   });
 
   test('Does not show banner for already-read notifications', async () => {
@@ -374,7 +376,7 @@ describe('GroupDetails Extended - Payment confirmation banners', () => {
 
     render(<GroupDetails />);
     await waitFor(() => screen.getByText('Weekend Trip'));
-    expect(screen.queryByText('Payment Confirmation Required')).not.toBeInTheDocument();
+    expect(screen.queryByText(/says they paid you/)).not.toBeInTheDocument();
   });
 });
 
@@ -530,14 +532,14 @@ describe('GroupDetails Extended - Pending payment banner (sessionStorage)', () =
   test('Shows pending payment banner when sessionStorage has matching payment', async () => {
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Payment Confirmation Needed')).toBeInTheDocument()
+      expect(screen.getByText(/Did you finish paying/)).toBeInTheDocument()
     );
   });
 
  test('Shows payment amount in pending banner', async () => {
     render(<GroupDetails />);
     await waitFor(() =>
-      expect(screen.getByText('Payment Confirmation Needed')).toBeInTheDocument()
+      expect(screen.getByText(/Did you finish paying/)).toBeInTheDocument()
     );
     expect(screen.getAllByText(/30\.00/).length).toBeGreaterThan(0);
   });
@@ -564,7 +566,7 @@ describe('GroupDetails Extended - Pending payment banner (sessionStorage)', () =
 
     render(<GroupDetails />);
     await waitFor(() => screen.getByText('Weekend Trip'));
-    expect(screen.queryByText('Payment Confirmation Needed')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Did you finish paying/)).not.toBeInTheDocument();
   });
 
   test('Clicking Not Yet removes pending payment banner', async () => {
@@ -579,10 +581,10 @@ describe('GroupDetails Extended - Pending payment banner (sessionStorage)', () =
     }));
 
     render(<GroupDetails />);
-    await waitFor(() => screen.getByText('Not Yet'));
-    fireEvent.click(screen.getByText('Not Yet'));
+    await waitFor(() => screen.getByText('Not yet'));
+    fireEvent.click(screen.getByText('Not yet'));
     await waitFor(() =>
-      expect(screen.queryByText('Payment Confirmation Needed')).not.toBeInTheDocument()
+      expect(screen.queryByText(/Did you finish paying/)).not.toBeInTheDocument()
     );
   });
 });
