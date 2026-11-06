@@ -23,8 +23,13 @@ import {
 } from '../utils/biometric';
 import BalanceBreakdownModal from '../components/BalanceBreakdownModal';
 import { isActiveMember } from '../utils/memberDirectory';
+import useSpaces from '../hooks/useSpaces';
+import AppTopBar from '../components/AppTopBar';
+import { spaceStyle, SpaceIcon } from '../components/hub/spaceStyle';
+import { moneyLines } from '../components/hub/SpaceTile';
 
 export default function Profile() {
+  const { circlesOn, spaces } = useSpaces();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [userData, setUserData] = useState(null);
@@ -467,6 +472,8 @@ export default function Profile() {
           </div>
         </div>
       )}
+      {/* Shared top bar for testers */}
+      {circlesOn && <AppTopBar />}
       {/* ── Header ── */}
       <div className="bg-white dark:bg-gray-800 shadow-card top-0 z-30">
         <div className="bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-900 dark:to-blue-900 text-white shadow-card-3d">
@@ -570,6 +577,33 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+        {/* Balances by space (FR-HUB-08): per space and per currency, never combined */}
+        {circlesOn && (
+          <section aria-labelledby="balances-by-space" className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-4 mb-6">
+            <h2 id="balances-by-space" className="text-base font-bold text-gray-900 dark:text-white">Balances by space</h2>
+            <p className="mt-1 mb-2 text-xs text-gray-600 dark:text-gray-400">Shown per space and per currency. No conversion and no combined total.</p>
+            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+              {spaces.map((sp) => {
+                const st = spaceStyle(sp);
+                const owe = sp.id === 'expenses' ? moneyLines(owingByCurrency).map((l) => `You owe ${l}`) : [];
+                const owed = sp.id === 'expenses' ? moneyLines(owedByCurrency).map((l) => `Owed ${l}`) : [];
+                const lines = sp.id === 'expenses' ? (owe.length || owed.length ? [...owe, ...owed] : ['Settled up']) : ['Nothing yet'];
+                return (
+                  <li key={sp.id} className="flex items-center gap-3 py-2.5">
+                    <span className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center ${st.soft}`}>
+                      <SpaceIcon space={sp} size={18} />
+                    </span>
+                    <span className="flex-1 font-medium text-gray-900 dark:text-white">{sp.name}</span>
+                    <span className="text-right text-sm font-semibold text-gray-800 dark:text-gray-200 tabular-nums">
+                      {lines.map((l) => <span key={l} className="block">{l}</span>)}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
 
         {/* ── Stats ── */}
         <div className="grid grid-cols-2 gap-4 mb-6">

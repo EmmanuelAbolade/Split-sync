@@ -8,6 +8,10 @@ import { useAuthStore } from '../stores/authStore';
 import { ArrowLeft, Calendar, Users, TrendingUp, TrendingDown, Archive, Info } from 'lucide-react';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 import { getMemberName, isActiveMember } from '../utils/memberDirectory';
+import useSpaces from '../hooks/useSpaces';
+import AppTopBar from '../components/AppTopBar';
+import SpaceChips from '../components/SpaceChips';
+import { getSpace } from '../config/spaces';
 
 // Firestore 'in' queries accept at most 30 values — split larger id lists.
 const IN_QUERY_LIMIT = 30;
@@ -28,6 +32,14 @@ export default function Activity() {
   const [filter, setFilter] = useState(location.state?.filter || 'all');
   // Status filter: 'active' | 'archived'
   const [statusFilter, setStatusFilter] = useState('active');
+  // Space filter (FR-HUB-06): shown only when more than one space is on. Under
+  // "All" the Expenses totals and filters are hidden: nothing is totalled
+  // across spaces. The Expenses chip is today's page, unchanged.
+  const { spaces, circlesOn } = useSpaces();
+  const showChips = spaces.length > 1;
+  const [spaceFilter, setSpaceFilter] = useState('all');
+  const expensesView = !showChips || spaceFilter === 'expenses';
+  const otherSpace = showChips && spaceFilter !== 'all' && spaceFilter !== 'expenses' ? getSpace(spaceFilter) : null;
 
   const getDisplayTitle = (expense, group) => {
     if (!expense.isSettlement) return expense.title;
@@ -81,11 +93,14 @@ export default function Activity() {
   // Apply status filter first then role filter
   const filteredExpenses = expenses
     .filter(e => {
-      if (statusFilter === 'active')   return !e.status || e.status === 'active';
-      if (statusFilter === 'archived') return e.status === 'archived';
+      if (otherSpace) return false;
+      const status = expensesView ? statusFilter : 'active';
+      if (status === 'active')   return !e.status || e.status === 'active';
+      if (status === 'archived') return e.status === 'archived';
       return true;
     })
     .filter(e => {
+      if (!expensesView) return true;
       if (filter === 'paid') return e.paidBy === user.uid;
       if (filter === 'owe')  return e.participants?.includes(user.uid) && e.paidBy !== user.uid;
       return true;
@@ -116,8 +131,11 @@ export default function Activity() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
 
+      {/* Shared top bar for testers (it sticks; this page header then scrolls) */}
+      {circlesOn && <AppTopBar />}
+
       {/* Top Bar */}
-      <div className="bg-white dark:bg-gray-800 shadow-card sticky top-0 z-30">
+      <div className={`bg-white dark:bg-gray-800 shadow-card ${circlesOn ? '' : 'sticky top-0 z-30'}`}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <button
@@ -137,6 +155,26 @@ export default function Activity() {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
 
+        {showChips && (
+          <div className="mb-4 flex flex-col gap-3">
+            <SpaceChips spaces={spaces} value={spaceFilter} onChange={setSpaceFilter} includeAll label="Filter by space" />
+            {spaceFilter === 'all' && (
+              <p className="flex items-start gap-2 rounded-xl bg-gray-100 dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+                <Info size={16} className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+                Showing everything in time order. Amounts are labelled by space and not totalled.
+              </p>
+            )}
+          </div>
+        )}
+
+        {otherSpace && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-gray-900/50 p-10 text-center">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Nothing in {otherSpace.name} yet</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Activity from {otherSpace.name} will appear here once the space is ready.</p>
+          </div>
+        )}
+
+        {expensesView && (<>
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl shadow-card dark:shadow-gray-900/50 p-4 border border-green-200 dark:border-green-800">
@@ -252,9 +290,10 @@ export default function Activity() {
             </button>
           ))}
         </div>
+        </>)}
 
         {/* Expenses List */}
-        {loading ? (
+        {otherSpace ? null : loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
             <p className="mt-4 text-gray-600 dark:text-gray-300">Loading activity...</p>
@@ -316,6 +355,9 @@ export default function Activity() {
                         </h4>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        {showChips && spaceFilter === 'all' && (
+                          <span className="font-semibold text-blue-700 dark:text-blue-300">Expenses ·</span>
+                        )}
                         <Users size={14} />
                         <span>{group?.name || 'Unknown Group'}</span>
                       </div>

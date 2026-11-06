@@ -12,6 +12,17 @@ import '@testing-library/jest-dom';
 // ---------------------------------------------------------------------------
 
 const mockNavigate = jest.fn();
+// Spaces (Phase 2): only Expenses unless a test switches more on
+let mockSpaceIds = ['expenses'];
+jest.mock('../components/AppTopBar', () => () => <div data-testid="app-top-bar" />);
+jest.mock('../hooks/useSpaces', () => ({
+  __esModule: true,
+  default: () => {
+    const { SPACES } = jest.requireActual('../config/spaces');
+    const spaces = SPACES.filter((s) => mockSpaceIds.includes(s.id));
+    return { loading: false, circlesOn: mockSpaceIds.length > 1, spaces, isSpaceOn: (id) => mockSpaceIds.includes(id) };
+  },
+}));
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
@@ -792,5 +803,27 @@ describe('Analytics - Who Owes Who keeps currencies separate', () => {
     expect(amounts.some(t => /EUR|€/.test(t))).toBe(true);
     expect(amounts.some(t => /GBP|£/.test(t))).toBe(true);
     expect(screen.queryByText(/20\.00/)).not.toBeInTheDocument(); // not summed
+  });
+});
+
+describe('Analytics - space tabs (Phase 2)', () => {
+  afterEach(() => { mockSpaceIds = ['expenses']; });
+
+  test('no tabs while only Expenses is on', async () => {
+    render(<Analytics />);
+    await waitFor(() => expect(screen.queryByText(/Loading analytics/)).not.toBeInTheDocument());
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('app-top-bar')).not.toBeInTheDocument();
+  });
+
+  test('one tab per enabled space; another space shows its own empty state', async () => {
+    mockSpaceIds = ['expenses', 'events'];
+    render(<Analytics />);
+    expect(await screen.findByRole('tablist', { name: 'Stats by space' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Expenses' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('app-top-bar')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Events' }));
+    expect(screen.getByText('No Events data yet')).toBeInTheDocument();
+    expect(screen.getByText(/Each tab reads only its own space/)).toBeInTheDocument();
   });
 });

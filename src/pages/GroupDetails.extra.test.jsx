@@ -747,6 +747,39 @@ describe('GroupDetails Extra - Add Expense stopPropagation', () => {
 // 13. SettleUpModal onClose — clear pending banner (lines 1382-1386)
 // ---------------------------------------------------------------------------
 
+describe('GroupDetails Extra - Back goes to the right Home', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.clear();
+    mockGetDoc.mockResolvedValueOnce({ exists: () => true, id: 'group-123', data: () => mockGroupOwner })
+              .mockResolvedValue(mockUserDoc);
+    let callCount = 0;
+    mockOnSnapshot.mockImplementation((q, cb) => {
+      callCount++;
+      if (callCount === 1) cb({ exists: () => true, id: 'group-123', data: () => mockGroupOwner });
+      else if (callCount === 2) cb({ docs: [] });
+      else cb({ empty: true, docs: [] });
+      return jest.fn();
+    });
+    mockGetMySentInvitations.mockResolvedValue([]);
+    mockNotificationsStore.notifications = [];
+  });
+  afterEach(() => sessionStorage.clear());
+
+  test('without the hub, back goes to /dashboard', async () => {
+    render(<GroupDetails />);
+    fireEvent.click(await screen.findByLabelText('Back'));
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+  });
+
+  test('opened from the Expenses space, back returns there', async () => {
+    sessionStorage.setItem('splitsync:expensesHome', '/spaces/expenses');
+    render(<GroupDetails />);
+    fireEvent.click(await screen.findByLabelText('Back'));
+    expect(mockNavigate).toHaveBeenCalledWith('/spaces/expenses');
+  });
+});
+
 describe('GroupDetails Extra - Waiting for the payee card', () => {
   beforeEach(() => {
     jest.clearAllMocks();

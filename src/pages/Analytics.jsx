@@ -4,6 +4,9 @@
 // Uses Recharts for all visualisations with entrance animations.
 
 import { useState, useEffect, useMemo } from 'react';
+import useSpaces from '../hooks/useSpaces';
+import SpaceChips from '../components/SpaceChips';
+import AppTopBar from '../components/AppTopBar';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -91,7 +94,9 @@ function ChartCard({ title, icon: Icon, children, delay = 0 }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function Analytics() {
+// Today's Analytics page: the Expenses tab once Stats has one tab per space.
+function ExpensesAnalytics({ spaceTabs = null }) {
+  const { circlesOn } = useSpaces();
   const { user } = useAuthStore();
   const navigate  = useNavigate();
 
@@ -301,12 +306,15 @@ export default function Analytics() {
 
   if (loading) {
     return (
+      <>
+      {circlesOn && <AppTopBar />}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Loader size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
           <p className="text-gray-500 dark:text-gray-400 text-sm">Loading analytics...</p>
         </div>
       </div>
+      </>
     );
   }
 
@@ -314,7 +322,10 @@ export default function Analytics() {
 
   if (expenses.length === 0) {
     return (
+      <>
+      {circlesOn && <AppTopBar />}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-6 pb-24">
+        {spaceTabs && <div className="w-full max-w-2xl mb-6">{spaceTabs}</div>}
         <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4">
           <BarChart2 size={36} className="text-indigo-400" />
         </div>
@@ -329,6 +340,7 @@ export default function Analytics() {
           Go to Dashboard
         </button>
       </div>
+      </>
     );
   }
 
@@ -369,7 +381,8 @@ export default function Analytics() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-28">
 
       {/* ── Header ── */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-4">
+      {circlesOn && <AppTopBar />}
+      <div className={`${circlesOn ? '' : 'sticky top-0 z-10 '}bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-4`}>
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <button
             onClick={() => navigate('/dashboard')}
@@ -383,6 +396,8 @@ export default function Analytics() {
           </div>
         </div>
       </div>
+
+      {spaceTabs && <div className="max-w-2xl mx-auto px-4 pt-3">{spaceTabs}</div>}
 
       {/* Group selector — filters all charts to a single currency */}
       <div className="max-w-2xl mx-auto px-4 pt-3 pb-1">
@@ -669,6 +684,51 @@ export default function Analytics() {
           animation: fade-in 0.45s ease-out both;
         }
       `}</style>
+    </div>
+  );
+}
+
+// Stats (FR-HUB-07): one tab per enabled space, each reading only its own
+// space. With one space (the production default) this is exactly the page above.
+export default function Analytics() {
+  const navigate = useNavigate();
+  const { spaces } = useSpaces();
+  const [tab, setTab] = useState('expenses');
+
+  if (spaces.length < 2) return <ExpensesAnalytics />;
+  const tabs = <SpaceChips spaces={spaces} value={tab} onChange={setTab} asTabs label="Stats by space" />;
+  const space = spaces.find((x) => x.id === tab);
+  if (!space || space.id === 'expenses') return <ExpensesAnalytics spaceTabs={tabs} />;
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-28">
+      <AppTopBar />
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-4">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <button
+            onClick={() => navigate('/dashboard')}
+            aria-label="Back to Home"
+            className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <ArrowLeft size={20} className="text-gray-600 dark:text-gray-300" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Insights for each space</p>
+          </div>
+        </div>
+      </div>
+      <div className="max-w-2xl mx-auto px-4 pt-3 flex flex-col gap-4">
+        {tabs}
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center">
+          <BarChart2 size={36} className="mx-auto mb-3 text-gray-400" aria-hidden="true" />
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">No {space.name} data yet</h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Charts for {space.name} appear here once the space is ready.</p>
+        </div>
+        <p className="rounded-xl bg-gray-100 dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+          Each tab reads only its own space, so figures from different kinds of money are never mixed in one chart.
+        </p>
+      </div>
     </div>
   );
 }

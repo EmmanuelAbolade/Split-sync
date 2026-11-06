@@ -8,6 +8,17 @@ import '@testing-library/jest-dom';
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 const mockNavigate = jest.fn();
+// Spaces (Phase 2): only Expenses unless a test switches more on
+let mockSpaceIds = ['expenses'];
+jest.mock('../components/AppTopBar', () => () => <div data-testid="app-top-bar" />);
+jest.mock('../hooks/useSpaces', () => ({
+  __esModule: true,
+  default: () => {
+    const { SPACES } = jest.requireActual('../config/spaces');
+    const spaces = SPACES.filter((s) => mockSpaceIds.includes(s.id));
+    return { loading: false, circlesOn: mockSpaceIds.length > 1, spaces, isSpaceOn: (id) => mockSpaceIds.includes(id) };
+  },
+}));
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/activity' }),
@@ -348,5 +359,45 @@ describe('Activity - Navigation', () => {
     const backBtn = screen.getAllByRole('button')[0];
     fireEvent.click(backBtn);
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+  });
+});
+
+describe('Activity - space chips (Phase 2)', () => {
+  beforeEach(() => { jest.clearAllMocks(); setupActivity(); });
+  afterEach(() => { mockSpaceIds = ['expenses']; });
+
+  test('no chips while only Expenses is on', () => {
+    render(<Activity />);
+    expect(screen.queryByTestId('app-top-bar')).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Filter by space' })).not.toBeInTheDocument();
+  });
+
+  test('All lists items labelled by space, with no totals or Expenses filters', () => {
+    mockSpaceIds = ['expenses', 'events'];
+    render(<Activity />);
+    expect(screen.getByRole('group', { name: 'Filter by space' })).toBeInTheDocument();
+    expect(screen.getByTestId('app-top-bar')).toBeInTheDocument();
+    expect(screen.getByText(/Amounts are labelled by space and not totalled/)).toBeInTheDocument();
+    expect(screen.queryByText('You Paid')).not.toBeInTheDocument();
+    expect(screen.queryByText('I Paid')).not.toBeInTheDocument();
+    expect(screen.getByText('Dinner')).toBeInTheDocument();
+    expect(screen.getAllByText('Expenses ·').length).toBe(2);
+  });
+
+  test('the Expenses chip is the page as before', () => {
+    mockSpaceIds = ['expenses', 'events'];
+    render(<Activity />);
+    fireEvent.click(screen.getByRole('button', { name: 'Expenses' }));
+    expect(screen.getByText('You Paid')).toBeInTheDocument();
+    expect(screen.getByText('I Paid')).toBeInTheDocument();
+    expect(screen.queryByText('Expenses ·')).not.toBeInTheDocument();
+  });
+
+  test('another space says it has nothing yet', () => {
+    mockSpaceIds = ['expenses', 'events'];
+    render(<Activity />);
+    fireEvent.click(screen.getByRole('button', { name: 'Events' }));
+    expect(screen.getByText('Nothing in Events yet')).toBeInTheDocument();
+    expect(screen.queryByText('Dinner')).not.toBeInTheDocument();
   });
 });

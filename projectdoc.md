@@ -396,6 +396,25 @@ Branch `feature/settle-up-ux`. Mockups approved by the user (Design canvas https
 
 Tests: 70 suites, 1,557 passing (Settle Up tests rewritten for the new flow: 35, down from 66 tests of the old screens; ActionButton 3; methodLabel 1). Build compiles. Preview tested by the user on a phone (Revolut and PayPal open their apps; all five checks passed), then merged to `master` and hosting deployed (hosting only; no Functions or rules changes).
 
+### 2026-11-05 (Circles Phase 2: Hub and navigation; live)
+
+Branch `feature/circles-2`. Everything is behind `circlesEnabled` (off in production; the user's UID is on its allow-list). No Functions, rules or index changes.
+
+| Area | What changed |
+|---|---|
+| Routes (`App.js`) | `/dashboard`: `Hub` when circlesEnabled is on, otherwise today's `Dashboard` (spinner while flags load). `/spaces/:spaceId`: `expenses` = `ExpensesSpace` (Dashboard unchanged under a space header), other enabled spaces = `SpaceHome` ("being built"); unknown/disabled/flag off -> `/dashboard` |
+| Hub (`pages/Hub.jsx`) | Welcome, Needs attention (payments to confirm, largest debt; tasks not totals), Your spaces tiles (Expenses: group count and owe/owed per currency, never combined; others "Coming soon"), Customise Home (hidden spaces in `users/{uid}/private/hubPrefs`, owner-only, existing rules), bell and Settings |
+| + action sheet | `BottomNav`: with circlesEnabled on, + opens `ActionSheet` (one action per enabled space, current space first then "Other spaces"; Add an expense -> `/add`); off: navigates to `/add` as before. Home stays active inside `/spaces/*` |
+| Activity / Stats | `SpaceChips` shown only when 2+ spaces are on. Activity: All (time order, labelled by space, no totals or Expenses filters), Expenses (page unchanged), other spaces (empty state). Analytics: one tab per space; Expenses tab = today's page (`ExpensesAnalytics` with a `spaceTabs` prop) |
+| Profile | "Balances by space" card (per space, per currency, no combined total) when circlesEnabled is on. "Who can ask me" deferred to Phase 5 (no privacy data model yet) |
+| Back targets | `GroupDetails` back arrow (now labelled "Back"), not-a-member, after leave and after delete use `expensesHome()` (`utils/spaceNav.js`): `/spaces/expenses` when opened from the Expenses space, else `/dashboard` |
+| Registry | `config/spaces.js`: routes `/spaces/<id>`, mockup accents (blue, pink, violet, amber, teal), blurbs, `spaceOfPath` |
+| Shared UI | `BottomSheet`, `ActionSheet`, `SpaceChips`, `hub/SpaceTile`, `hub/NeedsAttention`, `hub/CustomiseHomeSheet`, `hub/spaceStyle`; hooks `useSpaces`, `useExpensesSummary` (read-only), `useHubPrefs`; Tailwind `sheet-in`, `fade-in` |
+| Top bar (user feedback 2026-11-06) | First preview replaced the Home top bar; restored. New shared `components/AppTopBar.jsx` = the original Dashboard bar (logo -> Taskmaster for admins, name, bell, Settings, Logout), now used by `Dashboard` (looks identical), `Hub` and `SpaceHome`. With circlesEnabled on it is sticky and adds a Spaces menu (Home + each enabled space; names the current space). Hub welcome restored: profile photo (links to Profile), `CyclingTagline` (exported from Dashboard), date. Expenses space no longer adds its own bar. User then chose the recommended scope: the shared bar also on Activity, Stats (all its screens) and You for testers; those pages keep their own header (no longer sticky while the bar is shown). Inner pages (group, Settings, Quick Add, Taskmaster) keep only their back-arrow header |
+| Not done here | AI assistant `spaceId` context (05 §5) and notification deep links for new types come with the spaces that create them |
+
+Tests: 74 suites, 1,611 passing (new: AppTopBar 9, Hub 9, ActionSheet 6, hub parts 10, App routing 8, BottomNav 3, Activity 4, Analytics 2, Profile 2, GroupDetails back 2). Build compiles. Preview reviewed by the user (2026-11-06, with eventsEnabled, circlesSpaceEnabled, loansEnabled and aidEnabled on for their UID only; nothing enabled for everyone), then merged to `master` and hosting deployed (hosting only).
+
 ## 15. Maintaining this document
 
 - Add a dated entry to §14 for every working session, and keep §12 (deployment state) accurate.

@@ -26,6 +26,17 @@ global.crypto = {
 };
 
 const mockNavigate = jest.fn();
+// Spaces (Phase 2): only Expenses unless a test switches more on
+let mockSpaceIds = ['expenses'];
+jest.mock('../components/AppTopBar', () => () => <div data-testid="app-top-bar" />);
+jest.mock('../hooks/useSpaces', () => ({
+  __esModule: true,
+  default: () => {
+    const { SPACES } = jest.requireActual('../config/spaces');
+    const spaces = SPACES.filter((s) => mockSpaceIds.includes(s.id));
+    return { loading: false, circlesOn: mockSpaceIds.length > 1, spaces, isSpaceOn: (id) => mockSpaceIds.includes(id) };
+  },
+}));
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
@@ -643,5 +654,26 @@ describe('Profile - Stats', () => {
     render(<Profile />);
     // The Groups stat card label is always rendered regardless of group count
     expect(screen.getByText('Groups')).toBeInTheDocument();
+  });
+});
+
+describe('Profile - Balances by space (Phase 2)', () => {
+  beforeEach(() => { jest.clearAllMocks(); defaultSetup(); });
+  afterEach(() => { mockSpaceIds = ['expenses']; });
+
+  test('hidden while circlesEnabled is off', () => {
+    render(<Profile />);
+    expect(screen.queryByText('Balances by space')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('app-top-bar')).not.toBeInTheDocument();
+  });
+
+  test('lists each enabled space with no combined total', () => {
+    mockSpaceIds = ['expenses', 'loans'];
+    render(<Profile />);
+    expect(screen.getByText('Balances by space')).toBeInTheDocument();
+    expect(screen.getByTestId('app-top-bar')).toBeInTheDocument();
+    expect(screen.getByText('Shown per space and per currency. No conversion and no combined total.')).toBeInTheDocument();
+    expect(screen.getByText('Loans')).toBeInTheDocument();
+    expect(screen.getByText('Nothing yet')).toBeInTheDocument();
   });
 });
