@@ -10,7 +10,8 @@ import { Home, Plane, Pizza, PartyPopper, Car, Palmtree, Gamepad2, Heart, Users,
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
 import InvitationNotification from '../components/InvitationNotification';
 import OnboardingWizard from "../components/OnboardingWizard";
-import NotificationsDropdown from '../components/NotificationsDropdown'; 
+import NotificationsDropdown from '../components/NotificationsDropdown';
+import AppTopBar from '../components/AppTopBar'; 
 import { useNotificationsStore } from '../stores/notificationsStore';
 import { calculateBalances, getUserBalanceSummary } from '../utils/balanceCalculator';
 import { isActiveMember } from '../utils/memberDirectory';
@@ -51,7 +52,7 @@ const TAGLINES = [
   'Keep relationships sync and smooth.',
 ];
 
-function CyclingTagline() {
+export function CyclingTagline() {
   const [index,   setIndex]   = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -395,46 +396,13 @@ export default function Dashboard() {
       />
 
 
-      {/* Top Bar */}
-      <div className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <img 
-            src="/logo.png" 
-            alt="Split-Sync" 
-            className="h-10 w-auto cursor-pointer"
-            onClick={() => isAdmin ? navigate('/taskmaster') : navigate('/dashboard')}
-            title={isAdmin ? 'Open Taskmaster' : 'Go to dashboard'}
-          />
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {user?.displayName || user?.email}
-            </span>
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
-            >
-              <Bell size={24} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => navigate('/settings')}
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              <Settings size={24} />
-            </button>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Top Bar (shared with the Hub and space pages) */}
+      <AppTopBar
+        isAdmin={isAdmin}
+        unreadCount={unreadCount}
+        onBell={() => setShowNotifications(!showNotifications)}
+        onLogout={handleLogout}
+      />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">

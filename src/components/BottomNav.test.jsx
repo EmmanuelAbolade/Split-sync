@@ -10,6 +10,17 @@ import BottomNav from './BottomNav';
 const mockNavigate = jest.fn();
 let mockPathname = '/dashboard';
 
+// Spaces (Phase 2): only Expenses unless a test switches more on
+let mockSpaceIds = ['expenses'];
+jest.mock('../hooks/useSpaces', () => ({
+  __esModule: true,
+  default: () => {
+    const { SPACES } = jest.requireActual('../config/spaces');
+    const spaces = SPACES.filter((s) => mockSpaceIds.includes(s.id));
+    return { loading: false, circlesOn: mockSpaceIds.length > 1, spaces, isSpaceOn: (id) => mockSpaceIds.includes(id) };
+  },
+}));
+jest.mock('./ActionSheet', () => ({ open }) => (open ? <div data-testid="action-sheet" /> : null));
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: mockPathname }),
@@ -290,5 +301,35 @@ describe('BottomNav Component - Inactive Tab Styling', () => {
     render(<BottomNav />);
     const activityLabel = screen.getByText('Activity');
     expect(activityLabel).toHaveClass('text-gray-500');
+  });
+});
+
+describe('BottomNav - Circles hub (Phase 2)', () => {
+  beforeEach(() => { jest.clearAllMocks(); mockPathname = '/dashboard'; });
+  afterEach(() => { mockSpaceIds = ['expenses']; });
+
+  test('with circlesEnabled off, + still goes straight to Quick Add', () => {
+    render(<BottomNav />);
+    fireEvent.click(screen.getByLabelText('Add expense'));
+    expect(mockNavigate).toHaveBeenCalledWith('/add');
+    expect(screen.queryByTestId('action-sheet')).not.toBeInTheDocument();
+  });
+
+  test('with circlesEnabled on, + opens the action sheet instead', () => {
+    mockSpaceIds = ['expenses', 'events'];
+    render(<BottomNav />);
+    fireEvent.click(screen.getByLabelText('Create'));
+    expect(screen.getByTestId('action-sheet')).toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalledWith('/add');
+  });
+
+  test('Home stays highlighted inside a space only when the hub is on', () => {
+    mockPathname = '/spaces/expenses';
+    const { unmount } = render(<BottomNav />);
+    expect(screen.getByText('Home').className).not.toMatch(/text-primary/);
+    unmount();
+    mockSpaceIds = ['expenses', 'events'];
+    render(<BottomNav />);
+    expect(screen.getByText('Home').className).toMatch(/text-primary/);
   });
 });

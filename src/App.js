@@ -1,6 +1,6 @@
 // src/App.js
 import { useNotificationsStore } from './stores/notificationsStore';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -23,6 +23,40 @@ import { useSessionTimeout } from './hooks/useSessionTimeout';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 import Taskmaster from './pages/Taskmaster';
 import { rememberRedirect, peekRedirect, clearRedirect } from './utils/postAuthRedirect';
+import Hub from './pages/Hub';
+import ExpensesSpace from './pages/spaces/ExpensesSpace';
+import SpaceHome from './pages/spaces/SpaceHome';
+import useSpaces from './hooks/useSpaces';
+import { getSpace } from './config/spaces';
+import { forgetExpensesHome } from './utils/spaceNav';
+
+function PageSpinner() {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center" role="status" aria-label="Loading">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+    </div>
+  );
+}
+
+// /dashboard: the Hub when circlesEnabled is on for this user, otherwise
+// today's Dashboard exactly as before (the kill switch, 05-sitemap §3).
+function HomeRoute() {
+  const { loading, circlesOn } = useSpaces();
+  useEffect(() => { if (!loading && !circlesOn) forgetExpensesHome(); }, [loading, circlesOn]);
+  if (loading) return <PageSpinner />;
+  return circlesOn ? <Hub /> : <Dashboard />;
+}
+
+// /spaces/:spaceId: a space's entry page. Unknown or switched-off spaces, and
+// everything while circlesEnabled is off, go back to /dashboard.
+function SpaceRoute() {
+  const { spaceId } = useParams();
+  const { loading, circlesOn, isSpaceOn } = useSpaces();
+  if (loading) return <PageSpinner />;
+  if (!circlesOn || !isSpaceOn(spaceId)) return <Navigate to="/dashboard" replace />;
+  if (spaceId === 'expenses') return <ExpensesSpace />;
+  return <SpaceHome space={getSpace(spaceId)} />;
+}
 
 // Sends a signed-out visitor to /login, remembering the page they were trying
 // to open (for example an invite link) so they return to it after signing in.
@@ -156,7 +190,7 @@ function App() {
           path="/dashboard"
           element={
             isAuthenticated ? (
-              <ProtectedLayout><Dashboard /></ProtectedLayout>
+              <ProtectedLayout><HomeRoute /></ProtectedLayout>
             ) : (
               <LoginRedirect />
             )
@@ -235,6 +269,17 @@ function App() {
           element={
             isAuthenticated ? (
               <ProtectedLayout><JoinGroup /></ProtectedLayout>
+            ) : (
+              <LoginRedirect />
+            )
+          }
+        />
+
+        <Route
+          path="/spaces/:spaceId"
+          element={
+            isAuthenticated ? (
+              <ProtectedLayout><SpaceRoute /></ProtectedLayout>
             ) : (
               <LoginRedirect />
             )

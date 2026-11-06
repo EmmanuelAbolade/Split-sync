@@ -23,6 +23,17 @@ global.crypto = {
 };
 
 const mockNavigate = jest.fn();
+// Spaces (Phase 2): only Expenses unless a test switches more on
+let mockSpaceIds = ['expenses'];
+jest.mock('../components/AppTopBar', () => () => <div data-testid="app-top-bar" />);
+jest.mock('../hooks/useSpaces', () => ({
+  __esModule: true,
+  default: () => {
+    const { SPACES } = jest.requireActual('../config/spaces');
+    const spaces = SPACES.filter((s) => mockSpaceIds.includes(s.id));
+    return { loading: false, circlesOn: mockSpaceIds.length > 1, spaces, isSpaceOn: (id) => mockSpaceIds.includes(id) };
+  },
+}));
 jest.mock('react-router-dom', () => ({ useNavigate: () => mockNavigate }));
 
 const mockSignOut = jest.fn();

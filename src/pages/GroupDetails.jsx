@@ -24,6 +24,7 @@ import useStepUp from '../hooks/useStepUp';
 import { cancelSettlement, confirmParams, settlementErrorMessage, methodLabel } from '../utils/settlements';
 import { newIdempotencyKey } from '../utils/stepUp';
 import ActionButton from '../components/ActionButton';
+import { expensesHome } from '../utils/spaceNav';
 import ExpenseDetailsModal from '../components/ExpenseDetailsModal';
 import ShareInviteModal from '../components/ShareInviteModal';
 import { getMySentInvitations, cancelInvitation, sendInvitation } from '../utils/invitationSystem'; 
@@ -434,7 +435,7 @@ export default function GroupDetails() {
           reason: 'left',
         }),
       });
-      navigate('/dashboard');
+      navigate(expensesHome());
     } catch (err) {
       console.error('[GroupDetails] Leave group failed:', err);
       setGroupActionError('Failed to leave the group. Please try again.');
@@ -538,7 +539,7 @@ export default function GroupDetails() {
 
       // Delete the group document itself
       await deleteDoc(doc(db, 'groups', groupId));
-      navigate('/dashboard');
+      navigate(expensesHome());
     } catch (err) {
       console.error('[GroupDetails] Delete group failed:', err);
       setGroupActionError('Failed to delete the group. Please try again.');
@@ -588,7 +589,7 @@ export default function GroupDetails() {
             You no longer have access to <strong>{group.name}</strong>. Ask a member for the group's invite link to rejoin.
           </p>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(expensesHome())}
             className="w-full px-4 py-3 bg-primary dark:bg-indigo-600 text-white rounded-lg hover:bg-primary-hover dark:hover:bg-indigo-700 transition font-medium"
           >
             Back to Dashboard
@@ -816,7 +817,8 @@ export default function GroupDetails() {
       <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(expensesHome())}
+            aria-label="Back"
             className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >
             <ArrowLeft size={24} />

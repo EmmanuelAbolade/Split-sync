@@ -1,11 +1,18 @@
 // src/components/BottomNav.jsx
 // Bottom navigation bar — Home, Activity, Add (FAB), Analytics, Profile
+// With circlesEnabled on, the centre + opens the action sheet (one action per
+// space) and Home stays highlighted inside any space. Off: exactly as before.
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import ActionSheet from './ActionSheet';
+import useSpaces from '../hooks/useSpaces';
 import { Home, Activity, Plus, User, BarChart2 } from 'lucide-react';
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { circlesOn } = useSpaces();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const tabs = [
     { 
@@ -48,7 +55,8 @@ export default function BottomNav() {
 
   const isActive = (path) => {
     if (path === '/dashboard') {
-      return location.pathname === '/dashboard' || location.pathname === '/';
+      return location.pathname === '/dashboard' || location.pathname === '/' ||
+        (circlesOn && location.pathname.startsWith('/spaces/'));
     }
     return location.pathname === path;
   };
@@ -66,9 +74,10 @@ export default function BottomNav() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => navigate(tab.path)}
+                  onClick={() => (circlesOn ? setSheetOpen(true) : navigate(tab.path))}
                   className="relative -mt-6"
-                  aria-label="Add expense"
+                  aria-label={circlesOn ? 'Create' : 'Add expense'}
+                  aria-haspopup={circlesOn ? 'dialog' : undefined}
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark dark:from-indigo-600 dark:to-blue-600 rounded-full flex items-center justify-center shadow-card-hover hover:shadow-card-3d dark:shadow-gray-900/50 transition-all duration-300 transform hover:scale-110 active:scale-95">
                     <Icon size={24} className="text-white" strokeWidth={2.5} />
@@ -108,6 +117,7 @@ export default function BottomNav() {
           })}
         </div>
       </div>
+      {circlesOn ? <ActionSheet open={sheetOpen} onClose={() => setSheetOpen(false)} /> : null}
     </nav>
   );
 }

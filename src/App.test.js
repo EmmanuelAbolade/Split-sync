@@ -54,6 +54,21 @@ jest.mock('./pages/Settings', () => stub('Settings'));
 jest.mock('./pages/GroupDetails', () => stub('GroupDetails'));
 jest.mock('./pages/JoinGroup', () => stub('JoinGroup'));
 jest.mock('./pages/Taskmaster', () => stub('Taskmaster'));
+jest.mock('./pages/Hub', () => stub('Hub'));
+jest.mock('./pages/spaces/ExpensesSpace', () => stub('ExpensesSpace'));
+jest.mock('./pages/spaces/SpaceHome', () => ({ space }) => <h1>{space.name} space page</h1>);
+
+// Circles flags (useSpaces): off unless a test switches them on
+let mockSpaces = { loading: false, circlesOn: false, ids: ['expenses'] };
+jest.mock('./hooks/useSpaces', () => ({
+  __esModule: true,
+  default: () => ({
+    loading: mockSpaces.loading,
+    circlesOn: mockSpaces.circlesOn,
+    spaces: mockSpaces.ids.map((id) => ({ id })),
+    isSpaceOn: (id) => mockSpaces.ids.includes(id),
+  }),
+}));
 
 // eslint-disable-next-line import/first
 import App from './App';
@@ -77,6 +92,7 @@ beforeEach(() => {
   mockUpdateDoc.mockClear().mockImplementation(() => Promise.resolve());
   sessionStorage.clear();
   localStorage.clear();
+  mockSpaces = { loading: false, circlesOn: false, ids: ['expenses'] };
   act(() => { useAuthStore.setState({ user: null, isAuthenticated: false, loading: true }); });
 });
 
@@ -209,5 +225,54 @@ describe('Sign-in side effects', () => {
     renderAt('/dashboard', SIGNED_IN);
     expect(await screen.findByText('Dashboard page')).toBeInTheDocument();
     expect(mockSignOut).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('Hub and spaces (Phase 2)', () => {
+  test('with circlesEnabled off, /dashboard is the current Dashboard and spaces redirect to it', async () => {
+    renderAt('/spaces/expenses', SIGNED_IN);
+    expect(await screen.findByText('Dashboard page')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/dashboard');
+  });
+
+  test('with circlesEnabled off, a remembered Expenses back target is cleared', async () => {
+    sessionStorage.setItem('splitsync:expensesHome', '/spaces/expenses');
+    renderAt('/dashboard', SIGNED_IN);
+    await screen.findByText('Dashboard page');
+    await waitFor(() => expect(sessionStorage.getItem('splitsync:expensesHome')).toBeNull());
+  });
+
+  test('with circlesEnabled on, /dashboard is the Hub', async () => {
+    mockSpaces = { loading: false, circlesOn: true, ids: ['expenses'] };
+    renderAt('/dashboard', SIGNED_IN);
+    expect(await screen.findByText('Hub page')).toBeInTheDocument();
+  });
+
+  test('with circlesEnabled on, /spaces/expenses is the Expenses space', async () => {
+    mockSpaces = { loading: false, circlesOn: true, ids: ['expenses'] };
+    renderAt('/spaces/expenses', SIGNED_IN);
+    expect(await screen.findByText('ExpensesSpace page')).toBeInTheDocument();
+    expect(screen.getByTestId('bottom-nav')).toBeInTheDocument();
+  });
+
+  test('an enabled space opens its page; a switched-off or unknown space goes to the Hub', async () => {
+    mockSpaces = { loading: false, circlesOn: true, ids: ['expenses', 'events'] };
+    renderAt('/spaces/events', SIGNED_IN);
+    expect(await screen.findByText('Events space page')).toBeInTheDocument();
+  });
+
+  test.each(['/spaces/loans', '/spaces/nope'])('%s redirects to the Hub when not enabled', async (path) => {
+    mockSpaces = { loading: false, circlesOn: true, ids: ['expenses', 'events'] };
+    renderAt(path, SIGNED_IN);
+    expect(await screen.findByText('Hub page')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/dashboard');
+  });
+
+  test('while flags load, Home shows a spinner rather than guessing', async () => {
+    mockSpaces = { loading: true, circlesOn: false, ids: ['expenses'] };
+    renderAt('/dashboard', SIGNED_IN);
+    expect(await screen.findByRole('status', { name: 'Loading' })).toBeInTheDocument();
+    expect(screen.queryByText('Dashboard page')).not.toBeInTheDocument();
   });
 });
